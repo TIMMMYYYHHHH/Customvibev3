@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Fredoka", cursive, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Custom premium soft pink pastel variables */
+  --color-brand-pink-soft: #ffeef1;
+  --color-brand-pink-light: #ffd3db;
+  --color-brand-pink: #ffb3c1;
+  --color-brand-pink-dark: #ff758f;
+  --color-brand-pastel-peach: #ffcad4;
+  --color-brand-pastel-yellow: #fff0f3;
+  --color-brand-pastel-mint: #d8f3dc;
+  --color-brand-pastel-blue: #e8f0fe;
+  --color-brand-cream: #faf5f5;
+  --color-brand-charcoal: #2d3142;
+}
+
+/* Custom Utilities for Aesthetic Flare */
+
+.magnet-gloss {
+  position: relative;
+  overflow: hidden;
+}
+
+.magnet-gloss::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -200%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transition: all 0.8s ease;
+  pointer-events: none;
+}
+
+.magnet-gloss:hover::after {
+  left: 100%;
+}
+
+.fridge-reflection {
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%, rgba(0,0,0,0.03) 100%);
+}
+
+/* Custom scrollbar for pastel elegance */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-brand-pink-soft);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-pink-light);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-pink);
+}
+
+/* Polaroids effect */
+.polaroid-border {
+  border: 10px solid #ffffff;
+  border-bottom: 24px solid #ffffff;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+}
+
+.polaroid-shimmer {
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.7), 0 4px 12px rgba(0,0,0,0.04);
+}
+
+/* Soft grid pattern for the background or fridge */
+.grid-bg {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 117, 143, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 117, 143, 0.03) 1px, transparent 1px);
+}
+
+.fridge-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 1px, transparent 1px);
+}
+
+body {
+  background-color: #fbf8f8;
+  color: var(--color-brand-charcoal);
+  font-family: var(--font-sans);
+}
+
