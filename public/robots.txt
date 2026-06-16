@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://customvibe.co.za/sitemap.xml

@@ -22,7 +22,7 @@ export default function Testimonials() {
               key={slot}
               className="border-2 border-dashed border-brand-pink/40 rounded-[28px] p-6 flex flex-col items-center gap-3 text-center bg-[#fff8f9]"
             >
-              <Quote className="w-6 h-6 text-brand-pink-dark" />
+              <Quote className="w-6 h-6 text-brand-pink-text" />
               <div className="flex gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star key={star} className="w-3.5 h-3.5 text-brand-pink/40" />

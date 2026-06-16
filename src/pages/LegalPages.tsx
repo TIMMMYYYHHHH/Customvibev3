@@ -10,7 +10,7 @@ interface LegalPageProps {
 function LegalPageLayout({ title, children }: LegalPageProps) {
   return (
     <div className="max-w-2xl mx-auto px-4 md:px-12 py-16">
-      <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-pink-dark hover:underline mb-8">
+      <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-pink-text hover:underline mb-8">
         <ArrowLeft className="w-4 h-4" /> Back to home
       </Link>
       <div className="bg-white rounded-[32px] border border-brand-pink-soft shadow-xs p-8 sm:p-10 space-y-4">

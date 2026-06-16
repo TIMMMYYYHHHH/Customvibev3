@@ -60,8 +60,8 @@ export default function QuoteSummaryModal({
 
         {/* Modal Header */}
         <div className="flex items-center gap-4 mb-6 text-left">
-          <div className="w-12 h-12 rounded-2xl bg-[#ffeef1] text-brand-pink-dark flex items-center justify-center shadow-3xs">
-            <ShoppingBag className="w-5 h-5 text-brand-pink-dark" />
+          <div className="w-12 h-12 rounded-2xl bg-[#ffeef1] text-brand-pink-text flex items-center justify-center shadow-3xs">
+            <ShoppingBag className="w-5 h-5 text-brand-pink-text" />
           </div>
           <div>
             <h3 className="font-display font-bold text-2xl text-brand-charcoal">
@@ -80,7 +80,7 @@ export default function QuoteSummaryModal({
               <p className="text-sm font-semibold text-zinc-500">Your design studio list is currently empty.</p>
               <button
                 onClick={onClose}
-                className="py-2 px-5 rounded-xl bg-brand-pink-soft text-brand-pink-dark text-xs font-bold hover:bg-brand-pink/30 cursor-pointer"
+                className="py-2 px-5 rounded-xl bg-brand-pink-soft text-brand-pink-text text-xs font-bold hover:bg-brand-pink/30 cursor-pointer"
                 id="summary-modal-add-designs-btn"
               >
                 Go Add Magnet Cards
@@ -88,7 +88,7 @@ export default function QuoteSummaryModal({
             </div>
           ) : (
             <div className="space-y-5">
-              <span className="block text-[10px] font-mono font-bold text-brand-pink-dark uppercase tracking-widest text-left">
+              <span className="block text-[10px] font-mono font-bold text-brand-pink-text uppercase tracking-widest text-left">
                 Basket Items List ({designs.length})
               </span>
 
@@ -129,7 +129,7 @@ export default function QuoteSummaryModal({
                         <span className="block text-xs font-mono font-bold text-brand-charcoal">
                           {design.quantity} unit{design.quantity !== 1 ? 's' : ''}
                         </span>
-                        <span className="block text-[9.5px] text-brand-pink-dark font-bold uppercase tracking-wider">
+                        <span className="block text-[9.5px] text-brand-pink-text font-bold uppercase tracking-wider">
                           R{design.quantity * 50} base
                         </span>
                       </div>
@@ -141,7 +141,7 @@ export default function QuoteSummaryModal({
               {/* Pricing Breakdown Card */}
               <div className="bg-[#ffeef1]/60 border border-brand-pink/30 p-5 rounded-[28px] space-y-4">
                 <div className="flex items-center justify-between border-b border-brand-pink/20 pb-3">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-pink-dark">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-pink-text">
                     Production Estimate Breakdown
                   </span>
                   <span className="bg-white p-1 px-3 rounded-full text-[10px] font-bold text-brand-charcoal border border-brand-pink/20">
@@ -220,7 +220,7 @@ export default function QuoteSummaryModal({
               id="summary-modal-proceed-btn"
             >
               Confirm and Proceed
-              <ArrowRight className="w-4 h-4 text-brand-pink-dark" />
+              <ArrowRight className="w-4 h-4 text-brand-pink-text" />
             </button>
           </div>
         </div>

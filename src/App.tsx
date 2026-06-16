@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, Heart, MapPin, Camera, Layers } from 'lucide-react';
@@ -7,15 +7,30 @@ import { MagnetDesign } from './types';
 // Importing CustomVibe sub-components
 import Header from './components/Header';
 import Hero from './components/Hero';
-import MagnetDesigner from './components/MagnetDesigner';
 import PricingCalculator from './components/PricingCalculator';
-import QuoteForm from './components/QuoteForm';
-import QuoteSummaryModal from './components/QuoteSummaryModal';
 import Testimonials from './components/Testimonials';
+import FAQ from './components/FAQ';
 import WhatsAppButton from './components/WhatsAppButton';
-import { PrivacyPage, TermsPage, ContactPage } from './pages/LegalPages';
-import NotFoundPage from './pages/NotFoundPage';
 import { usePageMeta } from './hooks/usePageMeta';
+
+// Route-level code splitting: these are only needed once a user navigates
+// to that specific route (or opens the modal), so keep them out of the
+// initial bundle that loads on first paint.
+const MagnetDesigner = lazy(() => import('./components/MagnetDesigner'));
+const QuoteForm = lazy(() => import('./components/QuoteForm'));
+const QuoteSummaryModal = lazy(() => import('./components/QuoteSummaryModal'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const PrivacyPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.TermsPage })));
+const ContactPage = lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.ContactPage })));
+
+function RouteLoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="w-8 h-8 rounded-full border-2 border-brand-pink/40 border-t-brand-pink-text animate-spin" />
+    </div>
+  );
+}
 
 const PAGE_META: Record<string, { title: string; description: string }> = {
   '/': {
@@ -175,6 +190,7 @@ export default function App() {
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <div key={location.pathname}>
+            <Suspense fallback={<RouteLoadingFallback />}>
             <Routes location={location}>
               <Route
                 path="/"
@@ -195,6 +211,7 @@ export default function App() {
                       onStartDesigning={() => navigate('/design')}
                     />
                     <Testimonials />
+                    <FAQ />
                   </motion.div>
                 }
               />
@@ -247,6 +264,7 @@ export default function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            </Suspense>
           </div>
         </AnimatePresence>
       </main>
@@ -254,15 +272,17 @@ export default function App() {
       {/* Quote Summary Modal Overlay */}
       <AnimatePresence>
         {showSummaryModal && (
-          <QuoteSummaryModal
-            isOpen={showSummaryModal}
-            onClose={() => setShowSummaryModal(false)}
-            designs={designs}
-            onProceed={() => {
-              setShowSummaryModal(false);
-              navigate('/quote');
-            }}
-          />
+          <Suspense fallback={null}>
+            <QuoteSummaryModal
+              isOpen={showSummaryModal}
+              onClose={() => setShowSummaryModal(false)}
+              designs={designs}
+              onProceed={() => {
+                setShowSummaryModal(false);
+                navigate('/quote');
+              }}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
 
@@ -274,7 +294,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 text-center md:text-left">
 
           <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <Camera className="w-6 h-6 text-brand-pink-dark mx-auto md:mx-0" />
+            <Camera className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
             <h4 className="font-display font-bold text-sm text-brand-charcoal">High-Definition Print Gloss</h4>
             <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
               Waterproof protection coating layer safeguards details against greasy hands, humidity, or sunlight bleach.
@@ -282,7 +302,7 @@ export default function App() {
           </div>
 
           <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <Layers className="w-6 h-6 text-brand-pink-dark mx-auto md:mx-0" />
+            <Layers className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
             <h4 className="font-display font-bold text-sm text-brand-charcoal">Strong Flexible Rubber Grip</h4>
             <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
               Sturdy 3mm backing won&apos;t slip or slide when slamming refrigerator doors. Clings beautifully.
@@ -290,7 +310,7 @@ export default function App() {
           </div>
 
           <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <Heart className="w-6 h-6 text-brand-pink-dark mx-auto md:mx-0" />
+            <Heart className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
             <h4 className="font-display font-bold text-sm text-brand-charcoal">Local Craftsmanship</h4>
             <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
               Made with pride by custom design lovers. Hand-inspected and carefully trimmed square templates.
@@ -298,7 +318,7 @@ export default function App() {
           </div>
 
           <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <MapPin className="w-6 h-6 text-brand-pink-dark mx-auto md:mx-0" />
+            <MapPin className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
             <h4 className="font-display font-bold text-sm text-brand-charcoal">Nationwide Delivery</h4>
             <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
               Secure priority postage directly to your residential doorstep. Custom quotes dispatched instantly.

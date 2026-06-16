@@ -50,7 +50,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-pink/20 text-brand-charcoal text-xs font-bold border border-brand-pink/40 uppercase tracking-widest"
           >
-            <Sparkles className="w-3.5 h-3.5 text-brand-pink-dark animate-spin" style={{ animationDuration: '5s' }} />
+            <Sparkles className="w-3.5 h-3.5 text-brand-pink-text animate-spin" style={{ animationDuration: '5s' }} />
             Premium Soft-Pink Custom prints
           </motion.div>
 
@@ -62,14 +62,14 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
           >
             <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-semibold text-brand-charcoal leading-[1.08] tracking-tight">
               Aesthetic <br />
-              <span className="relative inline-block text-brand-pink-dark">
+              <span className="relative inline-block text-brand-pink-text">
                 Fridge Art
                 <span className="absolute bottom-2 left-0 w-full h-4 bg-brand-pink-light/60 -z-10 rounded-xs" />
               </span> <br className="hidden sm:inline" />
               For Your Tribe.
             </h1>
             <p className="text-brand-charcoal/80 max-w-lg mx-auto lg:mx-0 text-sm sm:text-base md:text-lg leading-relaxed font-semibold">
-              Transform your digital photo grids, squad memories, and beloved pets into gorgeous high-gloss physical square magnets. Crafted by hand, finished in premium soft lamination, and delivered straight to you.
+              Transform your digital photo grids, squad memories, and beloved pets into gorgeous high-gloss physical square magnets. Handcrafted in Durban, KwaZulu-Natal, and delivered nationwide across South Africa.
             </p>
           </motion.div>
 
@@ -82,10 +82,10 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
           >
             <div className="bg-white/95 backdrop-blur-md p-4 rounded-[24px] border border-brand-pink-soft flex items-center gap-3 shadow-[0_4px_20px_rgba(255,182,193,0.12)]">
               <div className="w-9 h-9 rounded-xl bg-[#ffeef1] flex items-center justify-center shrink-0">
-                <Heart className="w-4.5 h-4.5 text-brand-pink-dark" />
+                <Heart className="w-4.5 h-4.5 text-brand-pink-text" />
               </div>
               <div className="text-left">
-                <p className="text-[11px] text-brand-pink-dark font-bold uppercase tracking-wider">Premium Gloss Finish Wrap</p>
+                <p className="text-[11px] text-brand-pink-text font-bold uppercase tracking-wider">Premium Gloss Finish Wrap</p>
                 <p className="text-xs font-mono font-bold text-brand-charcoal/70">Beautiful glossy protective layer</p>
               </div>
             </div>
@@ -114,7 +114,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
               className="w-full sm:w-auto px-10 py-4.5 rounded-[22px] bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal font-display font-medium text-base shadow-[0_6px_25px_rgba(45,49,66,0.15)] hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
             >
               Enter Design Studio
-              <ArrowRight className="w-5 h-5 text-brand-pink-dark" />
+              <ArrowRight className="w-5 h-5 text-brand-pink-text" />
             </button>
             <button
               id="hero-explore-presets-btn"
@@ -155,7 +155,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
         {/* Right Side: Re-created Ultra Tactical Fridge Door Interactive Exhibit */}
         <div className="col-span-1 lg:col-span-5 flex flex-col items-center justify-center relative" id="hero-interactive-showcase-column">
           
-          <p className="text-xs text-brand-pink-dark font-display font-semibold uppercase tracking-widest mb-4 bg-[#ffeef1] px-4 py-1.5 rounded-full shadow-3xs">
+          <p className="text-xs text-brand-pink-text font-display font-semibold uppercase tracking-widest mb-4 bg-[#ffeef1] px-4 py-1.5 rounded-full shadow-3xs">
             Interactive Fridge Door Mockup
           </p>
 
@@ -234,7 +234,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
                         className="absolute inset-x-2 bottom-2 py-2 bg-brand-charcoal text-white rounded-none opacity-0 group-hover/magnet:opacity-100 transition-opacity duration-200 hover:bg-brand-pink hover:text-brand-charcoal text-[9px] font-bold text-center shadow-xs flex items-center justify-center gap-1"
                         title="Customize inside the Design Studio"
                       >
-                        <ImageIcon className="w-3 h-3 text-brand-pink-dark" /> Customise
+                        <ImageIcon className="w-3 h-3 text-brand-pink-text" /> Customise
                       </div>
                     </div>
                   </motion.div>
@@ -245,7 +245,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
             {/* Bottom Panel message */}
             <div className="text-center pb-1 z-10 select-none">
               <span className="font-sans text-[10px] text-brand-charcoal/50 font-bold">
-                Hover to tilt or tap <span className="text-brand-pink-dark">Customise</span> to personalize!
+                Hover to tilt or tap <span className="text-brand-pink-text">Customise</span> to personalize!
               </span>
             </div>
 

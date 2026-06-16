@@ -62,7 +62,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
       
       {/* Redesigned Pricing Intro */}
       <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-        <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-pink-dark bg-brand-pink/20 px-3 py-1 rounded-full">
+        <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-pink-text bg-brand-pink/20 px-3 py-1 rounded-full">
           Simplicity first
         </span>
         <h2 className="font-display text-4xl md:text-5xl font-semibold text-brand-charcoal">
@@ -93,7 +93,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
               )}
 
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-pink-dark">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-pink-text">
                   {pack.qty}
                 </span>
                 <h3 className="font-display font-semibold text-2xl text-brand-charcoal mt-1">
@@ -114,7 +114,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
                 <ul className="space-y-4">
                   {pack.features.map((feat) => (
                     <li key={feat} className="flex items-start gap-3 text-xs text-brand-charcoal/80 font-semibold text-left">
-                      <Check className="w-4 h-4 text-brand-pink-dark flex-none mt-0.5" />
+                      <Check className="w-4 h-4 text-brand-pink-text flex-none mt-0.5" />
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -142,7 +142,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
         {/* Left Control Panel */}
         <div className="lg:col-span-7 space-y-8">
           <div className="space-y-3 text-left">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-pink-dark flex items-center gap-2">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-pink-text flex items-center gap-2">
               <Percent className="w-4 h-4" /> Live Budget Calculator
             </span>
             <h3 className="font-display font-bold text-3xl text-brand-charcoal">
@@ -195,7 +195,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
         <div className="lg:col-span-5 bg-[#ffeef1]/60 p-8 rounded-[32px] border border-brand-pink/30 space-y-6 text-center lg:text-left">
           
           <div className="space-y-1">
-            <span className="text-[10px] font-mono font-bold text-brand-pink-dark uppercase tracking-widest block">
+            <span className="text-[10px] font-mono font-bold text-brand-pink-text uppercase tracking-widest block">
               Estimated Total Cost
             </span>
             <span className="text-5xl font-mono font-bold text-brand-charcoal block">
@@ -212,7 +212,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
             </div>
             <div>
               <span className="text-[10px] text-zinc-500 block font-bold uppercase tracking-wider">Assigned Tier</span>
-              <span className="text-xs font-display font-semibold text-brand-pink-dark truncate block mt-0.5">
+              <span className="text-xs font-display font-semibold text-brand-pink-text truncate block mt-0.5">
                 {calcResult.tier}
               </span>
             </div>

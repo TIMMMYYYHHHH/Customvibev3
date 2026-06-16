@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { MagnetDesign } from '../types';
 import { calculateBundlePrice } from '../utils/pricing';
+import { fileToCompressedDataUrl } from '../utils/image';
 
 interface MagnetDesignerProps {
   designs: MagnetDesign[];
@@ -169,14 +170,11 @@ export default function MagnetDesigner({
 
     Array.from(files).forEach((fileRaw, index) => {
       const file = fileRaw as File;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64Url = event.target?.result as string;
-        
+      fileToCompressedDataUrl(file).then((compressedUrl) => {
         const newDesign: MagnetDesign = {
           id: `design-${Date.now()}-${index}`,
           name: file.name.substring(0, file.name.lastIndexOf('.')) || 'Photo Magnet',
-          imageUrl: base64Url,
+          imageUrl: compressedUrl,
           quantity: 1,
           sizeCm: 7.5,
           cropZoom: 100,
@@ -187,8 +185,9 @@ export default function MagnetDesigner({
         if (index === 0) {
           setActiveDesignId(newDesign.id);
         }
-      };
-      reader.readAsDataURL(file);
+      }).catch((err) => {
+        console.error('Failed to process uploaded image', err);
+      });
     });
   };
 
@@ -233,7 +232,7 @@ export default function MagnetDesigner({
 
         {/* Dynamic Cart Progress Badge */}
         <div className="bg-[#ffeef1]/80 backdrop-blur-md p-5 rounded-[24px] border border-brand-pink/35 flex flex-col items-center sm:items-end shadow-xs">
-          <p className="text-[10px] uppercase font-bold text-brand-pink-dark tracking-widest font-mono">My Design Basket</p>
+          <p className="text-[10px] uppercase font-bold text-brand-pink-text tracking-widest font-mono">My Design Basket</p>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-2xl font-display font-semibold text-brand-charcoal">
               {totalQty} Magnet{totalQty !== 1 ? 's' : ''}
@@ -244,7 +243,7 @@ export default function MagnetDesigner({
             </span>
           </div>
           {totalQty < 6 ? (
-            <span className="text-[11px] text-brand-pink-dark font-semibold mt-2 text-center sm:text-right">
+            <span className="text-[11px] text-brand-pink-text font-semibold mt-2 text-center sm:text-right">
               Assemble <span className="font-bold">{6 - totalQty} more</span> to reach the 6-pack rate (R250)!
             </span>
           ) : totalQty < 10 ? (
@@ -269,9 +268,9 @@ export default function MagnetDesigner({
             
             <div className="w-full flex items-center justify-between pointer-events-none mb-3">
               <div className="flex items-center gap-1.5 text-[10px] font-mono text-brand-charcoal/50 bg-neutral-50 border border-zinc-150 p-1 px-3 rounded-full font-bold">
-                <Move className="w-3.5 h-3.5 text-brand-pink-dark" /> Interactive Canvas
+                <Move className="w-3.5 h-3.5 text-brand-pink-text" /> Interactive Canvas
               </div>
-              <span className="font-display text-xs font-bold text-brand-pink-dark tracking-wide bg-[#ffeef1] p-1.5 px-4 rounded-full">
+              <span className="font-display text-xs font-bold text-brand-pink-text tracking-wide bg-[#ffeef1] p-1.5 px-4 rounded-full">
                 7.5 cm Perfect Square
               </span>
             </div>
@@ -391,7 +390,7 @@ export default function MagnetDesigner({
                 className="w-8.5 h-8.5 rounded-lg bg-white border border-brand-pink-soft hover:bg-brand-pink/20 flex items-center justify-center disabled:opacity-45 cursor-pointer transition-colors"
                 title="Zoom Out"
               >
-                <ZoomOut className="w-4.5 h-4.5 text-brand-pink-dark" />
+                <ZoomOut className="w-4.5 h-4.5 text-brand-pink-text" />
               </button>
 
               <div className="flex-1 text-center select-none">
@@ -400,7 +399,7 @@ export default function MagnetDesigner({
                   <button 
                     type="button" 
                     onClick={handleZoomReset} 
-                    className="text-[9px] font-bold text-brand-pink-dark hover:underline cursor-pointer tracking-wider uppercase"
+                    className="text-[9px] font-bold text-brand-pink-text hover:underline cursor-pointer tracking-wider uppercase"
                   >
                     Auto Center
                   </button>
@@ -414,7 +413,7 @@ export default function MagnetDesigner({
                 className="w-8.5 h-8.5 rounded-lg bg-white border border-brand-pink-soft hover:bg-brand-pink/20 flex items-center justify-center disabled:opacity-45 cursor-pointer transition-colors"
                 title="Zoom In"
               >
-                <ZoomIn className="w-4.5 h-4.5 text-brand-pink-dark" />
+                <ZoomIn className="w-4.5 h-4.5 text-brand-pink-text" />
               </button>
             </div>
 
@@ -430,7 +429,7 @@ export default function MagnetDesigner({
             </p>
             <div className="space-y-3.5 pt-1">
               <div className="flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-brand-pink-dark shrink-0 mt-0.5" />
+                <Sparkles className="w-4 h-4 text-brand-pink-text shrink-0 mt-0.5" />
                 <div>
                   <p className="text-[12px] font-bold text-brand-charcoal leading-tight">300DPI Fine-Art Paper lamination</p>
                   <p className="text-[10.5px] text-zinc-500 leading-normal font-semibold">
@@ -479,7 +478,7 @@ export default function MagnetDesigner({
               onClick={() => fileInputRef.current?.click()}
               className="border-2 border-dashed border-brand-pink/55 hover:border-brand-pink bg-[#ffeef1]/30 hover:bg-[#ffeef1]/50 p-6 rounded-[24px] text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-1.5 group select-none"
             >
-              <Upload className="w-8 h-8 text-brand-pink-dark mb-1 group-hover:scale-110 transition-transform" />
+              <Upload className="w-8 h-8 text-brand-pink-text mb-1 group-hover:scale-110 transition-transform" />
               <p className="text-xs font-bold text-brand-charcoal uppercase tracking-wide">Upload Custom Image Files</p>
               <p className="text-[10.5px] text-zinc-450 font-bold">Import multiple pictures at the same time directly</p>
             </div>
@@ -531,7 +530,7 @@ export default function MagnetDesigner({
                               quantity: Math.max(1, design.quantity - 1)
                             });
                           }}
-                          className="w-5.5 h-5.5 rounded-lg hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
+                          className="w-9 h-9 sm:w-5.5 sm:h-5.5 rounded-lg hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
                         >
                           -
                         </button>
@@ -545,7 +544,7 @@ export default function MagnetDesigner({
                               quantity: design.quantity + 1
                             });
                           }}
-                          className="w-5.5 h-5.5 rounded-lg hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
+                          className="w-9 h-9 sm:w-5.5 sm:h-5.5 rounded-lg hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
                         >
                           +
                         </button>
@@ -581,7 +580,7 @@ export default function MagnetDesigner({
             <button 
               id="btn-add-new-design"
               onClick={handleCreateEmptyDraft}
-              className="w-full py-3 rounded-2xl border-2 border-dashed border-brand-pink-dark/45 hover:border-brand-pink-dark text-brand-pink-dark text-xs font-semibold hover:bg-brand-pink-soft/22 transition-all flex items-center justify-center gap-2 cursor-pointer font-display"
+              className="w-full py-3 rounded-2xl border-2 border-dashed border-brand-pink-dark/45 hover:border-brand-pink-dark text-brand-pink-text text-xs font-semibold hover:bg-brand-pink-soft/22 transition-all flex items-center justify-center gap-2 cursor-pointer font-display"
             >
               <Plus className="w-4 h-4" /> Add Placeholder Magnet Card
             </button>
@@ -589,7 +588,7 @@ export default function MagnetDesigner({
             <hr className="border-brand-pink-soft/80" />
 
             <div className="pt-1 text-[11px] text-zinc-500 flex items-start gap-2 font-semibold text-left">
-              <HelpCircle className="w-4 h-4 text-brand-pink-dark flex-none mt-0.5 animate-pulse" />
+              <HelpCircle className="w-4 h-4 text-brand-pink-text flex-none mt-0.5 animate-pulse" />
               <p>
                 Each custom template stores its distinct cropping parameters. Reposition photos seamlessly with pointer grabs on mobile or mice.
               </p>
@@ -623,7 +622,7 @@ export default function MagnetDesigner({
               className="w-full py-4 px-4 rounded-2xl bg-brand-charcoal hover:bg-brand-pink hover:text-brand-charcoal text-white font-display font-medium text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2.5"
             >
               Get Custom Quote & Checkout
-              <ChevronRight className="w-4.5 h-4.5 text-brand-pink-dark" />
+              <ChevronRight className="w-4.5 h-4.5 text-brand-pink-text" />
             </button>
           </div>
 

@@ -8,6 +8,15 @@
     <link rel="canonical" href="https://customvibe.co.za/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <!-- Preconnect + early stylesheet fetch for Google Fonts, instead of a
+         render-blocking @import inside index.css -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="CustomVibe" />
@@ -58,6 +67,31 @@
         }
       }
     </script>
+    <!--
+      TODO: Analytics — currently disabled (no real tracking IDs set).
+      Both services are free and take a few minutes to set up:
+
+      1. Microsoft Clarity (session recordings + heatmaps):
+         - Sign up at https://clarity.microsoft.com, create a project for
+           customvibe.co.za, and copy the project ID it gives you.
+         - Replace YOUR_CLARITY_PROJECT_ID below and uncomment the script.
+
+      2. Cloudflare Web Analytics (privacy-friendly pageview/traffic stats):
+         - In the Cloudflare dashboard: Analytics & Logs > Web Analytics >
+           Add a site, then copy the auto-generated <script> snippet's token.
+         - Replace YOUR_CLOUDFLARE_BEACON_TOKEN below and uncomment the script.
+
+      <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+          t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+          y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "YOUR_CLARITY_PROJECT_ID");
+      </script>
+
+      <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+        data-cf-beacon='{"token": "YOUR_CLOUDFLARE_BEACON_TOKEN"}'></script>
+    -->
   </head>
   <body>
     <div id="root"></div>

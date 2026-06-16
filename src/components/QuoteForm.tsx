@@ -166,7 +166,7 @@ export default function QuoteForm({
 
             {designs.length === 0 ? (
               <div className="bg-white rounded-[40px] p-12 border border-brand-pink-soft text-center space-y-5 shadow-xs">
-                <ShoppingBag className="w-14 h-14 text-brand-pink-dark mx-auto animate-pulse" />
+                <ShoppingBag className="w-14 h-14 text-brand-pink-text mx-auto animate-pulse" />
                 <p className="font-display font-bold text-xl text-brand-charcoal">No designed magnets in your basket yet</p>
                 <p className="text-xs text-zinc-500 max-w-sm mx-auto font-semibold leading-relaxed">
                   Head over to the Design Studio, upload your custom layouts, and position them nicely to watch your pricing adjust.
@@ -218,7 +218,7 @@ export default function QuoteForm({
                           <div>
                             <h4 className="font-display font-bold text-xs text-brand-charcoal truncate max-w-[170px] sm:max-w-xs">{design.name}</h4>
                             <div className="flex flex-wrap items-center gap-2 mt-1 text-[10px] text-zinc-400 font-mono font-bold">
-                              <span className="bg-[#ffeef1] text-brand-pink-dark px-2 py-0.5 rounded-md">7.5 cm Perfect Square</span>
+                              <span className="bg-[#ffeef1] text-brand-pink-text px-2 py-0.5 rounded-md">7.5 cm Perfect Square</span>
                               <span>Full Bleed Gloss</span>
                             </div>
                           </div>
@@ -266,7 +266,7 @@ export default function QuoteForm({
                 <div className="bg-[#ffeef1]/60 rounded-[40px] p-8 border border-brand-pink/30 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                   
                   <div className="space-y-1 text-left">
-                    <p className="text-[10px] font-mono font-bold text-brand-pink-dark uppercase tracking-widest">Calculated Price Estimate</p>
+                    <p className="text-[10px] font-mono font-bold text-brand-pink-text uppercase tracking-widest">Calculated Price Estimate</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl font-mono font-bold text-brand-charcoal">R{Math.round(totalPrice)}</span>
                       <span className="text-xs text-[#2c181b]/50 font-bold">•</span>
@@ -319,7 +319,7 @@ export default function QuoteForm({
                 onClick={() => setStep('review')}
                 className="p-1 px-3.5 py-2 rounded-xl bg-white border border-brand-pink-soft text-xs text-brand-charcoal font-bold cursor-pointer hover:bg-neutral-50 flex items-center gap-1 shrink-0"
               >
-                <ArrowLeft className="w-4 h-4 text-brand-pink-dark" /> Back
+                <ArrowLeft className="w-4 h-4 text-brand-pink-text" /> Back
               </button>
               <div>
                 <h2 className="font-display font-bold text-3xl text-brand-charcoal">Delivery Coordinates</h2>
@@ -331,13 +331,14 @@ export default function QuoteForm({
               
               {/* Contact Full Name */}
               <div className="space-y-1.5 md:col-span-2 text-left">
-                <label className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
-                  <User className="w-4 h-4 text-brand-pink-dark" /> Full Name
+                <label htmlFor="quote-client-name" className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
+                  <User className="w-4 h-4 text-brand-pink-text" /> Full Name
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  id="quote-client-name"
+                  type="text"
                   required
-                  value={clientName} 
+                  value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-brand-pink-soft text-xs text-brand-charcoal focus:outline bg-[#faf5f5]/30 focus:bg-white font-semibold"
                   placeholder="e.g. Sipho Nkosi"
@@ -346,13 +347,14 @@ export default function QuoteForm({
 
               {/* Email address */}
               <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
-                  <Mail className="w-4 h-4 text-brand-pink-dark" /> Email Address
+                <label htmlFor="quote-client-email" className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
+                  <Mail className="w-4 h-4 text-brand-pink-text" /> Email Address
                 </label>
-                <input 
-                  type="email" 
+                <input
+                  id="quote-client-email"
+                  type="email"
                   required
-                  value={clientEmail} 
+                  value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-brand-pink-soft text-xs text-brand-charcoal focus:outline bg-[#faf5f5]/30 focus:bg-white font-semibold"
                   placeholder="e.g. sipho@gmail.com"
@@ -361,13 +363,14 @@ export default function QuoteForm({
 
               {/* Phone number */}
               <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
-                  <Phone className="w-4 h-4 text-brand-pink-dark" /> Phone Number
+                <label htmlFor="quote-client-phone" className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
+                  <Phone className="w-4 h-4 text-brand-pink-text" /> Phone Number
                 </label>
-                <input 
-                  type="tel" 
+                <input
+                  id="quote-client-phone"
+                  type="tel"
                   required
-                  value={clientPhone} 
+                  value={clientPhone}
                   onChange={(e) => setClientPhone(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-brand-pink-soft text-xs text-brand-charcoal focus:outline bg-[#faf5f5]/30 focus:bg-white font-semibold"
                   placeholder="e.g. +27 82 123 4567"
@@ -376,13 +379,14 @@ export default function QuoteForm({
 
               {/* Delivery Address */}
               <div className="space-y-1.5 md:col-span-2 text-left">
-                <label className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
-                  <MapPin className="w-4 h-4 text-brand-pink-dark" /> Delivery Address
+                <label htmlFor="quote-address" className="block text-xs font-bold text-brand-charcoal flex items-center gap-1.5 font-display">
+                  <MapPin className="w-4 h-4 text-brand-pink-text" /> Delivery Address
                 </label>
-                <textarea 
+                <textarea
+                  id="quote-address"
                   required
                   rows={2}
-                  value={address} 
+                  value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-brand-pink-soft text-xs text-brand-charcoal focus:outline bg-[#faf5f5]/30 focus:bg-white resize-none font-semibold"
                   placeholder="e.g. 102 Florida Road, Morningside, Durban, 4001"
@@ -391,12 +395,13 @@ export default function QuoteForm({
 
               {/* Additional Comments */}
               <div className="space-y-1.5 md:col-span-2 text-left">
-                <label className="block text-xs font-bold text-brand-charcoal font-display">
+                <label htmlFor="quote-remarks" className="block text-xs font-bold text-brand-charcoal font-display">
                   Special Assembly Instructions (Optional)
                 </label>
-                <textarea 
+                <textarea
+                  id="quote-remarks"
                   rows={2}
-                  value={remarks} 
+                  value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-brand-pink-soft text-xs text-brand-charcoal focus:outline bg-[#faf5f5]/30 focus:bg-white resize-none font-semibold"
                   placeholder="e.g. Giftwrapping details, border spacing comments..."
@@ -447,13 +452,13 @@ export default function QuoteForm({
                   Quote Request Dispatched!
                 </h3>
                 <p className="text-xs md:text-sm text-zinc-500 max-w-md mx-auto font-semibold leading-relaxed">
-                  Excellent work, <strong className="text-brand-pink-dark font-display">{submittedQuote.customerName}</strong>! Our design squad has received the high resolution vector templates.
+                  Excellent work, <strong className="text-brand-pink-text font-display">{submittedQuote.customerName}</strong>! Our design squad has received the high resolution vector templates.
                 </p>
               </div>
 
               {/* Estimate summary box */}
               <div className="bg-[#ffeef1]/60 p-5 rounded-2xl max-w-md mx-auto border border-brand-pink/30 text-center">
-                <p className="text-[10px] font-mono font-bold text-brand-pink-dark uppercase tracking-widest">Estimated Value Summary</p>
+                <p className="text-[10px] font-mono font-bold text-brand-pink-text uppercase tracking-widest">Estimated Value Summary</p>
                 <p className="text-3xl font-mono font-bold text-brand-charcoal mt-1">R{submittedQuote.totalPriceEstimate}</p>
                 <p className="text-[9.5px] text-zinc-500 mt-1 font-bold uppercase tracking-wider">{submittedQuote.designs.reduce((sum, d) => sum + d.quantity, 0)} Hand-finished Magnets</p>
               </div>
@@ -481,14 +486,14 @@ export default function QuoteForm({
                     onClick={copyReceiptToClipboard}
                     className="p-3.5 py-2 px-5 rounded-xl bg-[#ffeef1] hover:bg-brand-pink-light text-brand-charcoal font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-3xs"
                   >
-                    <Clipboard className="w-4 h-4 text-brand-pink-dark" />
+                    <Clipboard className="w-4 h-4 text-brand-pink-text" />
                     <span>{submitCopied ? "Copied!" : "Copy Order Summary"}</span>
                   </button>
                   <button
                     onClick={() => window.print()}
                     className="p-3.5 py-2 px-5 rounded-xl bg-[#ffeef1] hover:bg-brand-pink-light text-brand-charcoal font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-3xs"
                   >
-                    <Printer className="w-4 h-4 text-brand-pink-dark" />
+                    <Printer className="w-4 h-4 text-brand-pink-text" />
                     <span>Print Receipt</span>
                   </button>
                 </div>

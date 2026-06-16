@@ -37,7 +37,7 @@ export default function Header({ designs, onRequestQuote }: HeaderProps) {
           </div>
           <div className="text-left select-none">
             <span className="font-display text-2xl font-bold tracking-tight text-brand-charcoal">
-              Custom<span className="text-brand-pink-dark">Vibe</span>
+              Custom<span className="text-brand-pink-text">Vibe</span>
             </span>
             <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest leading-none mt-0.5">
               Premium Fridge Prints
@@ -74,7 +74,7 @@ export default function Header({ designs, onRequestQuote }: HeaderProps) {
                   />
                 )}
                 <span className="relative z-10 flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-brand-pink-dark" />
+                  <Icon className="w-4 h-4 text-brand-pink-text" />
                   {tab.label}
                 </span>
               </Link>
