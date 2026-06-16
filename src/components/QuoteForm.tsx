@@ -1,10 +1,26 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ShoppingBag, Mail, User, Phone, MapPin, Sparkles, CheckCircle2, 
-  ChevronRight, Clipboard, Trash2, Printer, Compass, ArrowLeft
+import {
+  ShoppingBag, Mail, User, Phone, MapPin, Sparkles, CheckCircle2,
+  ChevronRight, Clipboard, Trash2, Printer, Compass, ArrowLeft, CreditCard
 } from 'lucide-react';
 import { MagnetDesign, QuoteRequest } from '../types';
+
+// TODO: create a free Formspree (or EmailJS) account and replace this with
+// your real form endpoint so quote submissions are actually delivered to you.
+const QUOTE_FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+
+async function deliverQuoteRequest(quote: QuoteRequest): Promise<void> {
+  try {
+    await fetch(QUOTE_FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(quote),
+    });
+  } catch (error) {
+    console.error('Quote submission delivery failed, check QUOTE_FORM_ENDPOINT setup', error);
+  }
+}
 
 interface QuoteFormProps {
   designs: MagnetDesign[];
@@ -35,6 +51,7 @@ export default function QuoteForm({
   // Submit Quote results tracker
   const [submittedQuote, setSubmittedQuote] = useState<QuoteRequest | null>(null);
   const [validationError, setValidationError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const calculateTotalQty = () => {
     return designs.reduce((sum, d) => sum + d.quantity, 0);
@@ -55,7 +72,7 @@ export default function QuoteForm({
   const totalPrice = calculateTotalPrice(totalQty);
   const potentialSavings = (totalQty * 50) - totalPrice;
 
-  const handleSubmitQuote = (e: React.FormEvent) => {
+  const handleSubmitQuote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientName || !clientEmail || !clientPhone || !address) {
       setValidationError("Please fill in all standard contact and delivery details.");
@@ -73,6 +90,10 @@ export default function QuoteForm({
       totalPriceEstimate: Math.round(totalPrice),
       status: 'submitted'
     };
+
+    setIsSubmitting(true);
+    await deliverQuoteRequest(compiledQuote);
+    setIsSubmitting(false);
 
     setSubmittedQuote(compiledQuote);
     setStep('success');
@@ -195,10 +216,11 @@ export default function QuoteForm({
                         {/* Summary details */}
                         <div className="flex items-center gap-4 text-left">
                           <div className="relative w-16 h-16 rounded-none border border-brand-pink-soft overflow-hidden shrink-0">
-                            <img 
-                              src={design.imageUrl} 
-                              alt="Summary item detail"
+                            <img
+                              src={design.imageUrl}
+                              alt={design.name}
                               referrerPolicy="no-referrer"
+                              loading="lazy"
                               className="w-full h-full object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-white/10" />
@@ -405,9 +427,10 @@ export default function QuoteForm({
                 <button
                   id="quote-final-submit-btn"
                   type="submit"
-                  className="w-full md:w-auto px-8 py-3.5 rounded-xl bg-brand-charcoal hover:bg-brand-pink hover:text-brand-charcoal text-white font-display font-semibold transition-colors text-xs shadow-md cursor-pointer text-center"
+                  disabled={isSubmitting}
+                  className="w-full md:w-auto px-8 py-3.5 rounded-xl bg-brand-charcoal hover:bg-brand-pink hover:text-brand-charcoal text-white font-display font-semibold transition-colors text-xs shadow-md cursor-pointer text-center disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Submit Quote Request
+                  {isSubmitting ? 'Sending...' : 'Submit Quote Request'}
                 </button>
               </div>
 
@@ -480,6 +503,34 @@ export default function QuoteForm({
                     <span>Print Receipt</span>
                   </button>
                 </div>
+              </div>
+
+              {/* Checkout / payment scaffold. Wire up a real payment provider (e.g. PayFast or Yoco) before launch. */}
+              <div className="border-t border-brand-pink-soft/80 pt-6 space-y-3">
+                <p className="text-xs font-bold text-brand-charcoal text-center font-display uppercase tracking-wider">
+                  Pay Now (Coming Soon)
+                </p>
+                <div className="flex items-center justify-center gap-3 flex-wrap">
+                  <button
+                    disabled
+                    title="Connect a payment provider to enable this"
+                    className="p-3.5 py-2 px-5 rounded-xl bg-zinc-100 text-zinc-400 font-bold text-xs flex items-center gap-2 cursor-not-allowed shadow-3xs"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>Pay with PayFast</span>
+                  </button>
+                  <button
+                    disabled
+                    title="Connect a payment provider to enable this"
+                    className="p-3.5 py-2 px-5 rounded-xl bg-zinc-100 text-zinc-400 font-bold text-xs flex items-center gap-2 cursor-not-allowed shadow-3xs"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>Pay with Yoco</span>
+                  </button>
+                </div>
+                <p className="text-[10px] text-zinc-400 text-center font-semibold">
+                  For now we will follow up by email or WhatsApp to arrange payment.
+                </p>
               </div>
 
               {/* Start new project button */}

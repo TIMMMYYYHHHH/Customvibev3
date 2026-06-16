@@ -1,20 +1,24 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# CustomVibe
 
-# Run and deploy your AI Studio app
+CustomVibe is a custom photo fridge magnet designer and quoting app for a Durban, South Africa based magnet business. Customers upload photos, design 7.5cm square magnets in an interactive studio, and submit a quote request for production.
 
-This contains everything you need to run your app locally.
+## Tech Stack
 
-View your app in AI Studio: https://ai.studio/apps/4e3a7914-9adb-4821-97cb-e7d8f6c303e6
+- React 19 + TypeScript
+- Vite 6
+- Tailwind CSS 4
+- Motion (animations)
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Copy `.env.example` to `.env.local` and set `GEMINI_API_KEY` to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Build
+
+`npm run build` produces a production build in `dist/`.

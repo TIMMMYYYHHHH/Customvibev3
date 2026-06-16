@@ -511,7 +511,14 @@ export default function MagnetDesigner({
                     }`}
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="relative w-13 h-13 rounded-none overflow-hidden border border-brand-pink-soft shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${design.imageUrl})` }}>
+                      <div className="relative w-13 h-13 rounded-none overflow-hidden border border-brand-pink-soft shrink-0 bg-zinc-100">
+                        <img
+                          src={design.imageUrl}
+                          alt={design.name}
+                          referrerPolicy="no-referrer"
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
                         <div className="absolute inset-0 bg-brand-charcoal/5" />
                       </div>
                       <div className="min-w-0 text-left">

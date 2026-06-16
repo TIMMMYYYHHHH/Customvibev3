@@ -115,10 +115,11 @@ export default function QuoteSummaryModal({
                       <div className="flex items-center gap-3.5 min-w-0">
                         {/* Thumbnail */}
                         <div className="relative w-12 h-12 rounded-none overflow-hidden border border-brand-pink-soft/80 shrink-0 bg-zinc-100">
-                          <img 
-                            src={design.imageUrl} 
+                          <img
+                            src={design.imageUrl}
                             alt={design.name}
                             referrerPolicy="no-referrer"
+                            loading="lazy"
                             className="w-full h-full object-cover"
                           />
                         </div>

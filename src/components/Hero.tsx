@@ -85,7 +85,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
                 <Heart className="w-4.5 h-4.5 text-brand-pink-dark" />
               </div>
               <div className="text-left">
-                <p className="text-[11px] text-brand-pink-dark font-bold uppercase tracking-wider">Premium Soft Matte Wrap</p>
+                <p className="text-[11px] text-brand-pink-dark font-bold uppercase tracking-wider">Premium Gloss Finish Wrap</p>
                 <p className="text-xs font-mono font-bold text-brand-charcoal/70">Beautiful glossy protective layer</p>
               </div>
             </div>

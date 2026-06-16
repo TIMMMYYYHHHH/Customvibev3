@@ -10,12 +10,16 @@ import MagnetDesigner from './components/MagnetDesigner';
 import PricingCalculator from './components/PricingCalculator';
 import QuoteForm from './components/QuoteForm';
 import QuoteSummaryModal from './components/QuoteSummaryModal';
+import Testimonials from './components/Testimonials';
+import WhatsAppButton from './components/WhatsAppButton';
+import InfoModal, { InfoModalType } from './components/InfoModal';
 
 export default function App() {
   const [activeTab, setActiveTab ] = useState<string>('hero');
   const [designs, setDesigns] = useState<MagnetDesign[]>([]);
   const [activeDesignId, setActiveDesignId] = useState<string | null>(null);
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
+  const [activeInfoModal, setActiveInfoModal] = useState<InfoModalType | null>(null);
 
   // Initialize with a default lovely custom welcome design so the studio is alive instantly!
   useEffect(() => {
@@ -141,9 +145,10 @@ export default function App() {
                   onLoadPreset={handleLoadPreset}
                 />
                 <hr className="border-brand-pink-soft max-w-7xl mx-auto opacity-40" />
-                <PricingCalculator 
-                  onStartDesigning={() => setActiveTab('designer')} 
+                <PricingCalculator
+                  onStartDesigning={() => setActiveTab('designer')}
                 />
+                <Testimonials />
               </div>
             )}
 
@@ -187,6 +192,16 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+      {/* Privacy / Terms / Contact Info Modal */}
+      <AnimatePresence>
+        {activeInfoModal && (
+          <InfoModal type={activeInfoModal} onClose={() => setActiveInfoModal(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* Floating WhatsApp click-to-chat button */}
+      <WhatsAppButton />
 
       {/* Brand Value Proposition footer cards */}
       <section className="bg-white border-t border-brand-pink-soft py-10 px-4 md:px-8">
@@ -285,11 +300,11 @@ export default function App() {
         <div className="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between text-[10px] text-white/40 gap-4">
           <p>&copy; {new Date().getFullYear()} CustomVibe Magnets Ltd. All rights reserved.</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-brand-pink transition-colors">Privacy Policy</a>
+            <button onClick={() => setActiveInfoModal('privacy')} className="hover:text-brand-pink transition-colors cursor-pointer">Privacy Policy</button>
             <span>•</span>
-            <a href="#" className="hover:text-brand-pink transition-colors">Terms of Craft</a>
+            <button onClick={() => setActiveInfoModal('terms')} className="hover:text-brand-pink transition-colors cursor-pointer">Terms of Craft</button>
             <span>•</span>
-            <a href="#" className="hover:text-brand-pink transition-colors">Local Tribe Coordinates</a>
+            <button onClick={() => setActiveInfoModal('contact')} className="hover:text-brand-pink transition-colors cursor-pointer">Local Tribe Coordinates</button>
           </div>
         </div>
       </footer>
