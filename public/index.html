@@ -7,167 +7,165 @@
     <meta name="description" content="Design your own photo fridge magnets with CustomVibe. Upload photos, build a custom grid, and get a quote for premium 7.5cm gloss-finish magnets, handmade and delivered across South Africa." />
     <link rel="canonical" href="https://customvibe.co.za/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
-    />
-
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" />
     <link rel="stylesheet" href="/css/tokens.css" />
     <link rel="stylesheet" href="/css/base.css" />
     <link rel="stylesheet" href="/css/pages/home.css" />
-
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="CustomVibe" />
-    <meta property="og:title" content="CustomVibe | Custom Photo Fridge Magnets in Durban, South Africa" />
-    <meta property="og:description" content="Design your own photo fridge magnets with CustomVibe. Upload photos, build a custom grid, and get a quote for premium 7.5cm gloss-finish magnets, handmade and delivered across South Africa." />
+    <meta property="og:title" content="CustomVibe | Custom Photo Fridge Magnets" />
+    <meta property="og:description" content="Design your own photo fridge magnets with CustomVibe. Premium 7.5cm gloss-finish magnets, handmade in Durban." />
     <meta property="og:image" content="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1200&auto=format&fit=crop&q=80" />
     <meta property="og:url" content="https://customvibe.co.za/" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CustomVibe | Custom Photo Fridge Magnets in Durban, South Africa" />
-    <meta name="twitter:description" content="Design your own photo fridge magnets with CustomVibe. Upload photos, build a custom grid, and get a quote for premium 7.5cm gloss-finish magnets." />
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1200&auto=format&fit=crop&q=80" />
-
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "CustomVibe",
-        "description": "Custom photo fridge magnet designer and printing studio based in Durban, South Africa.",
-        "email": "hello@customvibe.co.za",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Durban",
-          "addressCountry": "ZA"
-        },
-        "areaServed": "ZA",
-        "priceRange": "R40-R50"
-      }
-    </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": "Custom Photo Fridge Magnet",
-        "description": "A 7.5cm square custom photo fridge magnet with gloss finish and 3mm rubber backing, printed from your own photo.",
-        "brand": { "@type": "Brand", "name": "CustomVibe" },
-        "offers": {
-          "@type": "Offer",
-          "priceCurrency": "ZAR",
-          "price": "40",
-          "availability": "https://schema.org/InStock"
-        }
-      }
-    </script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"CustomVibe","description":"Custom photo fridge magnet designer and printing studio based in Durban, South Africa.","email":"hello@customvibe.co.za","address":{"@type":"PostalAddress","addressLocality":"Durban","addressCountry":"ZA"},"areaServed":"ZA","priceRange":"R40-R50"}</script>
   </head>
   <body>
     <div data-partial="header" id="partial-header"></div>
 
     <main>
 
-      <!-- ============ HERO ============ -->
+      <!-- ============ HERO: full-screen, centered, floating magnets ============ -->
       <section class="hero">
-        <div class="hero-inner container">
+        <!-- Floating polaroid magnets (rendered by home.js into this stage) -->
+        <div class="hero-float-stage" id="simulated-fridge-magnet-stage"></div>
 
-          <!-- Left: copy -->
-          <div class="hero-copy animate-fadeIn">
-            <div class="hero-eyebrow">
-              <span id="hero-eyebrow-icon"></span>
-              Handcrafted in Durban, South Africa
-            </div>
+        <!-- Pink radial gradient blobs -->
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
 
-            <h1 class="hero-heading">
-              Your memories, <em>pressed</em> onto the fridge.
-            </h1>
-
-            <p class="hero-subtitle">
-              Transform your favourite photos into gorgeous 7.5cm gloss-finish square magnets.
-              Every one hand-finished and shipped right to your door across South Africa.
-            </p>
-
-            <div class="hero-ctas">
-              <a href="design.html" class="btn btn-primary">
-                Start Designing
-                <span id="hero-cta-arrow"></span>
-              </a>
-              <a href="#pricing-section" class="btn btn-outline">
-                View Pricing
-              </a>
-            </div>
-
-            <div class="hero-trust-row">
-              <span class="hero-trust-pill">
-                <span id="hero-trust-icon-1"></span>
-                7.5 cm square
-              </span>
-              <span class="hero-trust-divider"></span>
-              <span class="hero-trust-pill">
-                <span id="hero-trust-icon-2"></span>
-                High-gloss finish
-              </span>
-              <span class="hero-trust-divider"></span>
-              <span class="hero-trust-pill">From R40/magnet</span>
-            </div>
+        <!-- Centered content -->
+        <div class="hero-center animate-fadeIn">
+          <div class="hero-badge">
+            <span id="hero-badge-icon"></span>
+            Handcrafted in Durban, South Africa
           </div>
 
-          <!-- Right: visual -->
-          <div class="hero-visual">
-            <div class="hero-visual-blob"></div>
-            <div class="hero-stage-wrap">
-              <p class="hero-stage-label">Tap <em>Customise</em> to try it</p>
-              <div class="hero-stage" id="simulated-fridge-magnet-stage"></div>
-            </div>
-          </div>
+          <h1 class="hero-heading">
+            Memories you can <em>stick</em> to the fridge.
+          </h1>
 
+          <p class="hero-subtitle">
+            Turn your favourite photos into premium 7.5&nbsp;cm gloss-finish square magnets.
+            Each one hand-finished and shipped anywhere in South Africa.
+          </p>
+
+          <div class="hero-ctas">
+            <a href="design.html" class="btn btn-primary hero-cta-main">
+              Start Designing <span id="hero-cta-arrow"></span>
+            </a>
+            <a href="#pricing-section" class="btn btn-secondary">
+              See Pricing
+            </a>
+          </div>
+        </div>
+
+        <!-- Scroll cue -->
+        <div class="hero-scroll">
+          <span id="hero-scroll-icon"></span>
         </div>
       </section>
 
-      <!-- ============ HOW IT WORKS ============ -->
+      <!-- ============ STATS TICKER ============ -->
+      <div class="stats-strip">
+        <div class="stats-inner">
+          <div class="stat-item">
+            <span class="stat-value">7.5 cm</span>
+            <span class="stat-label">Perfect square</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">Gloss</span>
+            <span class="stat-label">Waterproof finish</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">3 mm</span>
+            <span class="stat-label">Heavy rubber backing</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">R40</span>
+            <span class="stat-label">Bulk price per magnet</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">
+              <span id="stat-shield-icon"></span>
+              Nationwide
+            </span>
+            <span class="stat-label">Delivery across SA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ HOW IT WORKS: alternating zigzag ============ -->
       <section class="how-section">
-        <div class="how-inner container">
-          <div class="how-intro">
-            <p class="how-label">How it works</p>
-            <h2>Three steps to fridge-ready memories.</h2>
+        <div class="container">
+          <div class="how-header text-center">
+            <p class="eyebrow" id="how-eyebrow-icon-wrap"><span id="how-eyebrow-icon"></span> How it works</p>
+            <h2 class="section-heading">As simple as 1, 2, 3.</h2>
           </div>
 
-          <div class="how-steps">
-            <div class="how-step">
+          <!-- Step 1: image right -->
+          <div class="how-step how-step--text-left">
+            <div class="how-step-content">
               <div class="how-step-num">01</div>
-              <div class="how-step-body">
-                <div class="how-step-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+              <h3>Upload your photo</h3>
+              <p>Any JPG, PNG, or HEIC — straight from your phone camera roll. Our studio automatically compresses large files so nothing slows down.</p>
+              <a href="design.html" class="how-step-link">Go to Design Studio <span id="how-step-arrow-1"></span></a>
+            </div>
+            <div class="how-step-visual how-step-visual--upload">
+              <div class="how-visual-card">
+                <div class="how-visual-icon"><span id="how-upload-icon"></span></div>
+                <p class="how-visual-label">Drop your photos here</p>
+                <div class="how-visual-files">
+                  <span>holiday.jpg</span>
+                  <span>puppy.png</span>
+                  <span>squad.heic</span>
                 </div>
-                <h3>Upload your photo</h3>
-                <p>Any JPG, PNG, or HEIC from your phone or camera. We handle the compression automatically.</p>
               </div>
             </div>
+          </div>
 
-            <div class="how-step-connector"></div>
-
-            <div class="how-step">
+          <!-- Step 2: image left -->
+          <div class="how-step how-step--text-right">
+            <div class="how-step-visual how-step-visual--design">
+              <div class="how-visual-card how-visual-card--pink">
+                <div class="how-visual-magnets">
+                  <div class="how-mini-magnet how-mini-magnet-1"></div>
+                  <div class="how-mini-magnet how-mini-magnet-2"></div>
+                  <div class="how-mini-magnet how-mini-magnet-3"></div>
+                </div>
+                <p class="how-visual-label">Crop · Zoom · Position</p>
+              </div>
+            </div>
+            <div class="how-step-content">
               <div class="how-step-num">02</div>
-              <div class="how-step-body">
-                <div class="how-step-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></svg>
-                </div>
-                <h3>Design in the studio</h3>
-                <p>Crop, zoom, and position each image. Bundle multiple photos for better bulk savings.</p>
-              </div>
+              <h3>Design in the studio</h3>
+              <p>Crop, zoom, and reposition each photo inside its own magnet frame. Add multiple photos to a bundle for bigger savings — each one can look completely different.</p>
             </div>
+          </div>
 
-            <div class="how-step-connector"></div>
-
-            <div class="how-step">
+          <!-- Step 3: image right -->
+          <div class="how-step how-step--text-left">
+            <div class="how-step-content">
               <div class="how-step-num">03</div>
-              <div class="how-step-body">
-                <div class="how-step-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              <h3>Delivered to your door</h3>
+              <p>We hand-print, finish, and package every order ourselves in Durban. Once ready, we ship nationwide via courier and send you a tracking update on WhatsApp.</p>
+            </div>
+            <div class="how-step-visual how-step-visual--deliver">
+              <div class="how-visual-card how-visual-card--dark">
+                <div class="how-visual-icon"><span id="how-deliver-icon"></span></div>
+                <p class="how-visual-label" style="color:rgba(255,255,255,0.8);">On its way to you ✦</p>
+                <div class="how-visual-track">
+                  <div class="how-track-dot how-track-dot--done"></div>
+                  <div class="how-track-line how-track-line--done"></div>
+                  <div class="how-track-dot how-track-dot--done"></div>
+                  <div class="how-track-line"></div>
+                  <div class="how-track-dot how-track-dot--active"></div>
                 </div>
-                <h3>Delivered to your door</h3>
-                <p>Hand-finished, wrapped, and shipped nationwide. We follow up by WhatsApp to confirm everything.</p>
               </div>
             </div>
           </div>
@@ -176,99 +174,106 @@
 
       <!-- ============ PRICING ============ -->
       <section id="pricing-section" class="pricing-section">
-        <div class="container section-md">
-          <div class="pricing-intro">
-            <p class="section-eyebrow">Simple &amp; honest</p>
-            <h2 class="section-heading">No hidden fees. No fine print.</h2>
-            <p class="section-subtext">
-              Design each magnet individually — every one uniquely yours. Bundle more to save more, down to R40 each for orders of 10+.
-            </p>
+        <div class="container">
+          <div class="pricing-header text-center">
+            <p class="eyebrow">Honest pricing</p>
+            <h2 class="section-heading">No hidden fees. Ever.</h2>
+            <p class="section-sub">Bundle more to pay less — right down to R40 per magnet for orders of 10+. Each magnet in your order can be a completely different photo.</p>
           </div>
 
           <div class="pricing-cards" id="packages-cards-grid"></div>
 
-          <div class="panel pricing-simulator" id="pricing-interactive-simulator">
-            <div class="pricing-simulator-controls">
-              <div>
-                <span class="label-xs" style="color: var(--color-terracotta); display:flex; align-items:center; gap:0.5rem;">
-                  <span id="pricing-percent-icon"></span> Budget Calculator
-                </span>
-                <h3 class="pricing-simulator-heading">See your bundle price live</h3>
-                <p class="section-subtext" style="margin:0;">Drag the slider to set your quantity and watch the tier pricing update in real time.</p>
-              </div>
-
-              <div class="pricing-slider-block">
-                <div class="pricing-slider-readout">
-                  <span class="label-xs" style="color: var(--color-brown-muted);">Bundle size:</span>
-                  <span class="pricing-slider-value" id="pricing-qty-display">6 Magnets</span>
-                </div>
-                <input type="range" min="1" max="50" value="6" id="pricing-qty-slider" class="pricing-slider" />
-                <div class="pricing-slider-ticks">
-                  <span>1</span>
-                  <span>10 (R40/u)</span>
-                  <span>20</span>
-                  <span>30</span>
-                  <span>40</span>
-                  <span>50</span>
-                </div>
-              </div>
-
-              <div id="pricing-bulk-note" class="pricing-bulk-note" hidden>
-                <span id="pricing-helping-icon"></span>
-                <p><strong>Large order?</strong> Orders above 15 units get priority studio processing. Just submit your quote and we'll coordinate everything from there.</p>
-              </div>
-            </div>
-
-            <div class="pricing-output">
-              <div>
-                <span class="label-xs" style="color: var(--color-brown-muted); display:block; margin-bottom:0.375rem;">Estimated total</span>
-                <span class="pricing-output-cost" id="pricing-output-cost">R250</span>
-              </div>
-              <div class="pricing-output-stats">
+          <!-- Live calculator -->
+          <div class="pricing-calc-wrap">
+            <div class="panel pricing-simulator" id="pricing-interactive-simulator">
+              <div class="pricing-simulator-controls">
                 <div>
-                  <span class="label-xs" style="display:block; color:var(--color-brown-muted);">Per magnet</span>
-                  <span class="pricing-output-stat-value" id="pricing-output-avg">R41.67</span>
+                  <span class="label-xs" style="color:var(--color-pink-text); display:flex; align-items:center; gap:0.5rem;">
+                    <span id="pricing-percent-icon"></span> Live Calculator
+                  </span>
+                  <h3 class="pricing-simulator-heading">What will my order cost?</h3>
+                  <p style="font-size:0.875rem; color:var(--color-charcoal-mid); line-height:1.65; margin-top:0.375rem;">Drag the slider to set your quantity and watch the price update instantly.</p>
                 </div>
-                <div>
-                  <span class="label-xs" style="display:block; color:var(--color-brown-muted);">Tier</span>
-                  <span class="pricing-tier-chip" id="pricing-output-tier">Tribe Half-Dozen Discount</span>
+
+                <div class="pricing-slider-block">
+                  <div class="pricing-slider-readout">
+                    <span class="label-xs" style="color:var(--color-muted);">Magnets in bundle:</span>
+                    <span class="pricing-slider-value" id="pricing-qty-display">6 Magnets</span>
+                  </div>
+                  <input type="range" min="1" max="50" value="6" id="pricing-qty-slider" class="pricing-slider" />
+                  <div class="pricing-slider-ticks">
+                    <span>1</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span>
+                  </div>
+                </div>
+
+                <div id="pricing-bulk-note" class="pricing-bulk-note" hidden>
+                  <span id="pricing-helping-icon"></span>
+                  <p><strong>Large order?</strong> Orders above 15 units get priority studio processing. Just submit your quote and we coordinate everything from there.</p>
                 </div>
               </div>
-              <div id="pricing-savings-block"></div>
-              <a href="design.html" class="btn btn-primary" style="width:100%; margin-top:0.5rem;" id="pricing-design-now-btn">Design 6 Magnets Now &rarr;</a>
+
+              <div class="pricing-output">
+                <div class="pricing-output-total">
+                  <span class="label-xs" style="color:var(--color-muted); display:block; margin-bottom:0.5rem;">Estimated total</span>
+                  <span class="pricing-output-cost" id="pricing-output-cost">R250</span>
+                </div>
+                <div class="pricing-output-stats">
+                  <div>
+                    <span class="label-xs" style="color:var(--color-muted); display:block;">Per magnet</span>
+                    <span class="pricing-output-stat-value" id="pricing-output-avg">R41.67</span>
+                  </div>
+                  <div>
+                    <span class="label-xs" style="color:var(--color-muted); display:block;">Tier</span>
+                    <span class="pricing-tier-chip" id="pricing-output-tier">Half-Dozen</span>
+                  </div>
+                </div>
+                <div id="pricing-savings-block"></div>
+                <a href="design.html" class="btn btn-primary" style="width:100%; margin-top:0.5rem;" id="pricing-design-now-btn">Design 6 Magnets Now &rarr;</a>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ============ TESTIMONIALS ============ -->
-      <section class="testimonials-section" id="testimonials-section">
-        <div class="container section-md">
-          <div class="section-intro text-center">
-            <p class="section-eyebrow">What people say</p>
-            <h2 class="section-heading">What Your Tribe Will Say</h2>
-            <p class="section-subtext">
-              Real reviews build real trust. Swap these placeholders for your own once orders start coming in.
-            </p>
+      <!-- ============ TESTIMONIAL: single editorial quote ============ -->
+      <section class="testimonial-section">
+        <div class="container">
+          <div class="testimonial-eyebrow">
+            <span id="testimonial-quote-icon"></span>
+            <p class="eyebrow">What people say</p>
           </div>
-
+          <!-- Home.js renders testimonials into this grid — styled as editorial quotes -->
           <div class="testimonial-grid" id="testimonial-grid"></div>
         </div>
       </section>
 
+      <!-- ============ CTA BAND ============ -->
+      <section class="cta-band">
+        <div class="container cta-band-inner">
+          <div class="cta-band-copy">
+            <h2>Ready to stick your memories on the fridge?</h2>
+            <p>Upload a photo, set your quantity, and request a quote — the whole thing takes under two minutes.</p>
+          </div>
+          <div class="cta-band-actions">
+            <a href="design.html" class="btn btn-outline cta-band-btn">
+              Open Design Studio <span id="cta-band-arrow"></span>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <!-- ============ FAQ ============ -->
-      <section class="faq-section" id="faq-section">
-        <div class="container section-md" style="max-width: 52rem;">
-          <div class="section-intro text-center">
-            <p class="section-eyebrow">Questions</p>
-            <h2 class="section-heading">Frequently Asked</h2>
+      <section class="faq-section">
+        <div class="container section-md" style="max-width:52rem;">
+          <div class="faq-header text-center">
+            <p class="eyebrow">Questions</p>
+            <h2 class="section-heading">Frequently asked</h2>
           </div>
 
           <div class="faq-list" id="faq-list"></div>
 
-          <div class="faq-cta">
-            <p>Still have questions?</p>
-            <a href="contact.html" class="btn btn-outline">Get in Touch</a>
+          <div class="faq-footer">
+            <p>Still have questions? <a href="contact.html" class="faq-contact-link">Drop us a message</a></p>
           </div>
         </div>
       </section>

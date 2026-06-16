@@ -1,56 +1,51 @@
-/* Design tokens — Warm & Cosy redesign.
-   All --color-brand-* aliases are kept so design.css / quote.css / base.css
-   pick up the new palette without sweeping file changes. */
-
+/* Design tokens — soft pink redesign */
 :root {
   /* Fonts */
   --font-sans:    "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-heading: "DM Serif Display", Georgia, "Times New Roman", serif;
   --font-mono:    "JetBrains Mono", monospace;
 
-  /* Warm palette */
-  --color-cream:           #FDF8F0;
-  --color-linen:           #F5EFE3;
-  --color-parchment:       #EDE4D3;
-  --color-terracotta:      #B85C3A;
-  --color-terracotta-dark: #9A4B2E;
-  --color-terracotta-soft: rgba(184, 92, 58, 0.10);
-  --color-terracotta-light:#F2CEC0;
-  --color-sage:            #7A9E7E;
-  --color-sage-soft:       rgba(122, 158, 126, 0.15);
-  --color-apricot:         #D4956A;
-  --color-brown-deep:      #2C1F14;
-  --color-brown-mid:       #5C4030;
-  --color-brown-muted:     #9B8070;
-  --color-border:          rgba(176, 142, 110, 0.22);
-  --color-border-mid:      rgba(176, 142, 110, 0.38);
+  /* Pink palette */
+  --color-pink-bg:     #FFF5F8;
+  --color-pink-soft:   #FFEEF1;
+  --color-pink-light:  #FFD3DB;
+  --color-pink:        #FFB3C1;
+  --color-pink-mid:    #FF9EB5;
+  --color-pink-dark:   #FF758F;
+  --color-pink-deep:   #E8547A;
+  --color-pink-text:   #C2486B;
+  --color-charcoal:    #2D3142;
+  --color-charcoal-mid:#4A4E6A;
+  --color-muted:       #71717A;
+  --color-border:      rgba(255, 179, 193, 0.35);
+  --color-border-mid:  rgba(255, 179, 193, 0.55);
 
-  /* Brand aliases — keeps existing CSS classes working */
-  --color-brand-pink-soft:   rgba(184, 92, 58, 0.10);
-  --color-brand-pink-light:  #F2CEC0;
-  --color-brand-pink:        #B85C3A;
-  --color-brand-pink-dark:   #9A4B2E;
-  --color-brand-pink-text:   #B85C3A;
-  --color-brand-pastel-peach:#EECFBF;
-  --color-brand-pastel-mint: #D8E8D4;
-  --color-brand-pastel-blue: #E8EDF5;
-  --color-brand-cream:       #FDF8F0;
-  --color-brand-charcoal:    #2C1F14;
+  /* Brand aliases (keeps existing design.css/quote.css working) */
+  --color-brand-pink-soft:   #FFEEF1;
+  --color-brand-pink-light:  #FFD3DB;
+  --color-brand-pink:        #FFB3C1;
+  --color-brand-pink-dark:   #FF758F;
+  --color-brand-pink-text:   #C2486B;
+  --color-brand-pastel-peach:#FFCAD4;
+  --color-brand-pastel-mint: #D8F3DC;
+  --color-brand-pastel-blue: #E8F0FE;
+  --color-brand-cream:       #FFF5F8;
+  --color-brand-charcoal:    #2D3142;
 
-  /* Radius — slightly tighter, more artisanal */
-  --radius-control: 8px;
-  --radius-card:    14px;
-  --radius-panel:   20px;
+  /* Radius */
+  --radius-control: 10px;
+  --radius-card:    18px;
+  --radius-panel:   26px;
 
-  /* Shadows — warm brown undertone, not pink */
-  --shadow-soft:     0 2px 12px rgba(44, 31, 20, 0.06);
-  --shadow-raised:   0 8px 24px rgba(44, 31, 20, 0.10);
-  --shadow-floating: 0 20px 48px rgba(44, 31, 20, 0.15);
+  /* Shadows */
+  --shadow-soft:     0 2px 14px rgba(255, 117, 143, 0.10);
+  --shadow-raised:   0 8px 28px rgba(255, 117, 143, 0.16);
+  --shadow-floating: 0 20px 52px rgba(45, 49, 66, 0.16);
 
-  /* Section spacing */
-  --spacing-section-sm: 3.5rem;
-  --spacing-section-md: 5.5rem;
-  --spacing-section-lg: 7rem;
+  /* Spacing */
+  --spacing-section-sm: 4rem;
+  --spacing-section-md: 6rem;
+  --spacing-section-lg: 8rem;
 
   --text-label-xs: 0.625rem;
 }
