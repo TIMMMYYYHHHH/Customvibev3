@@ -41,12 +41,11 @@ export default function QuoteSummaryModal({
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className="relative bg-white w-full max-w-2xl rounded-[40px] border border-brand-pink-soft shadow-xl p-6 sm:p-9 overflow-hidden z-10 text-left"
+        className="relative bg-white w-full max-w-2xl rounded-panel border border-brand-pink-soft shadow-floating p-6 sm:p-9 overflow-hidden z-10 text-left"
         id="summary-modal-content-card"
       >
-        {/* Decorative corner backgrounds */}
-        <div className="absolute top-0 right-0 w-36 h-36 bg-[#ffeef1]/60 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-36 h-36 bg-brand-pastel-mint/35 rounded-full blur-2xl pointer-events-none" />
+        {/* Subtle depth wash, replacing the previous purposeless decorative blur circles */}
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-pink-soft/40 via-transparent to-transparent pointer-events-none" />
 
         {/* Modal Close Button */}
         <button
@@ -60,11 +59,11 @@ export default function QuoteSummaryModal({
 
         {/* Modal Header */}
         <div className="flex items-center gap-4 mb-6 text-left">
-          <div className="w-12 h-12 rounded-2xl bg-[#ffeef1] text-brand-pink-text flex items-center justify-center shadow-3xs">
+          <div className="w-12 h-12 rounded-control bg-brand-pink-soft text-brand-pink-text flex items-center justify-center shadow-soft">
             <ShoppingBag className="w-5 h-5 text-brand-pink-text" />
           </div>
           <div>
-            <h3 className="font-display font-bold text-2xl text-brand-charcoal">
+            <h3 className="font-display font-bold text-xl md:text-2xl text-brand-charcoal">
               Design Summary
             </h3>
             <p className="text-xs text-zinc-500 font-semibold mt-0.5">
@@ -80,7 +79,7 @@ export default function QuoteSummaryModal({
               <p className="text-sm font-semibold text-zinc-500">Your design studio list is currently empty.</p>
               <button
                 onClick={onClose}
-                className="py-2 px-5 rounded-xl bg-brand-pink-soft text-brand-pink-text text-xs font-bold hover:bg-brand-pink/30 cursor-pointer"
+                className="py-2 px-5 rounded-control bg-brand-pink-soft text-brand-pink-text text-xs font-bold hover:bg-brand-pink/30 cursor-pointer"
                 id="summary-modal-add-designs-btn"
               >
                 Go Add Magnet Cards
@@ -88,7 +87,7 @@ export default function QuoteSummaryModal({
             </div>
           ) : (
             <div className="space-y-5">
-              <span className="block text-[10px] font-mono font-bold text-brand-pink-text uppercase tracking-widest text-left">
+              <span className="block text-label-xs font-mono font-bold text-brand-pink-text uppercase tracking-widest text-left">
                 Basket Items List ({designs.length})
               </span>
 
@@ -98,11 +97,11 @@ export default function QuoteSummaryModal({
                   return (
                     <div 
                       key={design.id}
-                      className="p-3.5 bg-[#faf5f5]/65 border border-brand-pink-soft/75 rounded-2xl flex items-center justify-between gap-4 text-left"
+                      className="p-3.5 bg-brand-cream/65 border border-brand-pink-soft/75 rounded-card flex items-center justify-between gap-4 text-left"
                       id={`summary-modal-item-${design.id}`}
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
-                        {/* Thumbnail */}
+                        {/* Thumbnail — rounded-none is intentional, a sharp "photo print" edge */}
                         <div className="relative w-12 h-12 rounded-none overflow-hidden border border-brand-pink-soft/80 shrink-0 bg-zinc-100">
                           <img
                             src={design.imageUrl}
@@ -115,10 +114,10 @@ export default function QuoteSummaryModal({
 
                         {/* Metadata */}
                         <div className="min-w-0">
-                          <h4 className="font-display font-medium text-xs text-brand-charcoal truncate">
+                          <h4 className="font-sans font-semibold text-xs text-brand-charcoal truncate">
                             {design.name || `Photo Magnet #${index + 1}`}
                           </h4>
-                          <p className="text-[10px] text-zinc-400 font-semibold mt-0.5 font-mono">
+                          <p className="text-label-xs text-zinc-400 font-semibold mt-0.5 font-mono">
                             7.5 x 7.5 cm size • Zoom: {design.cropZoom ?? 100}%
                           </p>
                         </div>
@@ -129,7 +128,7 @@ export default function QuoteSummaryModal({
                         <span className="block text-xs font-mono font-bold text-brand-charcoal">
                           {design.quantity} unit{design.quantity !== 1 ? 's' : ''}
                         </span>
-                        <span className="block text-[9.5px] text-brand-pink-text font-bold uppercase tracking-wider">
+                        <span className="block text-label-xs text-brand-pink-text font-bold uppercase tracking-wider">
                           R{design.quantity * 50} base
                         </span>
                       </div>
@@ -139,12 +138,12 @@ export default function QuoteSummaryModal({
               </div>
 
               {/* Pricing Breakdown Card */}
-              <div className="bg-[#ffeef1]/60 border border-brand-pink/30 p-5 rounded-[28px] space-y-4">
+              <div className="bg-brand-pink-soft/60 border border-brand-pink/30 p-5 rounded-card space-y-4">
                 <div className="flex items-center justify-between border-b border-brand-pink/20 pb-3">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-pink-text">
+                  <span className="text-label-xs font-mono font-bold uppercase tracking-widest text-brand-pink-text">
                     Production Estimate Breakdown
                   </span>
-                  <span className="bg-white p-1 px-3 rounded-full text-[10px] font-bold text-brand-charcoal border border-brand-pink/20">
+                  <span className="bg-white p-1 px-3 rounded-full text-label-xs font-bold text-brand-charcoal border border-brand-pink/20">
                     Gloss Finish Wrap
                   </span>
                 </div>
@@ -160,7 +159,7 @@ export default function QuoteSummaryModal({
                   </div>
 
                   {totalQty >= 6 && (
-                    <div className="flex items-center gap-1.5 text-emerald-700 font-bold text-[11px] pt-1.5 border-t border-brand-pink/20 mt-1">
+                    <div className="flex items-center gap-1.5 text-emerald-700 font-bold text-label-xs pt-1.5 border-t border-brand-pink/20 mt-1">
                       <Tag className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Applied bundle rates active!</span>
                     </div>
@@ -169,7 +168,7 @@ export default function QuoteSummaryModal({
 
                 <div className="border-t border-brand-pink/20 pt-4 mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-left">
                   <div>
-                    <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                    <span className="block text-label-xs text-zinc-500 font-bold uppercase tracking-wider">
                       Estimated Production Cost
                     </span>
                     <div className="flex items-baseline gap-2 mt-0.5">
@@ -177,14 +176,14 @@ export default function QuoteSummaryModal({
                         R{Math.round(totalPriceEst)}
                       </span>
                       {savings > 0 && (
-                        <span className="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-100 p-1 px-2.5 rounded-xl">
+                        <span className="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-100 p-1 px-2.5 rounded-control">
                           Saved R{Math.round(savings)}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <p className="text-[10px] text-zinc-400 max-w-[240px] text-left sm:text-right font-medium leading-relaxed">
+                  <p className="text-label-xs text-zinc-400 max-w-[240px] text-left sm:text-right font-medium leading-relaxed">
                     Courier fees are computed during shipping verification.
                   </p>
                 </div>
@@ -197,7 +196,7 @@ export default function QuoteSummaryModal({
         {/* Modal Footer Controls */}
         <div className="mt-8 pt-5 border-t border-brand-pink-soft/80 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-left hidden sm:block">
-            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold">
+            <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>Free Image Proportions Quality Check</span>
             </div>
@@ -206,7 +205,7 @@ export default function QuoteSummaryModal({
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-initial py-3 px-5 rounded-2xl border border-brand-pink-soft hover:bg-neutral-50 text-brand-charcoal text-xs font-bold transition-all cursor-pointer text-center"
+              className="flex-1 sm:flex-initial py-3 px-5 rounded-control border border-brand-pink-soft hover:bg-neutral-50 text-brand-charcoal text-xs font-bold transition-all cursor-pointer text-center"
               id="summary-modal-cancel-btn"
             >
               Keep Editing
@@ -216,7 +215,7 @@ export default function QuoteSummaryModal({
                 onProceed();
               }}
               disabled={designs.length === 0}
-              className="flex-1 sm:flex-initial py-3 px-6 rounded-2xl bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-40 cursor-pointer"
+              className="flex-1 sm:flex-initial py-3 px-6 rounded-control bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-floating disabled:opacity-40 cursor-pointer"
               id="summary-modal-proceed-btn"
             >
               Confirm and Proceed

@@ -7,11 +7,11 @@ const PLACEHOLDER_SLOTS = [1, 2, 3];
 
 export default function Testimonials() {
   return (
-    <section className="bg-white border-t border-brand-pink-soft py-14 px-4 md:px-8" id="testimonials-section">
+    <section className="bg-white border-t border-brand-pink-soft py-section-sm px-4 md:px-8" id="testimonials-section">
       <div className="max-w-7xl mx-auto text-center space-y-10">
         <div className="space-y-2">
-          <h2 className="font-display text-3xl font-semibold text-brand-charcoal">What Your Tribe Will Say</h2>
-          <p className="text-xs sm:text-sm text-brand-charcoal/60 font-semibold max-w-md mx-auto">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-brand-charcoal">What Your Tribe Will Say</h2>
+          <p className="text-xs text-brand-charcoal/60 font-semibold max-w-md mx-auto">
             Real customer reviews build trust faster than anything else. Swap these placeholder cards for your own once orders start coming in.
           </p>
         </div>
@@ -20,7 +20,7 @@ export default function Testimonials() {
           {PLACEHOLDER_SLOTS.map((slot) => (
             <div
               key={slot}
-              className="border-2 border-dashed border-brand-pink/40 rounded-[28px] p-6 flex flex-col items-center gap-3 text-center bg-[#fff8f9]"
+              className="border-2 border-dashed border-brand-pink/40 rounded-card p-6 flex flex-col items-center gap-3 text-center bg-[#fff8f9]"
             >
               <Quote className="w-6 h-6 text-brand-pink-text" />
               <div className="flex gap-0.5">
@@ -31,7 +31,7 @@ export default function Testimonials() {
               <p className="text-xs text-brand-charcoal/50 font-semibold">
                 Add a real customer quote here
               </p>
-              <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-bold">
+              <p className="text-label-xs text-zinc-400 uppercase tracking-wider font-bold">
                 Customer name, City
               </p>
             </div>

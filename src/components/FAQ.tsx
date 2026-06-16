@@ -47,11 +47,11 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="bg-[#faf6f6] py-14 px-4 md:px-8" id="faq-section">
+    <section className="bg-brand-cream py-section-sm px-4 md:px-8" id="faq-section">
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-2">
-          <h2 className="font-display text-3xl font-semibold text-brand-charcoal">Frequently Asked Questions</h2>
-          <p className="text-xs sm:text-sm text-brand-charcoal/60 font-semibold max-w-md mx-auto">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-brand-charcoal">Frequently Asked Questions</h2>
+          <p className="text-xs text-brand-charcoal/60 font-semibold max-w-md mx-auto">
             Everything you need to know before you order.
           </p>
         </div>
@@ -62,7 +62,7 @@ export default function FAQ() {
             return (
               <div
                 key={item.question}
-                className="bg-white rounded-2xl border border-brand-pink-soft overflow-hidden shadow-xs"
+                className="bg-white rounded-card border border-brand-pink-soft overflow-hidden shadow-soft"
               >
                 <button
                   type="button"
@@ -70,13 +70,13 @@ export default function FAQ() {
                   aria-expanded={isOpen}
                   className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left cursor-pointer"
                 >
-                  <span className="font-display font-semibold text-sm text-brand-charcoal">{item.question}</span>
+                  <span className="font-sans font-bold text-sm text-brand-charcoal">{item.question}</span>
                   <ChevronDown
                     className={`w-4 h-4 text-brand-pink-text shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                   />
                 </button>
                 {isOpen && (
-                  <p className="px-5 pb-4 text-xs sm:text-sm text-brand-charcoal/75 leading-relaxed font-semibold">
+                  <p className="px-5 pb-4 text-sm text-brand-charcoal/75 leading-relaxed font-semibold">
                     {item.answer}
                   </p>
                 )}

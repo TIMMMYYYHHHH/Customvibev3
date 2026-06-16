@@ -178,7 +178,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf6f6] flex flex-col justify-between selection:bg-brand-pastel-peach text-brand-charcoal">
+    <div className="min-h-screen bg-brand-cream flex flex-col justify-between selection:bg-brand-pastel-peach text-brand-charcoal">
 
       {/* Sticky CustomVibe Nav Header */}
       <Header
@@ -289,42 +289,47 @@ export default function App() {
       {/* Floating WhatsApp click-to-chat button */}
       <WhatsAppButton />
 
-      {/* Brand Value Proposition footer cards */}
-      <section className="bg-white border-t border-brand-pink-soft py-10 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 text-center md:text-left">
-
-          <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <Camera className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
-            <h4 className="font-display font-bold text-sm text-brand-charcoal">High-Definition Print Gloss</h4>
-            <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
-              Waterproof protection coating layer safeguards details against greasy hands, humidity, or sunlight bleach.
-            </p>
-          </div>
-
-          <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <Layers className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
-            <h4 className="font-display font-bold text-sm text-brand-charcoal">Strong Flexible Rubber Grip</h4>
-            <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
-              Sturdy 3mm backing won&apos;t slip or slide when slamming refrigerator doors. Clings beautifully.
-            </p>
-          </div>
-
-          <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <Heart className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
-            <h4 className="font-display font-bold text-sm text-brand-charcoal">Local Craftsmanship</h4>
-            <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
-              Made with pride by custom design lovers. Hand-inspected and carefully trimmed square templates.
-            </p>
-          </div>
-
-          <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
-            <MapPin className="w-6 h-6 text-brand-pink-text mx-auto md:mx-0" />
-            <h4 className="font-display font-bold text-sm text-brand-charcoal">Nationwide Delivery</h4>
-            <p className="text-[11.5px] text-brand-charcoal/70 leading-relaxed font-semibold">
-              Secure priority postage directly to your residential doorstep. Custom quotes dispatched instantly.
-            </p>
-          </div>
-
+      {/* Brand Value Proposition footer strip — flat, divider-separated, no card chrome */}
+      <section className="bg-white border-t border-brand-pink-soft py-section-sm px-4 md:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-brand-pink-soft text-center md:text-left">
+          {[
+            {
+              icon: Camera,
+              title: 'High-Definition Print Gloss',
+              desc: 'Waterproof protection coating layer safeguards details against greasy hands, humidity, or sunlight bleach.',
+            },
+            {
+              icon: Layers,
+              title: 'Strong Flexible Rubber Grip',
+              desc: "Sturdy 3mm backing won't slip or slide when slamming refrigerator doors. Clings beautifully.",
+            },
+            {
+              icon: Heart,
+              title: 'Local Craftsmanship',
+              desc: 'Made with pride by custom design lovers. Hand-inspected and carefully trimmed square templates.',
+            },
+            {
+              icon: MapPin,
+              title: 'Nationwide Delivery',
+              desc: 'Secure priority postage directly to your residential doorstep. Custom quotes dispatched instantly.',
+            },
+          ].map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.08 }}
+                className="flex-1 py-6 md:py-0 md:px-6 first:md:pl-0 last:md:pr-0 space-y-2"
+              >
+                <Icon className="w-5 h-5 text-brand-pink-text mx-auto md:mx-0" />
+                <h4 className="font-sans font-bold text-sm text-brand-charcoal">{item.title}</h4>
+                <p className="text-xs text-brand-charcoal/70 leading-relaxed font-semibold">{item.desc}</p>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
@@ -334,24 +339,24 @@ export default function App() {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-brand-pink text-brand-charcoal font-display font-bold text-md flex items-center justify-center rotate-[-4deg]">
+              <div className="w-8 h-8 rounded-control bg-brand-pink text-brand-charcoal font-display font-bold text-md flex items-center justify-center rotate-[-4deg]">
                 CV
               </div>
               <span className="font-display text-xl font-bold">
                 Custom<span className="text-brand-pink">Vibe</span>
               </span>
             </div>
-            <p className="text-xs text-brand-pastel-peach font-display font-medium">
+            <p className="text-xs text-brand-pastel-peach font-sans font-semibold">
               &quot;Find your tribe at Custom Vibe&quot;
             </p>
-            <p className="text-[11px] text-white/60 max-w-sm leading-relaxed">
+            <p className="text-xs text-white/60 max-w-sm leading-relaxed">
               We specialize in turning your beautiful phone photos, squad voyages, kitten moments, and aesthetic boards into durable grid-aligned matching fridge magnets.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
             <div className="space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Vibe navigation</span>
+              <span className="text-label-xs font-bold uppercase tracking-wider text-white/40 block">Vibe navigation</span>
               <ul className="space-y-1.5 text-xs text-white/80">
                 <li><Link to="/design" className="hover:text-brand-pink transition-colors">Designer Studio</Link></li>
                 <li><Link to="/#pricing-section" className="hover:text-brand-pink transition-colors">Pricing &amp; Bundles</Link></li>
@@ -359,18 +364,18 @@ export default function App() {
             </div>
 
             <div className="space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Contact Us</span>
+              <span className="text-label-xs font-bold uppercase tracking-wider text-white/40 block">Contact Us</span>
               <p className="text-xs text-white/80">hello@customvibe.co.za</p>
               <p className="text-xs text-white/80">+27 (0) 31 555-VIBE</p>
-              <p className="text-[10px] text-white/50 block">Durban, South Africa</p>
+              <p className="text-label-xs text-white/50 block">Durban, South Africa</p>
             </div>
 
             <div className="space-y-2 col-span-2 md:col-span-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 block">100% Secure Guarantee</span>
-              <div className="flex items-center gap-1 text-[11px] text-brand-pastel-mint">
+              <span className="text-label-xs font-bold uppercase tracking-wider text-white/40 block">100% Secure Guarantee</span>
+              <div className="flex items-center gap-1 text-xs text-brand-pastel-mint">
                 <ShieldCheck className="w-4 h-4 text-brand-pastel-mint" /> Secure SSL Checked
               </div>
-              <p className="text-[10px] text-white/55 leading-relaxed">
+              <p className="text-label-xs text-white/55 leading-relaxed">
                 Images of designed templates are handled in strict sandboxed compliance. Perfect privacy for personal memories.
               </p>
             </div>
@@ -378,7 +383,7 @@ export default function App() {
 
         </div>
 
-        <div className="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between text-[10px] text-white/40 gap-4">
+        <div className="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between text-label-xs text-white/40 gap-4">
           <p>&copy; {new Date().getFullYear()} CustomVibe Magnets Ltd. All rights reserved.</p>
           <div className="flex gap-4">
             <Link to="/privacy" className="hover:text-brand-pink transition-colors">Privacy Policy</Link>

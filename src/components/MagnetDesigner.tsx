@@ -217,24 +217,24 @@ export default function MagnetDesigner({
   const transY = (posY - 50) * 2;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-12 py-10" id="magnet-designer-root">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 py-section-md" id="magnet-designer-root">
       
       {/* Studio Header Row */}
       <div className="mb-10 text-center sm:text-left flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-brand-pink-soft pb-8">
         <div>
-          <h2 className="font-display text-4xl font-semibold text-brand-charcoal flex items-center justify-center sm:justify-start gap-3">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-brand-charcoal flex items-center justify-center sm:justify-start gap-3">
             Magnet Studio
           </h2>
-          <p className="text-xs sm:text-sm text-brand-charcoal/70 font-semibold mt-1">
+          <p className="text-xs text-brand-charcoal/70 font-semibold mt-1">
             Drag photo grids to position, zoom, duplicate, or adjust bulk printing orders.
           </p>
         </div>
 
         {/* Dynamic Cart Progress Badge */}
-        <div className="bg-[#ffeef1]/80 backdrop-blur-md p-5 rounded-[24px] border border-brand-pink/35 flex flex-col items-center sm:items-end shadow-xs">
-          <p className="text-[10px] uppercase font-bold text-brand-pink-text tracking-widest font-mono">My Design Basket</p>
+        <div className="bg-brand-pink-soft/80 backdrop-blur-md p-5 rounded-card border border-brand-pink/35 flex flex-col items-center sm:items-end shadow-soft">
+          <p className="text-label-xs uppercase font-bold text-brand-pink-text tracking-widest font-mono">My Design Basket</p>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-2xl font-display font-semibold text-brand-charcoal">
+            <span className="text-2xl font-sans font-bold text-brand-charcoal">
               {totalQty} Magnet{totalQty !== 1 ? 's' : ''}
             </span>
             <span className="text-[#ffb3c1] font-bold">•</span>
@@ -243,15 +243,15 @@ export default function MagnetDesigner({
             </span>
           </div>
           {totalQty < 6 ? (
-            <span className="text-[11px] text-brand-pink-text font-semibold mt-2 text-center sm:text-right">
+            <span className="text-label-xs text-brand-pink-text font-semibold mt-2 text-center sm:text-right">
               Assemble <span className="font-bold">{6 - totalQty} more</span> to reach the 6-pack rate (R250)!
             </span>
           ) : totalQty < 10 ? (
-            <span className="text-[11px] text-[#ff85a1] font-semibold mt-2 text-center sm:text-right">
+            <span className="text-label-xs text-[#ff85a1] font-semibold mt-2 text-center sm:text-right">
               Excellent! Add <span className="font-bold">{10 - totalQty} more</span> to qualify for maximum bulk rates (R40/u)!
             </span>
           ) : (
-            <span className="text-[11px] text-[#2c4e30] mt-2 font-semibold text-center sm:text-right flex items-center gap-1.5 bg-emerald-50 p-1.5 px-3 rounded-xl border border-emerald-100">
+            <span className="text-label-xs text-[#2c4e30] mt-2 font-semibold text-center sm:text-right flex items-center gap-1.5 bg-emerald-50 p-1.5 px-3 rounded-control border border-emerald-100">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Maximum bulk savings active (R40 each!)
             </span>
           )}
@@ -264,13 +264,13 @@ export default function MagnetDesigner({
         {/* ================= COLUMN 1: LEFT - THE LIVE 3D INTERACTIVE MAGNET CANVAS ================= */}
         <div className="col-span-1 lg:col-span-6 flex flex-col items-center gap-6 order-2 lg:order-1">
           
-          <div className="w-full bg-white rounded-[40px] p-8 border border-brand-pink-soft shadow-xs flex flex-col items-center justify-between min-h-[490px]">
-            
+          <div className="w-full bg-white rounded-panel p-8 border border-brand-pink-soft shadow-soft flex flex-col items-center justify-between min-h-[490px]">
+
             <div className="w-full flex items-center justify-between pointer-events-none mb-3">
-              <div className="flex items-center gap-1.5 text-[10px] font-mono text-brand-charcoal/50 bg-neutral-50 border border-zinc-150 p-1 px-3 rounded-full font-bold">
+              <div className="flex items-center gap-1.5 text-label-xs font-mono text-brand-charcoal/50 bg-neutral-50 border border-zinc-200 p-1 px-3 rounded-full font-bold">
                 <Move className="w-3.5 h-3.5 text-brand-pink-text" /> Interactive Canvas
               </div>
-              <span className="font-display text-xs font-bold text-brand-pink-text tracking-wide bg-[#ffeef1] p-1.5 px-4 rounded-full">
+              <span className="font-sans text-xs font-bold text-brand-pink-text tracking-wide bg-brand-pink-soft p-1.5 px-4 rounded-full">
                 7.5 cm Perfect Square
               </span>
             </div>
@@ -327,7 +327,7 @@ export default function MagnetDesigner({
                       {/* Guidance indicator overlay */}
                       {!isDragging && isHovered && (
                         <div className="absolute inset-x-0 bottom-3 px-3 pointer-events-none">
-                          <div className="bg-brand-charcoal/90 backdrop-blur-xs text-white text-[10px] font-bold py-1.5 px-3.5 rounded-xl mx-auto w-max flex items-center gap-1.5 shadow-md">
+                          <div className="bg-brand-charcoal/90 backdrop-blur-xs text-white text-label-xs font-bold py-1.5 px-3.5 rounded-control mx-auto w-max flex items-center gap-1.5 shadow-floating">
                             <Move className="w-3.5 h-3.5 text-brand-pink" /> Drag Image Layer
                           </div>
                         </div>
@@ -335,7 +335,7 @@ export default function MagnetDesigner({
 
                       {isDragging && (
                         <div className="absolute inset-0 bg-brand-charcoal/20 pointer-events-none flex items-center justify-center">
-                          <div className="bg-brand-charcoal/95 text-white font-mono text-[9px] p-2 rounded-xl flex items-center gap-2 shadow-lg font-bold tracking-widest uppercase">
+                          <div className="bg-brand-charcoal/95 text-white font-mono text-label-xs p-2 rounded-control flex items-center gap-2 shadow-floating font-bold tracking-widest uppercase">
                             <RefreshCw className="w-3.5 h-3.5 text-brand-pink animate-spin" /> Moving Frame
                           </div>
                         </div>
@@ -352,7 +352,7 @@ export default function MagnetDesigner({
                       )}
                       
                       {/* Premium Lamination sheen */}
-                      <div className="absolute inset-0 bg-radial-gradient from-transparent to-black/5 mix-blend-multiply opacity-15 pointer-events-none" />
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.05)_100%)] mix-blend-multiply opacity-15 pointer-events-none" />
                       <div className="absolute inset-0 fridge-reflection pointer-events-none" />
                     </div>
                   </div>
@@ -375,42 +375,42 @@ export default function MagnetDesigner({
 
                 </motion.div>
               ) : (
-                <div className="w-56 h-56 rounded-2xl border-2 border-dashed border-brand-pink/30 flex items-center justify-center bg-zinc-50">
+                <div className="w-56 h-56 rounded-card border-2 border-dashed border-brand-pink/30 flex items-center justify-center bg-zinc-50">
                   <p className="text-xs text-brand-charcoal/40 font-semibold">Select a design card to render live mockup</p>
                 </div>
               )}
             </div>
 
             {/* Focal Frame parameters widget */}
-            <div className="w-full max-w-[290px] bg-[#faf5f5] p-3.5 rounded-2xl border border-brand-pink-soft flex items-center justify-between gap-3 shadow-3xs">
-              <button 
-                type="button" 
+            <div className="w-full max-w-[290px] bg-brand-cream p-3.5 rounded-control border border-brand-pink-soft flex items-center justify-between gap-3 shadow-soft">
+              <button
+                type="button"
                 onClick={handleZoomOut}
                 disabled={imgZoom <= 50}
-                className="w-8.5 h-8.5 rounded-lg bg-white border border-brand-pink-soft hover:bg-brand-pink/20 flex items-center justify-center disabled:opacity-45 cursor-pointer transition-colors"
+                className="w-9 h-9 rounded-control bg-white border border-brand-pink-soft hover:bg-brand-pink/20 flex items-center justify-center disabled:opacity-45 cursor-pointer transition-colors"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-4.5 h-4.5 text-brand-pink-text" />
               </button>
 
               <div className="flex-1 text-center select-none">
-                <span className="text-[11px] font-mono font-bold text-brand-charcoal">Zoom Layer: {imgZoom}%</span>
+                <span className="text-xs font-mono font-bold text-brand-charcoal">Zoom Layer: {imgZoom}%</span>
                 <div className="flex gap-2 justify-center mt-0.5">
-                  <button 
-                    type="button" 
-                    onClick={handleZoomReset} 
-                    className="text-[9px] font-bold text-brand-pink-text hover:underline cursor-pointer tracking-wider uppercase"
+                  <button
+                    type="button"
+                    onClick={handleZoomReset}
+                    className="text-label-xs font-bold text-brand-pink-text hover:underline cursor-pointer tracking-wider uppercase"
                   >
                     Auto Center
                   </button>
                 </div>
               </div>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleZoomIn}
                 disabled={imgZoom >= 300}
-                className="w-8.5 h-8.5 rounded-lg bg-white border border-brand-pink-soft hover:bg-brand-pink/20 flex items-center justify-center disabled:opacity-45 cursor-pointer transition-colors"
+                className="w-9 h-9 rounded-control bg-white border border-brand-pink-soft hover:bg-brand-pink/20 flex items-center justify-center disabled:opacity-45 cursor-pointer transition-colors"
                 title="Zoom In"
               >
                 <ZoomIn className="w-4.5 h-4.5 text-brand-pink-text" />
@@ -420,8 +420,8 @@ export default function MagnetDesigner({
           </div>
 
           {/* Crafted design highlights note card */}
-          <div className="w-full bg-gradient-to-br from-white to-[#ffeef1] rounded-[32px] p-6 border border-brand-pink-soft shadow-3xs space-y-4 text-left">
-            <span className="font-display font-bold text-xs text-brand-charcoal uppercase tracking-wider block">
+          <div className="w-full bg-gradient-to-br from-white to-brand-pink-soft rounded-panel p-6 border border-brand-pink-soft shadow-soft space-y-4 text-left">
+            <span className="font-sans font-bold text-xs text-brand-charcoal uppercase tracking-wider block">
               The CustomVibe Craft Standard
             </span>
             <p className="text-xs text-brand-charcoal/70 leading-relaxed font-semibold">
@@ -431,8 +431,8 @@ export default function MagnetDesigner({
               <div className="flex items-start gap-2.5">
                 <Sparkles className="w-4 h-4 text-brand-pink-text shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[12px] font-bold text-brand-charcoal leading-tight">300DPI Fine-Art Paper lamination</p>
-                  <p className="text-[10.5px] text-zinc-500 leading-normal font-semibold">
+                  <p className="text-xs font-bold text-brand-charcoal leading-tight">300DPI Fine-Art Paper lamination</p>
+                  <p className="text-xs text-zinc-500 leading-normal font-semibold">
                     Sealed below high-gloss shielding. Water and greasy fingers won't ruin your favorite memories.
                   </p>
                 </div>
@@ -440,8 +440,8 @@ export default function MagnetDesigner({
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-[#ff85a1] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[12px] font-bold text-brand-charcoal leading-tight">Solid 3mm Matte Flat Magnet Backing</p>
-                  <p className="text-[10.5px] text-zinc-500 leading-normal font-semibold">
+                  <p className="text-xs font-bold text-brand-charcoal leading-tight">Solid 3mm Matte Flat Magnet Backing</p>
+                  <p className="text-xs text-zinc-500 leading-normal font-semibold">
                     Perfect alignment with our lowercase @customvibe stamp sealing the background structure.
                   </p>
                 </div>
@@ -454,10 +454,10 @@ export default function MagnetDesigner({
         {/* ================= COLUMN 2: RIGHT - CUSTOM UPLOAD BATCH CONTROLS ================= */}
         <div className="col-span-1 lg:col-span-6 space-y-6 order-1 lg:order-2">
           
-          <div className="bg-white rounded-[40px] p-6 sm:p-8 border border-brand-pink-soft shadow-sm space-y-6">
-            
+          <div className="bg-white rounded-panel p-6 sm:p-8 border border-brand-pink-soft shadow-soft space-y-6">
+
             <div className="text-left">
-              <h3 className="font-display font-bold text-lg text-brand-charcoal uppercase tracking-wider">
+              <h3 className="font-display font-bold text-xl md:text-2xl text-brand-charcoal">
                 My Draft Designs ({designs.length})
               </h3>
               <p className="text-xs text-zinc-500 font-semibold mt-1">Upload files, change magnet counts, or build backup templates.</p>
@@ -474,13 +474,13 @@ export default function MagnetDesigner({
             />
 
             {/* Soft pink drag drag zone */}
-            <div 
+            <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-brand-pink/55 hover:border-brand-pink bg-[#ffeef1]/30 hover:bg-[#ffeef1]/50 p-6 rounded-[24px] text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-1.5 group select-none"
+              className="border-2 border-dashed border-brand-pink/55 hover:border-brand-pink bg-brand-pink-soft/30 hover:bg-brand-pink-soft/50 p-6 rounded-panel shadow-soft text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-1.5 group select-none"
             >
               <Upload className="w-8 h-8 text-brand-pink-text mb-1 group-hover:scale-110 transition-transform" />
               <p className="text-xs font-bold text-brand-charcoal uppercase tracking-wide">Upload Custom Image Files</p>
-              <p className="text-[10.5px] text-zinc-450 font-bold">Import multiple pictures at the same time directly</p>
+              <p className="text-label-xs text-zinc-400 font-bold">Import multiple pictures at the same time directly</p>
             </div>
 
             {/* Magnet Draft Cards list */}
@@ -492,14 +492,15 @@ export default function MagnetDesigner({
                     key={design.id}
                     id={`layout-design-item-${design.id}`}
                     onClick={() => setActiveDesignId(design.id)}
-                    className={`p-3.5 rounded-[22px] border transition-all duration-200 cursor-pointer flex items-center justify-between ${
-                      isActive 
-                        ? 'bg-[#ffeef1] border-brand-pink shadow-3xs' 
+                    className={`p-3.5 rounded-card border transition-all duration-200 cursor-pointer flex items-center justify-between ${
+                      isActive
+                        ? 'bg-brand-pink-soft border-brand-pink shadow-soft'
                         : 'bg-white border-brand-pink-soft hover:bg-neutral-50'
                     }`}
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="relative w-13 h-13 rounded-none overflow-hidden border border-brand-pink-soft shrink-0 bg-zinc-100">
+                      {/* rounded-none is intentional — sharp "photo print" thumbnail edge */}
+                      <div className="relative w-12 h-12 rounded-none overflow-hidden border border-brand-pink-soft shrink-0 bg-zinc-100">
                         <img
                           src={design.imageUrl}
                           alt={design.name}
@@ -510,10 +511,10 @@ export default function MagnetDesigner({
                         <div className="absolute inset-0 bg-brand-charcoal/5" />
                       </div>
                       <div className="min-w-0 text-left">
-                        <p className="font-display font-semibold text-xs text-brand-charcoal truncate pr-2">
+                        <p className="font-sans font-bold text-xs text-brand-charcoal truncate pr-2">
                           {design.name}
                         </p>
-                        <p className="text-[10.5px] text-zinc-450 font-bold mt-0.5">
+                        <p className="text-label-xs text-zinc-400 font-bold mt-0.5">
                           Size: 7.5cm • Gloss Finish
                         </p>
                       </div>
@@ -522,29 +523,29 @@ export default function MagnetDesigner({
                     <div className="flex items-center gap-2.5 shrink-0" onClick={e => e.stopPropagation()}>
                       
                       {/* Miniature Quantity widget */}
-                      <div className="flex items-center bg-white border border-brand-pink-soft rounded-xl p-0.5 shadow-3xs">
-                        <button 
+                      <div className="flex items-center bg-white border border-brand-pink-soft rounded-control p-0.5 shadow-soft">
+                        <button
                           onClick={() => {
                             onUpdateDesign({
                               ...design,
                               quantity: Math.max(1, design.quantity - 1)
                             });
                           }}
-                          className="w-9 h-9 sm:w-5.5 sm:h-5.5 rounded-lg hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
+                          className="w-9 h-9 rounded-control hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
                         >
                           -
                         </button>
-                        <span className="w-5.5 text-center font-mono font-bold text-xs text-brand-charcoal select-none">
+                        <span className="w-6 text-center font-mono font-bold text-xs text-brand-charcoal select-none">
                           {design.quantity}
                         </span>
-                        <button 
+                        <button
                           onClick={() => {
                             onUpdateDesign({
                               ...design,
                               quantity: design.quantity + 1
                             });
                           }}
-                          className="w-9 h-9 sm:w-5.5 sm:h-5.5 rounded-lg hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
+                          className="w-9 h-9 rounded-control hover:bg-neutral-100 text-brand-charcoal font-bold text-xs flex items-center justify-center cursor-pointer select-none"
                         >
                           +
                         </button>
@@ -554,7 +555,7 @@ export default function MagnetDesigner({
                       <div className="flex items-center gap-0.5">
                         <button
                           onClick={() => onCloneDesign(design.id)}
-                          className="p-1.5 rounded-lg hover:bg-neutral-50 text-zinc-400 hover:text-brand-charcoal transition-colors cursor-pointer"
+                          className="p-1.5 rounded-control hover:bg-neutral-50 text-zinc-400 hover:text-brand-charcoal transition-colors cursor-pointer"
                           title="Duplicate templates"
                         >
                           <Copy className="w-4 h-4" />
@@ -562,7 +563,7 @@ export default function MagnetDesigner({
                         {designs.length > 1 && (
                           <button
                             onClick={() => onDeleteDesign(design.id)}
-                            className="p-1.5 rounded-lg hover:bg-neutral-50 text-zinc-400 hover:text-red-500 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-control hover:bg-neutral-50 text-zinc-400 hover:text-red-500 transition-colors cursor-pointer"
                             title="Discard design"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -577,17 +578,17 @@ export default function MagnetDesigner({
             </div>
 
             {/* Quick add placeholder draft */}
-            <button 
+            <button
               id="btn-add-new-design"
               onClick={handleCreateEmptyDraft}
-              className="w-full py-3 rounded-2xl border-2 border-dashed border-brand-pink-dark/45 hover:border-brand-pink-dark text-brand-pink-text text-xs font-semibold hover:bg-brand-pink-soft/22 transition-all flex items-center justify-center gap-2 cursor-pointer font-display"
+              className="w-full py-3 rounded-card border-2 border-dashed border-brand-pink-dark/45 hover:border-brand-pink-dark text-brand-pink-text text-xs font-bold hover:bg-brand-pink-soft/22 transition-all flex items-center justify-center gap-2 cursor-pointer font-sans"
             >
               <Plus className="w-4 h-4" /> Add Placeholder Magnet Card
             </button>
 
             <hr className="border-brand-pink-soft/80" />
 
-            <div className="pt-1 text-[11px] text-zinc-500 flex items-start gap-2 font-semibold text-left">
+            <div className="pt-1 text-xs text-zinc-500 flex items-start gap-2 font-semibold text-left">
               <HelpCircle className="w-4 h-4 text-brand-pink-text flex-none mt-0.5 animate-pulse" />
               <p>
                 Each custom template stores its distinct cropping parameters. Reposition photos seamlessly with pointer grabs on mobile or mice.
@@ -597,18 +598,18 @@ export default function MagnetDesigner({
           </div>
 
           {/* Trigger Request Quote Card */}
-          <div className="bg-[#ffeef1]/80 rounded-[36px] p-6 border border-brand-pink/30 space-y-4">
+          <div className="bg-brand-pink-soft/80 rounded-panel p-6 border border-brand-pink/30 space-y-4">
             <div className="flex items-center justify-between text-left">
               <div>
-                <p className="font-display font-bold text-sm text-brand-charcoal">Design Session Complete?</p>
-                <p className="text-[10.5px] text-zinc-550 font-bold">Compile files and verify shipping details.</p>
+                <p className="font-sans font-bold text-sm text-brand-charcoal">Design Session Complete?</p>
+                <p className="text-label-xs text-zinc-500 font-bold">Compile files and verify shipping details.</p>
               </div>
               <div className="text-right">
                 <span className="block font-mono font-bold text-brand-charcoal text-lg">R{Math.round(totalPriceEst)}</span>
-                <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{totalQty} Magnet{totalQty !== 1 ? 's' : ''} total</span>
+                <span className="block text-label-xs text-zinc-500 font-bold uppercase tracking-wider">{totalQty} Magnet{totalQty !== 1 ? 's' : ''} total</span>
               </div>
             </div>
-            
+
             <button
               id="magnet-designer-checkout-btn"
               onClick={() => {
@@ -619,7 +620,7 @@ export default function MagnetDesigner({
                   quoteTab?.click();
                 }
               }}
-              className="w-full py-4 px-4 rounded-2xl bg-brand-charcoal hover:bg-brand-pink hover:text-brand-charcoal text-white font-display font-medium text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2.5"
+              className="w-full py-4 px-4 rounded-control bg-brand-charcoal hover:bg-brand-pink hover:text-brand-charcoal text-white font-display font-medium text-xs shadow-floating transition-all cursor-pointer flex items-center justify-center gap-2.5"
             >
               Get Custom Quote & Checkout
               <ChevronRight className="w-4.5 h-4.5 text-brand-pink-text" />

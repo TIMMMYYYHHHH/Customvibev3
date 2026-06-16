@@ -32,11 +32,11 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
   ];
 
   return (
-    <div className="relative overflow-hidden min-h-[92vh] flex flex-col justify-center py-20 px-4 md:px-12 bg-[#faf5f5] grid-bg">
-      
+    <div className="relative overflow-hidden min-h-[92vh] flex flex-col justify-center py-section-lg px-4 md:px-12 bg-brand-cream grid-bg">
+
       {/* Delicate floating pastel spheres for professional depth */}
       <div className="absolute top-12 left-10 w-72 h-72 rounded-full bg-brand-pink-light/45 filter blur-3xl -z-10 animate-pulse" style={{ animationDuration: '8s' }} />
-      <div className="absolute bottom-24 right-12 w-96 h-96 rounded-full bg-[#ffeef1] filter blur-3xl -z-10 animate-pulse" style={{ animationDuration: '6s' }} />
+      <div className="absolute bottom-24 right-12 w-96 h-96 rounded-full bg-brand-pink-soft filter blur-3xl -z-10 animate-pulse" style={{ animationDuration: '6s' }} />
       <div className="absolute top-1/3 right-1/4 w-52 h-52 rounded-full bg-brand-pastel-mint/25 filter blur-2xl -z-10" />
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center w-full relative z-10">
@@ -60,7 +60,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="space-y-6"
           >
-            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-semibold text-brand-charcoal leading-[1.08] tracking-tight">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold text-brand-charcoal leading-[1.08] tracking-tight">
               Aesthetic <br />
               <span className="relative inline-block text-brand-pink-text">
                 Fridge Art
@@ -73,30 +73,26 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
             </p>
           </motion.div>
 
-          {/* Key Value Highlights */}
+          {/* Key Value Highlights — same flat, divider-separated stat language as the spec strip below */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto lg:mx-0"
+            className="flex items-center justify-center lg:justify-start gap-6 max-w-lg mx-auto lg:mx-0"
           >
-            <div className="bg-white/95 backdrop-blur-md p-4 rounded-[24px] border border-brand-pink-soft flex items-center gap-3 shadow-[0_4px_20px_rgba(255,182,193,0.12)]">
-              <div className="w-9 h-9 rounded-xl bg-[#ffeef1] flex items-center justify-center shrink-0">
-                <Heart className="w-4.5 h-4.5 text-brand-pink-text" />
-              </div>
-              <div className="text-left">
-                <p className="text-[11px] text-brand-pink-text font-bold uppercase tracking-wider">Premium Gloss Finish Wrap</p>
-                <p className="text-xs font-mono font-bold text-brand-charcoal/70">Beautiful glossy protective layer</p>
+            <div className="flex items-center gap-2.5 text-left">
+              <Heart className="w-4 h-4 text-brand-pink-text shrink-0" />
+              <div>
+                <p className="text-label-xs text-brand-pink-text font-bold uppercase tracking-wider">Premium Gloss Finish</p>
+                <p className="text-xs font-mono font-bold text-brand-charcoal/70">Glossy protective layer</p>
               </div>
             </div>
-
-            <div className="bg-white/95 backdrop-blur-md p-4 rounded-[24px] border border-brand-pink-soft flex items-center gap-3 shadow-[0_4px_20px_rgba(255,182,193,0.12)]">
-              <div className="w-9 h-9 rounded-xl bg-brand-pastel-mint/60 flex items-center justify-center shrink-0">
-                <Star className="w-4.5 h-4.5 text-brand-charcoal" />
-              </div>
-              <div className="text-left">
-                <p className="text-[11px] text-brand-charcoal font-bold uppercase tracking-wider">Bundle & Save Rates</p>
-                <p className="text-xs font-mono font-bold text-brand-charcoal/70">Starting at just R40/magnet</p>
+            <div className="w-px h-8 bg-brand-pink-soft" />
+            <div className="flex items-center gap-2.5 text-left">
+              <Star className="w-4 h-4 text-brand-charcoal shrink-0" />
+              <div>
+                <p className="text-label-xs text-brand-charcoal font-bold uppercase tracking-wider">Bundle & Save Rates</p>
+                <p className="text-xs font-mono font-bold text-brand-charcoal/70">From R40/magnet</p>
               </div>
             </div>
           </motion.div>
@@ -111,7 +107,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
             <button
               id="hero-start-designing-btn"
               onClick={onStartDesigning}
-              className="w-full sm:w-auto px-10 py-4.5 rounded-[22px] bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal font-display font-medium text-base shadow-[0_6px_25px_rgba(45,49,66,0.15)] hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
+              className="w-full sm:w-auto px-10 py-4.5 rounded-control bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal font-display font-medium text-base shadow-raised hover:shadow-floating transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
             >
               Enter Design Studio
               <ArrowRight className="w-5 h-5 text-brand-pink-text" />
@@ -121,7 +117,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
               onClick={() => {
                 document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="w-full sm:w-auto px-10 py-4.5 rounded-[22px] bg-white text-brand-charcoal hover:bg-[#ffeef1]/50 font-display font-medium text-base border border-brand-pink/40 shadow-xs hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-10 py-4.5 rounded-control bg-white text-brand-charcoal hover:bg-brand-pink-soft/50 font-display font-medium text-base border border-brand-pink/40 shadow-soft hover:shadow-raised transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
             >
               View Bulk Tiers
             </button>
@@ -136,17 +132,17 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
           >
             <div>
               <p className="text-2xl font-mono font-bold text-brand-charcoal">7.5 cm</p>
-              <p className="text-[10px] tracking-widest uppercase font-bold text-zinc-400 mt-0.5">Perfect Square size</p>
+              <p className="text-label-xs tracking-widest uppercase font-bold text-zinc-400 mt-0.5">Perfect Square size</p>
             </div>
             <div className="w-px h-8 bg-brand-pink-soft" />
             <div>
               <p className="text-2xl font-mono font-bold text-brand-charcoal">3 mm</p>
-              <p className="text-[10px] tracking-widest uppercase font-bold text-zinc-400 mt-0.5">Heavy rubber backing</p>
+              <p className="text-label-xs tracking-widest uppercase font-bold text-zinc-400 mt-0.5">Heavy rubber backing</p>
             </div>
             <div className="w-px h-8 bg-brand-pink-soft" />
             <div>
               <p className="text-2xl font-mono font-bold text-brand-charcoal">R40</p>
-              <p className="text-[10px] tracking-widest uppercase font-bold text-zinc-400 mt-0.5">Discount bulk price</p>
+              <p className="text-label-xs tracking-widest uppercase font-bold text-zinc-400 mt-0.5">Discount bulk price</p>
             </div>
           </motion.div>
 
@@ -155,24 +151,24 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
         {/* Right Side: Re-created Ultra Tactical Fridge Door Interactive Exhibit */}
         <div className="col-span-1 lg:col-span-5 flex flex-col items-center justify-center relative" id="hero-interactive-showcase-column">
           
-          <p className="text-xs text-brand-pink-text font-display font-semibold uppercase tracking-widest mb-4 bg-[#ffeef1] px-4 py-1.5 rounded-full shadow-3xs">
+          <p className="text-xs text-brand-pink-text font-sans font-bold uppercase tracking-widest mb-4 bg-brand-pink-soft px-4 py-1.5 rounded-full shadow-soft">
             Interactive Fridge Door Mockup
           </p>
 
-          <div className="relative w-full max-w-[390px] aspect-[4/5] bg-[#ece4db] rounded-[40px] p-6 shadow-[0_20px_50px_rgba(45,49,66,0.12)] border border-brand-pink-soft flex flex-col justify-between overflow-hidden">
-            
+          <div className="relative w-full max-w-[390px] aspect-[4/5] bg-[#ece4db] rounded-panel p-6 shadow-floating border border-brand-pink-soft flex flex-col justify-between overflow-hidden">
+
             {/* Gloss reflection line across the fridge door */}
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
-            
+
             {/* Magnetic grid wireframe for background aesthetics */}
             <div className="absolute inset-0 fridge-grid opacity-25 pointer-events-none" />
 
             {/* Simulated Refrigerator Metallic Handle on Right Edge */}
-            <div className="absolute top-1/4 right-0 w-3.5 h-1/2 bg-gradient-to-l from-[#ffffff] via-[#dcd8d0] to-[#bfb9ae] rounded-l-md border-y border-l border-brand-pink-soft/40 shadow-xs" />
+            <div className="absolute top-1/4 right-0 w-3.5 h-1/2 bg-gradient-to-l from-[#ffffff] via-[#dcd8d0] to-[#bfb9ae] rounded-l-md border-y border-l border-brand-pink-soft/40 shadow-soft" />
 
             {/* Custom Vibe Logo engraved silently onto the fridge door top center */}
             <div className="text-center w-full z-10 pt-2 selection:bg-transparent">
-              <span className="font-display text-[10px] text-brand-charcoal/30 tracking-widest uppercase font-bold border-b border-brand-charcoal/10 pb-1 inline-block">
+              <span className="font-sans text-label-xs text-brand-charcoal/30 tracking-widest uppercase font-bold border-b border-brand-charcoal/10 pb-1 inline-block">
                 CustomVibe Solid Magnet Board
               </span>
             </div>
@@ -211,8 +207,9 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
                       left: pos.left,
                       transform: `rotate(${pos.rotate})`,
                     }}
-                    className="w-34 aspect-square bg-white rounded-none shadow-md border border-brand-pink-soft/30 cursor-pointer overflow-hidden p-0 group/magnet pointer-events-auto select-none"
+                    className="w-34 aspect-square bg-white rounded-none shadow-soft border border-brand-pink-soft/30 cursor-pointer overflow-hidden p-0 group/magnet pointer-events-auto select-none"
                   >
+                    {/* rounded-none is intentional — sharp "photo print" thumbnail edge */}
                     <div className="h-full w-full relative overflow-hidden rounded-none bg-zinc-50">
                       <img 
                         src={preset.imageUrl} 
@@ -231,7 +228,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
                           e.stopPropagation();
                           onLoadPreset(preset);
                         }}
-                        className="absolute inset-x-2 bottom-2 py-2 bg-brand-charcoal text-white rounded-none opacity-0 group-hover/magnet:opacity-100 transition-opacity duration-200 hover:bg-brand-pink hover:text-brand-charcoal text-[9px] font-bold text-center shadow-xs flex items-center justify-center gap-1"
+                        className="absolute inset-x-2 bottom-2 py-2 bg-brand-charcoal text-white rounded-none opacity-0 group-hover/magnet:opacity-100 transition-opacity duration-200 hover:bg-brand-pink hover:text-brand-charcoal text-label-xs font-bold text-center shadow-soft flex items-center justify-center gap-1"
                         title="Customize inside the Design Studio"
                       >
                         <ImageIcon className="w-3 h-3 text-brand-pink-text" /> Customise
@@ -244,7 +241,7 @@ export default function Hero({ onStartDesigning, onLoadPreset }: HeroProps) {
 
             {/* Bottom Panel message */}
             <div className="text-center pb-1 z-10 select-none">
-              <span className="font-sans text-[10px] text-brand-charcoal/50 font-bold">
+              <span className="font-sans text-label-xs text-brand-charcoal/50 font-bold">
                 Hover to tilt or tap <span className="text-brand-pink-text">Customise</span> to personalize!
               </span>
             </div>

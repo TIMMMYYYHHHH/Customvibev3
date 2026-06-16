@@ -58,17 +58,17 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
   ];
 
   return (
-    <div id="pricing-section" className="max-w-7xl mx-auto px-4 md:px-12 py-20 bg-[#faf5f5]">
-      
+    <div id="pricing-section" className="max-w-7xl mx-auto px-4 md:px-12 py-section-md bg-brand-cream">
+
       {/* Redesigned Pricing Intro */}
       <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
         <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-pink-text bg-brand-pink/20 px-3 py-1 rounded-full">
           Simplicity first
         </span>
-        <h2 className="font-display text-4xl md:text-5xl font-semibold text-brand-charcoal">
+        <h2 className="font-display text-3xl md:text-4xl font-semibold text-brand-charcoal">
           Completely Honest, Low-stress Pricing
         </h2>
-        <p className="text-brand-charcoal/70 text-xs sm:text-sm md:text-base leading-relaxed font-semibold">
+        <p className="text-brand-charcoal/70 text-sm leading-relaxed font-semibold">
           Design distinct layouts for every single magnet in your bundle. There are zero hidden fees, extra plate costs, or sneaky fine print. Bundling brings greater savings.
         </p>
       </div>
@@ -80,23 +80,23 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
             <div
               key={pack.title}
               id={`pricing-package-${idx}`}
-              className={`rounded-[36px] p-8 border relative flex flex-col justify-between transition-all duration-300 ${
-                pack.popular 
-                  ? 'bg-white border-brand-pink shadow-[0_12px_40px_rgba(255,182,193,0.25)] scale-[1.03]' 
-                  : 'bg-white/70 border-brand-pink-soft hover:bg-white shadow-[0_4px_25px_rgba(0,0,0,0.02)] hover:shadow-md'
+              className={`rounded-card p-8 border relative flex flex-col justify-between transition-all duration-300 ${
+                pack.popular
+                  ? 'bg-white border-brand-pink shadow-raised scale-[1.03]'
+                  : 'bg-white/70 border-brand-pink-soft hover:bg-white shadow-soft hover:shadow-raised'
               }`}
             >
               {pack.popular && (
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-charcoal text-white font-display font-bold text-[10px] uppercase tracking-wider py-1.5 px-4 rounded-full flex items-center gap-1">
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-charcoal text-white font-sans font-bold text-label-xs uppercase tracking-wider py-1.5 px-4 rounded-full flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5 text-brand-pink" /> Customer Darling
                 </span>
               )}
 
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-pink-text">
+                <span className="text-label-xs font-mono font-bold uppercase tracking-widest text-brand-pink-text">
                   {pack.qty}
                 </span>
-                <h3 className="font-display font-semibold text-2xl text-brand-charcoal mt-1">
+                <h3 className="font-display font-semibold text-xl md:text-2xl text-brand-charcoal mt-1">
                   {pack.title}
                 </h3>
                 
@@ -123,9 +123,9 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
 
               <button
                 onClick={onStartDesigning}
-                className={`w-full mt-10 py-3.5 rounded-2xl font-display font-medium text-xs text-center transition-all cursor-pointer ${
+                className={`w-full mt-10 py-3.5 rounded-control font-display font-medium text-xs text-center transition-all cursor-pointer ${
                   pack.popular
-                    ? 'bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal shadow-sm'
+                    ? 'bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal shadow-floating'
                     : 'bg-brand-pink-soft hover:bg-brand-pink-light text-brand-charcoal border border-brand-pink/30'
                 }`}
               >
@@ -137,40 +137,40 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
       </div>
 
       {/* ================= RE-DESIGNED SIMULATOR BENTO BLOCK ================= */}
-      <div className="bg-white rounded-[40px] p-8 md:p-12 border border-brand-pink-soft shadow-[0_8px_35px_rgba(255,182,193,0.1)] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center" id="pricing-interactive-simulator">
-        
+      <div className="bg-white rounded-panel p-8 md:p-12 border border-brand-pink-soft shadow-floating grid grid-cols-1 lg:grid-cols-12 gap-12 items-center" id="pricing-interactive-simulator">
+
         {/* Left Control Panel */}
         <div className="lg:col-span-7 space-y-8">
           <div className="space-y-3 text-left">
             <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-pink-text flex items-center gap-2">
               <Percent className="w-4 h-4" /> Live Budget Calculator
             </span>
-            <h3 className="font-display font-bold text-3xl text-brand-charcoal">
+            <h3 className="font-display font-bold text-xl md:text-2xl text-brand-charcoal">
               Simulate Larger Order Discounts
             </h3>
-            <p className="text-brand-charcoal/75 text-xs sm:text-sm leading-relaxed font-semibold">
+            <p className="text-brand-charcoal/75 text-sm leading-relaxed font-semibold">
               Slide the controller below to select exactly how many magnets you want to print. Watch applied rates adjust in real-time as your tribe grows!
             </p>
           </div>
 
           <div className="space-y-5 pt-2">
-            <div className="flex justify-between items-center bg-[#faf5f5] p-3.5 rounded-2xl border border-brand-pink-soft">
-              <span className="text-xs font-bold text-brand-charcoal uppercase tracking-wider font-display">Simulated Bundle Size:</span>
-              <span className="bg-brand-charcoal text-white font-mono font-bold text-sm px-4 py-1.5 rounded-xl">
+            <div className="flex justify-between items-center bg-brand-cream p-3.5 rounded-card border border-brand-pink-soft">
+              <span className="text-xs font-bold text-brand-charcoal uppercase tracking-wider font-sans">Simulated Bundle Size:</span>
+              <span className="bg-brand-charcoal text-white font-mono font-bold text-sm px-4 py-1.5 rounded-control">
                 {estimateQty} Magnet{estimateQty !== 1 ? 's' : ''}
               </span>
             </div>
 
             <div className="relative pt-2">
-              <input 
+              <input
                 type="range"
                 min="1"
                 max="50"
                 value={estimateQty}
                 onChange={(e) => setEstimateQty(parseInt(e.target.value))}
-                className="w-full h-3 bg-[#ffeef1] rounded-lg appearance-none cursor-pointer accent-brand-pink"
+                className="w-full h-3 bg-brand-pink-soft rounded-control appearance-none cursor-pointer accent-brand-pink"
               />
-              <div className="flex justify-between font-mono text-[9px] text-zinc-400 font-bold px-1 mt-2.5">
+              <div className="flex justify-between font-mono text-label-xs text-zinc-400 font-bold px-1 mt-2.5">
                 <span>1 Unit</span>
                 <span>10 pack (R40/u)</span>
                 <span>20 pack</span>
@@ -182,7 +182,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
           </div>
 
           {estimateQty > 15 && (
-            <div className="p-4.5 bg-brand-pastel-mint/30 border border-brand-pink-soft/55 rounded-2xl flex items-start gap-3 text-xs text-[#2c4e30] text-left animate-fadeIn">
+            <div className="p-4 bg-brand-pastel-mint/30 border border-brand-pink-soft/55 rounded-card flex items-start gap-3 text-xs text-[#2c4e30] text-left animate-fadeIn">
               <HelpingHand className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <p className="font-semibold leading-relaxed">
                 <strong>Large Dispatch Protocol Enabled:</strong> Orders above 15 units undergo priority studio assembly. Simply checkout on your custom designs, and our couriers will handle secure door-to-door transit coordinates.
@@ -192,10 +192,10 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
         </div>
 
         {/* Right Output Panel */}
-        <div className="lg:col-span-5 bg-[#ffeef1]/60 p-8 rounded-[32px] border border-brand-pink/30 space-y-6 text-center lg:text-left">
-          
+        <div className="lg:col-span-5 bg-brand-pink-soft/60 p-8 rounded-panel border border-brand-pink/30 space-y-6 text-center lg:text-left">
+
           <div className="space-y-1">
-            <span className="text-[10px] font-mono font-bold text-brand-pink-text uppercase tracking-widest block">
+            <span className="text-label-xs font-mono font-bold text-brand-pink-text uppercase tracking-widest block">
               Estimated Total Cost
             </span>
             <span className="text-5xl font-mono font-bold text-brand-charcoal block">
@@ -203,37 +203,38 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 py-4.5 border-y border-brand-pink/20 text-left">
+          <div className="grid grid-cols-2 gap-4 py-4 border-y border-brand-pink/20 text-left">
             <div>
-              <span className="text-[10px] text-zinc-500 block font-bold uppercase tracking-wider">Unit Average</span>
+              <span className="text-label-xs text-zinc-500 block font-bold uppercase tracking-wider">Unit Average</span>
               <span className="text-base font-mono font-bold text-brand-charcoal">
                 R{calcResult.avgPerUnit.toFixed(2)}
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-zinc-500 block font-bold uppercase tracking-wider">Assigned Tier</span>
-              <span className="text-xs font-display font-semibold text-brand-pink-text truncate block mt-0.5">
+              <span className="text-label-xs text-zinc-500 block font-bold uppercase tracking-wider">Assigned Tier</span>
+              {/* brand-pastel-blue's one approved use — the Assigned Tier stat chip */}
+              <span className="inline-block text-xs font-sans font-bold text-brand-pink-text bg-brand-pastel-blue/60 px-2 py-0.5 rounded-control truncate mt-0.5">
                 {calcResult.tier}
               </span>
             </div>
           </div>
 
           {calcResult.savings > 0 ? (
-            <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-center flex items-center justify-center gap-2">
+            <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-control text-center flex items-center justify-center gap-2">
               <Tag className="w-4 h-4 text-emerald-600" />
               <span className="text-xs font-semibold text-emerald-700 leading-none">
                 Volume bundle saved you R{calcResult.savings}!
               </span>
             </div>
           ) : (
-            <p className="text-[11px] text-zinc-500 leading-normal bg-white/70 p-3 rounded-2xl text-center font-semibold">
+            <p className="text-label-xs text-zinc-500 leading-normal bg-white/70 p-3 rounded-card text-center font-semibold">
               Bundle 10 units or more to reduce each magnet by up to R10!
             </p>
           )}
 
           <button
             onClick={onStartDesigning}
-            className="w-full py-4 rounded-2xl bg-brand-charcoal hover:bg-brand-pink text-white hover:text-brand-charcoal font-display font-medium text-xs shadow-md transition-all cursor-pointer text-center block"
+            className="w-full py-4 rounded-control bg-brand-charcoal hover:bg-brand-pink text-white hover:text-brand-charcoal font-display font-medium text-xs shadow-floating transition-all cursor-pointer text-center block"
           >
             Design {estimateQty} Magnets Now &rarr;
           </button>

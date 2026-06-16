@@ -11,7 +11,7 @@ export default function NotFoundPage() {
       </p>
       <Link
         to="/"
-        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-charcoal hover:bg-brand-pink hover:text-brand-charcoal text-white font-display font-bold text-xs shadow-md"
+        className="inline-flex items-center gap-2 px-6 py-3 rounded-control bg-brand-charcoal hover:bg-brand-pink hover:text-brand-charcoal text-white font-display font-bold text-xs shadow-raised"
       >
         <Compass className="w-4 h-4" /> Back to Home
       </Link>
