@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShieldCheck, Heart, Sparkles, MapPin, Smile, Camera, Layers, HelpCircle } from 'lucide-react';
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShieldCheck, Heart, MapPin, Camera, Layers } from 'lucide-react';
 import { MagnetDesign } from './types';
 
 // Importing CustomVibe sub-components
@@ -12,14 +13,62 @@ import QuoteForm from './components/QuoteForm';
 import QuoteSummaryModal from './components/QuoteSummaryModal';
 import Testimonials from './components/Testimonials';
 import WhatsAppButton from './components/WhatsAppButton';
-import InfoModal, { InfoModalType } from './components/InfoModal';
+import { PrivacyPage, TermsPage, ContactPage } from './pages/LegalPages';
+import NotFoundPage from './pages/NotFoundPage';
+import { usePageMeta } from './hooks/usePageMeta';
+
+const PATH_TO_TAB: Record<string, string> = {
+  '/': 'hero',
+  '/design': 'designer',
+  '/quote': 'quote',
+};
+
+const TAB_TO_PATH: Record<string, string> = {
+  hero: '/',
+  designer: '/design',
+  quote: '/quote',
+};
+
+const PAGE_META: Record<string, { title: string; description: string }> = {
+  '/': {
+    title: 'CustomVibe | Custom Photo Fridge Magnets in Durban, South Africa',
+    description: 'Design your own photo fridge magnets with CustomVibe. Upload photos, build a custom grid, and get a quote for premium 7.5cm gloss-finish magnets, handmade and delivered across South Africa.',
+  },
+  '/design': {
+    title: 'Design Studio | CustomVibe Custom Photo Magnets',
+    description: 'Upload your photos and design custom 7.5cm gloss-finish fridge magnets in our interactive Design Studio. Crop, position, and bundle your magnets, then request a quote.',
+  },
+  '/quote': {
+    title: 'Get a Quote | CustomVibe Custom Photo Magnets',
+    description: 'Review your custom magnet order, enter your delivery details, and submit a quote request to CustomVibe.',
+  },
+  '/privacy': {
+    title: 'Privacy Policy | CustomVibe',
+    description: 'How CustomVibe collects, uses, and protects your personal information and uploaded photos.',
+  },
+  '/terms': {
+    title: 'Terms of Craft | CustomVibe',
+    description: 'The terms that apply when you order custom photo fridge magnets from CustomVibe.',
+  },
+  '/contact': {
+    title: 'Contact Us | CustomVibe',
+    description: 'Get in touch with CustomVibe for questions about your custom photo fridge magnet order.',
+  },
+};
 
 export default function App() {
-  const [activeTab, setActiveTab ] = useState<string>('hero');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const activeTab = PATH_TO_TAB[location.pathname] ?? 'hero';
+  const setActiveTab = (tab: string) => navigate(TAB_TO_PATH[tab] ?? '/');
+
+  const meta = PAGE_META[location.pathname] ?? PAGE_META['/'];
+  usePageMeta(meta.title, meta.description, location.pathname);
+
   const [designs, setDesigns] = useState<MagnetDesign[]>([]);
   const [activeDesignId, setActiveDesignId] = useState<string | null>(null);
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
-  const [activeInfoModal, setActiveInfoModal] = useState<InfoModalType | null>(null);
 
   // Initialize with a default lovely custom welcome design so the studio is alive instantly!
   useEffect(() => {
@@ -49,6 +98,17 @@ export default function App() {
     setActiveDesignId(defaultDesign.id);
   }, []);
 
+  // Scroll to an in-page anchor (e.g. /#pricing-section) once the target route has rendered
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.slice(1);
+      const timeout = setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [location.pathname, location.hash]);
+
   // Sync state to standard client-side LocalStorage
   const saveToLocalStorage = (allDesigns: MagnetDesign[]) => {
     localStorage.setItem('customvibe_designs', JSON.stringify(allDesigns));
@@ -71,7 +131,7 @@ export default function App() {
     const updated = designs.filter((d) => d.id !== id);
     setDesigns(updated);
     saveToLocalStorage(updated);
-    
+
     // Auto shift focused design
     if (activeDesignId === id && updated.length > 0) {
       setActiveDesignId(updated[0].id);
@@ -106,9 +166,9 @@ export default function App() {
     setDesigns(updated);
     setActiveDesignId(newDesign.id);
     saveToLocalStorage(updated);
-    
+
     // Smoothly route back to internal Design Studio
-    setActiveTab('designer');
+    navigate('/design');
   };
 
   const handleClearAllDesigns = () => {
@@ -119,62 +179,92 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#faf6f6] flex flex-col justify-between selection:bg-brand-pastel-peach text-brand-charcoal">
-      
+
       {/* Sticky CustomVibe Nav Header */}
-      <Header 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        designs={designs} 
+      <Header
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        designs={designs}
         onRequestQuote={() => setShowSummaryModal(true)}
       />
 
-      {/* Main interactive Tab Content Stage */}
+      {/* Main routed page stage */}
       <main className="flex-grow">
         <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
-          >
-            {activeTab === 'hero' && (
-              <div className="space-y-4">
-                <Hero 
-                  onStartDesigning={() => setActiveTab('designer')}
-                  onLoadPreset={handleLoadPreset}
-                />
-                <hr className="border-brand-pink-soft max-w-7xl mx-auto opacity-40" />
-                <PricingCalculator
-                  onStartDesigning={() => setActiveTab('designer')}
-                />
-                <Testimonials />
-              </div>
-            )}
-
-            {activeTab === 'designer' && (
-              <MagnetDesigner
-                designs={designs}
-                activeDesignId={activeDesignId}
-                setActiveDesignId={setActiveDesignId}
-                onUpdateDesign={handleUpdateDesign}
-                onAddDesign={handleAddDesign}
-                onDeleteDesign={handleDeleteDesign}
-                onCloneDesign={handleCloneDesign}
-                onRequestQuote={() => setShowSummaryModal(true)}
+          <div key={location.pathname}>
+            <Routes location={location}>
+              <Route
+                path="/"
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                    className="space-y-4"
+                  >
+                    <Hero
+                      onStartDesigning={() => navigate('/design')}
+                      onLoadPreset={handleLoadPreset}
+                    />
+                    <hr className="border-brand-pink-soft max-w-7xl mx-auto opacity-40" />
+                    <PricingCalculator
+                      onStartDesigning={() => navigate('/design')}
+                    />
+                    <Testimonials />
+                  </motion.div>
+                }
               />
-            )}
 
-            {activeTab === 'quote' && (
-              <QuoteForm
-                designs={designs}
-                onUpdateDesign={handleUpdateDesign}
-                onDeleteDesign={handleDeleteDesign}
-                onClearAllDesigns={handleClearAllDesigns}
-                onNavigateToDesigner={() => setActiveTab('designer')}
+              <Route
+                path="/design"
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                  >
+                    <MagnetDesigner
+                      designs={designs}
+                      activeDesignId={activeDesignId}
+                      setActiveDesignId={setActiveDesignId}
+                      onUpdateDesign={handleUpdateDesign}
+                      onAddDesign={handleAddDesign}
+                      onDeleteDesign={handleDeleteDesign}
+                      onCloneDesign={handleCloneDesign}
+                      onRequestQuote={() => setShowSummaryModal(true)}
+                    />
+                  </motion.div>
+                }
               />
-            )}
-          </motion.div>
+
+              <Route
+                path="/quote"
+                element={
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                  >
+                    <QuoteForm
+                      designs={designs}
+                      onUpdateDesign={handleUpdateDesign}
+                      onDeleteDesign={handleDeleteDesign}
+                      onClearAllDesigns={handleClearAllDesigns}
+                      onNavigateToDesigner={() => navigate('/design')}
+                    />
+                  </motion.div>
+                }
+              />
+
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </div>
         </AnimatePresence>
       </main>
 
@@ -187,16 +277,9 @@ export default function App() {
             designs={designs}
             onProceed={() => {
               setShowSummaryModal(false);
-              setActiveTab('quote');
+              navigate('/quote');
             }}
           />
-        )}
-      </AnimatePresence>
-
-      {/* Privacy / Terms / Contact Info Modal */}
-      <AnimatePresence>
-        {activeInfoModal && (
-          <InfoModal type={activeInfoModal} onClose={() => setActiveInfoModal(null)} />
         )}
       </AnimatePresence>
 
@@ -206,7 +289,7 @@ export default function App() {
       {/* Brand Value Proposition footer cards */}
       <section className="bg-white border-t border-brand-pink-soft py-10 px-4 md:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 text-center md:text-left">
-          
+
           <div className="space-y-2 p-4 rounded-2xl hover:bg-[#fff0f3]/45 transition-colors">
             <Camera className="w-6 h-6 text-brand-pink-dark mx-auto md:mx-0" />
             <h4 className="font-display font-bold text-sm text-brand-charcoal">High-Definition Print Gloss</h4>
@@ -245,7 +328,7 @@ export default function App() {
       {/* Primary Brand Footer info */}
       <footer className="bg-brand-charcoal text-white pt-12 pb-6 px-4 md:px-8 font-sans">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between border-b border-white/10 pb-8 gap-8">
-          
+
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-brand-pink text-brand-charcoal font-display font-bold text-md flex items-center justify-center rotate-[-4deg]">
@@ -267,16 +350,11 @@ export default function App() {
             <div className="space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Vibe navigation</span>
               <ul className="space-y-1.5 text-xs text-white/80">
-                <li><button onClick={() => setActiveTab('designer')} className="hover:text-brand-pink transition-colors cursor-pointer text-left">Designer Studio</button></li>
-                <li><button onClick={() => {
-                  setActiveTab('hero');
-                  setTimeout(() => {
-                    document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }} className="hover:text-brand-pink transition-colors cursor-pointer text-left">Pricing & Bundles</button></li>
+                <li><Link to="/design" className="hover:text-brand-pink transition-colors">Designer Studio</Link></li>
+                <li><Link to="/#pricing-section" className="hover:text-brand-pink transition-colors">Pricing &amp; Bundles</Link></li>
               </ul>
             </div>
-            
+
             <div className="space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 block">Contact Us</span>
               <p className="text-xs text-white/80">hello@customvibe.co.za</p>
@@ -300,11 +378,11 @@ export default function App() {
         <div className="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between text-[10px] text-white/40 gap-4">
           <p>&copy; {new Date().getFullYear()} CustomVibe Magnets Ltd. All rights reserved.</p>
           <div className="flex gap-4">
-            <button onClick={() => setActiveInfoModal('privacy')} className="hover:text-brand-pink transition-colors cursor-pointer">Privacy Policy</button>
+            <Link to="/privacy" className="hover:text-brand-pink transition-colors">Privacy Policy</Link>
             <span>•</span>
-            <button onClick={() => setActiveInfoModal('terms')} className="hover:text-brand-pink transition-colors cursor-pointer">Terms of Craft</button>
+            <Link to="/terms" className="hover:text-brand-pink transition-colors">Terms of Craft</Link>
             <span>•</span>
-            <button onClick={() => setActiveInfoModal('contact')} className="hover:text-brand-pink transition-colors cursor-pointer">Local Tribe Coordinates</button>
+            <Link to="/contact" className="hover:text-brand-pink transition-colors">Local Tribe Coordinates</Link>
           </div>
         </div>
       </footer>
