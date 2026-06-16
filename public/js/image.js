@@ -5,7 +5,8 @@ const JPEG_QUALITY = 0.85;
 // stored as a base64 string in localStorage. Phone camera photos (often
 // 3-10MB) would otherwise blow past localStorage's ~5-10MB per-origin quota
 // after just a couple of uploads, silently breaking the save.
-export function fileToCompressedDataUrl(file: File): Promise<string> {
+// Ported verbatim from the old src/utils/image.ts.
+export function fileToCompressedDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(reader.error);
@@ -23,14 +24,14 @@ export function fileToCompressedDataUrl(file: File): Promise<string> {
 
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          resolve(reader.result as string);
+          resolve(reader.result);
           return;
         }
 
         ctx.drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', JPEG_QUALITY));
       };
-      img.src = reader.result as string;
+      img.src = reader.result;
     };
     reader.readAsDataURL(file);
   });

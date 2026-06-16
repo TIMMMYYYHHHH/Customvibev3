@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Design Studio | CustomVibe Custom Photo Magnets</title>
+    <meta name="description" content="Upload your photos and design custom 7.5cm gloss-finish fridge magnets in our interactive Design Studio. Crop, position, and bundle your magnets, then request a quote." />
+    <link rel="canonical" href="https://customvibe.co.za/design" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/pages/design.css" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CustomVibe" />
+    <meta property="og:title" content="Design Studio | CustomVibe Custom Photo Magnets" />
+    <meta property="og:description" content="Upload your photos and design custom 7.5cm gloss-finish fridge magnets in our interactive Design Studio." />
+    <meta property="og:url" content="https://customvibe.co.za/design" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Design Studio | CustomVibe Custom Photo Magnets" />
+    <meta name="twitter:description" content="Upload your photos and design custom 7.5cm gloss-finish fridge magnets in our interactive Design Studio." />
+  </head>
+  <body>
+    <div data-partial="header" id="partial-header"></div>
+
+    <main>
+      <div class="container section-md" id="magnet-designer-root">
+        <div class="studio-header-row">
+          <div>
+            <h2 class="studio-title">Magnet Studio</h2>
+            <p class="studio-subtitle">Drag photo grids to position, zoom, duplicate, or adjust bulk printing orders.</p>
+          </div>
+
+          <div class="studio-basket-badge" id="studio-basket-badge">
+            <p class="label-xs" style="color: var(--color-brand-pink-text);">My Design Basket</p>
+            <div class="studio-basket-totals">
+              <span class="studio-basket-qty" id="studio-basket-qty">0 Magnets</span>
+              <span class="studio-basket-dot">&bull;</span>
+              <span class="studio-basket-cost" id="studio-basket-cost">R0</span>
+            </div>
+            <span class="studio-basket-tier-note" id="studio-basket-tier-note"></span>
+          </div>
+        </div>
+
+        <div class="studio-workspace-grid" id="studio-workspace-grid">
+          <!-- COLUMN 1: Live 3D mockup canvas -->
+          <div class="studio-canvas-col">
+            <div class="studio-canvas-panel">
+              <div class="studio-canvas-toolbar">
+                <span class="studio-canvas-chip"><span id="studio-move-icon"></span> Interactive Canvas</span>
+                <span class="studio-canvas-chip studio-canvas-chip-pink">7.5 cm Perfect Square</span>
+              </div>
+
+              <div class="studio-3d-frame">
+                <div id="studio-3d-mockup" class="studio-3d-mockup">
+                  <div id="studio-mockup-face" class="studio-mockup-face">
+                    <div class="studio-mockup-img-wrap">
+                      <img id="studio-mockup-img" src="" alt="Aesthetic Magnet Face" referrerpolicy="no-referrer" />
+                      <div class="studio-mockup-hint" id="studio-mockup-drag-hint"><span id="studio-mockup-move-icon"></span> Drag Image Layer</div>
+                      <div class="studio-mockup-dragging" id="studio-mockup-dragging-indicator" hidden><span id="studio-mockup-refresh-icon"></span> Moving Frame</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="studio-empty-canvas" id="studio-empty-canvas" hidden>
+                  <p>Select a design card to render live mockup</p>
+                </div>
+              </div>
+
+              <div class="studio-zoom-bar">
+                <button type="button" class="studio-zoom-btn" id="studio-zoom-out-btn" title="Zoom Out"><span id="studio-zoom-out-icon"></span></button>
+                <div class="studio-zoom-readout">
+                  <span id="studio-zoom-label">Zoom Layer: 100%</span>
+                  <button type="button" class="studio-zoom-reset" id="studio-zoom-reset-btn">Auto Center</button>
+                </div>
+                <button type="button" class="studio-zoom-btn" id="studio-zoom-in-btn" title="Zoom In"><span id="studio-zoom-in-icon"></span></button>
+              </div>
+            </div>
+
+            <div class="studio-craft-card">
+              <span class="label-xs" style="display:block;">The CustomVibe Craft Standard</span>
+              <p class="studio-craft-intro">These are physical custom magnets wrapped by hand so your pictures stretch clean off the edge without digital clipping:</p>
+              <div class="studio-craft-item">
+                <span id="studio-craft-sparkle-icon"></span>
+                <div>
+                  <p class="studio-craft-item-title">300DPI Fine-Art Paper lamination</p>
+                  <p class="studio-craft-item-desc">Sealed below high-gloss shielding. Water and greasy fingers won't ruin your favorite memories.</p>
+                </div>
+              </div>
+              <div class="studio-craft-item">
+                <span id="studio-craft-check-icon"></span>
+                <div>
+                  <p class="studio-craft-item-title">Solid 3mm Matte Flat Magnet Backing</p>
+                  <p class="studio-craft-item-desc">Perfect alignment with our lowercase @customvibe stamp sealing the background structure.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLUMN 2: Upload + design list + checkout -->
+          <div class="studio-list-col">
+            <div class="studio-list-panel">
+              <div>
+                <h3 class="studio-list-title" id="studio-list-title">My Draft Designs (0)</h3>
+                <p class="studio-list-subtitle">Upload files, change magnet counts, or build backup templates.</p>
+              </div>
+
+              <input type="file" id="studio-file-input" multiple accept="image/*" hidden />
+
+              <div class="studio-upload-zone" id="studio-upload-zone">
+                <span id="studio-upload-icon"></span>
+                <p class="studio-upload-title">Upload Custom Image Files</p>
+                <p class="studio-upload-sub">Import multiple pictures at the same time directly</p>
+              </div>
+
+              <div class="studio-design-list" id="studio-design-list"></div>
+
+              <button type="button" class="studio-add-draft-btn" id="btn-add-new-design">
+                <span id="studio-plus-icon"></span> Add Placeholder Magnet Card
+              </button>
+
+              <hr class="divider" />
+
+              <div class="studio-help-note">
+                <span id="studio-help-icon"></span>
+                <p>Each custom template stores its distinct cropping parameters. Reposition photos seamlessly with pointer grabs on mobile or mice.</p>
+              </div>
+            </div>
+
+            <div class="studio-checkout-card">
+              <div class="studio-checkout-row">
+                <div>
+                  <p class="studio-checkout-title">Design Session Complete?</p>
+                  <p class="studio-checkout-sub">Compile files and verify shipping details.</p>
+                </div>
+                <div class="studio-checkout-price">
+                  <span class="studio-checkout-cost" id="studio-checkout-cost">R0</span>
+                  <span class="studio-checkout-qty" id="studio-checkout-qty">0 Magnets total</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-primary" style="width:100%;" id="magnet-designer-checkout-btn">
+                Get Custom Quote &amp; Checkout
+                <span id="studio-checkout-arrow-icon"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div data-partial="footer"></div>
+    <div data-partial="quote-modal"></div>
+
+    <script type="module" src="/js/partials.js"></script>
+    <script type="module" src="/js/quote-modal.js"></script>
+    <script type="module" src="/js/design.js"></script>
+  </body>
+</html>

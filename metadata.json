@@ -1,6 +1,0 @@
-{
-  "name": "CustomVibe",
-  "description": "Find your tribe at Custom Vibe. Premium interactive square magnet designer with automatic cost calculator, multi-magnet designer studio, custom quotes, and responsive animations.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

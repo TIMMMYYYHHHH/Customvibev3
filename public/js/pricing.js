@@ -1,12 +1,6 @@
-export interface BundlePriceSummary {
-  cost: number;
-  savings: number;
-  avgPerUnit: number;
-  tier: string;
-}
-
 // South African Rand (R) tiers: R50 x1, R250 x6 (R41.67/unit), R40/unit for 10+.
-export function calculateBundlePrice(totalQty: number): BundlePriceSummary {
+// Ported verbatim from the old src/utils/pricing.ts.
+export function calculateBundlePrice(totalQty) {
   if (totalQty === 0) {
     return { cost: 0, savings: 0, avgPerUnit: 0, tier: 'N/A' };
   }

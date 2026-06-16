@@ -1,13 +1,10 @@
-// Cloudflare Worker entry point. Serves the built SPA assets and returns a
-// real 404 status for unmatched routes (instead of always 200), since the
-// SPA shell only understands the routes baked into the React Router config.
+// Cloudflare Worker entry point. Static site is served entirely by Workers
+// Assets (see wrangler.jsonc: html_handling/not_found_handling), so this
+// worker only adds security headers to whatever ASSETS.fetch returns.
 
-const KNOWN_ROUTES = new Set(['/', '/design', '/quote', '/privacy', '/terms', '/contact']);
-
-// Headers with well-understood, low-risk behavior across browsers. A full
-// Content-Security-Policy is deliberately left out: this app loads Google
-// Fonts, Unsplash images, and inline JSON-LD <script> blocks, and getting a
-// CSP allowlist wrong fails silently at runtime (not at build time) — that
+// A full Content-Security-Policy is deliberately left out: this app loads
+// Google Fonts and inline JSON-LD <script> blocks, and getting a CSP
+// allowlist wrong fails silently at runtime (not at build time) — that
 // needs verifying in a real browser before shipping, which isn't available
 // in this environment.
 function withSecurityHeaders(response) {
@@ -23,17 +20,6 @@ function withSecurityHeaders(response) {
 export default {
   async fetch(request, env) {
     const assetResponse = await env.ASSETS.fetch(request);
-    if (assetResponse.status !== 404) {
-      return withSecurityHeaders(assetResponse);
-    }
-
-    const url = new URL(request.url);
-    const indexResponse = await env.ASSETS.fetch(new Request(new URL('/index.html', url.origin), request));
-    const status = KNOWN_ROUTES.has(url.pathname) ? 200 : 404;
-
-    return withSecurityHeaders(new Response(indexResponse.body, {
-      status,
-      headers: indexResponse.headers,
-    }));
+    return withSecurityHeaders(assetResponse);
   },
 };
