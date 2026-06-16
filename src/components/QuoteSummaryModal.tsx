@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { X, ShoppingBag, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
 import { MagnetDesign } from '../types';
+import { calculateBundlePrice } from '../utils/pricing';
 
 interface QuoteSummaryModalProps {
   isOpen: boolean;
@@ -22,20 +23,8 @@ export default function QuoteSummaryModal({
     return designs.reduce((sum, d) => sum + d.quantity, 0);
   };
 
-  const getBundlePriceSummary = (totalQty: number) => {
-    if (totalQty === 0) return 0;
-    if (totalQty === 1) return 50;
-    if (totalQty < 6) return totalQty * 50;
-    if (totalQty >= 6 && totalQty < 10) {
-      const remaining = totalQty - 6;
-      return 250 + (remaining * 41.67);
-    }
-    const remaining = totalQty - 10;
-    return 400 + (remaining * 40);
-  };
-
   const totalQty = calculateTotalQuantity();
-  const totalPriceEst = getBundlePriceSummary(totalQty);
+  const totalPriceEst = calculateBundlePrice(totalQty).cost;
   
   const normalPriceSum = totalQty * 50;
   const savings = Math.max(0, normalPriceSum - totalPriceEst);
@@ -217,7 +206,7 @@ export default function QuoteSummaryModal({
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-initial py-3 px-5 rounded-xl.5 border border-brand-pink-soft hover:bg-neutral-50 text-brand-charcoal text-xs font-bold transition-all cursor-pointer text-center"
+              className="flex-1 sm:flex-initial py-3 px-5 rounded-2xl border border-brand-pink-soft hover:bg-neutral-50 text-brand-charcoal text-xs font-bold transition-all cursor-pointer text-center"
               id="summary-modal-cancel-btn"
             >
               Keep Editing
@@ -227,7 +216,7 @@ export default function QuoteSummaryModal({
                 onProceed();
               }}
               disabled={designs.length === 0}
-              className="flex-1 sm:flex-initial py-3 px-6 rounded-xl.5 bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-40 cursor-pointer"
+              className="flex-1 sm:flex-initial py-3 px-6 rounded-2xl bg-brand-charcoal text-white hover:bg-brand-pink hover:text-brand-charcoal text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-40 cursor-pointer"
               id="summary-modal-proceed-btn"
             >
               Confirm and Proceed

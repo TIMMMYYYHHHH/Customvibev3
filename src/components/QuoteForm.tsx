@@ -5,6 +5,7 @@ import {
   ChevronRight, Clipboard, Trash2, Printer, Compass, ArrowLeft, CreditCard
 } from 'lucide-react';
 import { MagnetDesign, QuoteRequest } from '../types';
+import { calculateBundlePrice } from '../utils/pricing';
 
 // TODO: create a free Formspree (or EmailJS) account and replace this with
 // your real form endpoint so quote submissions are actually delivered to you.
@@ -57,20 +58,8 @@ export default function QuoteForm({
     return designs.reduce((sum, d) => sum + d.quantity, 0);
   };
 
-  const calculateTotalPrice = (qty: number) => {
-    if (qty === 0) return 0;
-    if (qty === 1) return 50;
-    if (qty < 6) return qty * 50;
-    if (qty >= 6 && qty < 10) {
-      const extra = qty - 6;
-      return 250 + (extra * 41.67);
-    }
-    return qty * 40;
-  };
-
   const totalQty = calculateTotalQty();
-  const totalPrice = calculateTotalPrice(totalQty);
-  const potentialSavings = (totalQty * 50) - totalPrice;
+  const { cost: totalPrice, savings: potentialSavings } = calculateBundlePrice(totalQty);
 
   const handleSubmitQuote = async (e: React.FormEvent) => {
     e.preventDefault();

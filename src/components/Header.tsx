@@ -1,30 +1,34 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, ShoppingBag, Layers } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Sparkles, ShoppingBag, Layers, Percent } from 'lucide-react';
 import { MagnetDesign } from '../types';
+import { calculateBundlePrice } from '../utils/pricing';
 
 interface HeaderProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   designs: MagnetDesign[];
   onRequestQuote?: () => void;
 }
 
-export default function Header({ activeTab, setActiveTab, designs, onRequestQuote }: HeaderProps) {
+export default function Header({ designs, onRequestQuote }: HeaderProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const totalMagnets = designs.reduce((sum, item) => sum + item.quantity, 0);
+  const { cost: totalCost } = calculateBundlePrice(totalMagnets);
 
   const tabs = [
-    { id: 'hero', label: 'Explore Custom Vibe', icon: Sparkles },
-    { id: 'designer', label: 'Design Studio', icon: Layers },
+    { id: 'hero', label: 'Explore Custom Vibe', icon: Sparkles, path: '/' },
+    { id: 'designer', label: 'Design Studio', icon: Layers, path: '/design' },
+    { id: 'pricing', label: 'Bundles & Pricing', icon: Percent, path: '/#pricing-section' },
   ];
 
   return (
     <header className="sticky top-0 z-50 bg-[#faf5f5]/92 backdrop-blur-md border-b border-brand-pink/30 px-6 md:px-12 py-4 shadow-[0_2px_20px_rgba(255,182,193,0.08)]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        
+
         {/* Soft-Pink Brand Logo & Moto */}
-        <div 
-          onClick={() => setActiveTab('hero')}
+        <Link
+          to="/"
           className="flex items-center gap-3.5 cursor-pointer group self-center md:self-auto"
           id="brand-logo-container"
         >
@@ -39,21 +43,25 @@ export default function Header({ activeTab, setActiveTab, designs, onRequestQuot
               Premium Fridge Prints
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Studio Navigation pillbox with smooth slide indicators */}
         <nav className="flex items-center justify-center gap-1 bg-[#ffeef1] p-1 rounded-2xl border border-brand-pink/30">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+            const isActive = tab.path === '/'
+              ? location.pathname === '/' && !location.hash
+              : tab.path.startsWith('/#')
+                ? location.pathname === '/' && location.hash === tab.path.slice(1)
+                : location.pathname === tab.path;
             return (
-              <button
+              <Link
                 key={tab.id}
                 id={`nav-tab-${tab.id}`}
-                onClick={() => setActiveTab(tab.id)}
+                to={tab.path}
                 className={`relative px-5 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 flex items-center gap-2 cursor-pointer ${
-                  isActive 
-                    ? 'text-brand-charcoal z-10' 
+                  isActive
+                    ? 'text-brand-charcoal z-10'
                     : 'text-zinc-500 hover:text-brand-charcoal'
                 }`}
               >
@@ -69,7 +77,7 @@ export default function Header({ activeTab, setActiveTab, designs, onRequestQuot
                   <Icon className="w-4 h-4 text-brand-pink-dark" />
                   {tab.label}
                 </span>
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -77,17 +85,9 @@ export default function Header({ activeTab, setActiveTab, designs, onRequestQuot
         {/* Custom Quote Request Basket Button */}
         <button
           id="nav-quote-basket"
-          onClick={() => {
-            if (activeTab === 'quote') {
-              setActiveTab('quote');
-            } else if (onRequestQuote) {
-              onRequestQuote();
-            } else {
-              setActiveTab('quote');
-            }
-          }}
+          onClick={() => (onRequestQuote ? onRequestQuote() : navigate('/quote'))}
           className={`relative px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer self-center md:self-auto ${
-            activeTab === 'quote'
+            location.pathname === '/quote'
               ? 'bg-brand-charcoal text-white shadow-md'
               : 'bg-brand-pink hover:bg-brand-pink-dark text-[#2c181b] shadow-3xs hover:shadow-xs'
           }`}
@@ -95,8 +95,8 @@ export default function Header({ activeTab, setActiveTab, designs, onRequestQuot
           <ShoppingBag className="w-4.5 h-4.5 text-brand-charcoal" />
           <span>Request Quote</span>
           {totalMagnets > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 bg-brand-charcoal text-[#ffeef1] font-mono font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center animate-bounce shadow-sm border border-brand-pink/40">
-              {totalMagnets}
+            <span className="absolute -top-1.5 -right-1.5 bg-brand-charcoal text-[#ffeef1] font-mono font-bold text-[10px] h-5 px-1.5 rounded-full flex items-center justify-center gap-0.5 animate-bounce shadow-sm border border-brand-pink/40 whitespace-nowrap">
+              {totalMagnets} &bull; R{totalCost}
             </span>
           )}
         </button>

@@ -5,6 +5,7 @@ import {
   ChevronRight, ZoomIn, ZoomOut, CheckCircle2, Move, HelpCircle, RefreshCw
 } from 'lucide-react';
 import { MagnetDesign } from '../types';
+import { calculateBundlePrice } from '../utils/pricing';
 
 interface MagnetDesignerProps {
   designs: MagnetDesign[];
@@ -209,21 +210,9 @@ export default function MagnetDesigner({
   const calculateTotalQuantity = () => {
     return designs.reduce((sum, d) => sum + d.quantity, 0);
   };
-  
-  const getBundlePriceSummary = (totalQty: number) => {
-    if (totalQty === 0) return 0;
-    if (totalQty === 1) return 50;
-    if (totalQty < 6) return totalQty * 50;
-    if (totalQty >= 6 && totalQty < 10) {
-      const remaining = totalQty - 6;
-      return 250 + (remaining * 41.67);
-    }
-    const remaining = totalQty - 10;
-    return 400 + (remaining * 40);
-  };
 
   const totalQty = calculateTotalQuantity();
-  const totalPriceEst = getBundlePriceSummary(totalQty);
+  const totalPriceEst = calculateBundlePrice(totalQty).cost;
 
   const transX = (posX - 50) * 2;
   const transY = (posY - 50) * 2;
@@ -274,7 +263,7 @@ export default function MagnetDesigner({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" id="studio-workspace-grid">
         
         {/* ================= COLUMN 1: LEFT - THE LIVE 3D INTERACTIVE MAGNET CANVAS ================= */}
-        <div className="col-span-1 lg:col-span-6 flex flex-col items-center gap-6">
+        <div className="col-span-1 lg:col-span-6 flex flex-col items-center gap-6 order-2 lg:order-1">
           
           <div className="w-full bg-white rounded-[40px] p-8 border border-brand-pink-soft shadow-xs flex flex-col items-center justify-between min-h-[490px]">
             
@@ -464,7 +453,7 @@ export default function MagnetDesigner({
         </div>
 
         {/* ================= COLUMN 2: RIGHT - CUSTOM UPLOAD BATCH CONTROLS ================= */}
-        <div className="col-span-1 lg:col-span-6 space-y-6">
+        <div className="col-span-1 lg:col-span-6 space-y-6 order-1 lg:order-2">
           
           <div className="bg-white rounded-[40px] p-6 sm:p-8 border border-brand-pink-soft shadow-sm space-y-6">
             

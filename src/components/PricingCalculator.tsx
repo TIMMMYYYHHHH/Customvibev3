@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Sparkles, Percent, HelpingHand, Tag } from 'lucide-react';
+import { calculateBundlePrice } from '../utils/pricing';
 
 interface PricingCalculatorProps {
   onStartDesigning: () => void;
@@ -9,46 +10,7 @@ interface PricingCalculatorProps {
 export default function PricingCalculator({ onStartDesigning }: PricingCalculatorProps) {
   const [estimateQty, setEstimateQty] = useState(6);
 
-  // South African Rand (R) tiers calculation:
-  // R50 x1 (R50 per unit)
-  // R250 x6 (R41.67 per unit)
-  // R400 x10 (R40.00 per unit)
-  const calculateCostAndSavings = (qty: number) => {
-    const rawCost = qty * 50; 
-    let finalCost = 0;
-    let tierName = '';
-
-    if (qty === 0) {
-      return { cost: 0, savings: 0, avgPerUnit: 0, tier: 'N/A' };
-    }
-    if (qty === 1) {
-      finalCost = 50;
-      tierName = 'Single Shot Trial';
-    } else if (qty < 6) {
-      finalCost = qty * 50;
-      tierName = 'Standard Tier';
-    } else if (qty >= 6 && qty < 10) {
-      const extra = qty - 6;
-      finalCost = 250 + (extra * 41.67);
-      tierName = 'Tribe Half-Dozen Discount';
-    } else {
-      // 10 or more is R40 each
-      finalCost = qty * 40;
-      tierName = 'Ultimate Pack Bulk Rate';
-    }
-
-    const savings = rawCost - finalCost;
-    const avgPerUnit = finalCost / qty;
-
-    return {
-      cost: Math.round(finalCost),
-      savings: Math.round(savings),
-      avgPerUnit: Math.round(avgPerUnit * 100) / 100,
-      tier: tierName
-    };
-  };
-
-  const calcResult = calculateCostAndSavings(estimateQty);
+  const calcResult = calculateBundlePrice(estimateQty);
 
   const packs = [
     {
@@ -271,7 +233,7 @@ export default function PricingCalculator({ onStartDesigning }: PricingCalculato
 
           <button
             onClick={onStartDesigning}
-            className="w-full py-4 rounded-xl.5 bg-brand-charcoal hover:bg-brand-pink text-white hover:text-brand-charcoal font-display font-medium text-xs shadow-md transition-all cursor-pointer text-center block"
+            className="w-full py-4 rounded-2xl bg-brand-charcoal hover:bg-brand-pink text-white hover:text-brand-charcoal font-display font-medium text-xs shadow-md transition-all cursor-pointer text-center block"
           >
             Design {estimateQty} Magnets Now &rarr;
           </button>

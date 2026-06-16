@@ -17,18 +17,6 @@ import { PrivacyPage, TermsPage, ContactPage } from './pages/LegalPages';
 import NotFoundPage from './pages/NotFoundPage';
 import { usePageMeta } from './hooks/usePageMeta';
 
-const PATH_TO_TAB: Record<string, string> = {
-  '/': 'hero',
-  '/design': 'designer',
-  '/quote': 'quote',
-};
-
-const TAB_TO_PATH: Record<string, string> = {
-  hero: '/',
-  designer: '/design',
-  quote: '/quote',
-};
-
 const PAGE_META: Record<string, { title: string; description: string }> = {
   '/': {
     title: 'CustomVibe | Custom Photo Fridge Magnets in Durban, South Africa',
@@ -59,9 +47,6 @@ const PAGE_META: Record<string, { title: string; description: string }> = {
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const activeTab = PATH_TO_TAB[location.pathname] ?? 'hero';
-  const setActiveTab = (tab: string) => navigate(TAB_TO_PATH[tab] ?? '/');
 
   const meta = PAGE_META[location.pathname] ?? PAGE_META['/'];
   usePageMeta(meta.title, meta.description, location.pathname);
@@ -182,8 +167,6 @@ export default function App() {
 
       {/* Sticky CustomVibe Nav Header */}
       <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
         designs={designs}
         onRequestQuote={() => setShowSummaryModal(true)}
       />
