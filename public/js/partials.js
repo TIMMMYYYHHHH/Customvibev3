@@ -4,9 +4,9 @@ import { calculateBundlePrice } from './pricing.js';
 import { openQuoteModal } from './quote-modal.js';
 
 const NAV_TABS = [
-  { id: 'hero', label: 'Explore Custom Vibe', icon: 'Sparkles', path: '/' },
-  { id: 'designer', label: 'Design Studio', icon: 'Layers', path: '/design' },
-  { id: 'pricing', label: 'Bundles & Pricing', icon: 'Percent', path: '/#pricing-section' },
+  { id: 'hero',     label: 'Home',          icon: 'Sparkles', path: '/' },
+  { id: 'designer', label: 'Design Studio', icon: 'Layers',   path: '/design' },
+  { id: 'pricing',  label: 'Pricing',       icon: 'Percent',  path: '/#pricing-section' },
 ];
 
 const VALUE_ITEMS = [

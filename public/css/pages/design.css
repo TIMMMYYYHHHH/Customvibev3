@@ -32,17 +32,17 @@
 
 .studio-subtitle {
   font-size: 0.75rem;
-  color: rgba(45, 49, 66, 0.7);
+  color: rgba(44, 31, 20, 0.7);
   font-weight: 600;
   margin-top: 0.25rem;
 }
 
 .studio-basket-badge {
-  background: rgba(255, 238, 241, 0.8);
+  background: rgba(253, 248, 240, 0.8);
   backdrop-filter: blur(8px);
   padding: 1.25rem;
   border-radius: var(--radius-card);
-  border: 1px solid rgba(255, 179, 193, 0.35);
+  border: 1px solid rgba(184, 92, 58, 0.35);
   box-shadow: var(--shadow-soft);
   display: flex;
   flex-direction: column;
@@ -90,7 +90,7 @@
 }
 
 .studio-basket-tier-note.tier-low { color: var(--color-brand-pink-text); }
-.studio-basket-tier-note.tier-mid { color: #ff85a1; }
+.studio-basket-tier-note.tier-mid { color: #C0604A; }
 .studio-basket-tier-note.tier-max {
   color: #2c4e30;
   display: inline-flex;
@@ -172,7 +172,7 @@
   gap: 0.375rem;
   font-size: var(--text-label-xs);
   font-family: var(--font-mono);
-  color: rgba(45, 49, 66, 0.5);
+  color: rgba(44, 31, 20, 0.5);
   background: #fafafa;
   border: 1px solid #e4e4e7;
   padding: 0.25rem 0.75rem;
@@ -206,18 +206,18 @@
   transform-style: preserve-3d;
   user-select: none;
   transition: box-shadow 0.3s ease, transform 0.15s ease-out;
-  border: 1px solid rgba(255, 238, 241, 0.3);
+  border: 1px solid rgba(253, 248, 240, 0.3);
   box-shadow: 0 10px 24px rgba(0,0,0,0.05);
 }
 
 .studio-3d-mockup.is-hovered {
-  box-shadow: 0 28px 50px rgba(255,117,143,0.22);
+  box-shadow: 0 28px 50px rgba(184,92,58,0.22);
 }
 
 .studio-mockup-face {
   position: absolute;
   inset: 0;
-  background: #fffbfb;
+  background: #FDF8F0;
   overflow: hidden;
   cursor: grab;
   touch-action: none;
@@ -233,7 +233,7 @@
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: rgba(255, 179, 193, 0.1);
+  background: rgba(184, 92, 58, 0.1);
 }
 
 .studio-mockup-img-wrap img {
@@ -254,7 +254,7 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  background: rgba(45, 49, 66, 0.9);
+  background: rgba(44, 31, 20, 0.9);
   color: white;
   font-size: var(--text-label-xs);
   font-weight: 700;
@@ -277,14 +277,14 @@
 .studio-mockup-dragging {
   position: absolute;
   inset: 0;
-  background: rgba(45, 49, 66, 0.2);
+  background: rgba(44, 31, 20, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .studio-mockup-dragging span {
-  background: rgba(45, 49, 66, 0.95);
+  background: rgba(44, 31, 20, 0.95);
   color: white;
   font-family: var(--font-mono);
   font-size: var(--text-label-xs);
@@ -303,7 +303,7 @@
   width: 14rem;
   height: 14rem;
   border-radius: var(--radius-card);
-  border: 2px dashed rgba(255, 179, 193, 0.3);
+  border: 2px dashed rgba(184, 92, 58, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,7 +314,7 @@
 
 .studio-empty-canvas p {
   font-size: 0.75rem;
-  color: rgba(45, 49, 66, 0.4);
+  color: rgba(44, 31, 20, 0.4);
   font-weight: 600;
 }
 
@@ -345,7 +345,7 @@
 }
 
 .studio-zoom-btn:hover {
-  background: rgba(255, 179, 193, 0.2);
+  background: rgba(184, 92, 58, 0.2);
 }
 
 .studio-zoom-btn:disabled {
@@ -400,7 +400,7 @@
 
 .studio-craft-intro {
   font-size: 0.75rem;
-  color: rgba(45, 49, 66, 0.7);
+  color: rgba(44, 31, 20, 0.7);
   line-height: 1.6;
   font-weight: 600;
 }
@@ -467,8 +467,8 @@
 }
 
 .studio-upload-zone {
-  border: 2px dashed rgba(255, 179, 193, 0.55);
-  background: rgba(255, 238, 241, 0.3);
+  border: 2px dashed rgba(184, 92, 58, 0.55);
+  background: rgba(253, 248, 240, 0.3);
   padding: 1.5rem;
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-soft);
@@ -483,7 +483,7 @@
 
 .studio-upload-zone:hover {
   border-color: var(--color-brand-pink);
-  background: rgba(255, 238, 241, 0.5);
+  background: rgba(253, 248, 240, 0.5);
 }
 
 .studio-upload-zone svg {
@@ -645,7 +645,7 @@
   width: 100%;
   padding: 0.75rem;
   border-radius: var(--radius-card);
-  border: 2px dashed rgba(255, 117, 143, 0.45);
+  border: 2px dashed rgba(184, 92, 58, 0.45);
   color: var(--color-brand-pink-text);
   font-size: 0.75rem;
   font-weight: 700;
@@ -658,7 +658,7 @@
 
 .studio-add-draft-btn:hover {
   border-color: var(--color-brand-pink-dark);
-  background: rgba(255, 238, 241, 0.22);
+  background: rgba(253, 248, 240, 0.22);
 }
 
 .studio-help-note {
@@ -681,10 +681,10 @@
 /* ---------- Checkout card ---------- */
 
 .studio-checkout-card {
-  background: rgba(255, 238, 241, 0.8);
+  background: rgba(253, 248, 240, 0.8);
   border-radius: var(--radius-panel);
   padding: 1.5rem;
-  border: 1px solid rgba(255, 179, 193, 0.3);
+  border: 1px solid rgba(184, 92, 58, 0.3);
   display: flex;
   flex-direction: column;
   gap: 1rem;

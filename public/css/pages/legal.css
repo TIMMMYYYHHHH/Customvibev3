@@ -6,9 +6,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--color-brand-pink-text);
+  color: var(--color-terracotta);
   margin-bottom: 2rem;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .legal-back-link svg {
-  color: var(--color-brand-pink-text);
+  color: var(--color-terracotta);
 }
 
 .legal-card {
@@ -29,53 +29,58 @@
 }
 
 .legal-card h1 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: var(--color-brand-charcoal);
-  margin-bottom: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--color-brown-deep);
+  margin-bottom: 0.625rem;
 }
 
 .legal-card p {
-  font-size: 0.8rem;
-  color: rgba(45, 49, 66, 0.8);
-  line-height: 1.6;
-  font-weight: 600;
-  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-brown-mid);
+  line-height: 1.7;
+  font-weight: 500;
+  margin-top: 0.875rem;
 }
 
 .legal-card p:first-of-type {
-  margin-top: 1rem;
+  margin-top: 1.125rem;
 }
 
 .legal-placeholder-note {
-  color: #a1a1aa;
+  color: var(--color-brown-muted);
   font-size: var(--text-label-xs);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 700;
+  font-family: var(--font-sans);
+  opacity: 0.7;
 }
 
 /* ---------- 404 ---------- */
 
 .notfound-page {
   max-width: 36rem;
-  padding-top: 4rem;
-  padding-bottom: 6rem;
+  padding-top: 5rem;
+  padding-bottom: 7rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .notfound-page h1 {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--color-brand-charcoal);
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--color-brown-deep);
 }
 
 .notfound-page p {
-  font-size: 0.875rem;
-  color: #71717a;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-brown-mid);
+  font-weight: 500;
+  line-height: 1.65;
 }

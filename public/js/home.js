@@ -102,13 +102,18 @@ const FAQ_ITEMS = [
   },
 ];
 
+function setIcon(id, name, opts) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = iconSvg(name, opts);
+}
+
 function renderStaticIcons() {
-  document.getElementById('hero-sparkle-icon').innerHTML = iconSvg('Sparkles', { size: 14 });
-  document.getElementById('hero-heart-icon').innerHTML = iconSvg('Heart', { size: 18 });
-  document.getElementById('hero-star-icon').innerHTML = iconSvg('Star', { size: 18 });
-  document.getElementById('hero-arrow-icon').innerHTML = iconSvg('ArrowRight', { size: 16 });
-  document.getElementById('pricing-percent-icon').innerHTML = iconSvg('Percent', { size: 14 });
-  document.getElementById('pricing-helping-icon').innerHTML = iconSvg('HelpingHand', { size: 16 });
+  setIcon('hero-eyebrow-icon',  'Sparkles',     { size: 13 });
+  setIcon('hero-cta-arrow',     'ArrowRight',   { size: 16 });
+  setIcon('hero-trust-icon-1',  'Layers',       { size: 12 });
+  setIcon('hero-trust-icon-2',  'Star',         { size: 12 });
+  setIcon('pricing-percent-icon','Percent',     { size: 13 });
+  setIcon('pricing-helping-icon','HelpingHand', { size: 16 });
 }
 
 function renderFridgeMagnets() {
