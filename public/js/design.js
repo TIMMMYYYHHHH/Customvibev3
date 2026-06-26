@@ -59,7 +59,7 @@ function renderBasketBadge() {
 }
 
 function renderDesignList() {
-  document.getElementById('studio-list-title').textContent = `My Draft Designs (${designs.length})`;
+  document.getElementById('studio-list-title').textContent = `Your magnet designs (${designs.length})`;
 
   const list = document.getElementById('studio-design-list');
   list.innerHTML = designs.map((design) => `

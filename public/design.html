@@ -34,20 +34,30 @@
 
     <main>
       <div class="container section-md" id="magnet-designer-root">
-        <div class="studio-header-row">
-          <div>
-            <h2 class="studio-title">Magnet Studio</h2>
-            <p class="studio-subtitle">Drag photo grids to position, zoom, duplicate, or adjust bulk printing orders.</p>
+        <div class="studio-hero-panel">
+          <div class="studio-header-row">
+            <div>
+              <span class="studio-kicker">Guided Design Studio</span>
+              <h2 class="studio-title">Build fridge-ready magnets in minutes.</h2>
+              <p class="studio-subtitle">Upload your photos, preview the crop, set quantities, and send everything through for a final quote.</p>
+            </div>
+
+            <div class="studio-basket-badge" id="studio-basket-badge">
+              <p class="label-xs" style="color: var(--color-brand-pink-text);">My Design Basket</p>
+              <div class="studio-basket-totals">
+                <span class="studio-basket-qty" id="studio-basket-qty">0 Magnets</span>
+                <span class="studio-basket-dot">&bull;</span>
+                <span class="studio-basket-cost" id="studio-basket-cost">R0</span>
+              </div>
+              <span class="studio-basket-tier-note" id="studio-basket-tier-note"></span>
+            </div>
           </div>
 
-          <div class="studio-basket-badge" id="studio-basket-badge">
-            <p class="label-xs" style="color: var(--color-brand-pink-text);">My Design Basket</p>
-            <div class="studio-basket-totals">
-              <span class="studio-basket-qty" id="studio-basket-qty">0 Magnets</span>
-              <span class="studio-basket-dot">&bull;</span>
-              <span class="studio-basket-cost" id="studio-basket-cost">R0</span>
-            </div>
-            <span class="studio-basket-tier-note" id="studio-basket-tier-note"></span>
+          <div class="studio-steps" aria-label="Design process">
+            <div><strong>01</strong><span>Upload photos</span></div>
+            <div><strong>02</strong><span>Crop live preview</span></div>
+            <div><strong>03</strong><span>Choose quantities</span></div>
+            <div><strong>04</strong><span>Request quote</span></div>
           </div>
         </div>
 
@@ -56,7 +66,7 @@
           <div class="studio-canvas-col">
             <div class="studio-canvas-panel">
               <div class="studio-canvas-toolbar">
-                <span class="studio-canvas-chip"><span id="studio-move-icon"></span> Interactive Canvas</span>
+                <span class="studio-canvas-chip"><span id="studio-move-icon"></span> Live Magnet Preview</span>
                 <span class="studio-canvas-chip studio-canvas-chip-pink">7.5 cm Perfect Square</span>
               </div>
 
@@ -64,14 +74,14 @@
                 <div id="studio-3d-mockup" class="studio-3d-mockup">
                   <div id="studio-mockup-face" class="studio-mockup-face">
                     <div class="studio-mockup-img-wrap">
-                      <img id="studio-mockup-img" src="" alt="Aesthetic Magnet Face" referrerpolicy="no-referrer" />
-                      <div class="studio-mockup-hint" id="studio-mockup-drag-hint"><span id="studio-mockup-move-icon"></span> Drag Image Layer</div>
-                      <div class="studio-mockup-dragging" id="studio-mockup-dragging-indicator" hidden><span id="studio-mockup-refresh-icon"></span> Moving Frame</div>
+                      <img id="studio-mockup-img" src="" alt="Selected magnet preview" referrerpolicy="no-referrer" />
+                      <div class="studio-mockup-hint" id="studio-mockup-drag-hint"><span id="studio-mockup-move-icon"></span> Drag photo to reposition</div>
+                      <div class="studio-mockup-dragging" id="studio-mockup-dragging-indicator" hidden><span id="studio-mockup-refresh-icon"></span> Repositioning photo</div>
                     </div>
                   </div>
                 </div>
                 <div class="studio-empty-canvas" id="studio-empty-canvas" hidden>
-                  <p>Select a design card to render live mockup</p>
+                  <p>Upload or select a photo to preview your magnet.</p>
                 </div>
               </div>
 
@@ -86,7 +96,7 @@
             </div>
 
             <div class="studio-craft-card">
-              <span class="label-xs" style="display:block;">The CustomVibe Craft Standard</span>
+              <span class="label-xs" style="display:block;">Finish & quality</span>
               <p class="studio-craft-intro">These are physical custom magnets wrapped by hand so your pictures stretch clean off the edge without digital clipping:</p>
               <div class="studio-craft-item">
                 <span id="studio-craft-sparkle-icon"></span>
@@ -109,29 +119,29 @@
           <div class="studio-list-col">
             <div class="studio-list-panel">
               <div>
-                <h3 class="studio-list-title" id="studio-list-title">My Draft Designs (0)</h3>
-                <p class="studio-list-subtitle">Upload files, change magnet counts, or build backup templates.</p>
+                <h3 class="studio-list-title" id="studio-list-title">Your magnet designs (0)</h3>
+                <p class="studio-list-subtitle">Start with your own photos or try a sample. Select any card to edit its crop.</p>
               </div>
 
               <input type="file" id="studio-file-input" multiple accept="image/*" hidden />
 
               <div class="studio-upload-zone" id="studio-upload-zone">
                 <span id="studio-upload-icon"></span>
-                <p class="studio-upload-title">Upload Custom Image Files</p>
-                <p class="studio-upload-sub">Import multiple pictures at the same time directly</p>
+                <p class="studio-upload-title">Upload photos</p>
+                <p class="studio-upload-sub">Choose one or more JPG, PNG, or HEIC files.</p>
               </div>
 
               <div class="studio-design-list" id="studio-design-list"></div>
 
               <button type="button" class="studio-add-draft-btn" id="btn-add-new-design">
-                <span id="studio-plus-icon"></span> Add Placeholder Magnet Card
+                <span id="studio-plus-icon"></span> Try a sample magnet
               </button>
 
               <hr class="divider" />
 
               <div class="studio-help-note">
                 <span id="studio-help-icon"></span>
-                <p>Each custom template stores its distinct cropping parameters. Reposition photos seamlessly with pointer grabs on mobile or mice.</p>
+                <p>Tip: each photo remembers its own crop and quantity. Select a card, then drag or zoom the preview.</p>
               </div>
             </div>
 
@@ -139,7 +149,7 @@
               <div class="studio-checkout-row">
                 <div>
                   <p class="studio-checkout-title">Design Session Complete?</p>
-                  <p class="studio-checkout-sub">Compile files and verify shipping details.</p>
+                  <p class="studio-checkout-sub">Send your designs so we can confirm delivery and payment details.</p>
                 </div>
                 <div class="studio-checkout-price">
                   <span class="studio-checkout-cost" id="studio-checkout-cost">R0</span>
