@@ -84,3 +84,19 @@
   font-weight: 500;
   line-height: 1.65;
 }
+
+/* ---------- Full rebuild layer: legal/contact pages ---------- */
+.legal-page, .notfound-page { position: relative; }
+.legal-card {
+  border-radius: var(--radius-panel);
+  background: rgba(255,255,255,0.88);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-raised);
+}
+.legal-card h1,
+.notfound-page h1 { color: var(--color-text); font-size: clamp(2.4rem, 6vw, 4rem); line-height: 0.95; }
+.legal-card p,
+.notfound-page p { color: var(--color-text-muted); font-size: 0.98rem; }
+.legal-back-link { color: var(--color-primary); border: 1px solid var(--color-border); border-radius: var(--radius-pill); padding: 0.55rem 0.85rem; background: rgba(255,255,255,0.72); text-decoration: none; }
+.legal-back-link:hover { background: var(--color-primary-100); text-decoration: none; }
+.legal-placeholder-note { color: var(--color-warning); background: var(--color-warning-bg); border-radius: 14px; padding: 0.75rem 0.9rem; opacity: 1; }

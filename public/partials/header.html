@@ -1,29 +1,38 @@
 <header class="site-header">
   <div class="site-header-inner">
-
-    <!-- Left nav -->
-    <nav class="site-nav-left">
-      <a href="index.html"                 id="nav-tab-hero"    data-nav-path="/"></a>
-      <a href="index.html#pricing-section" id="nav-tab-pricing" data-nav-path="/#pricing-section"></a>
-    </nav>
-
-    <!-- Center logo -->
-    <a href="index.html" class="brand-logo">
-      <div class="brand-logo-box">C</div>
+    <a href="index.html" class="brand-logo" aria-label="CustomVibe home">
+      <div class="brand-logo-box" aria-hidden="true">C</div>
       <div>
         <div class="brand-wordmark">Custom<span>Vibe</span></div>
+        <div class="brand-tagline">Photo fridge magnets</div>
       </div>
     </a>
 
-    <!-- Right: designer nav + basket -->
-    <div class="site-header-right">
-      <a href="design.html" id="nav-tab-designer" data-nav-path="/design" class="site-nav-right-link"></a>
+    <nav class="site-nav" id="site-primary-nav" aria-label="Primary navigation">
+      <a href="index.html" id="nav-tab-hero" data-nav-path="/"></a>
+      <a href="design.html" id="nav-tab-designer" data-nav-path="/design"></a>
+      <a href="index.html#pricing-section" id="nav-tab-pricing" data-nav-path="/#pricing-section"></a>
+      <a href="contact.html" id="nav-tab-contact" data-nav-path="/contact"></a>
+    </nav>
+
+    <div class="site-header-actions">
       <button type="button" class="quote-basket-btn" id="nav-quote-basket">
         <span id="nav-quote-basket-icon"></span>
         <span>Basket</span>
         <span class="quote-basket-badge" id="nav-quote-basket-badge" hidden></span>
       </button>
+      <button type="button" class="site-menu-toggle" id="site-menu-toggle" aria-controls="site-mobile-menu" aria-expanded="false" aria-label="Open navigation menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </div>
 
+  <div class="site-mobile-menu" id="site-mobile-menu" hidden>
+    <nav class="site-mobile-nav" aria-label="Mobile navigation">
+      <a href="index.html" id="mobile-nav-tab-hero" data-nav-path="/"></a>
+      <a href="design.html" id="mobile-nav-tab-designer" data-nav-path="/design"></a>
+      <a href="index.html#pricing-section" id="mobile-nav-tab-pricing" data-nav-path="/#pricing-section"></a>
+      <a href="contact.html" id="mobile-nav-tab-contact" data-nav-path="/contact"></a>
+    </nav>
   </div>
 </header>

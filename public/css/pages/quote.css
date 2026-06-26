@@ -684,3 +684,50 @@
 .quote-success-new-project {
   padding-top: 0.5rem;
 }
+
+/* ---------- Full rebuild layer: quote flow ---------- */
+.quote-page { max-width: min(100%, 980px); }
+.quote-stepper {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: rgba(255,255,255,0.72);
+  box-shadow: var(--shadow-xs);
+}
+.quote-step-chip { border-radius: var(--radius-pill); background: transparent; color: var(--color-text-muted); font-weight: 800; }
+.quote-step-chip.active { background: var(--color-text); color: #fff; box-shadow: none; }
+.quote-step-chip.complete { background: var(--color-accent-100); color: var(--color-accent); }
+.quote-step-connector { background: var(--color-border-strong); }
+.quote-step-title { font-family: var(--font-heading); font-weight: 400; color: var(--color-text); font-size: clamp(2.25rem, 5vw, 4rem); line-height: 0.95; }
+.quote-step-sub { color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.65; }
+.quote-items-card,
+.quote-form,
+.quote-success-card,
+.quote-empty-state { border-radius: var(--radius-panel); background: rgba(255,255,255,0.86); border-color: var(--color-border); }
+.quote-total-panel {
+  border-radius: var(--radius-panel);
+  background: linear-gradient(135deg, var(--color-text), #392a25);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: var(--shadow-raised);
+}
+.quote-total-cost,
+.quote-total-qty-text { color: #fff; }
+.quote-item-thumb { border-radius: 16px; border-color: var(--color-border); }
+.quote-back-btn,
+.quote-receipt-btn,
+.quote-pay-buttons button { border-radius: var(--radius-pill); border-color: var(--color-border); }
+.quote-form-field input,
+.quote-form-field textarea {
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+.quote-form-field input:focus,
+.quote-form-field textarea:focus { outline: 3px solid var(--color-focus); outline-offset: 2px; border-color: var(--color-focus); }
+.quote-success-icon-circle { background: var(--color-success-bg); color: var(--color-success); }
+@media (max-width: 640px) {
+  .quote-stepper { align-items: stretch; border-radius: 24px; }
+  .quote-step-chip { width: 100%; text-align: center; }
+  .quote-step-connector { display: none; }
+}

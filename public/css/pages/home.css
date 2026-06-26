@@ -848,3 +848,68 @@
   .hero-visual::before { right: 1rem; }
   .fridge-magnet { width: 132px; }
 }
+
+/* ---------- Full rebuild layer: editorial product layout ---------- */
+.hero {
+  min-height: min(860px, calc(100vh - 84px));
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(3rem, 6vw, 5rem);
+  background:
+    linear-gradient(115deg, rgba(255,248,242,0.96) 0%, rgba(255,241,232,0.86) 48%, rgba(223,245,241,0.76) 100%);
+}
+.hero::before {
+  width: min(42vw, 620px);
+  height: calc(100% - 3rem);
+  top: 1.5rem;
+  right: 1.5rem;
+  border-radius: 48px;
+  background: rgba(255,255,255,0.42);
+  border: 1px solid rgba(255,255,255,0.62);
+}
+.hero-split { max-width: var(--container-wide); gap: clamp(2rem, 5vw, 5rem); }
+.hero-text { gap: 1.25rem; }
+.hero-badge { color: var(--color-primary-600); border-color: var(--color-border); }
+.hero-title {
+  max-width: 10ch;
+  font-size: clamp(3.35rem, 9vw, 7.5rem);
+  line-height: 0.88;
+  color: var(--color-text);
+}
+.hero-title em { color: var(--color-primary); }
+.hero-sub { color: var(--color-text-muted); }
+.btn-ghost { color: var(--color-text-muted); }
+.btn-ghost:hover { color: var(--color-primary); }
+.hero-fridge { min-height: clamp(330px, 46vw, 560px); }
+.hero-specs { justify-content: center; padding-left: 0; }
+.process-section, .faq-section { background: var(--color-bg); }
+.process-header, .pricing-header, .testimonials-header, .faq-header { margin-bottom: clamp(2rem, 5vw, 4rem); }
+.section-heading { font-size: clamp(2.25rem, 5vw, 4rem); }
+.section-sub { color: var(--color-text-muted); }
+.process-track { gap: 1rem; }
+.process-card { border-radius: var(--radius-panel); padding: clamp(1.35rem, 3vw, 2rem); }
+.process-num { color: color-mix(in srgb, var(--color-primary), white 55%); }
+.process-card h3 { font-family: var(--font-sans); font-weight: 900; }
+.process-card p { color: var(--color-text-muted); }
+.process-link { color: var(--color-primary); }
+.process-connector::after { background: var(--color-border-strong); }
+.pricing-section { background: radial-gradient(circle at 80% 0%, rgba(13,107,103,0.24), transparent 24rem), #211b18; }
+.pricing-card { border-radius: var(--radius-panel); }
+.pricing-card.popular { border-color: rgba(255,255,255,0.36); box-shadow: 0 0 0 1px rgba(255,255,255,0.16), var(--shadow-floating); }
+.pricing-card-badge { background: var(--color-accent); color: #fff; }
+.pricing-card .btn-primary { background: #fff; color: var(--color-text); border-color: #fff; }
+.pricing-card .btn-primary:hover { background: var(--color-accent-100); color: var(--color-text); }
+.pricing-calc-label, .pricing-card-qty, .pricing-card-features li svg, .pricing-bulk-note svg { color: #f6bdca; }
+.testimonials-section { background: var(--color-surface-2); }
+.testimonial-card { border-radius: var(--radius-panel); border-color: var(--color-border); }
+.cta-section { background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary)); }
+.faq-list { border-radius: var(--radius-panel); }
+.faq-item summary:hover { background: var(--color-surface-2); }
+@media (max-width: 899px) {
+  .hero { min-height: auto; }
+  .hero-title { max-width: 11ch; }
+  .hero-fridge { min-height: 360px; }
+  .hero-specs { justify-content: flex-start; }
+}
+@media (max-width: 520px) {
+  .hero-actions .btn { width: 100%; }
+  .fridge-magnet { width: 118px; }
+}

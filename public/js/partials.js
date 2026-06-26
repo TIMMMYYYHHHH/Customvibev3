@@ -7,6 +7,7 @@ const NAV_TABS = [
   { id: 'hero',     label: 'Home',          icon: 'Sparkles', path: '/' },
   { id: 'designer', label: 'Design Studio', icon: 'Layers',   path: '/design' },
   { id: 'pricing',  label: 'Pricing',       icon: 'Percent',  path: '/#pricing-section' },
+  { id: 'contact',  label: 'Contact',       icon: 'MessageCircle', path: '/contact' },
 ];
 
 const VALUE_ITEMS = [
@@ -34,18 +35,42 @@ function wireHeader() {
   const hash = location.hash;
 
   NAV_TABS.forEach((tab) => {
-    const a = document.getElementById(`nav-tab-${tab.id}`);
-    if (!a) return;
-    a.innerHTML = `${iconSvg(tab.icon, { size: 16 })}${tab.label}`;
-
     const isActive = tab.path === '/'
       ? path === '/' && !hash
       : tab.path.startsWith('/#')
         ? path === '/' && hash === tab.path.slice(1)
         : path === tab.path;
 
-    a.classList.toggle('active', isActive);
+    [`nav-tab-${tab.id}`, `mobile-nav-tab-${tab.id}`].forEach((id) => {
+      const a = document.getElementById(id);
+      if (!a) return;
+      a.innerHTML = `${iconSvg(tab.icon, { size: 16 })}<span>${tab.label}</span>`;
+      a.classList.toggle('active', isActive);
+      if (isActive) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
   });
+
+  const toggle = document.getElementById('site-menu-toggle');
+  const mobileMenu = document.getElementById('site-mobile-menu');
+  if (toggle && mobileMenu) {
+    toggle.addEventListener('click', () => {
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!isOpen));
+      toggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+      mobileMenu.hidden = isOpen;
+      document.body.classList.toggle('mobile-nav-open', !isOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation menu');
+        mobileMenu.hidden = true;
+        document.body.classList.remove('mobile-nav-open');
+      });
+    });
+  }
 
   const quoteBtn = document.getElementById('nav-quote-basket');
   const quoteIcon = document.getElementById('nav-quote-basket-icon');
