@@ -24,12 +24,10 @@ const PREMIUM_PRESETS = [
   },
 ];
 
-// Positions scatter magnets around the EDGES of the full-screen hero
-// (avoiding the center where the main text lives)
 const MAGNET_POSITIONS = [
-  { top: '6%',  left: '3%',  rotate: '-10deg', hoverRotate: '-2deg', floatDur: '7s',  floatDelay: '0s' },
-  { top: '5%',  left: '72%', rotate: '8deg',   hoverRotate: '2deg',  floatDur: '5.5s',floatDelay: '-2s' },
-  { top: '65%', left: '78%', rotate: '-6deg',  hoverRotate: '1deg',  floatDur: '6.5s',floatDelay: '-1s' },
+  { top: '8%',  left: '5%',  rotate: '-8deg', hoverRotate: '-2deg', floatDur: '7s',   floatDelay: '0s' },
+  { top: '12%', left: '55%', rotate: '6deg',  hoverRotate: '1deg',  floatDur: '5.5s', floatDelay: '-2s' },
+  { top: '52%', left: '30%', rotate: '-4deg', hoverRotate: '2deg',  floatDur: '6.5s', floatDelay: '-1s' },
 ];
 
 const PRICING_PACKS = [
@@ -41,7 +39,7 @@ const PRICING_PACKS = [
     features: [
       '7.5 x 7.5 cm perfect square',
       'Fine-art gloss protective film',
-      '3mm heavy rubber backing',
+      '3 mm heavy rubber backing',
       'Hand-finished with care',
     ],
     popular: false,
@@ -65,7 +63,7 @@ const PRICING_PACKS = [
     title: 'Ultimate Family Pack',
     qty: '10 Magnets',
     price: 'R400',
-    description: 'Turn your entire phone roll into a full fridge gallery.',
+    description: 'Turn your entire phone gallery into a full fridge door.',
     features: [
       'Up to 10 unique photo uploads',
       'Best value at R40 per magnet',
@@ -100,7 +98,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Do you deliver across South Africa?',
-    answer: 'Yes — we\'re based in Durban and ship nationwide. Delivery cost is <span class="faq-placeholder">add real shipping cost</span> and is confirmed with your quote.',
+    answer: "Yes — we're based in Durban and ship nationwide. Delivery cost is <span class=\"faq-placeholder\">add real shipping cost</span> and is confirmed with your quote.",
   },
 ];
 
@@ -110,18 +108,19 @@ function setIcon(id, name, opts) {
 }
 
 function renderStaticIcons() {
-  setIcon('hero-badge-icon',      'Sparkles',    { size: 12 });
-  setIcon('hero-cta-arrow',       'ArrowRight',  { size: 16 });
-  setIcon('hero-scroll-icon',     'ChevronDown', { size: 20 });
-  setIcon('stat-shield-icon',     'ShieldCheck', { size: 14 });
-  setIcon('how-eyebrow-icon',     'Sparkles',    { size: 12 });
-  setIcon('how-upload-icon',      'Upload',      { size: 24 });
-  setIcon('how-step-arrow-1',     'ArrowRight',  { size: 14 });
-  setIcon('how-deliver-icon',     'Heart',       { size: 24 });
-  setIcon('testimonial-quote-icon','Quote',      { size: 28 });
-  setIcon('cta-band-arrow',       'ArrowRight',  { size: 18 });
-  setIcon('pricing-percent-icon', 'Percent',     { size: 13 });
-  setIcon('pricing-helping-icon', 'HelpingHand', { size: 16 });
+  setIcon('hero-badge-icon',       'Sparkles',    { size: 12 });
+  setIcon('hero-cta-arrow',        'ArrowRight',  { size: 16 });
+  setIcon('hero-scroll-icon',      'ChevronDown', { size: 20 });
+  setIcon('stat-shield-icon',      'ShieldCheck', { size: 12 });
+  setIcon('how-eyebrow-icon',      'Sparkles',    { size: 12 });
+  setIcon('how-upload-icon',       'Upload',      { size: 22 });
+  setIcon('how-design-icon',       'Layers',      { size: 22 });
+  setIcon('how-step-arrow-1',      'ArrowRight',  { size: 14 });
+  setIcon('how-deliver-icon',      'Heart',       { size: 22 });
+  setIcon('testimonial-quote-icon','Quote',       { size: 32 });
+  setIcon('cta-band-arrow',        'ArrowRight',  { size: 18 });
+  setIcon('pricing-percent-icon',  'Percent',     { size: 13 });
+  setIcon('pricing-helping-icon',  'HelpingHand', { size: 16 });
 }
 
 function renderFridgeMagnets() {
@@ -183,13 +182,13 @@ function renderPricingCards() {
 
 function renderPricingSimulator() {
   const slider = document.getElementById('pricing-qty-slider');
-  const qtyDisplay  = document.getElementById('pricing-qty-display');
-  const costEl      = document.getElementById('pricing-output-cost');
-  const avgEl       = document.getElementById('pricing-output-avg');
-  const tierEl      = document.getElementById('pricing-output-tier');
-  const savingsEl   = document.getElementById('pricing-savings-block');
-  const bulkNote    = document.getElementById('pricing-bulk-note');
-  const designBtn   = document.getElementById('pricing-design-now-btn');
+  const qtyDisplay = document.getElementById('pricing-qty-display');
+  const costEl = document.getElementById('pricing-output-cost');
+  const avgEl = document.getElementById('pricing-output-avg');
+  const tierEl = document.getElementById('pricing-output-tier');
+  const savingsEl = document.getElementById('pricing-savings-block');
+  const bulkNote = document.getElementById('pricing-bulk-note');
+  const designBtn = document.getElementById('pricing-design-now-btn');
   if (!slider) return;
 
   function update() {
@@ -198,7 +197,7 @@ function renderPricingSimulator() {
 
     qtyDisplay.textContent = `${qty} Magnet${qty !== 1 ? 's' : ''}`;
     costEl.textContent = `R${result.cost}`;
-    avgEl.textContent  = `R${result.avgPerUnit.toFixed(2)}`;
+    avgEl.textContent = `R${result.avgPerUnit.toFixed(2)}`;
     tierEl.textContent = result.tier;
 
     savingsEl.innerHTML = result.savings > 0
@@ -221,7 +220,7 @@ function renderTestimonials() {
     <div class="testimonial-card">
       ${iconSvg('Quote', { size: 22 })}
       <div class="testimonial-stars">
-        ${[1,2,3,4,5].map(() => iconSvg('Star', { size: 13 })).join('')}
+        ${[1, 2, 3, 4, 5].map(() => iconSvg('Star', { size: 13 })).join('')}
       </div>
       <p class="testimonial-quote">"Add a real customer quote here"</p>
       <p class="testimonial-name">Customer name, City</p>
