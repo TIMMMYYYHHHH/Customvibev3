@@ -5,19 +5,19 @@ import { refreshBasketBadge } from './partials.js';
 
 const PREMIUM_PRESETS = [
   {
-    name: 'Durban Sunset Squad',
-    imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&auto=format&fit=crop&q=80',
+    name: 'Family memory magnet',
+    imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&auto=format&fit=crop&q=80',
     quantity: 1,
     sizeCm: 7.5,
   },
   {
-    name: 'Golden Retriever Vibe',
-    imageUrl: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500&auto=format&fit=crop&q=80',
+    name: 'Pet portrait magnet',
+    imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=500&auto=format&fit=crop&q=80',
     quantity: 1,
     sizeCm: 7.5,
   },
   {
-    name: 'Coastal Solitude',
+    name: 'Holiday beach magnet',
     imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=80',
     quantity: 1,
     sizeCm: 7.5,
@@ -25,9 +25,9 @@ const PREMIUM_PRESETS = [
 ];
 
 const MAGNET_POSITIONS = [
-  { top: '8%',  left: '5%',  rotate: '-8deg', hoverRotate: '-2deg', floatDur: '7s',   floatDelay: '0s' },
-  { top: '12%', left: '55%', rotate: '6deg',  hoverRotate: '1deg',  floatDur: '5.5s', floatDelay: '-2s' },
-  { top: '52%', left: '30%', rotate: '-4deg', hoverRotate: '2deg',  floatDur: '6.5s', floatDelay: '-1s' },
+  { top: '10%', left: '10%', rotate: '-6deg', hoverRotate: '-2deg', floatDur: '7s', floatDelay: '0s' },
+  { top: '12%', left: '58%', rotate: '5deg', hoverRotate: '1deg', floatDur: '5.5s', floatDelay: '-2s' },
+  { top: '54%', left: '34%', rotate: '-3deg', hoverRotate: '2deg', floatDur: '6.5s', floatDelay: '-1s' },
 ];
 
 const PRICING_PACKS = [
@@ -138,8 +138,8 @@ function renderFridgeMagnets() {
       >
         <div class="fridge-magnet-img-wrap">
           <img src="${preset.imageUrl}" alt="${preset.name}" referrerpolicy="no-referrer" loading="lazy" />
-          <button type="button" class="fridge-magnet-customise" data-preset-index="${index}" title="Customise in Design Studio">
-            ${iconSvg('ImageIcon', { size: 11 })} Customise
+          <button type="button" class="fridge-magnet-customise" data-preset-index="${index}" title="Use this sample in the Design Studio">
+            ${iconSvg('ImageIcon', { size: 11 })} Try sample
           </button>
         </div>
       </div>`;
