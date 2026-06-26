@@ -913,3 +913,68 @@
   .hero-actions .btn { width: 100%; }
   .fridge-magnet { width: 118px; }
 }
+
+/* ---------- feedback pass: calmer, clearer hero ---------- */
+.hero {
+  min-height: auto;
+  padding: clamp(3.5rem, 7vw, 6rem) 0 clamp(3rem, 6vw, 5rem);
+  background:
+    radial-gradient(circle at 82% 18%, rgba(13,107,103,0.10), transparent 26rem),
+    linear-gradient(180deg, #fffaf6 0%, #fff8f2 100%);
+}
+.hero::before { display: none; }
+.hero-split {
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+@media (min-width: 960px) {
+  .hero-split { grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr); }
+}
+.hero-text { max-width: 660px; }
+.hero-title {
+  max-width: 13ch;
+  font-size: clamp(3rem, 7.2vw, 6rem);
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+}
+.hero-sub {
+  max-width: 34rem;
+  font-size: clamp(1rem, 1.7vw, 1.15rem);
+}
+.hero-actions .btn-primary { border-radius: 16px; }
+.hero-actions .btn-ghost {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 0.95rem 1.25rem;
+  background: rgba(255,255,255,0.7);
+}
+.hero-visual::before { display: none; }
+.hero-fridge {
+  min-height: clamp(340px, 42vw, 520px);
+  border-radius: 30px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.92), rgba(247,237,228,0.72)),
+    var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 24px 70px rgba(33,27,24,0.10);
+}
+.fridge-magnet { width: clamp(112px, 14vw, 158px); }
+.fridge-magnet-img-wrap {
+  border: 7px solid #fff;
+  border-radius: 14px;
+  box-shadow: 0 18px 36px rgba(33,27,24,0.14);
+}
+.fridge-magnet-customise {
+  opacity: 1;
+  min-height: auto;
+  background: rgba(33,27,24,0.82);
+  padding: 0.45rem;
+}
+.hero-specs { justify-content: flex-start; padding-left: 0; }
+.spec-chip { border-radius: 12px; }
+.hero-scroll-cue { display: none; }
+@media (max-width: 520px) {
+  .hero-title { font-size: clamp(2.65rem, 16vw, 4rem); }
+  .hero-actions { align-items: stretch; }
+  .hero-actions .btn { justify-content: center; }
+}

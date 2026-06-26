@@ -176,14 +176,8 @@ function wireMockupInteractions() {
   const face = document.getElementById('studio-mockup-face');
   const draggingIndicator = document.getElementById('studio-mockup-dragging-indicator');
 
-  mockup.addEventListener('mousemove', (e) => {
-    if (isDragging) return;
-    const box = mockup.getBoundingClientRect();
-    const x = e.clientX - box.left;
-    const y = e.clientY - box.top;
-    const calcX = -(y - box.height / 2) / 6;
-    const calcY = (x - box.width / 2) / 6;
-    mockup.style.transform = `rotateX(${calcX}deg) rotateY(${calcY}deg)`;
+  mockup.addEventListener('mousemove', () => {
+    // Keep the preview steady; dragging the photo is the primary interaction.
   });
 
   mockup.addEventListener('mouseenter', () => {
@@ -195,7 +189,7 @@ function wireMockupInteractions() {
     if (isDragging) return;
     isHovered = false;
     mockup.classList.remove('is-hovered');
-    mockup.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    mockup.style.transform = 'none';
   });
 
   face.addEventListener('pointerdown', (e) => {
@@ -203,7 +197,7 @@ function wireMockupInteractions() {
     face.setPointerCapture(e.pointerId);
     isDragging = true;
     mockup.classList.add('is-dragging');
-    mockup.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    mockup.style.transform = 'none';
     draggingIndicator.hidden = false;
     dragStart.x = e.clientX;
     dragStart.y = e.clientY;
