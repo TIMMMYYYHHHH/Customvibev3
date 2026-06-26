@@ -1,10 +1,10 @@
 import { iconSvg } from './icons.js';
-import { ensureSeeded, addDesign, updateDesign, deleteDesign, cloneDesign, getTotalQuantity } from './state.js';
+import { getDesigns, addDesign, updateDesign, deleteDesign, cloneDesign, getTotalQuantity } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
-import { fileToCompressedDataUrl } from './image.js';
+import { fileToCompressedDataUrl, FALLBACK_IMAGE } from './image.js';
 import { refreshBasketBadge } from './partials.js';
 
-let designs = ensureSeeded();
+let designs = getDesigns() || [];
 let activeDesignId = designs[0]?.id ?? null;
 
 let imgZoom = 100;
@@ -66,7 +66,7 @@ function renderDesignList() {
     <div class="studio-design-item${design.id === activeDesignId ? ' active' : ''}" data-design-id="${design.id}">
       <div class="studio-design-item-main">
         <div class="studio-design-item-thumb">
-          <img src="${design.imageUrl}" alt="${design.name}" referrerpolicy="no-referrer" loading="lazy" />
+          <img src="${design.imageUrl}" alt="${design.name}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'" />
         </div>
         <div style="min-width:0;">
           <p class="studio-design-item-name">${design.name}</p>
@@ -166,7 +166,9 @@ function renderMockup() {
   mockup.hidden = false;
   emptyCanvas.hidden = true;
 
-  document.getElementById('studio-mockup-img').src = active.imageUrl;
+  const mockupImg = document.getElementById('studio-mockup-img');
+  mockupImg.onerror = () => { mockupImg.onerror = null; mockupImg.src = FALLBACK_IMAGE; };
+  mockupImg.src = active.imageUrl;
   updateZoomLabel();
   applyImageTransform();
 }
@@ -301,8 +303,8 @@ function wireAddDraft() {
   document.getElementById('btn-add-new-design').addEventListener('click', () => {
     const newDesign = {
       id: `design-${Date.now()}`,
-      name: `Photo Magnet Draft #${designs.length + 1}`,
-      imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&auto=format&fit=crop&q=80',
+      name: `Sample magnet #${designs.length + 1}`,
+      imageUrl: '/images/placeholder-magnet-2.svg',
       quantity: 1,
       sizeCm: 7.5,
       cropZoom: 100,

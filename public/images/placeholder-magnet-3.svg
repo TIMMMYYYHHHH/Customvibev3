@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500" role="img" aria-label="Your photo here — CustomVibe sample magnet">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE3E9"/>
+      <stop offset="1" stop-color="#FFB3C1"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="500" fill="url(#bg3)"/>
+  <polygon points="0,0 190,0 70,500 0,500" fill="#ffffff" opacity="0.16"/>
+  <rect x="58" y="58" width="384" height="384" rx="20" fill="none" stroke="#FF758F" stroke-width="3" stroke-dasharray="14 12" opacity="0.7"/>
+  <g transform="translate(250,205) scale(6) translate(-12,-12)" fill="none" stroke="#C2486B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+  </g>
+  <text x="250" y="352" text-anchor="middle" font-family="'Plus Jakarta Sans','Segoe UI',sans-serif" font-size="34" font-weight="700" fill="#2D3142">Your photo here</text>
+  <text x="250" y="394" text-anchor="middle" font-family="'Plus Jakarta Sans','Segoe UI',sans-serif" font-size="18" font-weight="700" letter-spacing="3" fill="#C2486B">CUSTOMVIBE SAMPLE</text>
+</svg>
