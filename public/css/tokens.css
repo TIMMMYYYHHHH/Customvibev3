@@ -1,0 +1,51 @@
+/* Design tokens — soft pink redesign */
+:root {
+  /* Fonts */
+  --font-sans:    "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: "DM Serif Display", Georgia, "Times New Roman", serif;
+  --font-mono:    "JetBrains Mono", monospace;
+
+  /* Pink palette */
+  --color-pink-bg:     #FFF5F8;
+  --color-pink-soft:   #FFEEF1;
+  --color-pink-light:  #FFD3DB;
+  --color-pink:        #FFB3C1;
+  --color-pink-mid:    #FF9EB5;
+  --color-pink-dark:   #FF758F;
+  --color-pink-deep:   #E8547A;
+  --color-pink-text:   #C2486B;
+  --color-charcoal:    #2D3142;
+  --color-charcoal-mid:#4A4E6A;
+  --color-muted:       #71717A;
+  --color-border:      rgba(255, 179, 193, 0.35);
+  --color-border-mid:  rgba(255, 179, 193, 0.55);
+
+  /* Brand aliases (keeps existing design.css/quote.css working) */
+  --color-brand-pink-soft:   #FFEEF1;
+  --color-brand-pink-light:  #FFD3DB;
+  --color-brand-pink:        #FFB3C1;
+  --color-brand-pink-dark:   #FF758F;
+  --color-brand-pink-text:   #C2486B;
+  --color-brand-pastel-peach:#FFCAD4;
+  --color-brand-pastel-mint: #D8F3DC;
+  --color-brand-pastel-blue: #E8F0FE;
+  --color-brand-cream:       #FFF5F8;
+  --color-brand-charcoal:    #2D3142;
+
+  /* Radius */
+  --radius-control: 10px;
+  --radius-card:    18px;
+  --radius-panel:   26px;
+
+  /* Shadows */
+  --shadow-soft:     0 2px 14px rgba(255, 117, 143, 0.10);
+  --shadow-raised:   0 8px 28px rgba(255, 117, 143, 0.16);
+  --shadow-floating: 0 20px 52px rgba(45, 49, 66, 0.16);
+
+  /* Spacing */
+  --spacing-section-sm: 4rem;
+  --spacing-section-md: 6rem;
+  --spacing-section-lg: 8rem;
+
+  --text-label-xs: 0.625rem;
+}

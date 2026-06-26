@@ -4,21 +4,21 @@ CustomVibe is a custom photo fridge magnet designer and quoting app for a Durban
 
 ## Tech Stack
 
-- React 19 + TypeScript
-- Vite 6
-- Tailwind CSS 4
-- Motion (animations)
+Plain HTML, CSS, and vanilla JavaScript (ES modules) — no build step, no framework.
 
 ## Run Locally
 
-**Prerequisites:** Node.js
+```
+npm install
+npm run dev
+```
 
-1. Install dependencies:
-   `npm install`
-2. Copy `.env.example` to `.env.local` and set `GEMINI_API_KEY` to your Gemini API key
-3. Run the app:
-   `npm run dev`
+This serves the `public/` folder directly (e.g. via `npx serve public`).
 
-## Build
+## Deploy
 
-`npm run build` produces a production build in `dist/`.
+The site deploys to Cloudflare Workers as static assets (see `wrangler.jsonc` and `worker/index.js`).
+
+```
+npm run deploy
+```

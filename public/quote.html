@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Get a Quote | CustomVibe Custom Photo Magnets</title>
+    <meta name="description" content="Review your custom magnet order, enter your delivery details, and submit a quote request to CustomVibe." />
+    <link rel="canonical" href="https://customvibe.co.za/quote" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/pages/quote.css" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CustomVibe" />
+    <meta property="og:title" content="Get a Quote | CustomVibe Custom Photo Magnets" />
+    <meta property="og:description" content="Review your custom magnet order, enter your delivery details, and submit a quote request to CustomVibe." />
+    <meta property="og:url" content="https://customvibe.co.za/quote" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Get a Quote | CustomVibe Custom Photo Magnets" />
+    <meta name="twitter:description" content="Review your custom magnet order, enter your delivery details, and submit a quote request to CustomVibe." />
+  </head>
+  <body>
+    <div data-partial="header" id="partial-header"></div>
+
+    <main>
+      <div class="container section-md quote-page" id="quote-basket-component">
+
+        <div class="quote-stepper" id="quote-steps-stepper">
+          <div class="quote-step-chip" id="quote-step-chip-review">1. Verify Order</div>
+          <div class="quote-step-connector" id="quote-connector-1"></div>
+          <div class="quote-step-chip" id="quote-step-chip-details">2. Delivery Space</div>
+          <div class="quote-step-connector" id="quote-connector-2"></div>
+          <div class="quote-step-chip" id="quote-step-chip-success">3. Complete Request</div>
+        </div>
+
+        <!-- ============ STEP 1: REVIEW ============ -->
+        <section id="quote-step-review" class="quote-step">
+          <div class="quote-step-heading">
+            <h2 class="quote-step-title">Verify your custom magnets order</h2>
+            <p class="quote-step-sub">Review and update individual counts before submitting your official quote bundle.</p>
+          </div>
+
+          <div id="quote-empty-state" class="panel quote-empty-state" hidden>
+            <span id="quote-empty-icon"></span>
+            <p class="quote-empty-title">No designed magnets in your basket yet</p>
+            <p class="quote-empty-sub">Head over to the Design Studio, upload your custom layouts, and position them nicely to watch your pricing adjust.</p>
+            <button type="button" class="btn btn-pink" id="quote-empty-back-btn">
+              <span id="quote-compass-icon"></span> Back to Design Studio
+            </button>
+          </div>
+
+          <div id="quote-items-section">
+            <div class="panel quote-items-card">
+              <div class="quote-items-card-header">
+                <span class="label-xs" style="color:#a1a1aa;">Current Design Stack</span>
+                <button type="button" class="quote-clear-btn" id="quote-clear-basket-btn">Clear basket</button>
+              </div>
+              <div class="quote-items-list" id="quote-items-list"></div>
+            </div>
+
+            <div class="quote-total-panel">
+              <div class="quote-total-left">
+                <span class="label-xs" style="color:var(--color-brand-pink-text);">Calculated Price Estimate</span>
+                <div class="quote-total-row">
+                  <span class="quote-total-cost" id="quote-total-cost">R0</span>
+                  <span class="quote-total-dot">&bull;</span>
+                  <span class="quote-total-qty-text" id="quote-total-qty-text">0 standard magnets ordered</span>
+                </div>
+                <div id="quote-savings-block"></div>
+              </div>
+              <div class="quote-total-actions">
+                <button type="button" class="btn btn-secondary" id="quote-keep-designing-btn">Keep Designing</button>
+                <button type="button" class="btn btn-primary" id="quote-proceed-to-shipping-btn">
+                  Enter Shipping Info <span id="quote-proceed-icon"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ STEP 2: DETAILS ============ -->
+        <section id="quote-step-details" class="quote-step" hidden>
+          <div class="quote-step-heading-row">
+            <button type="button" class="quote-back-btn" id="quote-back-to-review-btn">
+              <span id="quote-back-icon"></span> Back
+            </button>
+            <div>
+              <h2 class="quote-step-title">Delivery Coordinates</h2>
+              <p class="quote-step-sub">Please specify correct destination details so we can quote couriers properly.</p>
+            </div>
+          </div>
+
+          <form id="quote-details-form" class="panel quote-form">
+            <div class="quote-form-field quote-form-field-full">
+              <label for="quote-client-name"><span id="quote-user-icon"></span> Full Name</label>
+              <input id="quote-client-name" type="text" required placeholder="e.g. Sipho Nkosi" />
+            </div>
+
+            <div class="quote-form-field">
+              <label for="quote-client-email"><span id="quote-mail-icon"></span> Email Address</label>
+              <input id="quote-client-email" type="email" required placeholder="e.g. sipho@gmail.com" />
+            </div>
+
+            <div class="quote-form-field">
+              <label for="quote-client-phone"><span id="quote-phone-icon"></span> Phone Number</label>
+              <input id="quote-client-phone" type="tel" required placeholder="e.g. +27 82 123 4567" />
+            </div>
+
+            <div class="quote-form-field quote-form-field-full">
+              <label for="quote-address"><span id="quote-mappin-icon"></span> Delivery Address</label>
+              <textarea id="quote-address" required rows="2" placeholder="e.g. 102 Florida Road, Morningside, Durban, 4001"></textarea>
+            </div>
+
+            <div class="quote-form-field quote-form-field-full">
+              <label for="quote-remarks">Special Assembly Instructions (Optional)</label>
+              <textarea id="quote-remarks" rows="2" placeholder="e.g. Giftwrapping details, border spacing comments..."></textarea>
+            </div>
+
+            <div id="quote-validation-error" class="quote-validation-error" hidden></div>
+
+            <div class="quote-form-footer">
+              <p class="quote-form-disclaimer">By clicking submit, our design specialists review image proportions to guarantee standard beautiful physical output profiles.</p>
+              <button type="submit" class="btn btn-primary" id="quote-final-submit-btn">Submit Quote Request</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ============ STEP 3: SUCCESS ============ -->
+        <section id="quote-step-success" class="quote-step quote-step-success" hidden>
+          <div class="panel quote-success-card">
+            <div class="quote-success-icon-circle"><span id="quote-success-check-icon"></span></div>
+
+            <div class="quote-success-heading">
+              <h3>Quote Request Dispatched!</h3>
+              <p>Excellent work, <strong id="quote-success-name"></strong>! Our design squad has received the high resolution vector templates.</p>
+            </div>
+
+            <div class="quote-success-summary">
+              <span class="label-xs" style="color:var(--color-brand-pink-text);">Estimated Value Summary</span>
+              <p class="quote-success-summary-cost" id="quote-success-cost">R0</p>
+              <p class="quote-success-summary-qty" id="quote-success-qty">0 Hand-finished Magnets</p>
+            </div>
+
+            <div class="quote-success-receipt-block">
+              <p class="quote-success-section-label">Personal Receipt Ledger</p>
+              <div class="quote-receipt-body" id="quote-receipt-body"></div>
+              <div class="quote-receipt-actions">
+                <button type="button" class="quote-receipt-btn" id="quote-copy-receipt-btn">
+                  <span id="quote-clipboard-icon"></span> <span id="quote-copy-label">Copy Order Summary</span>
+                </button>
+                <button type="button" class="quote-receipt-btn" id="quote-print-receipt-btn">
+                  <span id="quote-printer-icon"></span> <span>Print Receipt</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="quote-success-pay-block">
+              <p class="quote-success-section-label">Pay Now (Coming Soon)</p>
+              <div class="quote-pay-buttons">
+                <button type="button" disabled title="Connect a payment provider to enable this">
+                  <span id="quote-payfast-icon"></span> Pay with PayFast
+                </button>
+                <button type="button" disabled title="Connect a payment provider to enable this">
+                  <span id="quote-yoco-icon"></span> Pay with Yoco
+                </button>
+              </div>
+              <p class="quote-pay-note">For now we will follow up by email or WhatsApp to arrange payment.</p>
+            </div>
+
+            <div class="quote-success-new-project">
+              <button type="button" class="btn btn-primary" id="quote-start-new-btn">Start a New Studio Project</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <div data-partial="footer"></div>
+    <div data-partial="quote-modal"></div>
+
+    <script type="module" src="/js/partials.js"></script>
+    <script type="module" src="/js/quote-modal.js"></script>
+    <script type="module" src="/js/quote.js"></script>
+  </body>
+</html>
