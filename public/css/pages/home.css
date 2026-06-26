@@ -161,13 +161,15 @@
 .hero-fridge {
   position: relative;
   min-height: 340px;
-  background: linear-gradient(155deg, #f3f4f6 0%, #e5e7eb 100%);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.95), transparent 34%),
+    linear-gradient(155deg, #f8fafc 0%, #e8ebef 100%);
   border-radius: var(--radius-panel);
   border: 1px solid rgba(0,0,0,0.06);
   box-shadow:
     inset 0 1px 3px rgba(0,0,0,0.04),
     0 20px 50px rgba(45,49,66,0.10);
-  overflow: visible;
+  overflow: hidden;
 }
 
 @media (min-width: 900px) { .hero-fridge { min-height: 420px; } }
@@ -203,7 +205,6 @@
   overflow: hidden;
   box-shadow: 0 10px 28px rgba(45,49,66,0.18), 0 2px 6px rgba(45,49,66,0.08);
   border: 6px solid #fff;
-  border-bottom-width: 22px;
 }
 
 .fridge-magnet-img-wrap img {
@@ -215,15 +216,16 @@
 
 .fridge-magnet-customise {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(45,49,66,0.85);
+  inset: auto 0 0 0;
+  background: linear-gradient(180deg, transparent, rgba(45,49,66,0.86));
   color: #fff;
   font-size: 0.6rem;
   font-weight: 700;
   font-family: var(--font-sans);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 0.35rem;
+  min-height: 42%;
+  padding: 1.5rem 0.35rem 0.4rem;
   display: flex; align-items: center; justify-content: center; gap: 0.25rem;
   cursor: pointer;
   opacity: 0;
