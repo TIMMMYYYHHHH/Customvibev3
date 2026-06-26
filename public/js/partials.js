@@ -1,5 +1,5 @@
 import { iconSvg } from './icons.js';
-import { ensureSeeded, getTotalQuantity } from './state.js';
+import { getDesigns, getTotalQuantity } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
 import { openQuoteModal } from './quote-modal.js';
 
@@ -59,7 +59,7 @@ function wireHeader() {
 }
 
 export function refreshBasketBadge() {
-  const designs = ensureSeeded();
+  const designs = getDesigns() || [];
   const totalMagnets = getTotalQuantity(designs);
   const { cost: totalCost } = calculateBundlePrice(totalMagnets);
 
@@ -88,6 +88,9 @@ function wireFooter() {
 
   const secureIcon = document.getElementById('footer-secure-icon');
   if (secureIcon) secureIcon.innerHTML = iconSvg('ShieldCheck', { size: 16 });
+
+  const whatsapp = document.getElementById('whatsapp-floating-button');
+  if (whatsapp) whatsapp.innerHTML = iconSvg('MessageCircle', { size: 26 });
 
   const copyright = document.getElementById('footer-copyright');
   if (copyright) copyright.textContent = `© ${new Date().getFullYear()} CustomVibe Magnets Ltd. All rights reserved.`;

@@ -2,23 +2,27 @@ import { iconSvg } from './icons.js';
 import { addDesign } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
 import { refreshBasketBadge } from './partials.js';
+import { FALLBACK_IMAGE } from './image.js';
 
+// Sample tiles shown on the fridge in the hero. The imageUrls point at local,
+// self-hosted branded placeholders — swap these for real finished-magnet photos
+// (drop files in /public/images and update the paths). See FALLBACK_IMAGE below.
 const PREMIUM_PRESETS = [
   {
-    name: 'Family memory magnet',
-    imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&auto=format&fit=crop&q=80',
+    name: 'Sample family magnet',
+    imageUrl: '/images/placeholder-magnet-1.svg',
     quantity: 1,
     sizeCm: 7.5,
   },
   {
-    name: 'Pet portrait magnet',
-    imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=500&auto=format&fit=crop&q=80',
+    name: 'Sample portrait magnet',
+    imageUrl: '/images/placeholder-magnet-2.svg',
     quantity: 1,
     sizeCm: 7.5,
   },
   {
-    name: 'Holiday beach magnet',
-    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&auto=format&fit=crop&q=80',
+    name: 'Sample holiday magnet',
+    imageUrl: '/images/placeholder-magnet-3.svg',
     quantity: 1,
     sizeCm: 7.5,
   },
@@ -137,7 +141,7 @@ function renderFridgeMagnets() {
         style="top:${pos.top}; left:${pos.left}; --rot:${pos.rotate}; --fridge-magnet-hover-rotate:${pos.hoverRotate}; --float-dur:${pos.floatDur}; --float-delay:${pos.floatDelay};"
       >
         <div class="fridge-magnet-img-wrap">
-          <img src="${preset.imageUrl}" alt="${preset.name}" referrerpolicy="no-referrer" loading="lazy" />
+          <img src="${preset.imageUrl}" alt="${preset.name}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'" />
           <button type="button" class="fridge-magnet-customise" data-preset-index="${index}" title="Use this sample in the Design Studio">
             ${iconSvg('ImageIcon', { size: 11 })} Try sample
           </button>
@@ -216,15 +220,17 @@ function renderTestimonials() {
   const grid = document.getElementById('testimonial-grid');
   if (!grid) return;
 
-  grid.innerHTML = [1, 2, 3].map(() => `
-    <div class="testimonial-card">
-      ${iconSvg('Quote', { size: 22 })}
-      <div class="testimonial-stars">
-        ${[1, 2, 3, 4, 5].map(() => iconSvg('Star', { size: 13 })).join('')}
-      </div>
-      <p class="testimonial-quote">"Add a real customer quote here"</p>
-      <p class="testimonial-name">Customer name, City</p>
-    </div>`).join('');
+  // Honest placeholder: we never fabricate reviews (see CLAUDE.md hard
+  // constraint #1). Until real customer quotes exist, invite the first one
+  // instead of showing fake cards. Swap this for a real-testimonials grid
+  // once genuine quotes are available.
+  grid.classList.add('testimonial-grid--invite');
+  grid.innerHTML = `
+    <div class="testimonial-card testimonial-invite">
+      <span class="testimonial-invite-icon">${iconSvg('Sparkles', { size: 26 })}</span>
+      <p class="testimonial-quote">We're a young Durban studio, so we won't fake it: real customer reviews will appear right here as our first orders land on fridges around South Africa.</p>
+      <a href="design.html" class="btn btn-pink">Be our first review</a>
+    </div>`;
 }
 
 function renderFaq() {

@@ -599,6 +599,14 @@
   border-top: 1px dashed var(--color-border); padding-top: 0.875rem;
 }
 
+/* Honest "no fake reviews yet" invite — single centered card */
+.testimonial-grid--invite { display: block; max-width: 620px; }
+.testimonial-invite { gap: 1.25rem; padding: 2.5rem 2rem; }
+.testimonial-invite-icon { display: flex; justify-content: center; }
+.testimonial-invite-icon svg { color: var(--color-pink-dark); }
+.testimonial-invite .testimonial-quote { font-style: italic; font-size: 1.0625rem; }
+.testimonial-invite .btn { align-self: center; margin-top: 0.25rem; }
+
 /* ================================================================
    CTA
    ================================================================ */

@@ -13,6 +13,10 @@ body {
 
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
+/* The hidden attribute must always win, even over classes that set display
+   (e.g. .quote-empty-state, .pricing-bulk-note). Without this, JS `.hidden`
+   toggles silently fail wherever an author class sets display. */
+[hidden] { display: none !important; }
 button { font-family: inherit; border: none; background: none; cursor: pointer; }
 input, textarea { font-family: inherit; }
 ::selection { background: var(--color-pink-light); }
@@ -412,6 +416,7 @@ svg { display: block; flex-shrink: 0; }
   transition: transform 0.2s ease;
 }
 .whatsapp-fab:hover { transform: scale(1.08); }
+.whatsapp-fab svg { color: #fff; }
 
 /* ===================== QUOTE MODAL ===================== */
 

@@ -1,7 +1,8 @@
 import { iconSvg } from './icons.js';
-import { getDesigns, ensureSeeded } from './state.js';
+import { getDesigns } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
 import { refreshBasketBadge } from './partials.js';
+import { FALLBACK_IMAGE } from './image.js';
 
 function renderBody(designs) {
   const totalQty = designs.reduce((sum, d) => sum + d.quantity, 0);
@@ -21,7 +22,7 @@ function renderBody(designs) {
     <div class="quote-modal-item">
       <div style="display:flex; align-items:center; gap:0.875rem; min-width:0;">
         <div class="quote-modal-item-thumb">
-          <img src="${design.imageUrl}" alt="${design.name}" referrerpolicy="no-referrer" loading="lazy" />
+          <img src="${design.imageUrl}" alt="${design.name}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'" />
         </div>
         <div style="min-width:0;">
           <h4 class="quote-modal-item-name">${design.name || 'Photo Magnet'}</h4>
@@ -61,7 +62,7 @@ function renderBody(designs) {
 }
 
 function render() {
-  const designs = ensureSeeded();
+  const designs = getDesigns() || [];
   const body = document.getElementById('summary-modal-body');
   if (body) body.innerHTML = renderBody(designs);
 

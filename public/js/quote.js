@@ -1,11 +1,12 @@
 import { iconSvg } from './icons.js';
-import { ensureSeeded, updateDesign, deleteDesign, clearAllDesigns, getTotalQuantity } from './state.js';
+import { getDesigns, updateDesign, deleteDesign, clearAllDesigns, getTotalQuantity } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
 import { refreshBasketBadge } from './partials.js';
+import { FALLBACK_IMAGE } from './image.js';
 
 const QUOTE_FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
 
-let designs = ensureSeeded();
+let designs = getDesigns() || [];
 let step = 'review';
 let submittedQuote = null;
 let copyLabelTimeout = null;
@@ -91,7 +92,7 @@ function renderReview() {
     <div class="quote-item-row" data-design-id="${design.id}">
       <div class="quote-item-main">
         <div class="quote-item-thumb">
-          <img src="${design.imageUrl}" alt="${design.name}" referrerpolicy="no-referrer" loading="lazy" />
+          <img src="${design.imageUrl}" alt="${design.name}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'" />
         </div>
         <div>
           <h4 class="quote-item-name">${design.name}</h4>

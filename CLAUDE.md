@@ -27,6 +27,13 @@ public/
   terms.html          ← Terms of service (placeholder)
   contact.html        ← Contact page (placeholder)
   404.html            ← Not found
+  favicon.svg         ← Site favicon
+
+  images/
+    placeholder-magnet-1.svg   ← Branded "your photo here" sample tiles. Swap these
+    placeholder-magnet-2.svg      for photos of real finished magnets when available.
+    placeholder-magnet-3.svg      (used as hero fridge tiles + Design Studio sample)
+    og-cover.png               ← 1200×630 social-share card referenced by og:image
 
   partials/
     header.html       ← Nav fragment (no <html>/<body>, just the <header>)
@@ -156,7 +163,7 @@ Every page has three placeholder divs:
 
 `partials.js` fetches `partials/header.html`, `partials/footer.html`, `partials/quote-modal.html` and injects them. After injection it:
 - Calls `wireHeader()` — sets `innerHTML` on nav link elements from `NAV_TABS`, marks the active link by comparing `location.pathname`
-- Calls `wireFooter()` — renders value strip items and copyright year
+- Calls `wireFooter()` — renders value strip items, copyright year, and the WhatsApp FAB icon
 - Calls `wireQuoteModalChrome()` — injects icons into modal header
 - Fires `document.dispatchEvent(new CustomEvent('partials:ready'))`
 
@@ -173,7 +180,7 @@ Every page loads:
 
 ### Icons
 
-`js/icons.js` exports `iconSvg(name, { size, className })` returning an inline `<svg>` string. Icons used: `ArrowLeft`, `ArrowRight`, `Sparkles`, `Layers`, `Percent`, `ShoppingBag`, `Heart`, `Star`, `Compass`, `ImageIcon`, `Check`, `Tag`, `HelpingHand`, `ChevronDown`, `ChevronRight`, `Upload`, `Trash2`, `Copy`, `Plus`, `ZoomIn`, `ZoomOut`, `CheckCircle2`, `Move`, `HelpCircle`, `RefreshCw`, `ShieldCheck`, `X`, `Quote`, `Printer`, `Clipboard`, `User`, `Mail`, `Phone`, `CreditCard`, `MapPin`, `Camera`.
+`js/icons.js` exports `iconSvg(name, { size, className })` returning an inline `<svg>` string. Icons used: `ArrowLeft`, `ArrowRight`, `Sparkles`, `Layers`, `Percent`, `ShoppingBag`, `Heart`, `Star`, `Compass`, `ImageIcon`, `Check`, `Tag`, `HelpingHand`, `ChevronDown`, `ChevronRight`, `Upload`, `Trash2`, `Copy`, `Plus`, `ZoomIn`, `ZoomOut`, `CheckCircle2`, `Move`, `HelpCircle`, `RefreshCw`, `ShieldCheck`, `X`, `Quote`, `Printer`, `Clipboard`, `User`, `Mail`, `Phone`, `CreditCard`, `MapPin`, `Camera`, `MessageCircle` (WhatsApp FAB).
 
 To add new icons, add the Lucide SVG path string to the `PATHS` object in `icons.js`.
 
@@ -197,6 +204,8 @@ Each design object:
 
 This key is preserved from the original React app — existing visitor baskets survive the rewrite.
 
+**First visit starts empty.** There is no auto-seeded "welcome" design: `getDesigns()` returns `null` for a fresh visitor and every page reads `getDesigns() || []`. The Design Studio (`studio-empty-canvas`), Quote page (`quote-empty-state`), and basket modal each render their own empty state for this. (The old `ensureSeeded()` / `DEFAULT_DESIGN` seeding was removed.)
+
 ### Pricing tiers
 
 `js/pricing.js` exports `calculateBundlePrice(totalQty)`:
@@ -215,7 +224,7 @@ Returns `{ cost, savings, avgPerUnit, tier }` — all rounded. **Do not change t
 
 ## Hard constraints — never violate
 
-1. **No fabricated reviews.** Testimonial cards always say `"Add a real customer quote here"` — dashed border, clearly placeholder. Never invent names, cities, or quotes.
+1. **No fabricated reviews.** The homepage testimonials section shows a single honest invite card ("Real reviews, on the way" → "Be our first review"), rendered by `renderTestimonials()` in `home.js`. Never invent names, cities, or quotes — when real reviews exist, replace the invite card with a genuine-quotes grid.
 2. **No real phone number.** WhatsApp FAB always uses `27000000000` as placeholder. Never substitute a real number.
 3. **No working payment.** PayFast/Yoco buttons are permanently disabled with "Coming Soon" label. No real payment integration exists.
 4. **Formspree placeholder.** `QUOTE_FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'` in `quote.js` is a deliberate placeholder. Leave as-is until the owner provides a real form ID.
@@ -229,11 +238,10 @@ Returns `{ cost, savings, avgPerUnit, tier }` — all rounded. **Do not change t
 The owner's explicit direction: **soft pink is the brand colour and must stay. Everything else — layout, structure, hierarchy, copy — can and should be changed boldly.** Conservative visual tweaks (same layout with different colours) are not acceptable. When redesigning, change the actual structure: section order, layout type (full-screen vs. split vs. zigzag), component shapes, copy voice.
 
 **Current homepage structure** (as of last redesign):
-- Full-screen hero, centered text, floating polaroid magnets at corners
-- Dark charcoal stats ticker strip
-- Alternating zigzag "How It Works" (3 steps with visual cards)
-- Pricing cards + live slider calculator on pink-bg
-- Editorial testimonials on pink-soft bg
+- Split hero — copy left, "fridge" showcase right with floating sample magnets + spec chips
+- Horizontal 3-card "How it works" process track on white
+- Pricing on a **dark charcoal** canvas: 3 package cards + live slider calculator
+- Testimonials on pink-soft bg — honest "Real reviews, on the way" invite card (no fake quotes)
 - Full-width pink gradient CTA band (`#FF758F → #E8547A`)
 - Accordion FAQ on pink-bg
 
@@ -251,9 +259,10 @@ These IDs are written by `home.js` — they must exist in `index.html` or the pa
 | `hero-badge-icon` | Sparkles icon in hero badge |
 | `hero-cta-arrow` | ArrowRight in CTA button |
 | `hero-scroll-icon` | ChevronDown scroll cue |
-| `stat-shield-icon` | ShieldCheck icon in stats strip |
+| `stat-shield-icon` | ShieldCheck icon in the hero "Nationwide" spec chip |
 | `how-eyebrow-icon` | Sparkles in "How it works" eyebrow |
 | `how-upload-icon` | Upload icon in step 1 visual |
+| `how-design-icon` | Layers icon in step 2 visual |
 | `how-step-arrow-1` | ArrowRight in step 1 link |
 | `how-deliver-icon` | Heart icon in step 3 visual |
 | `testimonial-quote-icon` | Quote icon above testimonials |
@@ -288,7 +297,8 @@ Quote modal IDs (must exist in `quote-modal.html`):
 - **Production turnaround time**: FAQ answer for "How long does an order take?" contains `<span class="faq-placeholder">add real production + delivery turnaround time</span>`.
 - **Shipping cost**: FAQ answer for "Do you deliver nationwide?" contains a similar placeholder.
 - **Legal copy**: `privacy.html` and `terms.html` need real legal review.
-- **Real reviews**: Once the business has real customer quotes, replace the placeholder testimonial cards.
+- **Real reviews**: The testimonials section currently shows an honest "Real reviews, on the way" invite card. Once genuine customer quotes exist, replace the invite (in `renderTestimonials()`) with a real-quotes grid.
+- **Real product photos**: The hero sample magnets, the Design Studio "sample magnet", and the `og:image` use branded placeholder art in `public/images/` (`placeholder-magnet-1..3.svg`, `og-cover.png`). Swap these for photos of real finished magnets — update the paths in `home.js` (`PREMIUM_PRESETS`), `design.js` (sample draft), and `index.html` (`og:image`).
 - **Cloudflare auto-deploy reconnection**: Owner needs to reconnect GitHub OAuth in Cloudflare Dashboard → Settings → Builds & Deployments (had a disconnection).
 - **Payment**: PayFast/Yoco integration is permanently disabled — marked "Coming Soon". No timeline set.
 - **Content-Security-Policy**: Deliberately omitted from `worker/index.js` until someone can test it in a real browser (Google Fonts + inline JSON-LD need specific allowlist entries that fail silently if wrong).
