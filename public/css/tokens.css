@@ -1,5 +1,5 @@
 /* ============================================================
-   CustomVibe design tokens — "Crafted Premium"
+   CustomVibe design tokens: "Crafted Premium"
    Warm stone canvas · charcoal ink · refined rose accent.
    Legacy --color-pink-* / --color-brand-* names are kept and
    remapped so not-yet-redesigned pages still render coherently.
@@ -11,7 +11,7 @@
   --font-mono:    "JetBrains Mono", ui-monospace, monospace;
 
   /* ---- Core palette (WCAG AA checked for text pairings) ---- */
-  --color-bg:         #F7F5F2;  /* warm stone — page background */
+  --color-bg:         #F7F5F2;  /* warm stone, page background */
   --color-surface:    #FFFFFF;  /* cards, panels */
   --color-surface-2:  #F1ECE6;  /* section bands, subtle fills */
   --color-ink:        #211F1D;  /* primary text (15.8:1 on bg) */
@@ -20,7 +20,7 @@
   --color-line:       rgba(33, 31, 29, 0.10);
   --color-line-2:     rgba(33, 31, 29, 0.16);
 
-  /* Rose accent — the brand pink, elevated */
+  /* Rose accent: the brand pink, elevated */
   --color-accent:      #C2486B;  /* primary; white text = 4.7:1 (AA) */
   --color-accent-deep: #A8385A;  /* hover / pressed */
   --color-accent-soft: #FBE9EE;  /* soft tint background */
@@ -66,7 +66,7 @@
   --radius-panel:   24px;
   --radius-pill:    999px;
 
-  /* Shadows — soft, diffuse, premium */
+  /* Shadows: soft, diffuse, premium */
   --shadow-soft:     0 1px 2px rgba(33, 31, 29, 0.04), 0 4px 16px rgba(33, 31, 29, 0.05);
   --shadow-raised:   0 4px 12px rgba(33, 31, 29, 0.06), 0 14px 34px rgba(33, 31, 29, 0.08);
   --shadow-floating: 0 22px 54px rgba(33, 31, 29, 0.18);

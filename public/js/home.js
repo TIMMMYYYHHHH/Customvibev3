@@ -27,7 +27,7 @@ const PRICING_PACKS = [
     title: 'Family six-pack',
     price: 'R250',
     unit: 'total',
-    desc: 'Our most-loved bundle — mix up to six different photos.',
+    desc: 'Our most-loved bundle. Mix up to six different photos.',
     features: ['Six unique photos', 'Saves R50 vs singles', 'Gift-ready packaging'],
     popular: true,
     cta: 'Design six',
@@ -37,7 +37,7 @@ const PRICING_PACKS = [
     title: 'Bulk pack',
     price: 'R40',
     unit: 'each',
-    desc: 'Best value — turn a whole gallery (or an event) into magnets.',
+    desc: 'Best value. Turn a whole gallery (or an event) into magnets.',
     features: ['Lowest price per magnet', 'Great for events & business', 'Priority studio time'],
     popular: false,
     cta: 'Design a bulk pack',
@@ -55,7 +55,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'How does pricing work?',
-    a: "It's bundled — the more magnets in one order, the less each one costs, from R50 for one down to R40 each for ten or more. The calculator above shows your exact total.",
+    a: "It's bundled: the more magnets in one order, the less each one costs, from R50 for one down to R40 each for ten or more. The calculator above shows your exact total.",
   },
   {
     q: 'How do I pay?',
@@ -67,7 +67,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Do you deliver across South Africa?',
-    a: 'Yes — we\'re based in Durban and ship nationwide. Delivery is <span class="faq-placeholder">add real shipping cost</span>, confirmed before you pay.',
+    a: 'Yes, we\'re based in Durban and ship nationwide. Delivery is <span class="faq-placeholder">add real shipping cost</span>, confirmed before you pay.',
   },
 ];
 
@@ -166,7 +166,7 @@ function renderTestimonials() {
   grid.innerHTML = `
     <div class="reviews-invite">
       <span class="reviews-invite-icon">${iconSvg('Sparkles', { size: 26 })}</span>
-      <p class="reviews-invite-text">We're a young Durban studio, so we won't fake it — real customer reviews will appear right here as our first orders land on fridges around South Africa.</p>
+      <p class="reviews-invite-text">We're a young Durban studio, so we won't fake it. Real customer reviews will appear right here as our first orders land on fridges around South Africa.</p>
       <a href="design.html" class="btn btn-primary">Be our first review</a>
     </div>`;
 }
