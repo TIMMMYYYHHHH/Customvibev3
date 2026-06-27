@@ -4,10 +4,10 @@ import { calculateBundlePrice } from './pricing.js';
 import { openQuoteModal } from './quote-modal.js';
 
 const VALUE_ITEMS = [
-  { icon: 'Camera', title: 'High-Definition Print Gloss', desc: 'Waterproof protection coating layer safeguards details against greasy hands, humidity, or sunlight bleach.' },
-  { icon: 'Layers', title: 'Strong Flexible Rubber Grip', desc: "Sturdy 3mm backing won't slip or slide when slamming refrigerator doors. Clings beautifully." },
-  { icon: 'Heart', title: 'Local Craftsmanship', desc: 'Made with pride by custom design lovers. Hand-inspected and carefully trimmed square templates.' },
-  { icon: 'MapPin', title: 'Nationwide Delivery', desc: 'Secure priority postage directly to your residential doorstep. Custom quotes dispatched instantly.' },
+  { icon: 'Camera', title: 'Gloss, waterproof finish', desc: 'A protective gloss layer keeps your colours bright and shrugs off splashes and sticky fingers.' },
+  { icon: 'Layers', title: '3 mm rubber backing', desc: "A solid magnetic backing that grips the fridge and won't slide when the door swings." },
+  { icon: 'Heart', title: 'Handmade in Durban', desc: 'Designed, printed and hand-inspected by us before your order ships.' },
+  { icon: 'MapPin', title: 'Nationwide delivery', desc: 'Shipped anywhere in South Africa, straight to your door.' },
 ];
 
 async function injectPartial(name, selector) {

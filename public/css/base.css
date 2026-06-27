@@ -72,9 +72,11 @@ svg { display: block; flex-shrink: 0; }
 @media (min-width: 768px) { .container { padding: 0 2rem; } }
 .container-narrow { max-width: 880px; }
 
-.section-sm { padding: var(--spacing-section-sm) 0; }
-.section-md { padding: var(--spacing-section-md) 0; }
-.section-lg { padding: var(--spacing-section-lg) 0; }
+/* Vertical-only so these compose with .container's horizontal padding
+   (a `padding: X 0` shorthand here would zero the container's side padding). */
+.section-sm { padding-block: var(--spacing-section-sm); }
+.section-md { padding-block: var(--spacing-section-md); }
+.section-lg { padding-block: var(--spacing-section-lg); }
 .text-center { text-align: center; }
 
 .eyebrow {

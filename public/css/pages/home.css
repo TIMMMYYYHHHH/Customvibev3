@@ -15,7 +15,7 @@
   line-height: 1.7;
   max-width: 42rem;
 }
-.link-accent { color: var(--color-accent); font-weight: 700; background: none; cursor: pointer; font-size: inherit; }
+.link-accent { color: var(--color-accent-deep); font-weight: 700; background: none; cursor: pointer; font-size: inherit; }
 .link-accent:hover { text-decoration: underline; }
 
 /* ================= HERO ================= */
@@ -57,7 +57,7 @@
 
 /* ================= TRUST STRIP ================= */
 .trust-strip { background: var(--color-surface); border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
-.trust-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem 2rem; padding: 2.5rem 0; }
+.trust-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem 2rem; padding-block: 2.5rem; }
 @media (min-width: 560px) { .trust-grid { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 960px) { .trust-grid { grid-template-columns: repeat(4, 1fr); } }
 .trust-item { display: flex; gap: 0.85rem; align-items: flex-start; }
@@ -97,6 +97,15 @@
 .showcase-tile:nth-child(even) { transform: rotate(1.5deg); }
 .showcase-tile:hover { transform: rotate(0) translateY(-4px); }
 .showcase-tile img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.showcase-tile--cta {
+  aspect-ratio: 1; background: var(--color-accent-soft); color: var(--color-accent-deep);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem;
+  font-weight: 700; font-size: 0.9rem; text-align: center; text-decoration: none;
+}
+.showcase-cta-plus {
+  width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--color-accent); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 1.6rem; line-height: 1;
+}
 .showcase-note { text-align: center; font-size: 0.95rem; color: var(--color-ink-2); font-weight: 600; }
 
 /* ================= PRICING ================= */
