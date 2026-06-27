@@ -2,6 +2,8 @@
 
 CustomVibe is a custom photo fridge magnet business based in Durban, South Africa. Customers upload photos, design their magnets in a browser studio, and submit a quote request. Orders are hand-printed, inspected, and shipped nationwide. This file is the single source of truth for any AI working on this codebase.
 
+> **⚠ Redesign in progress (branch `claude/ecstatic-keller-d9uqd2`).** The site is moving to a **"Crafted Premium"** look — warm stone canvas, charcoal ink, and the brand pink elevated to a confident **rose accent**. This **supersedes the old "soft pink only" rule** described below. **Phase 1 is shipped:** new design tokens (`css/tokens.css`), refreshed primitives (`css/base.css`), an accessible shared nav with a persistent "Start designing" CTA + mobile menu (`partials/header.html` + `js/partials.js`), and a rebuilt landing page (`index.html` + `css/pages/home.css` + `js/home.js`). **Pending:** Design Studio restyle (Phase 2) and a real **EFT checkout** replacing the quote-request flow + full copy/trust pass (Phase 3). The "soft pink ONLY" palette, the `nav-tab-*` header contract, and the homepage JS-ID table described below are **partially stale** until that lands — trust the code over those sections.
+
 ---
 
 ## What the site does
