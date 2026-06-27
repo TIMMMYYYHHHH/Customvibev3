@@ -4,11 +4,11 @@ import { calculateBundlePrice } from './pricing.js';
 import { refreshBasketBadge } from './partials.js';
 import { FALLBACK_IMAGE } from './image.js';
 
-// Where new orders are delivered (email notification). Deliberate placeholder —
+// Where new orders are delivered (email notification). Deliberate placeholder;
 // swap YOUR_FORM_ID for a real Formspree (or other) form id to receive orders.
 const ORDER_FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
 
-// EFT / business details. PLACEHOLDERS — replace before going live. Bracketed
+// EFT / business details. PLACEHOLDERS, replace before going live. Bracketed
 // values render with a "sample" highlight on the confirmation page so they're
 // impossible to miss. See BUSINESS-DETAILS.md for the fill-in list.
 const BUSINESS = {
@@ -37,7 +37,7 @@ async function submitOrder(order) {
       body: JSON.stringify(order),
     });
   } catch (error) {
-    console.error('Order notification failed — check ORDER_FORM_ENDPOINT setup', error);
+    console.error('Order notification failed, check ORDER_FORM_ENDPOINT setup', error);
   }
 }
 
@@ -242,14 +242,14 @@ function renderConfirmation() {
   html += `<p>Deliver to: ${o.deliveryAddress}</p>`;
   if (o.notes) html += `<p>Notes: ${o.notes}</p>`;
   html += `<p class="receipt-items-label">Magnets (${o.totalQty})</p>`;
-  o.designs.forEach((d, i) => { html += `<p>#${i + 1} ${d.name} — ${d.quantity} × 7.5 cm</p>`; });
+  o.designs.forEach((d, i) => { html += `<p>#${i + 1} ${d.name}: ${d.quantity} × 7.5 cm</p>`; });
   html += `<p class="receipt-items-label">Total: R${o.total} (pay by EFT)</p>`;
   byId('quote-receipt-body').innerHTML = html;
 }
 
 function buildReceiptText(o) {
   let t = '====================================\n';
-  t += 'CUSTOMVIBE — ORDER\n';
+  t += 'CUSTOMVIBE ORDER\n';
   t += '====================================\n';
   t += `Order reference: ${o.orderRef}\n`;
   t += `Amount due (EFT): R${o.total}\n`;
@@ -257,7 +257,7 @@ function buildReceiptText(o) {
   t += `Deliver to: ${o.deliveryAddress}\n`;
   if (o.notes) t += `Notes: ${o.notes}\n`;
   t += '\n----- MAGNETS -----\n';
-  o.designs.forEach((d, i) => { t += `#${i + 1}: ${d.name} — qty ${d.quantity} — 7.5x7.5 cm gloss\n`; });
+  o.designs.forEach((d, i) => { t += `#${i + 1}: ${d.name}, qty ${d.quantity}, 7.5x7.5 cm gloss\n`; });
   t += '\n----- PAY BY EFT -----\n';
   t += `Account name: ${BUSINESS.bankAccountName}\n`;
   t += `Bank: ${BUSINESS.bankName}\n`;

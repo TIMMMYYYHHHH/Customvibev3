@@ -52,7 +52,7 @@ function renderBasketBadge() {
     note.innerHTML = `Add <strong>${10 - totalQty} more</strong> to reach R40 each.`;
   } else {
     note.className = 'studio-basket-tier-note tier-max';
-    note.innerHTML = `${iconSvg('CheckCircle2', { size: 14 })} Best price unlocked — R40 each.`;
+    note.innerHTML = `${iconSvg('CheckCircle2', { size: 14 })} Best price unlocked: R40 each.`;
   }
 
   document.getElementById('studio-checkout-cost').textContent = `R${Math.round(cost)}`;
