@@ -41,15 +41,18 @@ function renderBasketBadge() {
   document.getElementById('studio-basket-cost').textContent = `R${Math.round(cost)}`;
 
   const note = document.getElementById('studio-basket-tier-note');
-  if (totalQty < 6) {
+  if (totalQty === 0) {
     note.className = 'studio-basket-tier-note tier-low';
-    note.innerHTML = `Assemble <strong>${6 - totalQty} more</strong> to reach the 6-pack rate (R250)!`;
+    note.innerHTML = 'Add magnets to see your bundle price.';
+  } else if (totalQty < 6) {
+    note.className = 'studio-basket-tier-note tier-low';
+    note.innerHTML = `Add <strong>${6 - totalQty} more</strong> to reach the 6-pack price (R250).`;
   } else if (totalQty < 10) {
     note.className = 'studio-basket-tier-note tier-mid';
-    note.innerHTML = `Excellent! Add <strong>${10 - totalQty} more</strong> to qualify for maximum bulk rates (R40/u)!`;
+    note.innerHTML = `Add <strong>${10 - totalQty} more</strong> to reach R40 each.`;
   } else {
     note.className = 'studio-basket-tier-note tier-max';
-    note.innerHTML = `${iconSvg('CheckCircle2', { size: 14 })} Maximum bulk savings active (R40 each!)`;
+    note.innerHTML = `${iconSvg('CheckCircle2', { size: 14 })} Best price unlocked — R40 each.`;
   }
 
   document.getElementById('studio-checkout-cost').textContent = `R${Math.round(cost)}`;
@@ -75,13 +78,13 @@ function renderDesignList() {
       </div>
       <div class="studio-design-item-controls">
         <div class="studio-qty-stepper">
-          <button type="button" data-action="dec" data-design-id="${design.id}">-</button>
+          <button type="button" data-action="dec" data-design-id="${design.id}" aria-label="Decrease quantity for ${design.name}">-</button>
           <span>${design.quantity}</span>
-          <button type="button" data-action="inc" data-design-id="${design.id}">+</button>
+          <button type="button" data-action="inc" data-design-id="${design.id}" aria-label="Increase quantity for ${design.name}">+</button>
         </div>
         <div class="studio-item-actions">
-          <button type="button" data-action="clone" data-design-id="${design.id}" title="Duplicate templates">${iconSvg('Copy', { size: 16 })}</button>
-          ${designs.length > 1 ? `<button type="button" class="danger" data-action="delete" data-design-id="${design.id}" title="Discard design">${iconSvg('Trash2', { size: 16 })}</button>` : ''}
+          <button type="button" data-action="clone" data-design-id="${design.id}" title="Duplicate" aria-label="Duplicate ${design.name}">${iconSvg('Copy', { size: 16 })}</button>
+          ${designs.length > 1 ? `<button type="button" class="danger" data-action="delete" data-design-id="${design.id}" title="Remove" aria-label="Remove ${design.name}">${iconSvg('Trash2', { size: 16 })}</button>` : ''}
         </div>
       </div>
     </div>`).join('');
@@ -232,6 +235,23 @@ function wireMockupInteractions() {
     isDragging = false;
     mockup.classList.remove('is-dragging');
     draggingIndicator.hidden = true;
+  });
+
+  // Keyboard reposition: arrow keys nudge the crop (Shift = larger step).
+  face.addEventListener('keydown', (e) => {
+    if (!getActiveDesign()) return;
+    const step = e.shiftKey ? 8 : 3;
+    let handled = true;
+    if (e.key === 'ArrowLeft') posX = Math.max(0, posX - step);
+    else if (e.key === 'ArrowRight') posX = Math.min(100, posX + step);
+    else if (e.key === 'ArrowUp') posY = Math.max(0, posY - step);
+    else if (e.key === 'ArrowDown') posY = Math.min(100, posY + step);
+    else handled = false;
+    if (handled) {
+      e.preventDefault();
+      applyImageTransform();
+      persistActiveCrop();
+    }
   });
 
   document.getElementById('studio-zoom-in-btn').addEventListener('click', () => {
