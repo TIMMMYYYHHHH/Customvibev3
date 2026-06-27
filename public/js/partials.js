@@ -3,12 +3,6 @@ import { getDesigns, getTotalQuantity } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
 import { openQuoteModal } from './quote-modal.js';
 
-const NAV_TABS = [
-  { id: 'hero',     label: 'Home',          icon: 'Sparkles', path: '/' },
-  { id: 'designer', label: 'Design Studio', icon: 'Layers',   path: '/design' },
-  { id: 'pricing',  label: 'Pricing',       icon: 'Percent',  path: '/#pricing-section' },
-];
-
 const VALUE_ITEMS = [
   { icon: 'Camera', title: 'High-Definition Print Gloss', desc: 'Waterproof protection coating layer safeguards details against greasy hands, humidity, or sunlight bleach.' },
   { icon: 'Layers', title: 'Strong Flexible Rubber Grip', desc: "Sturdy 3mm backing won't slip or slide when slamming refrigerator doors. Clings beautifully." },
@@ -31,20 +25,10 @@ function currentRoutePath() {
 
 function wireHeader() {
   const path = currentRoutePath();
-  const hash = location.hash;
 
-  NAV_TABS.forEach((tab) => {
-    const a = document.getElementById(`nav-tab-${tab.id}`);
-    if (!a) return;
-    a.innerHTML = `${iconSvg(tab.icon, { size: 16 })}${tab.label}`;
-
-    const isActive = tab.path === '/'
-      ? path === '/' && !hash
-      : tab.path.startsWith('/#')
-        ? path === '/' && hash === tab.path.slice(1)
-        : path === tab.path;
-
-    a.classList.toggle('active', isActive);
+  // Mark the active primary-nav link (links carry data-nav-path).
+  document.querySelectorAll('.site-nav [data-nav-path]').forEach((a) => {
+    a.classList.toggle('active', a.getAttribute('data-nav-path') === path);
   });
 
   const quoteBtn = document.getElementById('nav-quote-basket');
@@ -55,7 +39,31 @@ function wireHeader() {
     quoteBtn.addEventListener('click', () => openQuoteModal());
   }
 
+  wireMobileNav();
   refreshBasketBadge();
+}
+
+// Accessible mobile menu: hamburger toggles the dropdown, swaps its icon,
+// closes on link click or Escape, and keeps aria-expanded in sync.
+function wireMobileNav() {
+  const toggle = document.getElementById('nav-toggle');
+  const menu = document.getElementById('mobile-nav');
+  const icon = document.getElementById('nav-toggle-icon');
+  if (!toggle || !menu) return;
+
+  const setOpen = (open) => {
+    menu.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (icon) icon.innerHTML = iconSvg(open ? 'X' : 'Menu', { size: 22 });
+  };
+  setOpen(false);
+
+  toggle.addEventListener('click', () => setOpen(menu.hidden));
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hidden) { setOpen(false); toggle.focus(); }
+  });
 }
 
 export function refreshBasketBadge() {

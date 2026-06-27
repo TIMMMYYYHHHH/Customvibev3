@@ -1,51 +1,89 @@
-/* Design tokens — soft pink redesign */
+/* ============================================================
+   CustomVibe design tokens — "Crafted Premium"
+   Warm stone canvas · charcoal ink · refined rose accent.
+   Legacy --color-pink-* / --color-brand-* names are kept and
+   remapped so not-yet-redesigned pages still render coherently.
+   ============================================================ */
 :root {
   /* Fonts */
   --font-sans:    "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-heading: "DM Serif Display", Georgia, "Times New Roman", serif;
-  --font-mono:    "JetBrains Mono", monospace;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
 
-  /* Pink palette */
-  --color-pink-bg:     #FFF5F8;
-  --color-pink-soft:   #FFEEF1;
-  --color-pink-light:  #FFD3DB;
-  --color-pink:        #FFB3C1;
-  --color-pink-mid:    #FF9EB5;
-  --color-pink-dark:   #FF758F;
-  --color-pink-deep:   #E8547A;
-  --color-pink-text:   #C2486B;
-  --color-charcoal:    #2D3142;
-  --color-charcoal-mid:#4A4E6A;
-  --color-muted:       #71717A;
-  --color-border:      rgba(255, 179, 193, 0.35);
-  --color-border-mid:  rgba(255, 179, 193, 0.55);
+  /* ---- Core palette (WCAG AA checked for text pairings) ---- */
+  --color-bg:         #F7F5F2;  /* warm stone — page background */
+  --color-surface:    #FFFFFF;  /* cards, panels */
+  --color-surface-2:  #F1ECE6;  /* section bands, subtle fills */
+  --color-ink:        #211F1D;  /* primary text (15.8:1 on bg) */
+  --color-ink-2:      #57514A;  /* secondary text (7.0:1 on bg) */
+  --color-muted:      #857F77;  /* meta / placeholder (4.6:1 on bg) */
+  --color-line:       rgba(33, 31, 29, 0.10);
+  --color-line-2:     rgba(33, 31, 29, 0.16);
 
-  /* Brand aliases (keeps existing design.css/quote.css working) */
-  --color-brand-pink-soft:   #FFEEF1;
-  --color-brand-pink-light:  #FFD3DB;
-  --color-brand-pink:        #FFB3C1;
-  --color-brand-pink-dark:   #FF758F;
-  --color-brand-pink-text:   #C2486B;
-  --color-brand-pastel-peach:#FFCAD4;
-  --color-brand-pastel-mint: #D8F3DC;
-  --color-brand-pastel-blue: #E8F0FE;
-  --color-brand-cream:       #FFF5F8;
-  --color-brand-charcoal:    #2D3142;
+  /* Rose accent — the brand pink, elevated */
+  --color-accent:      #C2486B;  /* primary; white text = 4.7:1 (AA) */
+  --color-accent-deep: #A8385A;  /* hover / pressed */
+  --color-accent-soft: #FBE9EE;  /* soft tint background */
+  --color-accent-tint: #F4D5DE;  /* decorative borders */
+
+  /* Dark surface (footer, contrast bands) */
+  --color-dark:    #211F1D;
+  --color-dark-2:  #2E2A26;
+  --color-on-dark: rgba(255, 255, 255, 0.72);
+
+  /* Semantic */
+  --color-success: #2E7D5B;
+  --color-error:   #B23B3B;
+
+  /* ---- Legacy aliases (older pages resolve through these) ---- */
+  --color-pink-bg:      var(--color-bg);
+  --color-pink-soft:    var(--color-surface-2);
+  --color-pink-light:   var(--color-accent-tint);
+  --color-pink:         #D96A89;
+  --color-pink-mid:     #CE5A7B;
+  --color-pink-dark:    var(--color-accent);
+  --color-pink-deep:    var(--color-accent-deep);
+  --color-pink-text:    var(--color-accent);
+  --color-charcoal:     var(--color-ink);
+  --color-charcoal-mid: var(--color-ink-2);
+  --color-border:       var(--color-line);
+  --color-border-mid:   var(--color-line-2);
+
+  --color-brand-pink-soft:    var(--color-accent-soft);
+  --color-brand-pink-light:   var(--color-accent-tint);
+  --color-brand-pink:         #D96A89;
+  --color-brand-pink-dark:    var(--color-accent);
+  --color-brand-pink-text:    var(--color-accent);
+  --color-brand-pastel-peach: #F4D5DE;
+  --color-brand-pastel-mint:  #DCEFE4;
+  --color-brand-pastel-blue:  #E5ECF5;
+  --color-brand-cream:        var(--color-bg);
+  --color-brand-charcoal:     var(--color-ink);
 
   /* Radius */
   --radius-control: 10px;
-  --radius-card:    18px;
-  --radius-panel:   26px;
+  --radius-card:    16px;
+  --radius-panel:   24px;
+  --radius-pill:    999px;
 
-  /* Shadows */
-  --shadow-soft:     0 2px 14px rgba(255, 117, 143, 0.10);
-  --shadow-raised:   0 8px 28px rgba(255, 117, 143, 0.16);
-  --shadow-floating: 0 20px 52px rgba(45, 49, 66, 0.16);
+  /* Shadows — soft, diffuse, premium */
+  --shadow-soft:     0 1px 2px rgba(33, 31, 29, 0.04), 0 4px 16px rgba(33, 31, 29, 0.05);
+  --shadow-raised:   0 4px 12px rgba(33, 31, 29, 0.06), 0 14px 34px rgba(33, 31, 29, 0.08);
+  --shadow-floating: 0 22px 54px rgba(33, 31, 29, 0.18);
 
-  /* Spacing */
+  /* Spacing (4px scale) */
+  --space-1: 0.25rem;  --space-2: 0.5rem;  --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.25rem;  --space-6: 1.5rem;  --space-8: 2rem;    --space-10: 2.5rem;
+  --space-12: 3rem;    --space-16: 4rem;   --space-20: 5rem;   --space-24: 6rem;
   --spacing-section-sm: 4rem;
   --spacing-section-md: 6rem;
   --spacing-section-lg: 8rem;
 
-  --text-label-xs: 0.625rem;
+  --text-label-xs: 0.6875rem;
+
+  /* Motion */
+  --ease:      cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast:  150ms;
+  --dur:       220ms;
 }

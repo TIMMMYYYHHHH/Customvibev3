@@ -4,70 +4,82 @@ import { calculateBundlePrice } from './pricing.js';
 import { refreshBasketBadge } from './partials.js';
 import { FALLBACK_IMAGE } from './image.js';
 
-const QUOTE_FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+// Where new orders are delivered (email notification). Deliberate placeholder —
+// swap YOUR_FORM_ID for a real Formspree (or other) form id to receive orders.
+const ORDER_FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+
+// EFT / business details. PLACEHOLDERS — replace before going live. Bracketed
+// values render with a "sample" highlight on the confirmation page so they're
+// impossible to miss. See BUSINESS-DETAILS.md for the fill-in list.
+const BUSINESS = {
+  bankAccountName: '[ADD ACCOUNT NAME]',
+  bankName: '[ADD BANK NAME]',
+  accountNumber: '[ADD ACCOUNT NUMBER]',
+  accountType: '[ADD ACCOUNT TYPE]',
+  branchCode: '[ADD BRANCH CODE]',
+  proofEmail: 'hello@customvibe.co.za',
+};
 
 let designs = getDesigns() || [];
 let step = 'review';
-let submittedQuote = null;
+let submittedOrder = null;
 let copyLabelTimeout = null;
 
-async function deliverQuoteRequest(quote) {
+const byId = (id) => document.getElementById(id);
+function setIcon(id, name, opts) { const el = byId(id); if (el) el.innerHTML = iconSvg(name, opts); }
+function orderReference() { return `CV-${Math.floor(Math.random() * 89999 + 10000)}`; }
+
+async function submitOrder(order) {
   try {
-    await fetch(QUOTE_FORM_ENDPOINT, {
+    await fetch(ORDER_FORM_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(quote),
+      body: JSON.stringify(order),
     });
   } catch (error) {
-    console.error('Quote submission delivery failed, check QUOTE_FORM_ENDPOINT setup', error);
+    console.error('Order notification failed — check ORDER_FORM_ENDPOINT setup', error);
   }
 }
 
 function renderStaticIcons() {
-  document.getElementById('quote-empty-icon').innerHTML = iconSvg('ShoppingBag', { size: 56 });
-  document.getElementById('quote-compass-icon').innerHTML = iconSvg('Compass', { size: 18 });
-  document.getElementById('quote-proceed-icon').innerHTML = iconSvg('ChevronRight', { size: 16 });
-  document.getElementById('quote-back-icon').innerHTML = iconSvg('ArrowLeft', { size: 16 });
-  document.getElementById('quote-user-icon').innerHTML = iconSvg('User', { size: 16 });
-  document.getElementById('quote-mail-icon').innerHTML = iconSvg('Mail', { size: 16 });
-  document.getElementById('quote-phone-icon').innerHTML = iconSvg('Phone', { size: 16 });
-  document.getElementById('quote-mappin-icon').innerHTML = iconSvg('MapPin', { size: 16 });
-  document.getElementById('quote-success-check-icon').innerHTML = iconSvg('CheckCircle2', { size: 36 });
-  document.getElementById('quote-clipboard-icon').innerHTML = iconSvg('Clipboard', { size: 16 });
-  document.getElementById('quote-printer-icon').innerHTML = iconSvg('Printer', { size: 16 });
-  document.getElementById('quote-payfast-icon').innerHTML = iconSvg('CreditCard', { size: 16 });
-  document.getElementById('quote-yoco-icon').innerHTML = iconSvg('CreditCard', { size: 16 });
+  setIcon('quote-empty-icon', 'ShoppingBag', { size: 48 });
+  setIcon('quote-compass-icon', 'Compass', { size: 16 });
+  setIcon('quote-proceed-icon', 'ArrowRight', { size: 16 });
+  setIcon('quote-back-icon', 'ArrowLeft', { size: 16 });
+  setIcon('quote-user-icon', 'User', { size: 15 });
+  setIcon('quote-mail-icon', 'Mail', { size: 15 });
+  setIcon('quote-phone-icon', 'Phone', { size: 15 });
+  setIcon('quote-mappin-icon', 'MapPin', { size: 15 });
+  setIcon('quote-success-check-icon', 'CheckCircle2', { size: 34 });
+  setIcon('quote-bank-icon', 'Banknote', { size: 16 });
+  setIcon('quote-clipboard-icon', 'Clipboard', { size: 15 });
+  setIcon('quote-printer-icon', 'Printer', { size: 15 });
+  setIcon('quote-payfast-icon', 'CreditCard', { size: 15 });
+  setIcon('quote-yoco-icon', 'CreditCard', { size: 15 });
 }
 
 function renderStepper() {
-  const chips = {
-    review: document.getElementById('quote-step-chip-review'),
-    details: document.getElementById('quote-step-chip-details'),
-    success: document.getElementById('quote-step-chip-success'),
-  };
-  const connector1 = document.getElementById('quote-connector-1');
-  const connector2 = document.getElementById('quote-connector-2');
+  const review = byId('quote-step-chip-review');
+  const details = byId('quote-step-chip-details');
+  const success = byId('quote-step-chip-success');
+  const detailsDone = step === 'details' || step === 'success';
+  const successDone = step === 'success';
 
-  const isDetailsComplete = step === 'details' || step === 'success';
-  const isSuccessComplete = step === 'success';
+  review.className = `quote-step-chip${step === 'review' ? ' active' : ''}${detailsDone ? ' complete' : ''}`;
+  review.textContent = detailsDone ? '✓ Review' : '1. Review';
+  details.className = `quote-step-chip${step === 'details' ? ' active' : ''}${successDone ? ' complete' : ''}`;
+  details.textContent = successDone ? '✓ Delivery' : '2. Delivery';
+  success.className = `quote-step-chip${step === 'success' ? ' active' : ''}`;
+  success.textContent = '3. Pay by EFT';
 
-  chips.review.className = `quote-step-chip${step === 'review' ? ' active' : ''}${isDetailsComplete ? ' complete' : ''}`;
-  chips.review.textContent = isDetailsComplete ? '✓ 1. Verify Order' : '1. Verify Order';
-
-  chips.details.className = `quote-step-chip${step === 'details' ? ' active' : ''}${isSuccessComplete ? ' complete' : ''}`;
-  chips.details.textContent = isSuccessComplete ? '✓ 2. Delivery Space' : '2. Delivery Space';
-
-  chips.success.className = `quote-step-chip${step === 'success' ? ' active' : ''}`;
-  chips.success.textContent = '3. Complete Request';
-
-  connector1.classList.toggle('complete', isDetailsComplete);
-  connector2.classList.toggle('complete', isSuccessComplete);
+  byId('quote-connector-1').classList.toggle('complete', detailsDone);
+  byId('quote-connector-2').classList.toggle('complete', successDone);
 }
 
 function showStep() {
-  document.getElementById('quote-step-review').hidden = step !== 'review';
-  document.getElementById('quote-step-details').hidden = step !== 'details';
-  document.getElementById('quote-step-success').hidden = step !== 'success';
+  byId('quote-step-review').hidden = step !== 'review';
+  byId('quote-step-details').hidden = step !== 'details';
+  byId('quote-step-success').hidden = step !== 'success';
   renderStepper();
 }
 
@@ -75,19 +87,17 @@ function renderReview() {
   const totalQty = getTotalQuantity(designs);
   const { cost: totalPrice, savings } = calculateBundlePrice(totalQty);
 
-  const emptyState = document.getElementById('quote-empty-state');
-  const itemsSection = document.getElementById('quote-items-section');
-
+  const emptyState = byId('quote-empty-state');
+  const itemsSection = byId('quote-items-section');
   if (designs.length === 0) {
     emptyState.hidden = false;
     itemsSection.hidden = true;
     return;
   }
-
   emptyState.hidden = true;
   itemsSection.hidden = false;
 
-  const list = document.getElementById('quote-items-list');
+  const list = byId('quote-items-list');
   list.innerHTML = designs.map((design) => `
     <div class="quote-item-row" data-design-id="${design.id}">
       <div class="quote-item-main">
@@ -95,22 +105,19 @@ function renderReview() {
           <img src="${design.imageUrl}" alt="${design.name}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'" />
         </div>
         <div>
-          <h4 class="quote-item-name">${design.name}</h4>
-          <div class="quote-item-tags">
-            <span>7.5 cm Perfect Square</span>
-            <span>Full Bleed Gloss</span>
-          </div>
+          <h3 class="quote-item-name">${design.name}</h3>
+          <div class="quote-item-tags"><span>7.5 cm square</span><span>Gloss finish</span></div>
         </div>
       </div>
       <div class="quote-item-actions">
         <div class="quote-item-qty-stepper">
-          <button type="button" data-action="dec" data-design-id="${design.id}">-</button>
+          <button type="button" data-action="dec" data-design-id="${design.id}" aria-label="Decrease quantity for ${design.name}">-</button>
           <span>${design.quantity}</span>
-          <button type="button" data-action="inc" data-design-id="${design.id}">+</button>
+          <button type="button" data-action="inc" data-design-id="${design.id}" aria-label="Increase quantity for ${design.name}">+</button>
         </div>
         <div class="quote-item-price-row">
           <span class="quote-item-price">R${design.quantity * 50}</span>
-          <button type="button" class="quote-item-delete" data-action="delete" data-design-id="${design.id}" title="Discard design">${iconSvg('Trash2', { size: 16 })}</button>
+          <button type="button" class="quote-item-delete" data-action="delete" data-design-id="${design.id}" aria-label="Remove ${design.name}">${iconSvg('Trash2', { size: 16 })}</button>
         </div>
       </div>
     </div>`).join('');
@@ -121,166 +128,159 @@ function renderReview() {
       const action = btn.dataset.action;
       const target = designs.find((d) => d.id === id);
       if (!target) return;
-
-      if (action === 'inc') {
-        designs = updateDesign({ ...target, quantity: target.quantity + 1 });
-      } else if (action === 'dec') {
-        designs = updateDesign({ ...target, quantity: Math.max(1, target.quantity - 1) });
-      } else if (action === 'delete') {
-        designs = deleteDesign(id);
-      }
-
+      if (action === 'inc') designs = updateDesign({ ...target, quantity: target.quantity + 1 });
+      else if (action === 'dec') designs = updateDesign({ ...target, quantity: Math.max(1, target.quantity - 1) });
+      else if (action === 'delete') designs = deleteDesign(id);
       renderReview();
       refreshBasketBadge();
     });
   });
 
-  document.getElementById('quote-total-cost').textContent = `R${Math.round(totalPrice)}`;
-  document.getElementById('quote-total-qty-text').textContent = `${totalQty} standard magnets ordered`;
-
-  const savingsBlock = document.getElementById('quote-savings-block');
-  savingsBlock.innerHTML = savings > 0
-    ? `<span class="quote-savings-pill">Volume discount saves you R${Math.round(savings)}!</span>`
-    : '';
+  byId('quote-total-cost').textContent = `R${Math.round(totalPrice)}`;
+  byId('quote-total-qty-text').textContent = `${totalQty} magnet${totalQty !== 1 ? 's' : ''}`;
+  byId('quote-savings-block').innerHTML = savings > 0
+    ? `<span class="quote-savings-pill">Bundle saves you R${Math.round(savings)}</span>` : '';
 }
 
 function wireReviewActions() {
-  document.getElementById('quote-empty-back-btn').addEventListener('click', () => {
-    location.href = 'design.html';
-  });
-  document.getElementById('quote-keep-designing-btn').addEventListener('click', () => {
-    location.href = 'design.html';
-  });
-  document.getElementById('quote-clear-basket-btn').addEventListener('click', () => {
-    if (confirm('Are you sure you want to completely clear your draft design list?')) {
+  byId('quote-empty-back-btn').addEventListener('click', () => { location.href = 'design.html'; });
+  byId('quote-keep-designing-btn').addEventListener('click', () => { location.href = 'design.html'; });
+  byId('quote-clear-basket-btn').addEventListener('click', () => {
+    if (confirm('Clear all magnets from your basket?')) {
       clearAllDesigns();
       designs = [];
       renderReview();
       refreshBasketBadge();
     }
   });
-  document.getElementById('quote-proceed-to-shipping-btn').addEventListener('click', () => {
-    step = 'details';
-    showStep();
-  });
-  document.getElementById('quote-back-to-review-btn').addEventListener('click', () => {
-    step = 'review';
-    showStep();
-  });
+  byId('quote-proceed-to-shipping-btn').addEventListener('click', () => { step = 'details'; showStep(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  byId('quote-back-to-review-btn').addEventListener('click', () => { step = 'review'; showStep(); });
 }
 
 function wireDetailsForm() {
-  const form = document.getElementById('quote-details-form');
-  const errorBox = document.getElementById('quote-validation-error');
-  const submitBtn = document.getElementById('quote-final-submit-btn');
+  const form = byId('quote-details-form');
+  const errorBox = byId('quote-validation-error');
+  const submitBtn = byId('quote-final-submit-btn');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const name = byId('quote-client-name').value.trim();
+    const email = byId('quote-client-email').value.trim();
+    const phone = byId('quote-client-phone').value.trim();
+    const address = byId('quote-address').value.trim();
+    const notes = byId('quote-remarks').value.trim();
 
-    const clientName = document.getElementById('quote-client-name').value.trim();
-    const clientEmail = document.getElementById('quote-client-email').value.trim();
-    const clientPhone = document.getElementById('quote-client-phone').value.trim();
-    const address = document.getElementById('quote-address').value.trim();
-    const remarks = document.getElementById('quote-remarks').value.trim();
-
-    if (!clientName || !clientEmail || !clientPhone || !address) {
-      errorBox.textContent = 'Please fill in all standard contact and delivery details.';
+    if (!name || !email || !phone || !address) {
+      errorBox.textContent = 'Please fill in your name, email, phone and delivery address.';
       errorBox.hidden = false;
       return;
     }
     errorBox.hidden = true;
 
     const totalQty = getTotalQuantity(designs);
-    const { cost: totalPrice } = calculateBundlePrice(totalQty);
-
-    const compiledQuote = {
-      customerName: clientName,
-      customerEmail: clientEmail,
-      customerPhone: clientPhone,
+    const { cost } = calculateBundlePrice(totalQty);
+    const order = {
+      orderRef: orderReference(),
+      customerName: name,
+      customerEmail: email,
+      customerPhone: phone,
       deliveryAddress: address,
-      additionalNotes: remarks,
+      notes,
       designs: [...designs],
-      totalPriceEstimate: Math.round(totalPrice),
-      status: 'submitted',
+      totalQty,
+      total: Math.round(cost),
+      paymentMethod: 'EFT',
+      status: 'awaiting_payment',
     };
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
-    await deliverQuoteRequest(compiledQuote);
+    submitBtn.textContent = 'Placing order…';
+    await submitOrder(order);
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Submit Quote Request';
+    submitBtn.textContent = 'Place order';
 
-    submittedQuote = compiledQuote;
+    submittedOrder = order;
     step = 'success';
-    renderSuccess();
+    renderConfirmation();
     showStep();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
 
-function buildReceiptText(quote) {
-  let text = `====================================\n`;
-  text += `CUSTOMVIBE MAGNETS - QUOTE REQUEST\n`;
-  text += `====================================\n`;
-  text += `Order Estimated Cost: R${quote.totalPriceEstimate}\n`;
-  text += `Contact Name: ${quote.customerName}\n`;
-  text += `Email Address: ${quote.customerEmail}\n`;
-  text += `Phone Number: ${quote.customerPhone}\n`;
-  text += `Delivery Address: ${quote.deliveryAddress}\n`;
-  if (quote.additionalNotes) {
-    text += `Comments: ${quote.additionalNotes}\n`;
-  }
-  text += `\n----- DESIGNED MAGNET ITEMS -----\n`;
-  quote.designs.forEach((d, idx) => {
-    text += `#${idx + 1}: [${d.name}] - Qty: ${d.quantity} pcs - Size: 7.5x7.5cm (Full Bleed Glossy)\n`;
-  });
-  text += `\n====================================\n`;
-  text += `Find your tribe at Custom Vibe!\n`;
-  return text;
+function renderConfirmation() {
+  if (!submittedOrder) return;
+  const o = submittedOrder;
+
+  byId('quote-success-name').textContent = o.customerName;
+  byId('quote-success-cost').textContent = `R${o.total}`;
+  byId('quote-success-qty').textContent = `${o.totalQty} magnet${o.totalQty !== 1 ? 's' : ''}`;
+  byId('quote-order-ref').textContent = o.orderRef;
+
+  const rows = [
+    ['Account name', BUSINESS.bankAccountName],
+    ['Bank', BUSINESS.bankName],
+    ['Account number', BUSINESS.accountNumber],
+    ['Account type', BUSINESS.accountType],
+    ['Branch code', BUSINESS.branchCode],
+    ['Reference', o.orderRef],
+    ['Amount', `R${o.total}`],
+  ];
+  byId('quote-bank-list').innerHTML = rows.map(([k, v]) => {
+    const isPlaceholder = /\[.*\]/.test(String(v));
+    return `<div class="quote-bank-row"><dt>${k}</dt><dd${isPlaceholder ? ' class="quote-bank-ph"' : ''}>${v}</dd></div>`;
+  }).join('');
+
+  byId('quote-eft-instructions').innerHTML =
+    `Use <strong>${o.orderRef}</strong> as your payment reference, then send proof of payment to ` +
+    `<a href="mailto:${BUSINESS.proofEmail}">${BUSINESS.proofEmail}</a> or WhatsApp us. ` +
+    `We'll confirm and start printing once it reflects.`;
+
+  let html = `<p class="receipt-order-id">Order ${o.orderRef}</p>`;
+  html += `<p>Name: ${o.customerName}</p>`;
+  html += `<p>Email: ${o.customerEmail}</p>`;
+  html += `<p>Phone: ${o.customerPhone}</p>`;
+  html += `<p>Deliver to: ${o.deliveryAddress}</p>`;
+  if (o.notes) html += `<p>Notes: ${o.notes}</p>`;
+  html += `<p class="receipt-items-label">Magnets (${o.totalQty})</p>`;
+  o.designs.forEach((d, i) => { html += `<p>#${i + 1} ${d.name} — ${d.quantity} × 7.5 cm</p>`; });
+  html += `<p class="receipt-items-label">Total: R${o.total} (pay by EFT)</p>`;
+  byId('quote-receipt-body').innerHTML = html;
 }
 
-function renderSuccess() {
-  if (!submittedQuote) return;
-  const orderId = `CV-${Math.floor(Math.random() * 89999 + 10000)}`;
-  const totalQty = submittedQuote.designs.reduce((sum, d) => sum + d.quantity, 0);
-
-  document.getElementById('quote-success-name').textContent = submittedQuote.customerName;
-  document.getElementById('quote-success-cost').textContent = `R${submittedQuote.totalPriceEstimate}`;
-  document.getElementById('quote-success-qty').textContent = `${totalQty} Hand-finished Magnets`;
-
-  const receiptBody = document.getElementById('quote-receipt-body');
-  let html = `<p class="receipt-order-id">Order ID: ${orderId}</p>`;
-  html += `<p>Customer: ${submittedQuote.customerName}</p>`;
-  html += `<p>Email: ${submittedQuote.customerEmail}</p>`;
-  html += `<p>Phone: ${submittedQuote.customerPhone}</p>`;
-  html += `<p>Destination: ${submittedQuote.deliveryAddress}</p>`;
-  html += `<p class="receipt-items-label">Included Magnet items:</p>`;
-  submittedQuote.designs.forEach((d, index) => {
-    html += `<p>- Item #${index + 1} ("${d.name}"): ${d.quantity} units (7.5x7.5 cm size)</p>`;
-  });
-  receiptBody.innerHTML = html;
+function buildReceiptText(o) {
+  let t = '====================================\n';
+  t += 'CUSTOMVIBE — ORDER\n';
+  t += '====================================\n';
+  t += `Order reference: ${o.orderRef}\n`;
+  t += `Amount due (EFT): R${o.total}\n`;
+  t += `Name: ${o.customerName}\nEmail: ${o.customerEmail}\nPhone: ${o.customerPhone}\n`;
+  t += `Deliver to: ${o.deliveryAddress}\n`;
+  if (o.notes) t += `Notes: ${o.notes}\n`;
+  t += '\n----- MAGNETS -----\n';
+  o.designs.forEach((d, i) => { t += `#${i + 1}: ${d.name} — qty ${d.quantity} — 7.5x7.5 cm gloss\n`; });
+  t += '\n----- PAY BY EFT -----\n';
+  t += `Account name: ${BUSINESS.bankAccountName}\n`;
+  t += `Bank: ${BUSINESS.bankName}\n`;
+  t += `Account number: ${BUSINESS.accountNumber}\n`;
+  t += `Branch code: ${BUSINESS.branchCode}\n`;
+  t += `Reference: ${o.orderRef}\n`;
+  t += `Send proof to: ${BUSINESS.proofEmail}\n`;
+  t += '====================================\n';
+  return t;
 }
 
 function wireSuccessActions() {
-  document.getElementById('quote-copy-receipt-btn').addEventListener('click', () => {
-    if (!submittedQuote) return;
-    const text = buildReceiptText(submittedQuote);
-    navigator.clipboard.writeText(text).then(() => {
-      const label = document.getElementById('quote-copy-label');
+  byId('quote-copy-receipt-btn').addEventListener('click', () => {
+    if (!submittedOrder) return;
+    navigator.clipboard.writeText(buildReceiptText(submittedOrder)).then(() => {
+      const label = byId('quote-copy-label');
       label.textContent = 'Copied!';
       clearTimeout(copyLabelTimeout);
-      copyLabelTimeout = setTimeout(() => { label.textContent = 'Copy Order Summary'; }, 2500);
+      copyLabelTimeout = setTimeout(() => { label.textContent = 'Copy order details'; }, 2500);
     });
   });
-
-  document.getElementById('quote-print-receipt-btn').addEventListener('click', () => {
-    window.print();
-  });
-
-  document.getElementById('quote-start-new-btn').addEventListener('click', () => {
-    clearAllDesigns();
-    step = 'review';
-    location.href = 'design.html';
-  });
+  byId('quote-print-receipt-btn').addEventListener('click', () => window.print());
+  byId('quote-start-new-btn').addEventListener('click', () => { clearAllDesigns(); location.href = 'design.html'; });
 }
 
 renderStaticIcons();

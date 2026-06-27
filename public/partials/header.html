@@ -1,29 +1,33 @@
 <header class="site-header">
   <div class="site-header-inner">
-
-    <!-- Left nav -->
-    <nav class="site-nav-left">
-      <a href="index.html"                 id="nav-tab-hero"    data-nav-path="/"></a>
-      <a href="index.html#pricing-section" id="nav-tab-pricing" data-nav-path="/#pricing-section"></a>
-    </nav>
-
-    <!-- Center logo -->
-    <a href="index.html" class="brand-logo">
-      <div class="brand-logo-box">C</div>
-      <div>
-        <div class="brand-wordmark">Custom<span>Vibe</span></div>
-      </div>
+    <a href="index.html" class="brand" aria-label="CustomVibe — home">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <span class="brand-word">Custom<em>Vibe</em></span>
     </a>
 
-    <!-- Right: designer nav + basket -->
-    <div class="site-header-right">
-      <a href="design.html" id="nav-tab-designer" data-nav-path="/design" class="site-nav-right-link"></a>
-      <button type="button" class="quote-basket-btn" id="nav-quote-basket">
-        <span id="nav-quote-basket-icon"></span>
-        <span>Basket</span>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="index.html#how-it-works" data-nav-path="/#how-it-works">How it works</a>
+      <a href="index.html#pricing-section" data-nav-path="/#pricing-section">Pricing</a>
+      <a href="design.html" data-nav-path="/design">Design Studio</a>
+    </nav>
+
+    <div class="site-header-actions">
+      <a href="design.html" class="btn btn-primary btn-sm header-cta">Start designing</a>
+      <button type="button" class="quote-basket-btn" id="nav-quote-basket" aria-label="Open basket summary">
+        <span id="nav-quote-basket-icon" aria-hidden="true"></span>
+        <span class="basket-label">Basket</span>
         <span class="quote-basket-badge" id="nav-quote-basket-badge" hidden></span>
       </button>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+        <span id="nav-toggle-icon" aria-hidden="true"></span>
+      </button>
     </div>
+  </div>
 
+  <div class="mobile-nav" id="mobile-nav" hidden>
+    <a href="index.html#how-it-works">How it works</a>
+    <a href="index.html#pricing-section">Pricing</a>
+    <a href="design.html">Design Studio</a>
+    <a href="design.html" class="btn btn-primary">Start designing</a>
   </div>
 </header>
