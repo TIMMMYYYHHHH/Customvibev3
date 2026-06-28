@@ -232,6 +232,7 @@ svg { display: block; flex-shrink: 0; }
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--color-line);
+  box-shadow: 0 1px 3px rgba(45, 43, 58, 0.03);
 }
 .site-header-inner {
   max-width: 1200px;
@@ -322,6 +323,11 @@ svg { display: block; flex-shrink: 0; }
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  animation: slide-down 0.25s var(--ease-out) both;
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 @media (min-width: 900px) { .mobile-nav { display: none !important; } }
 .mobile-nav a {
@@ -395,11 +401,12 @@ svg { display: block; flex-shrink: 0; }
   position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 40;
   width: 54px; height: 54px; border-radius: var(--radius-pill);
   background: #25D366;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
   display: flex; align-items: center; justify-content: center;
-  transition: transform var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
-.whatsapp-fab:hover { transform: scale(1.08); }
+.whatsapp-fab:hover { transform: scale(1.08); box-shadow: 0 8px 28px rgba(37, 211, 102, 0.4); }
+.whatsapp-fab:active { transform: scale(0.95); }
 .whatsapp-fab svg { color: #fff; }
 
 /* ===================== QUOTE MODAL ===================== */
@@ -415,7 +422,7 @@ svg { display: block; flex-shrink: 0; }
   position: relative; background: var(--color-surface); width: 100%; max-width: 42rem;
   border-radius: var(--radius-panel);
   border: 1px solid var(--color-line);
-  box-shadow: var(--shadow-floating);
+  box-shadow: var(--shadow-floating), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   padding: 1.5rem; overflow: hidden; text-align: left;
 }
 @media (min-width: 640px) { .quote-modal-card { padding: 2.25rem; } }
