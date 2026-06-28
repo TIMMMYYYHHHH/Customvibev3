@@ -3,7 +3,6 @@ import { addDesign } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
 import { refreshBasketBadge } from './partials.js';
 
-// One local, swappable sample used by the "try the studio" entry point.
 const SAMPLE_DESIGN = {
   name: 'Sample magnet',
   imageUrl: '/images/placeholder-magnet-2.svg',
@@ -79,22 +78,23 @@ function setIcon(id, name, opts) {
 function renderStaticIcons() {
   setIcon('hero-eyebrow-icon',     'Sparkles',     { size: 13 });
   setIcon('hero-cta-arrow',        'ArrowRight',   { size: 16 });
-  setIcon('trust-icon-1',          'MapPin',       { size: 22 });
-  setIcon('trust-icon-2',          'Truck',        { size: 22 });
-  setIcon('trust-icon-3',          'Banknote',     { size: 22 });
-  setIcon('trust-icon-4',          'ShieldCheck',  { size: 22 });
-  setIcon('how-eyebrow-icon',      'Sparkles',     { size: 13 });
-  setIcon('how-icon-1',            'Upload',       { size: 24 });
-  setIcon('how-icon-2',            'PenTool',      { size: 24 });
-  setIcon('how-icon-3',            'PackageCheck', { size: 24 });
-  setIcon('how-cta-arrow',         'ArrowRight',   { size: 16 });
-  setIcon('showcase-eyebrow-icon', 'ImageIcon',    { size: 13 });
+  setIcon('how-icon-1',            'Upload',       { size: 22 });
+  setIcon('how-icon-2',            'PenTool',      { size: 22 });
+  setIcon('how-icon-3',            'PackageCheck', { size: 22 });
+  setIcon('how-arrow-1',           'ArrowRight',   { size: 18 });
+  setIcon('how-arrow-2',           'ArrowRight',   { size: 18 });
   setIcon('pricing-eyebrow-icon',  'Tag',          { size: 13 });
   setIcon('pricing-percent-icon',  'Percent',      { size: 13 });
   setIcon('pricing-helping-icon',  'HelpingHand',  { size: 16 });
   setIcon('reviews-eyebrow-icon',  'Quote',        { size: 13 });
   setIcon('faq-eyebrow-icon',      'HelpCircle',   { size: 13 });
   setIcon('cta-band-arrow',        'ArrowRight',   { size: 18 });
+}
+
+function triggerMagnetLanding() {
+  const fridge = document.querySelector('.hero-fridge');
+  if (!fridge) return;
+  requestAnimationFrame(() => fridge.classList.add('animate'));
 }
 
 function renderPricingCards() {
@@ -115,8 +115,6 @@ function renderPricingCards() {
     </div>`).join('');
 }
 
-// Short, friendly tier label for the calculator chip (the verbose tier names
-// from pricing.js read poorly in a small chip).
 function shortTier(qty) {
   if (qty <= 1) return 'Single';
   if (qty < 6) return 'Standard';
@@ -161,8 +159,6 @@ function renderTestimonials() {
   const grid = document.getElementById('testimonial-grid');
   if (!grid) return;
 
-  // We never fabricate reviews (CLAUDE.md hard constraint #1). Until real
-  // customer quotes exist, invite the first one rather than show fake cards.
   grid.innerHTML = `
     <div class="reviews-invite">
       <span class="reviews-invite-icon">${iconSvg('Sparkles', { size: 26 })}</span>
@@ -193,6 +189,7 @@ function wireSampleEntry() {
 }
 
 renderStaticIcons();
+triggerMagnetLanding();
 renderPricingCards();
 renderPricingSimulator();
 renderTestimonials();
