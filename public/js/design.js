@@ -345,8 +345,7 @@ function wireAddDraft() {
 
 function wireCheckout() {
   document.getElementById('magnet-designer-checkout-btn').addEventListener('click', () => {
-    const quoteTab = document.getElementById('nav-quote-basket');
-    if (quoteTab) quoteTab.click();
+    location.href = 'quote.html';
   });
 }
 
