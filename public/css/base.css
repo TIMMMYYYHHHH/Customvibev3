@@ -241,8 +241,6 @@ svg { display: block; flex-shrink: 0; }
   border-radius: 11px;
   background: var(--color-ink);
   color: #fff;
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
   display: flex; align-items: center; justify-content: center;
   transform: rotate(-4deg);
   transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);

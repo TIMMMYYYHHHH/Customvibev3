@@ -149,7 +149,7 @@
 .studio-upload-title { font-size: 0.8rem; font-weight: 700; color: var(--color-ink); text-transform: uppercase; letter-spacing: 0.05em; }
 .studio-upload-sub { font-size: var(--text-label-xs); color: var(--color-muted); font-weight: 600; }
 
-.studio-design-list { display: flex; flex-direction: column; gap: 0.75rem; max-height: 340px; overflow-y: auto; padding-right: 0.25rem; }
+.studio-design-list { display: flex; flex-direction: column; gap: 0.75rem; max-height: 680px; overflow-y: auto; padding-right: 0.25rem; }
 .studio-design-item {
   padding: 0.75rem; border-radius: var(--radius-card); border: 1px solid var(--color-line); background: var(--color-surface);
   cursor: pointer; transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
