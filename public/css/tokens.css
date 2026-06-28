@@ -1,8 +1,6 @@
 /* ============================================================
-   CustomVibe design tokens: "Crafted Premium"
-   Warm stone canvas · charcoal ink · refined rose accent.
-   Legacy --color-pink-* / --color-brand-* names are kept and
-   remapped so not-yet-redesigned pages still render coherently.
+   CustomVibe design tokens: "Warm Handmade"
+   Soft pink canvas · warm charcoal ink · rose accent.
    ============================================================ */
 :root {
   /* Fonts */
@@ -10,39 +8,39 @@
   --font-heading: "DM Serif Display", Georgia, "Times New Roman", serif;
   --font-mono:    "JetBrains Mono", ui-monospace, monospace;
 
-  /* ---- Core palette (WCAG AA checked for text pairings) ---- */
-  --color-bg:         #F7F5F2;  /* warm stone, page background */
+  /* ---- Core palette ---- */
+  --color-bg:         #FFF5F8;  /* soft pink page background */
   --color-surface:    #FFFFFF;  /* cards, panels */
-  --color-surface-2:  #F1ECE6;  /* section bands, subtle fills */
-  --color-ink:        #211F1D;  /* primary text (15.8:1 on bg) */
-  --color-ink-2:      #57514A;  /* secondary text (7.0:1 on bg) */
-  --color-muted:      #857F77;  /* meta / placeholder (4.6:1 on bg) */
-  --color-line:       rgba(33, 31, 29, 0.10);
-  --color-line-2:     rgba(33, 31, 29, 0.16);
+  --color-surface-2:  #FFEEF1;  /* section bands, subtle fills */
+  --color-ink:        #2D2B3A;  /* primary text (warm dark with slight depth) */
+  --color-ink-2:      #5C5470;  /* secondary text */
+  --color-muted:      #8E8A9A;  /* meta / placeholder */
+  --color-line:       rgba(255, 179, 193, 0.25);
+  --color-line-2:     rgba(255, 179, 193, 0.40);
 
-  /* Rose accent: the brand pink, elevated */
-  --color-accent:      #C2486B;  /* primary; white text = 4.7:1 (AA) */
-  --color-accent-deep: #A8385A;  /* hover / pressed */
-  --color-accent-soft: #FBE9EE;  /* soft tint background */
-  --color-accent-tint: #F4D5DE;  /* decorative borders */
+  /* Rose accent */
+  --color-accent:      #E8547A;  /* primary CTA */
+  --color-accent-deep: #C2486B;  /* hover / pressed */
+  --color-accent-soft: #FFE4EB;  /* soft tint background */
+  --color-accent-tint: #FFD3DB;  /* decorative borders */
 
   /* Dark surface (footer, contrast bands) */
-  --color-dark:    #211F1D;
-  --color-dark-2:  #2E2A26;
+  --color-dark:    #2D2B3A;
+  --color-dark-2:  #3A3750;
   --color-on-dark: rgba(255, 255, 255, 0.72);
 
   /* Semantic */
   --color-success: #2E7D5B;
   --color-error:   #B23B3B;
 
-  /* ---- Legacy aliases (older pages resolve through these) ---- */
+  /* ---- Legacy aliases ---- */
   --color-pink-bg:      var(--color-bg);
   --color-pink-soft:    var(--color-surface-2);
   --color-pink-light:   var(--color-accent-tint);
-  --color-pink:         #D96A89;
-  --color-pink-mid:     #CE5A7B;
-  --color-pink-dark:    var(--color-accent);
-  --color-pink-deep:    var(--color-accent-deep);
+  --color-pink:         #FFB3C1;
+  --color-pink-mid:     #FF9EB5;
+  --color-pink-dark:    #FF758F;
+  --color-pink-deep:    var(--color-accent);
   --color-pink-text:    var(--color-accent);
   --color-charcoal:     var(--color-ink);
   --color-charcoal-mid: var(--color-ink-2);
@@ -51,10 +49,10 @@
 
   --color-brand-pink-soft:    var(--color-accent-soft);
   --color-brand-pink-light:   var(--color-accent-tint);
-  --color-brand-pink:         #D96A89;
+  --color-brand-pink:         #FFB3C1;
   --color-brand-pink-dark:    var(--color-accent);
   --color-brand-pink-text:    var(--color-accent);
-  --color-brand-pastel-peach: #F4D5DE;
+  --color-brand-pastel-peach: #FFD3DB;
   --color-brand-pastel-mint:  #DCEFE4;
   --color-brand-pastel-blue:  #E5ECF5;
   --color-brand-cream:        var(--color-bg);
