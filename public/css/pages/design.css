@@ -46,9 +46,9 @@
 .studio-workspace-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: start; }
 @media (min-width: 1024px) { .studio-workspace-grid { grid-template-columns: minmax(320px, 5fr) minmax(360px, 7fr); gap: 2.5rem; } }
 
-.studio-canvas-col { display: flex; flex-direction: column; gap: 1.5rem; order: 2; }
+.studio-canvas-col { display: flex; flex-direction: column; gap: 1.5rem; order: 1; }
 @media (min-width: 1024px) { .studio-canvas-col { order: 1; position: sticky; top: 88px; } }
-.studio-list-col { display: flex; flex-direction: column; gap: 1.5rem; order: 1; }
+.studio-list-col { display: flex; flex-direction: column; gap: 1.5rem; order: 2; }
 @media (min-width: 1024px) { .studio-list-col { order: 2; } }
 
 /* ---------- Canvas panel ---------- */

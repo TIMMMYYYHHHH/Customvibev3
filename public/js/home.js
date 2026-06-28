@@ -1,14 +1,5 @@
 import { iconSvg } from './icons.js';
-import { addDesign } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
-import { refreshBasketBadge } from './partials.js';
-
-const SAMPLE_DESIGN = {
-  name: 'Sample magnet',
-  imageUrl: '/images/placeholder-magnet-2.svg',
-  quantity: 1,
-  sizeCm: 7.5,
-};
 
 const PRICING_PACKS = [
   {
@@ -53,6 +44,10 @@ const FAQ_ITEMS = [
     a: 'Any photo from your phone or camera (JPG, PNG or HEIC). Upload it in the studio and crop, zoom and position it before you order.',
   },
   {
+    q: 'Are my photos stored?',
+    a: "No. We don't store any photos you upload to the site. Your photos stay in your browser. We only see them once you request a quote and they're sent to us.",
+  },
+  {
     q: 'How does pricing work?',
     a: "It's bundled: the more magnets in one order, the less each one costs, from R50 for one down to R40 each for ten or more. The calculator above shows your exact total.",
   },
@@ -78,6 +73,7 @@ function setIcon(id, name, opts) {
 function renderStaticIcons() {
   setIcon('hero-eyebrow-icon',     'Sparkles',     { size: 13 });
   setIcon('hero-cta-arrow',        'ArrowRight',   { size: 16 });
+  setIcon('hero-chip-privacy',     'ShieldCheck',  { size: 13 });
   setIcon('how-icon-1',            'Upload',       { size: 22 });
   setIcon('how-icon-2',            'PenTool',      { size: 22 });
   setIcon('how-icon-3',            'PackageCheck', { size: 22 });
@@ -89,12 +85,9 @@ function renderStaticIcons() {
   setIcon('reviews-eyebrow-icon',  'Quote',        { size: 13 });
   setIcon('faq-eyebrow-icon',      'HelpCircle',   { size: 13 });
   setIcon('cta-band-arrow',        'ArrowRight',   { size: 18 });
-}
-
-function triggerMagnetLanding() {
-  const fridge = document.querySelector('.hero-fridge');
-  if (!fridge) return;
-  requestAnimationFrame(() => fridge.classList.add('animate'));
+  setIcon('contact-eyebrow-icon',  'Mail',         { size: 13 });
+  setIcon('contact-send-icon',     'ArrowRight',   { size: 16 });
+  setIcon('contact-success-icon',  'CheckCircle2', { size: 18 });
 }
 
 function renderPricingCards() {
@@ -178,20 +171,45 @@ function renderFaq() {
     </details>`).join('');
 }
 
-function wireSampleEntry() {
-  const btn = document.getElementById('try-sample-btn');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    addDesign({ id: `sample-${Date.now()}`, ...SAMPLE_DESIGN });
-    refreshBasketBadge();
-    location.href = 'design.html';
+function wireContactForm() {
+  const form = document.getElementById('contact-form');
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('contact-submit-btn');
+    const successEl = document.getElementById('contact-success');
+    const errorEl = document.getElementById('contact-error');
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    successEl.hidden = true;
+    errorEl.hidden = true;
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      if (res.ok) {
+        successEl.hidden = false;
+        form.reset();
+      } else {
+        errorEl.hidden = false;
+      }
+    } catch {
+      errorEl.hidden = false;
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = `Send message ${iconSvg('ArrowRight', { size: 16 })}`;
   });
 }
 
 renderStaticIcons();
-triggerMagnetLanding();
 renderPricingCards();
 renderPricingSimulator();
 renderTestimonials();
 renderFaq();
-wireSampleEntry();
+wireContactForm();
