@@ -1,12 +1,57 @@
-/* home.css — Warm Handmade landing page */
+/* home.css — "Fridge door": one continuous surface, content stuck on as magnets,
+   not a stack of full-width section bands. */
+
+/* ---------- The canvas everything sits on ---------- */
+.fridge-canvas {
+  position: relative;
+  background-color: var(--color-bg);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(45, 43, 58, 0.028) 0px,
+    rgba(45, 43, 58, 0.028) 1px,
+    transparent 1px,
+    transparent 110px
+  );
+}
+
+/* Reusable "stuck on the fridge" pin dot, applied per-selector below
+   so it works on both static markup and JS-rendered cards. */
+.hero-note,
+.how-step,
+.pricing-card,
+.pricing-calc,
+.reviews-invite,
+.faq-list,
+.contact-card {
+  position: relative;
+}
+.hero-note::before,
+.how-step::before,
+.pricing-card::before,
+.pricing-calc::before,
+.reviews-invite::before,
+.faq-list::before,
+.contact-card::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 2px 4px rgba(33, 31, 29, 0.22), inset 0 -2px 3px rgba(33, 31, 29, 0.18);
+  z-index: 2;
+}
 
 /* ---------- Shared section chrome ---------- */
-.section-head { max-width: 640px; margin-bottom: 3rem; }
-.section-head.text-center { margin-inline: auto; }
+.section-head { max-width: 640px; margin-bottom: 2.5rem; }
+.section-head.text-center { margin-inline: auto; text-align: center; }
 .section-title {
-  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
   color: var(--color-ink);
-  line-height: 1.08;
+  line-height: 1.1;
 }
 .section-sub {
   margin-top: 1rem;
@@ -15,121 +60,128 @@
   line-height: 1.7;
   max-width: 42rem;
 }
-.link-accent { color: var(--color-accent-deep); font-weight: 700; background: none; cursor: pointer; font-size: inherit; }
-.link-accent:hover { text-decoration: underline; }
 
 /* ================= HERO ================= */
-.hero {
-  padding: clamp(4rem, 10vw, 9rem) 0 clamp(3rem, 6vw, 5rem);
-  overflow: hidden;
-  text-align: center;
-}
-.hero-inner {
+.hero { padding: clamp(3rem, 8vw, 6rem) 0 clamp(3.5rem, 7vw, 6rem); overflow: hidden; }
+.hero-board {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  gap: 2.5rem;
+}
+.hero-note {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-floating);
+  padding: 2rem 1.75rem 2.25rem;
+  max-width: 34rem;
 }
 .hero-title {
-  font-size: clamp(2.6rem, 7vw, 5rem);
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
   color: var(--color-ink);
-  line-height: 0.95;
+  line-height: 1.02;
   letter-spacing: -0.02em;
-  max-width: 16ch;
 }
 .hero-title em { font-style: italic; color: var(--color-accent); }
 .hero-sub {
-  margin-top: 1.4rem;
+  margin-top: 1.1rem;
   font-size: 1.0625rem;
   color: var(--color-ink-2);
   line-height: 1.7;
-  max-width: 34rem;
 }
-.hero-actions {
-  display: flex; gap: 0.75rem; flex-wrap: wrap;
-  align-items: center; justify-content: center;
-  margin-top: 2rem;
-}
-.hero-chips {
-  display: flex; flex-wrap: wrap; gap: 0.5rem;
-  justify-content: center;
-  margin-top: 2.5rem;
-}
+.hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-top: 1.75rem; }
+.hero-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.75rem; }
 .hero-chips li {
-  font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-ink-2);
-  background: var(--color-surface); border: 1px solid var(--color-line);
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-ink-2);
+  background: var(--color-surface-2); border: 1px solid var(--color-line);
   border-radius: var(--radius-pill); padding: 0.4rem 0.85rem;
   display: inline-flex; align-items: center; gap: 0.35rem;
 }
 .hero-chips li svg { color: var(--color-accent); }
 
-/* ================= HOW IT WORKS ================= */
-.how {
-  padding: var(--spacing-section-sm) 0;
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-line);
-  border-bottom: 1px solid var(--color-line);
+.hero-magnets { display: none; }
+@media (min-width: 860px) {
+  .hero-board { flex-direction: row; align-items: center; flex-wrap: nowrap; }
+  .hero-note { flex: 0 0 480px; }
+  .hero-magnets {
+    display: block;
+    position: relative;
+    flex: 1 1 auto;
+    height: 380px;
+    margin-left: -64px;
+    z-index: 1;
+  }
 }
-.how-strip {
+.hero-magnet {
+  position: absolute;
+  width: 148px;
+  border-radius: 18px;
+  box-shadow: var(--shadow-floating);
+  animation: float 6.5s ease-in-out infinite;
+}
+.hero-magnet-1 { top: 6px;   left: 150px; width: 130px; --rot: -8deg; animation-delay: 0s; }
+.hero-magnet-2 { top: 150px; left: 10px;  width: 150px; --rot: 6deg;  animation-delay: 1.4s; }
+.hero-magnet-3 { top: 248px; left: 190px; width: 118px; --rot: -4deg; animation-delay: 2.6s; }
+
+/* ================= HOW IT WORKS ================= */
+.how { padding: var(--spacing-section-md) 0 var(--spacing-section-lg); }
+.how-title {
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  color: var(--color-ink);
+  margin-bottom: 2.5rem;
+  max-width: 22ch;
+}
+.how-board {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  align-items: stretch;
-}
-@media (min-width: 768px) {
-  .how-strip {
-    flex-direction: row;
-    align-items: center;
-    gap: 0;
-  }
 }
 .how-step {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: 1.5rem 1.5rem 1.5rem;
   display: flex;
-  gap: 0.85rem;
+  flex-direction: column;
+  gap: 0.6rem;
   align-items: flex-start;
-  flex: 1;
+  max-width: 22rem;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .how-icon {
-  display: flex;
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  flex-shrink: 0;
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-  align-items: center;
-  justify-content: center;
+  display: flex; width: 44px; height: 44px; border-radius: 12px;
+  background: var(--color-accent-soft); color: var(--color-accent);
+  align-items: center; justify-content: center;
 }
-.how-step h3 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--color-ink);
-}
-.how-step p {
-  font-size: 0.825rem;
-  color: var(--color-ink-2);
-  line-height: 1.55;
-  margin-top: 0.15rem;
-}
-.how-arrow {
-  display: none;
-  color: var(--color-accent-tint);
-  flex-shrink: 0;
-  padding: 0 0.75rem;
-}
-@media (min-width: 768px) {
-  .how-arrow { display: flex; align-items: center; }
+.how-step h3 { font-family: var(--font-sans); font-weight: 700; font-size: 1rem; color: var(--color-ink); }
+.how-step p { font-size: 0.875rem; color: var(--color-ink-2); line-height: 1.6; }
+.how-arrow { display: none; }
+
+@media (min-width: 700px) {
+  .how-board { flex-direction: row; align-items: flex-start; gap: 0; position: relative; }
+  .how-step { flex: 1 1 0; max-width: none; }
+  .how-step-1 { transform: rotate(-3deg); margin-top: 0; }
+  .how-step-2 { transform: rotate(2deg); margin-top: 1.75rem; }
+  .how-step-3 { transform: rotate(-2deg); margin-top: -0.5rem; }
+  .how-step:hover { transform: rotate(0deg) translateY(-4px); box-shadow: var(--shadow-raised); }
+  .how-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-accent-tint); flex-shrink: 0; width: 2.5rem;
+    transform: rotate(20deg) translateY(10px);
+  }
 }
 
 /* ================= PRICING ================= */
 .pricing { padding: var(--spacing-section-lg) 0; }
-.pricing-cards { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 2.5rem; }
-@media (min-width: 640px) { .pricing-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.pricing-cards { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3.5rem; }
 .pricing-card {
   background: var(--color-surface); border: 1px solid var(--color-line);
   border-radius: var(--radius-card); padding: 1.75rem; display: flex; flex-direction: column; gap: 0.45rem;
-  position: relative; box-shadow: var(--shadow-soft); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  box-shadow: var(--shadow-soft); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  max-width: 26rem;
 }
-.pricing-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-raised); }
 .pricing-card.popular { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent), var(--shadow-raised); }
 .pricing-card-badge {
   position: absolute; top: -13px; left: 1.75rem;
@@ -148,8 +200,17 @@
 .pricing-card-features li svg { color: var(--color-accent); margin-top: 1px; flex-shrink: 0; }
 .pricing-card .btn { margin-top: auto; }
 
+@media (min-width: 760px) {
+  .pricing-cards { flex-direction: row; align-items: flex-start; gap: 1.75rem; max-width: none; }
+  .pricing-card { max-width: none; flex: 1 1 0; }
+  .pricing-cards > .pricing-card:nth-child(1) { transform: rotate(-3deg); }
+  .pricing-cards > .pricing-card:nth-child(2) { transform: rotate(0deg) translateY(-14px); }
+  .pricing-cards > .pricing-card:nth-child(3) { transform: rotate(3deg); }
+  .pricing-cards > .pricing-card:hover { transform: translateY(-6px); }
+}
+
 .pricing-calc { display: grid; grid-template-columns: 1fr; gap: 2rem; padding: 2rem; max-width: 900px; margin: 0 auto; }
-@media (min-width: 768px) { .pricing-calc { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); padding: 2.5rem; gap: 3rem; } }
+@media (min-width: 768px) { .pricing-calc { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); padding: 2.5rem; gap: 3rem; transform: rotate(-1deg); } }
 .pricing-calc-title { font-size: 1.4rem; color: var(--color-ink); margin: 0.5rem 0 0.4rem; }
 .pricing-calc-desc { font-size: 0.9rem; color: var(--color-ink-2); }
 .pricing-slider-block { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; }
@@ -185,21 +246,24 @@
 .pricing-savings-empty { font-size: 0.8rem; color: var(--color-muted); font-weight: 600; }
 
 /* ================= REVIEWS ================= */
-.reviews { padding: var(--spacing-section-lg) 0; background: var(--color-surface); }
-.reviews-grid { max-width: 620px; margin: 0 auto; }
+.reviews { padding: var(--spacing-section-lg) 0; }
+.reviews-grid { max-width: 600px; margin: 0 auto; }
 .reviews-invite {
-  background: var(--color-bg); border: 1px dashed var(--color-accent-tint); border-radius: var(--radius-card);
+  background: var(--color-surface); border: 1px dashed var(--color-accent-tint); border-radius: var(--radius-card);
   padding: 2.5rem 2rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
+  box-shadow: var(--shadow-soft);
 }
+@media (min-width: 700px) { .reviews-invite { transform: rotate(2deg); } }
 .reviews-invite-icon { color: var(--color-accent); display: flex; }
 .reviews-invite-text { font-family: var(--font-heading); font-style: italic; font-size: 1.15rem; color: var(--color-ink-2); line-height: 1.5; }
 
 /* ================= FAQ ================= */
-.faq { padding: var(--spacing-section-lg) 0; background: var(--color-surface-2); }
+.faq { padding: var(--spacing-section-lg) 0; }
 .faq-list {
   border: 1px solid var(--color-line); border-radius: var(--radius-card); overflow: hidden;
   background: var(--color-surface); box-shadow: var(--shadow-soft); margin-bottom: 2rem;
 }
+@media (min-width: 700px) { .faq-list { transform: rotate(-1deg); } }
 .faq-item { border-bottom: 1px solid var(--color-line); }
 .faq-item:last-child { border-bottom: none; }
 .faq-item summary {
@@ -213,7 +277,6 @@
 .faq-item[open] summary svg { transform: rotate(180deg); }
 .faq-item p { padding: 0 1.6rem 1.4rem; font-size: 0.9rem; color: var(--color-ink-2); line-height: 1.7; }
 .faq-placeholder { color: var(--color-accent); font-style: italic; border-bottom: 1px dashed currentColor; }
-.faq-foot { text-align: center; font-size: 0.95rem; color: var(--color-ink-2); font-weight: 600; }
 
 /* ================= FINAL CTA ================= */
 .cta-band { background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-deep) 100%); padding: clamp(3.5rem, 7vw, 5.5rem) 1.5rem; }
@@ -222,23 +285,22 @@
 .cta-inner p { color: rgba(255, 255, 255, 0.9); font-size: 1.0625rem; line-height: 1.6; }
 
 /* ================= CONTACT FORM ================= */
-.contact-section { padding: var(--spacing-section-lg) 0; background: var(--color-surface-2); }
-.contact-form {
-  max-width: 640px; margin: 0 auto;
-  display: flex; flex-direction: column; gap: 1.25rem;
+.contact-section { padding: var(--spacing-section-lg) 0; }
+.contact-card {
+  background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-floating); padding: 2rem; max-width: 640px; margin: 0 auto;
 }
+.contact-form { display: flex; flex-direction: column; gap: 1.25rem; }
 .contact-row { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
 @media (min-width: 560px) { .contact-row { grid-template-columns: 1fr 1fr; } }
 .contact-field { display: flex; flex-direction: column; gap: 0.4rem; }
-.contact-field label {
-  font-size: 0.85rem; font-weight: 700; color: var(--color-ink);
-}
+.contact-field label { font-size: 0.85rem; font-weight: 700; color: var(--color-ink); }
 .contact-field input,
 .contact-field textarea {
   padding: 0.85rem 1rem;
   border: 1.5px solid var(--color-line-2);
   border-radius: var(--radius-control);
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   color: var(--color-ink);
   font-size: 0.9rem;
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
@@ -251,9 +313,6 @@
 }
 .contact-field textarea { resize: vertical; min-height: 120px; }
 .contact-form .btn { align-self: flex-start; }
-.contact-success {
-  display: flex; align-items: center; gap: 0.5rem;
-  color: var(--color-success); font-weight: 700; font-size: 0.9rem;
-}
+.contact-success { display: flex; align-items: center; gap: 0.5rem; color: var(--color-success); font-weight: 700; font-size: 0.9rem; }
 .contact-success svg { color: var(--color-success); }
 .contact-error { color: var(--color-error); font-weight: 700; font-size: 0.9rem; }
