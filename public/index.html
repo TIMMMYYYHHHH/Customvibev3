@@ -25,55 +25,57 @@
     <a href="#main" class="skip-link">Skip to content</a>
     <div data-partial="header" id="partial-header"></div>
 
-    <main id="main">
+    <main id="main" class="fridge-canvas">
 
       <!-- ===== HERO ===== -->
-      <section class="hero">
-        <div class="container hero-inner">
-          <p class="eyebrow"><span id="hero-eyebrow-icon"></span> Handmade in Durban</p>
-          <h1 class="hero-title">Find your tribe<br>at Custom<em>Vibe.</em></h1>
-          <p class="hero-sub">
-            Turn your favourite photos into premium fridge magnets. Design yours in the browser,
-            and we hand-print it on 7.5&nbsp;cm magnets. Pay by EFT, delivered anywhere in South&nbsp;Africa.
-          </p>
-          <div class="hero-actions">
-            <a href="design.html" class="btn btn-primary btn-lg">Start designing <span id="hero-cta-arrow"></span></a>
-            <a href="#how-it-works" class="btn btn-ghost">See how it works</a>
+      <section class="hero" id="hero">
+        <div class="container hero-board">
+          <div class="hero-note">
+            <p class="eyebrow"><span id="hero-eyebrow-icon"></span> Handmade in Durban</p>
+            <h1 class="hero-title">Find your tribe<br>at Custom<em>Vibe.</em></h1>
+            <p class="hero-sub">
+              Turn your favourite photos into premium fridge magnets. Design yours in the browser,
+              and we hand-print it on 7.5&nbsp;cm magnets. Pay by EFT, delivered anywhere in South&nbsp;Africa.
+            </p>
+            <div class="hero-actions">
+              <a href="design.html" class="btn btn-primary btn-lg">Start designing <span id="hero-cta-arrow"></span></a>
+              <a href="#how-it-works" class="btn btn-ghost">See how it works</a>
+            </div>
+            <ul class="hero-chips">
+              <li><span id="hero-chip-privacy"></span> Photos never stored</li>
+              <li>Hand-inspected</li>
+              <li>Nationwide delivery</li>
+            </ul>
           </div>
-          <ul class="hero-chips">
-            <li><span id="hero-chip-privacy"></span> Photos never stored</li>
-            <li>Hand-inspected</li>
-            <li>Nationwide delivery</li>
-          </ul>
+          <div class="hero-magnets" aria-hidden="true">
+            <img src="images/placeholder-magnet-2.svg" alt="" class="hero-magnet hero-magnet-1">
+            <img src="images/placeholder-magnet-3.svg" alt="" class="hero-magnet hero-magnet-2">
+            <img src="images/placeholder-magnet-1.svg" alt="" class="hero-magnet hero-magnet-3">
+          </div>
         </div>
       </section>
 
       <!-- ===== HOW IT WORKS ===== -->
       <section class="how" id="how-it-works">
         <div class="container">
-          <div class="how-strip">
-            <div class="how-step">
+          <h2 class="how-title">Stuck on you in three steps</h2>
+          <div class="how-board">
+            <div class="how-step how-step-1">
               <span class="how-icon" id="how-icon-1"></span>
-              <div>
-                <h3>Upload your photo</h3>
-                <p>JPG, PNG or HEIC from your phone or camera.</p>
-              </div>
+              <h3>Upload your photo</h3>
+              <p>JPG, PNG or HEIC from your phone or camera.</p>
             </div>
-            <span class="how-arrow" id="how-arrow-1" aria-hidden="true"></span>
-            <div class="how-step">
+            <span class="how-arrow how-arrow-1" id="how-arrow-1" aria-hidden="true"></span>
+            <div class="how-step how-step-2">
               <span class="how-icon" id="how-icon-2"></span>
-              <div>
-                <h3>Design it your way</h3>
-                <p>Crop, zoom and position in a live preview.</p>
-              </div>
+              <h3>Design it your way</h3>
+              <p>Crop, zoom and position in a live preview.</p>
             </div>
-            <span class="how-arrow" id="how-arrow-2" aria-hidden="true"></span>
-            <div class="how-step">
+            <span class="how-arrow how-arrow-2" id="how-arrow-2" aria-hidden="true"></span>
+            <div class="how-step how-step-3">
               <span class="how-icon" id="how-icon-3"></span>
-              <div>
-                <h3>We print &amp; ship</h3>
-                <p>Hand-printed in Durban, delivered to your door.</p>
-              </div>
+              <h3>We print &amp; ship</h3>
+              <p>Hand-printed in Durban, delivered to your door.</p>
             </div>
           </div>
         </div>
@@ -82,10 +84,10 @@
       <!-- ===== PRICING ===== -->
       <section class="pricing" id="pricing-section">
         <div class="container">
-          <header class="section-head text-center">
-            <p class="eyebrow" style="justify-content:center;"><span id="pricing-eyebrow-icon"></span> Pricing</p>
+          <header class="section-head">
+            <p class="eyebrow"><span id="pricing-eyebrow-icon"></span> Pricing</p>
             <h2 class="section-title">Bundle more, pay less</h2>
-            <p class="section-sub" style="margin-inline:auto;">Every magnet in your order can be a different photo. The more you add, the less each one costs, right down to R40.</p>
+            <p class="section-sub">Every magnet in your order can be a different photo. The more you add, the less each one costs, right down to R40.</p>
           </header>
 
           <div class="pricing-cards" id="packages-cards-grid"></div>
@@ -126,7 +128,6 @@
       <section class="reviews" id="reviews-section">
         <div class="container">
           <header class="section-head text-center">
-            <p class="eyebrow" style="justify-content:center;"><span id="reviews-eyebrow-icon"></span> Reviews</p>
             <h2 class="section-title">Real reviews, on the way</h2>
           </header>
           <div class="reviews-grid" id="testimonial-grid"></div>
@@ -136,8 +137,7 @@
       <!-- ===== FAQ ===== -->
       <section class="faq" id="faq-section">
         <div class="container container-narrow">
-          <header class="section-head text-center">
-            <p class="eyebrow" style="justify-content:center;"><span id="faq-eyebrow-icon"></span> FAQ</p>
+          <header class="section-head">
             <h2 class="section-title">Good questions</h2>
           </header>
           <div class="faq-list" id="faq-list"></div>
@@ -161,28 +161,30 @@
             <h2 class="section-title">Send us a message</h2>
             <p class="section-sub" style="margin-inline:auto;">Have a question, a bulk order, or just want to say hello? Fill in the form and we'll get back to you.</p>
           </header>
-          <form id="contact-form" class="contact-form" action="/api/contact" method="POST">
-            <input type="hidden" name="subject" value="New message from CustomVibe website" />
-            <input type="hidden" name="from_name" value="CustomVibe Contact Form" />
-            <input type="checkbox" name="botcheck" class="hidden" style="display:none;" />
-            <div class="contact-row">
-              <div class="contact-field">
-                <label for="contact-name">Name</label>
-                <input type="text" id="contact-name" name="name" required placeholder="Your name" autocomplete="name" />
+          <div class="contact-card panel">
+            <form id="contact-form" class="contact-form" action="/api/contact" method="POST">
+              <input type="hidden" name="subject" value="New message from CustomVibe website" />
+              <input type="hidden" name="from_name" value="CustomVibe Contact Form" />
+              <input type="checkbox" name="botcheck" class="hidden" style="display:none;" />
+              <div class="contact-row">
+                <div class="contact-field">
+                  <label for="contact-name">Name</label>
+                  <input type="text" id="contact-name" name="name" required placeholder="Your name" autocomplete="name" />
+                </div>
+                <div class="contact-field">
+                  <label for="contact-email">Email</label>
+                  <input type="email" id="contact-email" name="email" required placeholder="you@example.com" autocomplete="email" />
+                </div>
               </div>
               <div class="contact-field">
-                <label for="contact-email">Email</label>
-                <input type="email" id="contact-email" name="email" required placeholder="you@example.com" autocomplete="email" />
+                <label for="contact-message">Message</label>
+                <textarea id="contact-message" name="message" required rows="5" placeholder="How can we help?"></textarea>
               </div>
-            </div>
-            <div class="contact-field">
-              <label for="contact-message">Message</label>
-              <textarea id="contact-message" name="message" required rows="5" placeholder="How can we help?"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-lg" id="contact-submit-btn">Send message <span id="contact-send-icon"></span></button>
-            <p class="contact-success" id="contact-success" hidden><span id="contact-success-icon"></span> Message sent! We'll be in touch soon.</p>
-            <p class="contact-error" id="contact-error" hidden>Something went wrong. Please try again or WhatsApp us.</p>
-          </form>
+              <button type="submit" class="btn btn-primary btn-lg" id="contact-submit-btn">Send message <span id="contact-send-icon"></span></button>
+              <p class="contact-success" id="contact-success" hidden><span id="contact-success-icon"></span> Message sent! We'll be in touch soon.</p>
+              <p class="contact-error" id="contact-error" hidden>Something went wrong. Please try again or WhatsApp us.</p>
+            </form>
+          </div>
         </div>
       </section>
 
