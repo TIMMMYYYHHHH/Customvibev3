@@ -387,6 +387,9 @@ svg { display: block; flex-shrink: 0; }
 .footer-col a, .footer-col p { font-size: 0.8125rem; color: rgba(255,255,255,0.72); }
 .footer-col a:hover { color: #fff; }
 .footer-secure { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: #9fd6b6; }
+.footer-location { color: rgba(255,255,255,0.4); font-size: var(--text-label-xs); margin-top: 0.25rem; }
+.footer-secure-note { color: rgba(255,255,255,0.5); line-height: 1.65; font-size: 0.8125rem; }
+.footer-dot { opacity: 0.3; }
 .footer-bottom {
   max-width: 1200px; margin: 0 auto; padding-top: 1.5rem;
   display: flex; flex-direction: column; align-items: center; justify-content: space-between;
@@ -475,6 +478,30 @@ svg { display: block; flex-shrink: 0; }
   text-align: center; padding: 3rem 1.5rem;
   display: flex; flex-direction: column; align-items: center; gap: 1rem;
 }
+.empty-state p { font-size: 0.875rem; font-weight: 600; color: var(--color-muted); }
+
+/* Quote modal breakdown */
+.quote-modal-item-left { display: flex; align-items: center; gap: 0.875rem; min-width: 0; }
+.quote-modal-item-info { min-width: 0; }
+.quote-modal-item-right { text-align: right; flex-shrink: 0; }
+.quote-modal-item-qty { display: block; font-size: 0.75rem; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color-ink); }
+.quote-modal-item-base { display: block; font-size: var(--text-label-xs); color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.quote-modal-basket-label { display: block; color: var(--color-accent); font-family: var(--font-mono); margin-bottom: 0.875rem; }
+.quote-modal-breakdown-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-line); padding-bottom: 0.75rem; margin-bottom: 0.75rem; }
+.quote-modal-breakdown-label { color: var(--color-accent); font-family: var(--font-mono); }
+.quote-modal-breakdown-badge { background: var(--color-surface); padding: 0.25rem 0.75rem; border-radius: var(--radius-pill); font-size: var(--text-label-xs); font-weight: 700; border: 1px solid var(--color-line); }
+.quote-modal-breakdown-rows { font-size: 0.75rem; font-weight: 600; color: var(--color-ink-2); display: flex; flex-direction: column; gap: 0.5rem; }
+.quote-modal-breakdown-row { display: flex; justify-content: space-between; }
+.quote-modal-breakdown-row .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.quote-modal-breakdown-row .bold { font-weight: 700; }
+.quote-modal-bundle-note { display: flex; align-items: center; gap: 0.375rem; color: var(--color-success); font-weight: 700; font-size: var(--text-label-xs); padding-top: 0.375rem; border-top: 1px solid var(--color-line); }
+.quote-modal-total { border-top: 1px solid var(--color-line); padding-top: 1rem; margin-top: 0.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.quote-modal-total-cost { font-size: 1.875rem; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color-ink); }
+.quote-modal-total-row { display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.125rem; }
+.quote-modal-savings { font-size: 0.75rem; color: var(--color-success); font-weight: 700; background: rgba(46, 125, 91, 0.08); border: 1px solid rgba(46, 125, 91, 0.2); padding: 0.25rem 0.625rem; border-radius: var(--radius-control); }
+.quote-modal-total-label { display: block; color: var(--color-muted); }
+.quote-modal-courier-note { max-width: 15rem; color: var(--color-muted); font-weight: 500; }
 [data-partial] { display: block; }
 
 .spinner {

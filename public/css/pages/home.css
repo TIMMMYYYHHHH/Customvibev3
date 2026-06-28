@@ -59,6 +59,7 @@
 /* ---------- Shared section chrome ---------- */
 .section-head { max-width: 640px; margin-bottom: 2.5rem; }
 .section-head.text-center { margin-inline: auto; text-align: center; }
+.section-head.text-center .section-sub { margin-inline: auto; }
 .section-title {
   font-size: var(--text-h2);
   color: var(--color-ink);
@@ -230,8 +231,10 @@
 
 .pricing-calc { display: grid; grid-template-columns: 1fr; gap: 2rem; padding: 2rem; max-width: 900px; margin: 0 auto; }
 @media (min-width: 768px) { .pricing-calc { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); padding: 2.5rem; gap: 3rem; transform: rotate(-1deg); } }
+.pricing-calc-label { color: var(--color-accent); }
 .pricing-calc-title { font-size: 1.4rem; color: var(--color-ink); margin: 0.5rem 0 0.4rem; }
 .pricing-calc-desc { font-size: 0.9rem; color: var(--color-ink-2); }
+.pricing-calc .label-xs { color: var(--color-muted); }
 .pricing-slider-block { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; }
 .pricing-slider-readout { display: flex; justify-content: space-between; align-items: center; }
 .pricing-slider-value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color-accent); }
