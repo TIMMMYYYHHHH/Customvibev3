@@ -46,7 +46,7 @@ function renderBody(designs) {
       <div style="font-size:0.75rem; font-weight:600; color:rgba(45,49,66,0.8); display:flex; flex-direction:column; gap:0.5rem;">
         <div style="display:flex; justify-content:space-between;"><span>Base material rate:</span><span style="font-family:var(--font-mono);">R50.00 / item</span></div>
         <div style="display:flex; justify-content:space-between;"><span>Total magnets count:</span><span style="font-weight:700; font-family:var(--font-mono);">${totalQty} Magnet${totalQty !== 1 ? 's' : ''}</span></div>
-        ${totalQty >= 6 ? `<div style="display:flex; align-items:center; gap:0.375rem; color:#047857; font-weight:700; font-size:var(--text-label-xs); padding-top:0.375rem; border-top:1px solid rgba(255,179,193,0.2);">${iconSvg('Tag', { size: 14 })}<span>Applied bundle rates active!</span></div>` : ''}
+        ${totalQty >= 6 ? `<div style="display:flex; align-items:center; gap:0.375rem; color:#047857; font-weight:700; font-size:var(--text-label-xs); padding-top:0.375rem; border-top:1px solid rgba(255,179,193,0.2);">${iconSvg('Tag', { size: 14 })}<span>Bundle rates applied</span></div>` : ''}
       </div>
       <div style="border-top:1px solid rgba(255,179,193,0.2); padding-top:1rem; margin-top:0.5rem; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;">
         <div>
