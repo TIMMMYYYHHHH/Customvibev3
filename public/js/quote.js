@@ -275,7 +275,7 @@ function wireSuccessActions() {
     if (!submittedOrder) return;
     navigator.clipboard.writeText(buildReceiptText(submittedOrder)).then(() => {
       const label = byId('quote-copy-label');
-      label.textContent = 'Copied!';
+      label.textContent = 'Copied';
       clearTimeout(copyLabelTimeout);
       copyLabelTimeout = setTimeout(() => { label.textContent = 'Copy order details'; }, 2500);
     });

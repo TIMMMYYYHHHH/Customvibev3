@@ -94,12 +94,12 @@
 
           <div class="pricing-calc panel" id="pricing-interactive-simulator">
             <div class="pricing-calc-left">
-              <p class="label-xs" style="color:var(--color-accent);"><span id="pricing-percent-icon"></span> Live calculator</p>
+              <p class="label-xs pricing-calc-label"><span id="pricing-percent-icon"></span> Live calculator</p>
               <h3 class="pricing-calc-title">What will my order cost?</h3>
               <p class="pricing-calc-desc">Drag the slider and watch your total update instantly.</p>
               <div class="pricing-slider-block">
                 <div class="pricing-slider-readout">
-                  <span class="label-xs" style="color:var(--color-muted);">Magnets</span>
+                  <span class="label-xs">Magnets</span>
                   <span class="pricing-slider-value" id="pricing-qty-display">6 magnets</span>
                 </div>
                 <input type="range" min="1" max="50" value="6" id="pricing-qty-slider" class="pricing-slider" aria-label="Number of magnets" />
@@ -111,11 +111,11 @@
               </div>
             </div>
             <div class="pricing-calc-right">
-              <span class="label-xs" style="color:var(--color-muted);">Estimated total</span>
+              <span class="label-xs">Estimated total</span>
               <span class="pricing-output-cost" id="pricing-output-cost">R250</span>
               <div class="pricing-output-stats">
-                <div><span class="label-xs" style="color:var(--color-muted);">Per magnet</span><span class="pricing-output-stat" id="pricing-output-avg">R41.67</span></div>
-                <div><span class="label-xs" style="color:var(--color-muted);">Tier</span><span class="pricing-tier-chip" id="pricing-output-tier">Half-dozen</span></div>
+                <div><span class="label-xs">Per magnet</span><span class="pricing-output-stat" id="pricing-output-avg">R41.67</span></div>
+                <div><span class="label-xs">Tier</span><span class="pricing-tier-chip" id="pricing-output-tier">Half-dozen</span></div>
               </div>
               <div id="pricing-savings-block"></div>
               <a href="design.html" class="btn btn-primary btn-block" id="pricing-design-now-btn">Design 6 magnets &rarr;</a>
@@ -157,9 +157,9 @@
       <section class="contact-section" id="contact">
         <div class="container container-narrow">
           <header class="section-head text-center">
-            <p class="eyebrow" style="justify-content:center;"><span id="contact-eyebrow-icon"></span> Get in touch</p>
+            <p class="eyebrow"><span id="contact-eyebrow-icon"></span> Get in touch</p>
             <h2 class="section-title">Send us a message</h2>
-            <p class="section-sub" style="margin-inline:auto;">Have a question, a bulk order, or just want to say hello? Fill in the form and we'll get back to you.</p>
+            <p class="section-sub">Have a question, a bulk order, or just want to say hello? Fill in the form and we'll get back to you.</p>
           </header>
           <div class="contact-card panel">
             <form id="contact-form" class="contact-form" action="/api/contact" method="POST">
@@ -181,7 +181,7 @@
                 <textarea id="contact-message" name="message" required rows="5" placeholder="How can we help?"></textarea>
               </div>
               <button type="submit" class="btn btn-primary btn-lg" id="contact-submit-btn">Send message <span id="contact-send-icon"></span></button>
-              <p class="contact-success" id="contact-success" hidden><span id="contact-success-icon"></span> Message sent! We'll be in touch soon.</p>
+              <p class="contact-success" id="contact-success" hidden><span id="contact-success-icon"></span> Message sent. We'll be in touch soon.</p>
               <p class="contact-error" id="contact-error" hidden>Something went wrong. Please try again or WhatsApp us.</p>
             </form>
           </div>

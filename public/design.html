@@ -24,15 +24,17 @@
     <meta property="og:title" content="Design Studio | CustomVibe Custom Photo Magnets" />
     <meta property="og:description" content="Upload your photos and design custom 7.5 cm fridge magnets in our interactive Design Studio." />
     <meta property="og:url" content="https://customvibe.co.za/design" />
+    <meta property="og:image" content="https://customvibe.co.za/images/og-cover.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Design Studio | CustomVibe Custom Photo Magnets" />
     <meta name="twitter:description" content="Upload your photos and design custom 7.5 cm fridge magnets in our interactive Design Studio." />
   </head>
   <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <div data-partial="header" id="partial-header"></div>
 
-    <main>
+    <main id="main">
       <div class="container section-md" id="magnet-designer-root">
         <div class="studio-header-row">
           <div>
@@ -41,7 +43,7 @@
           </div>
 
           <div class="studio-basket-badge" id="studio-basket-badge">
-            <p class="label-xs" style="color: var(--color-brand-pink-text);">My Design Basket</p>
+            <p class="label-xs">My Design Basket</p>
             <div class="studio-basket-totals">
               <span class="studio-basket-qty" id="studio-basket-qty">0 Magnets</span>
               <span class="studio-basket-dot">&bull;</span>
@@ -118,7 +120,7 @@
             </div>
 
             <div class="studio-craft-card">
-              <span class="label-xs" style="display:block;">How your magnet is made</span>
+              <span class="label-xs studio-craft-label">How your magnet is made</span>
               <p class="studio-craft-intro">Every magnet is printed and finished by hand, so your photo runs right to the edge, with no white border and no cropping surprises.</p>
               <div class="studio-craft-item">
                 <span id="studio-craft-sparkle-icon"></span>
@@ -148,7 +150,7 @@
                 </div>
               </div>
 
-              <button type="button" class="btn btn-primary" style="width:100%;" id="magnet-designer-checkout-btn">
+              <button type="button" class="btn btn-primary btn-block" id="magnet-designer-checkout-btn">
                 Review your order
                 <span id="studio-checkout-arrow-icon"></span>
               </button>

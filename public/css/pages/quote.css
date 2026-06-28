@@ -14,11 +14,12 @@
 
 /* ---------- Step heading ---------- */
 .quote-step-heading { text-align: left; margin-bottom: 2rem; }
-.quote-step-title { font-family: var(--font-heading); font-weight: 400; font-size: clamp(1.9rem, 4vw, 2.5rem); color: var(--color-ink); line-height: 1.05; }
+.quote-step-title { font-family: var(--font-heading); font-weight: 400; font-size: var(--text-h2); color: var(--color-ink); line-height: 1.05; letter-spacing: -0.025em; }
 .quote-step-sub { font-size: 0.95rem; color: var(--color-ink-2); font-weight: 500; margin-top: 0.5rem; line-height: 1.6; }
 .quote-step-heading-row { display: flex; align-items: center; gap: 1rem; text-align: left; margin-bottom: 1.75rem; }
 .quote-back-btn { padding: 0.55rem 0.9rem; border-radius: var(--radius-control); background: var(--color-surface); border: 1px solid var(--color-line-2); font-size: 0.8rem; font-weight: 700; color: var(--color-ink); display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0; }
 .quote-back-btn:hover { border-color: var(--color-accent); }
+.quote-back-btn:active { transform: scale(0.97); }
 .quote-back-btn svg { color: var(--color-accent); }
 
 /* ---------- Empty state ---------- */
@@ -50,7 +51,7 @@
 .quote-item-qty-stepper button:hover { background: var(--color-surface-2); }
 .quote-item-qty-stepper span { width: 1.6rem; text-align: center; font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; }
 .quote-item-price-row { display: flex; align-items: center; gap: 0.75rem; }
-.quote-item-price { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--color-ink-2); }
+.quote-item-price { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 0.85rem; font-weight: 700; color: var(--color-ink-2); }
 .quote-item-delete { padding: 0.45rem; border-radius: 8px; color: var(--color-muted); }
 .quote-item-delete:hover { color: var(--color-error); background: rgba(178, 59, 59, 0.08); }
 
@@ -60,7 +61,7 @@
 .quote-total-left { text-align: left; display: flex; flex-direction: column; gap: 0.3rem; }
 .quote-total-left .label-xs { color: var(--color-accent); }
 .quote-total-row { display: flex; align-items: baseline; gap: 0.5rem; }
-.quote-total-cost { font-size: 2.25rem; font-family: var(--font-mono); font-weight: 700; color: var(--color-ink); }
+.quote-total-cost { font-size: 2.25rem; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color-ink); }
 .quote-total-dot { color: var(--color-muted); font-weight: 700; }
 .quote-total-qty-text { font-size: 0.85rem; font-weight: 600; color: var(--color-ink-2); }
 .quote-savings-pill { display: inline-block; font-size: 0.8rem; font-weight: 700; color: var(--color-success); background: rgba(46, 125, 91, 0.1); border: 1px solid rgba(46, 125, 91, 0.22); padding: 0.25rem 0.75rem; border-radius: var(--radius-pill); margin-top: 0.4rem; }
@@ -104,7 +105,7 @@
 @media (min-width: 640px) { .quote-eft-grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); } }
 .quote-eft-summary { background: var(--color-ink); color: #fff; border-radius: var(--radius-card); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
 .quote-eft-summary .label-xs { color: rgba(255, 255, 255, 0.6); }
-.quote-success-summary-cost { font-family: var(--font-mono); font-size: 2.25rem; font-weight: 700; color: #fff; line-height: 1; margin-top: 0.2rem; }
+.quote-success-summary-cost { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 2.25rem; font-weight: 700; color: #fff; line-height: 1; margin-top: 0.2rem; }
 .quote-success-summary-qty { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); font-weight: 600; }
 .quote-orderref { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; gap: 0.2rem; }
 .quote-orderref strong { font-family: var(--font-mono); font-size: 1.25rem; color: var(--color-accent-tint); letter-spacing: 0.03em; }

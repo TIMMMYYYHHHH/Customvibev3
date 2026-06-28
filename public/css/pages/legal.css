@@ -30,10 +30,11 @@
 
 .legal-card h1 {
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: var(--text-h2);
   font-weight: 400;
   color: var(--color-charcoal);
   margin-bottom: 0.625rem;
+  letter-spacing: -0.025em;
 }
 
 .legal-card p {
@@ -62,20 +63,23 @@
 
 .notfound-page {
   max-width: 36rem;
+  min-height: 60dvh;
   padding-top: 5rem;
   padding-bottom: 7rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 1.5rem;
 }
 
 .notfound-page h1 {
   font-family: var(--font-heading);
-  font-size: 2.5rem;
+  font-size: var(--text-h1);
   font-weight: 400;
   color: var(--color-charcoal);
+  letter-spacing: -0.03em;
 }
 
 .notfound-page p {
