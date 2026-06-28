@@ -8,7 +8,7 @@ const PRICING_PACKS = [
     price: 'R50',
     unit: 'total',
     desc: 'Perfect for testing the quality before you commit to a bundle.',
-    features: ['7.5 cm gloss square', '3 mm rubber backing', 'Hand-finished & inspected'],
+    features: ['7.5 cm square magnet', 'Full-bleed photo print', 'Hand-finished & inspected'],
     popular: false,
     cta: 'Design one',
   },
@@ -37,7 +37,7 @@ const PRICING_PACKS = [
 const FAQ_ITEMS = [
   {
     q: 'What size are the magnets?',
-    a: 'Each magnet is a 7.5 cm square with a high-gloss, waterproof finish and a 3 mm rubber backing that grips firmly to any fridge.',
+    a: 'Each magnet is a 7.5 cm square with a premium photo finish. It grips firmly to any fridge or magnetic surface.',
   },
   {
     q: 'What photos can I use?',
