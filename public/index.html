@@ -161,8 +161,7 @@
             <h2 class="section-title">Send us a message</h2>
             <p class="section-sub" style="margin-inline:auto;">Have a question, a bulk order, or just want to say hello? Fill in the form and we'll get back to you.</p>
           </header>
-          <form id="contact-form" class="contact-form" action="https://api.web3forms.com/submit" method="POST">
-            <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY" />
+          <form id="contact-form" class="contact-form" action="/api/contact" method="POST">
             <input type="hidden" name="subject" value="New message from CustomVibe website" />
             <input type="hidden" name="from_name" value="CustomVibe Contact Form" />
             <input type="checkbox" name="botcheck" class="hidden" style="display:none;" />

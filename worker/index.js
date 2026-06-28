@@ -1,12 +1,7 @@
 // Cloudflare Worker entry point. Static site is served entirely by Workers
 // Assets (see wrangler.jsonc: html_handling/not_found_handling), so this
-// worker only adds security headers to whatever ASSETS.fetch returns.
+// worker adds security headers and proxies the contact form to Web3Forms.
 
-// A full Content-Security-Policy is deliberately left out: this app loads
-// Google Fonts and inline JSON-LD <script> blocks, and getting a CSP
-// allowlist wrong fails silently at runtime (not at build time) — that
-// needs verifying in a real browser before shipping, which isn't available
-// in this environment.
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
   headers.set('X-Content-Type-Options', 'nosniff');
@@ -17,8 +12,45 @@ function withSecurityHeaders(response) {
   return new Response(response.body, { status: response.status, headers });
 }
 
+async function handleContactForm(request, env) {
+  if (request.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+
+  const contentType = request.headers.get('Content-Type') || '';
+  let body;
+
+  if (contentType.includes('application/json')) {
+    body = await request.json();
+  } else {
+    const formData = await request.formData();
+    body = Object.fromEntries(formData);
+  }
+
+  delete body.botcheck;
+  body.access_key = env.WEB3FORMS_KEY;
+
+  const res = await fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  const result = await res.text();
+  return new Response(result, {
+    status: res.status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (url.pathname === '/api/contact') {
+      return handleContactForm(request, env);
+    }
+
     const assetResponse = await env.ASSETS.fetch(request);
     return withSecurityHeaders(assetResponse);
   },
