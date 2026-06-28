@@ -25,8 +25,9 @@ h1, h2, h3 {
   margin: 0;
   font-family: var(--font-heading);
   font-weight: 400;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 h4 { margin: 0; font-family: var(--font-sans); font-weight: 700; }
 p { margin: 0; }
@@ -81,10 +82,10 @@ svg { display: block; flex-shrink: 0; }
 
 .eyebrow {
   font-family: var(--font-sans);
-  font-size: var(--text-label-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
   color: var(--color-accent);
   display: inline-flex;
   align-items: center;
@@ -98,6 +99,7 @@ svg { display: block; flex-shrink: 0; }
   letter-spacing: 0.1em;
   font-weight: 700;
   font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- Buttons ---- */

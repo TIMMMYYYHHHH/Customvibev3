@@ -13,7 +13,7 @@
 }
 @media (min-width: 640px) { .studio-header-row { flex-direction: row; align-items: flex-end; } }
 
-.studio-title { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 400; color: var(--color-ink); line-height: 1.05; }
+.studio-title { font-family: var(--font-heading); font-size: var(--text-h2); font-weight: 400; color: var(--color-ink); line-height: 1.05; letter-spacing: -0.025em; }
 .studio-subtitle { font-size: 0.95rem; color: var(--color-ink-2); font-weight: 500; margin-top: 0.5rem; max-width: 34rem; line-height: 1.6; }
 
 .studio-basket-badge {
@@ -29,7 +29,7 @@
 .studio-basket-totals { display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.35rem; }
 .studio-basket-qty { font-size: 1.5rem; font-weight: 700; color: var(--color-ink); }
 .studio-basket-dot { color: var(--color-accent); font-weight: 700; }
-.studio-basket-cost { font-size: 1.5rem; font-family: var(--font-mono); font-weight: 700; color: var(--color-ink); }
+.studio-basket-cost { font-size: 1.5rem; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color-ink); }
 .studio-basket-tier-note { font-size: var(--text-label-xs); font-weight: 600; margin-top: 0.6rem; text-align: left; line-height: 1.4; }
 @media (min-width: 640px) { .studio-basket-tier-note { text-align: right; } }
 .studio-basket-tier-note.tier-low { color: var(--color-accent); }
@@ -189,7 +189,7 @@
 .studio-checkout-title { font-size: 1rem; font-weight: 700; color: var(--color-ink); }
 .studio-checkout-sub { font-size: 0.8rem; color: var(--color-ink-2); font-weight: 500; margin-top: 0.15rem; }
 .studio-checkout-price { text-align: right; }
-.studio-checkout-cost { display: block; font-family: var(--font-mono); font-weight: 700; color: var(--color-ink); font-size: 1.3rem; }
+.studio-checkout-cost { display: block; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--color-ink); font-size: 1.3rem; }
 .studio-checkout-qty { display: block; font-size: var(--text-label-xs); color: var(--color-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
 
 @media (max-width: 520px) {
