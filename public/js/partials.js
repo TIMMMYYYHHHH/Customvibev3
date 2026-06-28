@@ -1,7 +1,7 @@
 import { iconSvg } from './icons.js';
 import { getDesigns, getTotalQuantity } from './state.js';
 import { calculateBundlePrice } from './pricing.js';
-import { openQuoteModal } from './quote-modal.js';
+
 
 const VALUE_ITEMS = [
   { icon: 'Heart', title: 'Handmade in Durban', desc: 'Designed, printed and hand-inspected by us before your order ships.' },
@@ -35,7 +35,7 @@ function wireHeader() {
   if (quoteIcon) quoteIcon.innerHTML = iconSvg('ShoppingBag', { size: 18 });
   if (quoteBtn) {
     quoteBtn.classList.toggle('active', path === '/quote');
-    quoteBtn.addEventListener('click', () => openQuoteModal());
+    quoteBtn.addEventListener('click', () => { location.href = 'quote.html'; });
   }
 
   wireMobileNav();
@@ -103,30 +103,14 @@ function wireFooter() {
   if (copyright) copyright.textContent = `© ${new Date().getFullYear()} CustomVibe Magnets Ltd. All rights reserved.`;
 }
 
-function wireQuoteModalChrome() {
-  const closeBtn = document.getElementById('summary-modal-close-btn');
-  if (closeBtn) closeBtn.innerHTML = iconSvg('X', { size: 20 });
-
-  const headerIcon = document.getElementById('summary-modal-header-icon');
-  if (headerIcon) headerIcon.innerHTML = iconSvg('ShoppingBag', { size: 20 });
-
-  const secureIcon = document.getElementById('summary-modal-secure-icon');
-  if (secureIcon) secureIcon.innerHTML = iconSvg('ShieldCheck', { size: 16 });
-
-  const proceedIcon = document.getElementById('summary-modal-proceed-icon');
-  if (proceedIcon) proceedIcon.innerHTML = iconSvg('ArrowRight', { size: 16 });
-}
-
 export async function loadPartials() {
   await Promise.all([
     injectPartial('header', '[data-partial="header"]'),
     injectPartial('footer', '[data-partial="footer"]'),
-    injectPartial('quote-modal', '[data-partial="quote-modal"]'),
   ]);
 
   wireHeader();
   wireFooter();
-  wireQuoteModalChrome();
 
   document.dispatchEvent(new CustomEvent('partials:ready'));
 }
