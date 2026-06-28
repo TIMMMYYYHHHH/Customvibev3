@@ -204,10 +204,12 @@ svg { display: block; flex-shrink: 0; }
 /* ===================== SITE HEADER ===================== */
 #partial-header { min-height: 68px; }
 
-.site-header {
+#partial-header {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+.site-header {
   background: rgba(255, 245, 248, 0.82);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
