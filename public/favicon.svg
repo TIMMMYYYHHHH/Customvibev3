@@ -1,4 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="16" fill="#2d3142"/>
-  <text x="32" y="42" font-family="Fredoka, Verdana, sans-serif" font-size="26" font-weight="700" fill="#ff758f" text-anchor="middle">CV</text>
+  <!-- Stylised magnet/photo: rounded square photo frame with magnetic dot -->
+  <rect x="14" y="14" width="36" height="36" rx="8" fill="none" stroke="#ff758f" stroke-width="3"/>
+  <rect x="22" y="22" width="20" height="20" rx="4" fill="#ff758f" opacity="0.25"/>
+  <!-- Mountain/photo motif inside -->
+  <path d="M22 38 L29 29 L34 34 L38 28 L42 38Z" fill="#ff758f" opacity="0.7"/>
+  <!-- Magnetic dot top-right -->
+  <circle cx="46" cy="18" r="5" fill="#ff758f"/>
+  <circle cx="46" cy="18" r="2" fill="#2d3142"/>
 </svg>

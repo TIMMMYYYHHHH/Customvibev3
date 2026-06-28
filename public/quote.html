@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout | CustomVibe Custom Photo Magnets</title>
-    <meta name="description" content="Review your custom magnet order, add your delivery details, and pay securely by EFT. Handmade in Durban, shipped across South Africa." />
+    <meta name="description" content="Review your custom magnet order, add your pickup details, and pay securely by EFT. Handmade in Durban, shipped across South Africa." />
     <link rel="canonical" href="https://customvibe.co.za/quote" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,7 +16,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="CustomVibe" />
     <meta property="og:title" content="Checkout | CustomVibe Custom Photo Magnets" />
-    <meta property="og:description" content="Review your order, add delivery details, and pay by EFT." />
+    <meta property="og:description" content="Review your order, add pickup details, and pay by EFT." />
     <meta property="og:url" content="https://customvibe.co.za/quote" />
   </head>
   <body>
@@ -29,7 +29,7 @@
         <ol class="quote-stepper" id="quote-steps-stepper" aria-label="Checkout steps">
           <li class="quote-step-chip" id="quote-step-chip-review">1. Review</li>
           <li class="quote-step-connector" id="quote-connector-1" aria-hidden="true"></li>
-          <li class="quote-step-chip" id="quote-step-chip-details">2. Delivery</li>
+          <li class="quote-step-chip" id="quote-step-chip-details">2. Pickup</li>
           <li class="quote-step-connector" id="quote-connector-2" aria-hidden="true"></li>
           <li class="quote-step-chip" id="quote-step-chip-success">3. Pay by EFT</li>
         </ol>
@@ -38,7 +38,7 @@
         <section id="quote-step-review" class="quote-step">
           <div class="quote-step-heading">
             <h1 class="quote-step-title">Review your order</h1>
-            <p class="quote-step-sub">Check your magnets and quantities before adding delivery details.</p>
+            <p class="quote-step-sub">Check your magnets and quantities before adding pickup details.</p>
           </div>
 
           <div id="quote-empty-state" class="panel quote-empty-state" hidden>
@@ -72,7 +72,7 @@
               <div class="quote-total-actions">
                 <button type="button" class="btn btn-secondary" id="quote-keep-designing-btn">Keep designing</button>
                 <button type="button" class="btn btn-primary" id="quote-proceed-to-shipping-btn">
-                  Add delivery details <span id="quote-proceed-icon" aria-hidden="true"></span>
+                  Add pickup details <span id="quote-proceed-icon" aria-hidden="true"></span>
                 </button>
               </div>
             </div>
@@ -86,8 +86,8 @@
               <span id="quote-back-icon" aria-hidden="true"></span> Back
             </button>
             <div>
-              <h1 class="quote-step-title">Delivery details</h1>
-              <p class="quote-step-sub">Where should we send your magnets? We'll confirm shipping with you before you pay.</p>
+              <h1 class="quote-step-title">Pickup details</h1>
+              <p class="quote-step-sub">Choose your nearest PUDO locker and we'll ship your magnets there for collection.</p>
             </div>
           </div>
 
@@ -105,8 +105,13 @@
               <input id="quote-client-phone" name="phone" type="tel" autocomplete="tel" required placeholder="e.g. 082 123 4567" />
             </div>
             <div class="quote-form-field quote-form-field-full">
-              <label for="quote-address"><span id="quote-mappin-icon" aria-hidden="true"></span> Delivery address</label>
-              <textarea id="quote-address" name="address" autocomplete="street-address" required rows="2" placeholder="e.g. 102 Florida Road, Morningside, Durban, 4001"></textarea>
+              <label><span id="quote-mappin-icon" aria-hidden="true"></span> Pickup point (PUDO locker)</label>
+              <p class="quote-pudo-help">We deliver to your nearest PUDO locker — it's safe, convenient, and you collect when it suits you.</p>
+              <a href="https://www.pudo.co.za/where-to-find-us.php" target="_blank" rel="noopener noreferrer" class="btn btn-secondary quote-pudo-btn" id="quote-pudo-link">
+                <span id="quote-pudo-icon" aria-hidden="true"></span> Find your nearest PUDO point
+              </a>
+              <input id="quote-address" name="address" type="text" required placeholder="e.g. PUDO — Engen Florida Road, Durban" />
+              <p class="quote-pudo-hint">Paste or type the PUDO location name from the map above.</p>
             </div>
             <div class="quote-form-field quote-form-field-full">
               <label for="quote-remarks">Notes for us (optional)</label>

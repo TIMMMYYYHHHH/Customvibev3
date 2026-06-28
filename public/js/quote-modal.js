@@ -41,7 +41,7 @@ function renderBody(designs) {
     <div class="quote-modal-breakdown">
       <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,179,193,0.2); padding-bottom:0.75rem; margin-bottom:0.75rem;">
         <span class="label-xs" style="color:var(--color-brand-pink-text); font-family:var(--font-mono);">Production Estimate Breakdown</span>
-        <span style="background:white; padding:0.25rem 0.75rem; border-radius:999px; font-size:var(--text-label-xs); font-weight:700; border:1px solid rgba(255,179,193,0.2);">Gloss Finish Wrap</span>
+        <span style="background:white; padding:0.25rem 0.75rem; border-radius:999px; font-size:var(--text-label-xs); font-weight:700; border:1px solid rgba(255,179,193,0.2);">7.5 cm square</span>
       </div>
       <div style="font-size:0.75rem; font-weight:600; color:rgba(45,49,66,0.8); display:flex; flex-direction:column; gap:0.5rem;">
         <div style="display:flex; justify-content:space-between;"><span>Base material rate:</span><span style="font-family:var(--font-mono);">R50.00 / item</span></div>

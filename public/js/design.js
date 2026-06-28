@@ -73,7 +73,7 @@ function renderDesignList() {
         </div>
         <div style="min-width:0;">
           <p class="studio-design-item-name">${design.name}</p>
-          <p class="studio-design-item-meta">Size: 7.5cm &bull; Gloss Finish</p>
+          <p class="studio-design-item-meta">Size: 7.5 cm square</p>
         </div>
       </div>
       <div class="studio-design-item-controls">

@@ -50,6 +50,7 @@ function renderStaticIcons() {
   setIcon('quote-mail-icon', 'Mail', { size: 15 });
   setIcon('quote-phone-icon', 'Phone', { size: 15 });
   setIcon('quote-mappin-icon', 'MapPin', { size: 15 });
+  setIcon('quote-pudo-icon', 'MapPin', { size: 16 });
   setIcon('quote-success-check-icon', 'CheckCircle2', { size: 34 });
   setIcon('quote-bank-icon', 'Banknote', { size: 16 });
   setIcon('quote-clipboard-icon', 'Clipboard', { size: 15 });
@@ -68,7 +69,7 @@ function renderStepper() {
   review.className = `quote-step-chip${step === 'review' ? ' active' : ''}${detailsDone ? ' complete' : ''}`;
   review.textContent = detailsDone ? '✓ Review' : '1. Review';
   details.className = `quote-step-chip${step === 'details' ? ' active' : ''}${successDone ? ' complete' : ''}`;
-  details.textContent = successDone ? '✓ Delivery' : '2. Delivery';
+  details.textContent = successDone ? '✓ Pickup' : '2. Pickup';
   success.className = `quote-step-chip${step === 'success' ? ' active' : ''}`;
   success.textContent = '3. Pay by EFT';
 
@@ -106,7 +107,7 @@ function renderReview() {
         </div>
         <div>
           <h3 class="quote-item-name">${design.name}</h3>
-          <div class="quote-item-tags"><span>7.5 cm square</span><span>Gloss finish</span></div>
+          <div class="quote-item-tags"><span>7.5 cm square</span></div>
         </div>
       </div>
       <div class="quote-item-actions">
@@ -171,7 +172,7 @@ function wireDetailsForm() {
     const notes = byId('quote-remarks').value.trim();
 
     if (!name || !email || !phone || !address) {
-      errorBox.textContent = 'Please fill in your name, email, phone and delivery address.';
+      errorBox.textContent = 'Please fill in your name, email, phone and PUDO pickup point.';
       errorBox.hidden = false;
       return;
     }
@@ -184,7 +185,7 @@ function wireDetailsForm() {
       customerName: name,
       customerEmail: email,
       customerPhone: phone,
-      deliveryAddress: address,
+      pudoLocation: address,
       notes,
       designs: [...designs],
       totalQty,
@@ -239,7 +240,7 @@ function renderConfirmation() {
   html += `<p>Name: ${o.customerName}</p>`;
   html += `<p>Email: ${o.customerEmail}</p>`;
   html += `<p>Phone: ${o.customerPhone}</p>`;
-  html += `<p>Deliver to: ${o.deliveryAddress}</p>`;
+  html += `<p>PUDO pickup: ${o.pudoLocation}</p>`;
   if (o.notes) html += `<p>Notes: ${o.notes}</p>`;
   html += `<p class="receipt-items-label">Magnets (${o.totalQty})</p>`;
   o.designs.forEach((d, i) => { html += `<p>#${i + 1} ${d.name}: ${d.quantity} × 7.5 cm</p>`; });
@@ -254,10 +255,10 @@ function buildReceiptText(o) {
   t += `Order reference: ${o.orderRef}\n`;
   t += `Amount due (EFT): R${o.total}\n`;
   t += `Name: ${o.customerName}\nEmail: ${o.customerEmail}\nPhone: ${o.customerPhone}\n`;
-  t += `Deliver to: ${o.deliveryAddress}\n`;
+  t += `PUDO pickup: ${o.pudoLocation}\n`;
   if (o.notes) t += `Notes: ${o.notes}\n`;
   t += '\n----- MAGNETS -----\n';
-  o.designs.forEach((d, i) => { t += `#${i + 1}: ${d.name}, qty ${d.quantity}, 7.5x7.5 cm gloss\n`; });
+  o.designs.forEach((d, i) => { t += `#${i + 1}: ${d.name}, qty ${d.quantity}, 7.5x7.5 cm\n`; });
   t += '\n----- PAY BY EFT -----\n';
   t += `Account name: ${BUSINESS.bankAccountName}\n`;
   t += `Bank: ${BUSINESS.bankName}\n`;
