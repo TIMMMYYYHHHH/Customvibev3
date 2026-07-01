@@ -29,7 +29,14 @@ export function fileToCompressedDataUrl(file) {
 
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          resolve(reader.result);
+          // Can't compress without a 2D context. Storing a large original
+          // would blow the localStorage quota, so only small files pass.
+          if (file.size <= 2 * 1024 * 1024) {
+            console.warn('Image compression unavailable; storing original file');
+            resolve(reader.result);
+          } else {
+            reject(new Error('Could not process this photo. Please try a smaller image (under 2MB).'));
+          }
           return;
         }
 

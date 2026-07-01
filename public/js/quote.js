@@ -55,8 +55,6 @@ function renderStaticIcons() {
   setIcon('quote-bank-icon', 'Banknote', { size: 16 });
   setIcon('quote-clipboard-icon', 'Clipboard', { size: 15 });
   setIcon('quote-printer-icon', 'Printer', { size: 15 });
-  setIcon('quote-payfast-icon', 'CreditCard', { size: 15 });
-  setIcon('quote-yoco-icon', 'CreditCard', { size: 15 });
 }
 
 function renderStepper() {
@@ -86,7 +84,7 @@ function showStep() {
 
 function renderReview() {
   const totalQty = getTotalQuantity(designs);
-  const { cost: totalPrice, savings } = calculateBundlePrice(totalQty);
+  const { cost: totalPrice, savings, avgPerUnit } = calculateBundlePrice(totalQty);
 
   const emptyState = byId('quote-empty-state');
   const itemsSection = byId('quote-items-section');
@@ -117,7 +115,7 @@ function renderReview() {
           <button type="button" data-action="inc" data-design-id="${design.id}" aria-label="Increase quantity for ${design.name}">+</button>
         </div>
         <div class="quote-item-price-row">
-          <span class="quote-item-price">R${design.quantity * 50}</span>
+          <span class="quote-item-price">R${Math.round(design.quantity * avgPerUnit)}</span>
           <button type="button" class="quote-item-delete" data-action="delete" data-design-id="${design.id}" aria-label="Remove ${design.name}">${iconSvg('Trash2', { size: 16 })}</button>
         </div>
       </div>

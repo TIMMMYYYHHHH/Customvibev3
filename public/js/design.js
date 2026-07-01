@@ -57,12 +57,13 @@ function renderBasketBadge() {
 
   document.getElementById('studio-checkout-cost').textContent = `R${Math.round(cost)}`;
   document.getElementById('studio-checkout-qty').textContent = `${totalQty} Magnet${totalQty !== 1 ? 's' : ''} total`;
+  document.getElementById('magnet-designer-checkout-btn').disabled = totalQty === 0;
 
   refreshBasketBadge();
 }
 
 function renderDesignList() {
-  document.getElementById('studio-list-title').textContent = `My Draft Designs (${designs.length})`;
+  document.getElementById('studio-list-title').textContent = `Your magnets (${designs.length})`;
 
   const list = document.getElementById('studio-design-list');
   list.innerHTML = designs.map((design) => `
@@ -136,7 +137,7 @@ function renderDesignList() {
 }
 
 function updateZoomLabel() {
-  document.getElementById('studio-zoom-label').textContent = `Zoom Layer: ${imgZoom}%`;
+  document.getElementById('studio-zoom-label').textContent = `Zoom: ${imgZoom}%`;
   document.getElementById('studio-zoom-out-btn').disabled = imgZoom <= 50;
   document.getElementById('studio-zoom-in-btn').disabled = imgZoom >= 300;
 }
