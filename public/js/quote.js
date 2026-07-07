@@ -4,9 +4,9 @@ import { calculateBundlePrice } from './pricing.js';
 import { refreshBasketBadge } from './partials.js';
 import { FALLBACK_IMAGE } from './image.js';
 
-// Where new orders are delivered (email notification). Deliberate placeholder;
-// swap YOUR_FORM_ID for a real Formspree (or other) form id to receive orders.
-const ORDER_FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+// Orders are relayed by the Worker to an n8n workflow that WhatsApps the
+// customer a confirmation and notifies the business (see n8n-workflow/SETUP.md).
+const ORDER_ENDPOINT = '/api/order';
 
 // EFT / business details. PLACEHOLDERS, replace before going live. Bracketed
 // values render with a "sample" highlight on the confirmation page so they're
@@ -29,15 +29,19 @@ const byId = (id) => document.getElementById(id);
 function setIcon(id, name, opts) { const el = byId(id); if (el) el.innerHTML = iconSvg(name, opts); }
 function orderReference() { return `CV-${Math.floor(Math.random() * 89999 + 10000)}`; }
 
+// Returns true when the order notification went through. A failure never
+// blocks checkout — the customer still gets the EFT details on-screen.
 async function submitOrder(order) {
   try {
-    await fetch(ORDER_FORM_ENDPOINT, {
+    const res = await fetch(ORDER_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(order),
     });
+    return res.ok;
   } catch (error) {
-    console.error('Order notification failed, check ORDER_FORM_ENDPOINT setup', error);
+    console.error('Order notification failed', error);
+    return false;
   }
 }
 
@@ -194,21 +198,30 @@ function wireDetailsForm() {
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Placing order…';
-    await submitOrder(order);
+    const notified = await submitOrder(order);
     submitBtn.disabled = false;
     submitBtn.textContent = 'Place order';
 
     submittedOrder = order;
     step = 'success';
-    renderConfirmation();
+    renderConfirmation(notified);
     showStep();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
 
-function renderConfirmation() {
+function renderConfirmation(notified = false) {
   if (!submittedOrder) return;
   const o = submittedOrder;
+
+  const whatsappNote = byId('quote-whatsapp-note');
+  if (whatsappNote) {
+    whatsappNote.hidden = false;
+    whatsappNote.className = notified ? 'quote-whatsapp-note' : 'quote-whatsapp-note is-fallback';
+    whatsappNote.textContent = notified
+      ? `We've sent a WhatsApp confirmation to ${o.customerPhone}. We'll follow up shortly.`
+      : `We couldn't auto-send your WhatsApp confirmation — please WhatsApp us your order reference ${o.orderRef} so we can follow up.`;
+  }
 
   byId('quote-success-name').textContent = o.customerName;
   byId('quote-success-cost').textContent = `R${o.total}`;
