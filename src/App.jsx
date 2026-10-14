@@ -13,9 +13,9 @@ import TierNudge from './TierNudge';
 import Storefront from './storefront/Storefront';
 import {useContent} from './content/ContentProvider';
 import {canPurchase} from './content/model.mjs';
-import Admin from './content/Admin';
 
-const routes=['home','collections','studio','puzzle','basket','checkout','help',...(import.meta.env.DEV?['admin']:[])];
+
+const routes=['home','collections','studio','puzzle','basket','checkout','help'];
 const currentPage=()=>{const route=location.hash.replace('#/','').split('/')[0];return ['happy-chaos','colour-pop','keepsake-edit',''].includes(route)?'home':route;};
 export function App(){
  const {content}=useContent();const PACKS=Object.fromEntries(content.products.map(p=>[p.id,p]));
@@ -73,7 +73,7 @@ export function App(){
  {(!collectionBusy||basket.length>0)&&!collectionError&&page==='basket'&&<CollectionReview basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
  {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft}/>}
  {page==='help'&&<HelpPage/>}
- {page==='admin'&&import.meta.env.DEV&&<Admin/>}
+
  {!routes.includes(page)&&<main className="section empty-basket"><h1>Let’s find your way back.</h1><button className="button" onClick={()=>go('home')}>Back to CustomVibe</button></main>}
  </div>
  </div>

@@ -1,0 +1,7 @@
+{
+  "name": "customvibe-catalogue",
+  "main": "catalogue/index.mjs",
+  "compatibility_date": "2026-06-16",
+  "workers_dev": false,
+  "preview_urls": false
+}
