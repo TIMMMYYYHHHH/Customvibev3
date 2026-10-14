@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "revision": 8,
+  "pricing": {
+    "single": 5000,
+    "six": 25000,
+    "ten": 40000
+  },
+  "images": {
+    "logo": "/assets/brand-icon.png",
+    "tray": "/assets/cutouts/hero-real-magnets-tray.png",
+    "puzzle": "/assets/sample-coast.png",
+    "hero0": "/assets/cutouts/05-sunglasses-square.png",
+    "hero1": "/assets/cutouts/02-wedding-square.png",
+    "hero2": "/assets/cutouts/03-beach-square.png",
+    "hero3": "/assets/cutouts/04-pink-group-square.png",
+    "hero4": "/assets/cutouts/01-restaurant-square.png"
+  },
+  "products": [
+    {
+      "id": "alphabet",
+      "name": "The alphabet club",
+      "group": "Learning & play",
+      "image": "/assets/cutouts/alphabet-pack-glossy.png",
+      "description": "Little letters. Big discoveries.",
+      "details": "An A–Z collection for spelling names, finding letters and playing with words.",
+      "tags": "abc letters preschool school",
+      "status": "coming-soon",
+      "priceCents": null,
+      "count": 26,
+      "featured": true,
+      "contents": "26 uppercase letters, A–Z"
+    },
+    {
+      "id": "counting",
+      "name": "Count on a little fun",
+      "group": "Learning & play",
+      "image": "/assets/cutouts/counting-pack-glossy.png",
+      "description": "Make learning count, one square at a time.",
+      "details": "Numbers and matching dots for counting together. The collection runs from 1 to 10.",
+      "tags": "123 numbers dots preschool maths",
+      "status": "coming-soon",
+      "priceCents": null,
+      "count": 10,
+      "featured": true,
+      "contents": "10 number magnets, 1–10"
+    },
+    {
+      "id": "photos",
+      "name": "Your photo magnets",
+      "group": "Your photos",
+      "image": "/assets/cutouts/05-sunglasses-square.png",
+      "description": "Your people. Your places. Your photos.",
+      "href": "#/studio",
+      "tags": "personal custom photo magnets",
+      "status": "available",
+      "priceCents": null,
+      "count": 1,
+      "featured": false,
+      "contents": ""
+    },
+    {
+      "id": "words",
+      "name": "My first words",
+      "group": "Learning & play",
+      "image": "/assets/collections/first-words.png",
+      "description": "See it. Say it. Stick it.",
+      "details": "Friendly pictures paired with simple words. This concept includes apple, tree, sun and cat, with room to grow into more everyday words.",
+      "tags": "apple tree sun cat preschool vocabulary reading",
+      "status": "coming-soon",
+      "priceCents": null,
+      "count": 4,
+      "featured": false,
+      "contents": "Contents to be confirmed"
+    },
+    {
+      "id": "colours",
+      "name": "The colour club",
+      "group": "Learning & play",
+      "image": "/assets/collections/colour-club.png",
+      "description": "A little colour. A lot to discover.",
+      "details": "Big colour circles with easy-to-read names. Green, blue, pink and orange are shown here.",
+      "tags": "colors colours green blue pink orange learning cards",
+      "status": "coming-soon",
+      "priceCents": null,
+      "count": 4,
+      "featured": false,
+      "contents": "Contents to be confirmed"
+    },
+    {
+      "id": "reminders",
+      "name": "Little reminders",
+      "group": "Everyday favourites",
+      "image": "/assets/collections/little-reminders.png",
+      "description": "A kind word for an ordinary Tuesday.",
+      "details": "Small reminders for your kitchen, desk or someone who needs a lift: you’ve got this, one thing at a time, good things ahead, and make room for joy.",
+      "tags": "adult quotes encouragement affirmations home office",
+      "status": "coming-soon",
+      "priceCents": null,
+      "count": 4,
+      "featured": false,
+      "contents": "Contents to be confirmed"
+    },
+    {
+      "id": "thanks",
+      "name": "Little thank-yous",
+      "group": "Gifts & occasions",
+      "image": "/assets/collections/little-thank-yous.png",
+      "description": "For your favourite kind of human.",
+      "details": "Thoughtful little gifts for friends, hosts and everyday heroes. Designs include thank you, my favourite human, you are loved, and best day ever.",
+      "tags": "adult gifts friendship wedding birthday thank you",
+      "status": "coming-soon",
+      "priceCents": null,
+      "count": 4,
+      "featured": false,
+      "contents": "Contents to be confirmed"
+    },
+    {
+      "id": "puzzle",
+      "name": "Your picture puzzle",
+      "group": "Your photos",
+      "description": "One photo. A little bigger picture.",
+      "href": "#/puzzle",
+      "tags": "personal puzzle 3x3 5x5 9 25 square",
+      "image": "",
+      "status": "available",
+      "priceCents": null,
+      "count": 1,
+      "featured": true,
+      "contents": ""
+    }
+  ]
+}

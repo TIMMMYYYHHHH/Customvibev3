@@ -1,0 +1,20 @@
+.storefront .thread-brand .contact-section{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(40px,6vw,90px);align-items:center;padding:65px 0 70px;position:relative}
+.storefront .contact-intro>.overline{font-size:11px;letter-spacing:.12em;color:#7d3150;margin:0 0 20px}
+.storefront .contact-intro h2{font-size:clamp(38px,4.2vw,58px);line-height:1.07;margin:0 0 24px;max-width:550px}
+.storefront .contact-intro>p:not(.overline){font-size:18px;line-height:1.6;max-width:410px;margin:0}
+.storefront .contact-scribble{display:block;position:relative;width:fit-content;max-width:90%;font:26px/1.15 var(--hand);color:#7d3150;margin:32px 0 15px;transform:rotate(-4deg);padding-right:50px}
+.storefront .contact-heart{width:32px;height:32px;right:0;top:0;transform:rotate(14deg)}
+.storefront .contact-form{min-width:0;background:#e0f1e8;border-radius:12px 38px 12px 12px;padding:32px;display:grid;gap:22px}
+.storefront .contact-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.storefront .contact-field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.storefront .contact-field label{font:650 14px/1.4 'DM Sans Variable',sans-serif}
+.storefront .contact-field input,.storefront .contact-field textarea{width:100%;min-width:0;min-height:48px;border:1px solid #9f8ba8;border-radius:8px;background:#fffdf8;color:#26133d;padding:13px 14px;font:400 16px/1.5 'DM Sans Variable',sans-serif;box-shadow:none}
+.storefront .contact-field textarea{resize:vertical;min-height:145px;max-height:400px}
+.storefront .contact-field input::placeholder,.storefront .contact-field textarea::placeholder{color:#75647c;opacity:1}
+.storefront .contact-field input:focus-visible,.storefront .contact-field textarea:focus-visible{outline:3px solid #ae2e5b;outline-offset:3px}
+.storefront .contact-field [aria-invalid=true]{border-color:#92234b}
+.storefront .contact-field-error{font:500 13px/1.5 'DM Sans Variable',sans-serif;color:#8a2044}
+.storefront .contact-form>.action{justify-self:start;min-width:170px;margin:0}
+.storefront .contact-status{font:500 14px/1.5 'DM Sans Variable',sans-serif;color:#8a2044;margin:0}
+@media(max-width:800px){.storefront .thread-brand .contact-section{grid-template-columns:1fr;gap:30px;padding:45px 0 40px}.storefront .contact-intro h2{font-size:42px}.storefront .contact-intro>p:not(.overline){font-size:16px;max-width:480px}.storefront .contact-scribble{font-size:24px;margin-top:24px}.storefront .contact-form{padding:24px;gap:20px}}
+@media(max-width:500px){.storefront .contact-fields{grid-template-columns:1fr;gap:20px}.storefront .contact-form{padding:22px 20px}.storefront .contact-form>.action{width:100%}.storefront .contact-intro h2{font-size:38px}}

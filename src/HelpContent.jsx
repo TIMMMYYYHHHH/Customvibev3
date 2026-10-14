@@ -1,0 +1,23 @@
+import React,{useEffect,useState} from 'react';
+import {CaretDown} from '@phosphor-icons/react';
+import {useContent} from './content/ContentProvider';
+import {money} from './commerce.mjs';
+export function questions(pricing){return [
+ {id:'size',topic:'magnets',featured:true,q:'What size are the magnets?',a:'Every photo magnet is a 7.5 × 7.5 cm square, with your photo printed edge to edge.'},
+ {id:'different',topic:'magnets',featured:true,q:'Can I use a different photo on every magnet?',a:'Yes. Upload your favourites and crop each one separately. You can also choose more than one copy of a photo.'},
+ {id:'puzzles',topic:'magnets',featured:true,q:'How do the picture puzzles work?',a:'One square crop becomes a 3 × 3 grid of 9 magnets or a 5 × 5 grid of 25 magnets. Every piece is square. The finished picture measures 22.5 cm or 37.5 cm square before gaps.'},
+ {id:'mix',topic:'magnets',featured:true,q:'Can I mix photo magnets and puzzles?',a:'Yes. Choose a format for each photo in the designer. Every puzzle piece counts toward the same magnet pricing and bundle discounts.'},
+ {id:'pricing',topic:'magnets',q:'How much are photo magnets?',a:`One magnet is ${money(pricing.single)}, six are ${money(pricing.six)} and ten are ${money(pricing.ten)}. Ten or more use the ten-pack rate per magnet. The designer shows your price as you build your collection. Delivery is additional.`},
+ {id:'collections',topic:'magnets',q:'When can I buy a magnet collection?',a:'Available collections show a price and an Add to basket button. Coming soon collections can be explored while their price and availability are being confirmed. Premade collections have their own prices.'},
+ {id:'delivery',topic:'delivery',q:'How does collection work?',a:'Enter a town, suburb or postcode in the Delivery step, then choose a collection area. The map shows the area, not a confirmed locker. Your collection summary keeps your details and selected area together.'},
+ {id:'delivery-price',topic:'delivery',q:'Is delivery included?',a:'Delivery is additional and has not yet been calculated. The amount shown for your magnets is a subtotal, not a final delivered total.'},
+ {id:'photos',topic:'photos',q:'What happens to my photos?',a:'Your photos are processed in your browser. Photos and shopping drafts stay in this tab. Refreshing or closing the tab clears them.'},
+ {id:'upload',topic:'photos',q:'Which photos can I use?',a:'Upload JPG or PNG images up to 20 MB each. Choose a clear photo with space around the subject, then drag, zoom and rotate it to fit the square.'}
+ ]}
+export function FAQList({featured=false,topic='all'}){const {content}=useContent();return <div className="shared-faqs">{questions(content.pricing).filter(q=>(!featured||q.featured)&&(topic==='all'||q.topic===topic)).map(item=><details id={!featured?item.id:undefined} key={item.id}><summary>{item.q}<CaretDown size={20} aria-hidden="true"/></summary><p>{item.a}</p></details>)}</div>}
+const topicFromHash=()=>({pricing:'magnets',magnets:'magnets',delivery:'delivery',photos:'photos'}[location.hash.split('/')[2]]||'all');
+export function HelpPage(){
+ const {content}=useContent();const [topic,setTopic]=useState(topicFromHash);
+ useEffect(()=>{const update=()=>setTopic(topicFromHash());addEventListener('hashchange',update);return()=>removeEventListener('hashchange',update)},[]);
+ return <main className="help-page section"><div className="help-hero"><div><p className="eyebrow">HERE TO HELP</p><h1>A few good things<br/>to know.</h1><p className="help-lead">From your camera roll to your fridge. Here’s how it works.</p></div><figure><img src={content.images.hero2} alt="A little photo magnet of a favourite moment"/><figcaption>Here to help</figcaption></figure></div><div className="help-topics" aria-label="Help topics">{[['all','All questions'],['magnets','Your magnets'],['delivery','Delivery'],['photos','Your photos']].map(([id,label])=><button key={id} aria-pressed={topic===id} onClick={()=>{setTopic(id);history.replaceState(null,'',`#/help${id==='all'?'':'/'+id}`)}}>{label}</button>)}</div><FAQList topic={topic}/><div className="help-next"><a className="button" href="#/studio">Make your magnets</a><a className="text-button" href="#/collections">Explore magnet collections</a></div></main>;
+}

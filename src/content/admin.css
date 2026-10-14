@@ -1,0 +1,45 @@
+.shop-shell .admin-page{padding-block:36px 50px}
+.admin-heading{display:flex;justify-content:space-between;align-items:center;gap:25px}
+.shop-shell .admin-heading h1{font-size:clamp(34px,4vw,54px);margin:12px 0;line-height:1.08}
+.admin-heading em{font-style:normal;color:#ae2e5b}
+.admin-scope{padding:16px 20px;background:#e4f1e9;border-radius:10px;font-size:13px!important;line-height:1.6;margin:24px 0!important;max-width:900px}
+.admin-toolbar{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #26133d25;padding-bottom:16px;margin-bottom:24px}
+.admin-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.admin-tabs button{min-height:44px;padding:10px 18px;border-radius:30px;font-weight:650}
+.admin-tabs button[aria-pressed=true]{background:#26133d;color:white}
+.admin-save-state{font-size:12px;color:#655972}
+.shop-shell .admin-fields{border:0;padding:0;margin:0;min-width:0}
+.admin-catalogue{display:grid;grid-template-columns:245px minmax(0,1fr);gap:32px;align-items:start}
+.admin-product-list{display:grid;gap:6px}
+.admin-product-list>button:not(.button){padding:12px 15px;text-align:left;border-radius:8px;border:1px solid transparent;min-height:62px}
+.admin-product-list>button.selected{background:#f0e8f8;border-color:#ae2e5b70}
+.admin-product-list small{display:block;color:#6a5775;font-size:12px;margin-top:4px}
+.admin-product-list>.button{margin-bottom:15px}
+.admin-product-form{background:#f7f3fa;border-radius:14px;padding:28px}
+.shop-shell .admin-page h2{font-size:32px;margin:0 0 20px;line-height:1.15}
+.admin-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.admin-page label{display:flex;flex-direction:column;gap:7px;font-weight:600;font-size:13px;margin:0 0 16px}
+.admin-page :is(input:not([type=file]):not([type=checkbox]),select,textarea){width:100%;min-height:46px;padding:10px 12px;border:1px solid #8e7c9c;border-radius:7px;background:#fffdf8;color:#26133d;font:400 15px/1.4 'DM Sans Variable',sans-serif}
+.admin-page textarea{resize:vertical}
+.admin-page .admin-check{flex-direction:row;align-items:center;min-height:44px;gap:10px}
+.admin-check input{width:20px;height:20px;accent-color:#ae2e5b}
+.admin-image{display:grid;grid-template-columns:130px minmax(0,1fr);gap:20px;border-top:1px solid #26133d20;padding:22px 0;align-items:start;min-width:0}
+.admin-image-preview{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#e5eee7;border-radius:10px;overflow:hidden}
+.admin-image-preview img{width:100%;height:100%;object-fit:contain}
+.admin-image strong{font-size:15px}
+.admin-image .admin-upload{display:flex;flex-direction:row;align-items:center;width:max-content;border:1px solid #26133d;border-radius:7px;padding:10px 14px;margin:12px 0;min-height:44px;cursor:pointer;position:relative}
+.admin-upload input{position:absolute;opacity:0;inset:0;width:100%;cursor:pointer}
+.admin-upload:focus-within{outline:3px solid #ae2e5b;outline-offset:3px}
+.admin-image-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 40px;margin-top:30px}
+.admin-image .text-button{font-size:12px}
+.admin-pricing{max-width:800px}
+.admin-pricing>p{margin-bottom:24px!important}
+.admin-price-examples{background:#eee7f8;padding:24px;border-radius:12px;margin:20px 0}
+.admin-price-examples>div{display:flex;justify-content:space-between;gap:24px;padding:8px 0;border-bottom:1px solid #26133d18}
+.admin-savebar{position:sticky;bottom:0;padding:18px 0;display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#fffdf8;z-index:5;border-top:1px solid #26133d30;margin-top:25px}
+.admin-savebar .text-button{font-size:13px}
+.admin-error{padding:16px;background:#fce5ed;border:1px solid #ae2e5b;border-radius:9px;margin-bottom:20px}
+.admin-error button{display:block!important}
+.admin-success{display:flex;align-items:center;gap:10px;background:#e4f1e9;padding:16px;border-radius:9px;margin-bottom:20px!important}
+@media(max-width:1000px){.admin-image-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.admin-heading{align-items:start;flex-direction:column;gap:15px}.admin-toolbar{align-items:start;flex-direction:column;gap:12px}.admin-tabs{gap:3px}.admin-tabs button{padding:10px 13px;font-size:13px}.admin-catalogue{grid-template-columns:1fr;gap:20px}.admin-product-list{display:flex;overflow-x:auto;padding-bottom:8px;gap:8px}.admin-product-list>button{flex:0 0 160px;margin:0!important}.admin-product-form{padding:20px}.admin-form-grid{grid-template-columns:1fr;gap:0}.admin-image{grid-template-columns:80px minmax(0,1fr);gap:14px}.admin-image-grid .admin-image{grid-template-columns:90px minmax(0,1fr)}.admin-savebar{gap:10px 20px;padding:12px 0}.admin-savebar .button{width:100%}}
