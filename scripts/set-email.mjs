@@ -11,4 +11,4 @@ const names=mode==='email'?['RESEND_API_KEY']:mode==='w3forms'?['W3FORMS_ACCESS_
 for(const name of names){let value=await hidden(`${name} (hidden): `);if(!/^[A-Za-z0-9_-]{15,256}$/.test(value)||(name==='RESEND_API_KEY'&&!value.startsWith('re_'))||(name==='W3FORMS_ACCESS_KEY'&&!value.startsWith('w3f_'))||(name.startsWith('TURNSTILE_')&&!value.startsWith('0x'))){console.error('Value format not recognised. Use the real production key from the provider dashboard. No value was shown or saved.');process.exit(1)}
  try{await destination.installSecrets({[name]:value})}catch(error){console.error(error.message);process.exit(1)}finally{value=''}console.log(`Installed ${name}.`);
 }
-console.log('Keys installed. Keep sending OFF and the site password gate ON. Controlled delivery tests require separate approval.');
+console.log('Keys installed. Sending settings are unchanged. Keep the site password gate ON and preview sending OFF.');

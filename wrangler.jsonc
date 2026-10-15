@@ -15,5 +15,39 @@
       "binding": "CATALOGUE",
       "service": "customvibe-catalogue"
     }
-  ]
+  ],
+  "env": {
+    "production": {
+      "vars": {
+        "SITE_GATE_ENABLED": "true",
+        "SUBMISSIONS_ENABLED": "true"
+      },
+      "services": [
+        {
+          "binding": "AUTH",
+          "service": "customvibe-security"
+        },
+        {
+          "binding": "CATALOGUE",
+          "service": "customvibe-catalogue"
+        }
+      ]
+    },
+    "preview": {
+      "vars": {
+        "SITE_GATE_ENABLED": "true",
+        "SUBMISSIONS_ENABLED": "false"
+      },
+      "services": [
+        {
+          "binding": "AUTH",
+          "service": "customvibe-security"
+        },
+        {
+          "binding": "CATALOGUE",
+          "service": "customvibe-catalogue"
+        }
+      ]
+    }
+  }
 }

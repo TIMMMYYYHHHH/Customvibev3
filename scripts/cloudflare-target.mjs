@@ -1,5 +1,6 @@
 import {readFile} from 'node:fs/promises';
 import {createConnection} from 'node:net';
+import {validateProtection} from './deployment-protection.mjs';
 
 export const DESTINATION_ACCOUNT='4f57d4e924674cb87b33d4c884745cf6';
 export const PAGES_PROJECT='customvibe-business';
@@ -49,7 +50,7 @@ export async function verifyTarget({scope,project,env=process.env,config,request
   if(!resource.success||!resource.result||(scope==='site'&&resource.result.name!==expected))throw new Error('Destination resource verification failed.');
   if(scope==='site')for(const name of ['production','preview']){
    const deployment=resource.result.deployment_configs?.[name];
-   if(deployment?.fail_open!==false||deployment.env_vars?.SITE_GATE_ENABLED?.value!=='true'||deployment.env_vars?.SUBMISSIONS_ENABLED?.value!=='false')throw new Error('Destination protection verification failed. Keep the gate on, sending off and both environments fail closed.');
+   validateProtection(deployment,name);
   }
   return resource.result;
  }

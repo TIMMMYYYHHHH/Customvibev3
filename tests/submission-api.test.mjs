@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';import {Dat
 import {submissions} from '../server/submissions.mjs';import security from '../security/index.mjs';import {defaultContent} from '../src/content/model.mjs';import {random,secure} from '../server/auth.mjs';
 function database(){const db=new DatabaseSync(':memory:');db.exec(readFileSync('migrations/security/0001.sql','utf8'));db.exec(readFileSync('migrations/security/0002_submissions.sql','utf8'));db.exec(readFileSync('migrations/security/0003_contact_delivery.sql','utf8'));const prepare=(sql,args=[])=>({bind(...args){return prepare(sql,args)},run:async()=>({meta:db.prepare(sql).run(...args)}),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)})});let queue=Promise.resolve();return {prepare,batch(statements){const operation=queue.then(async()=>{db.exec('BEGIN');try{const rows=[];for(const statement of statements)rows.push(await statement.all());db.exec('COMMIT');return rows}catch(e){db.exec('ROLLBACK');throw e}});queue=operation.catch(()=>{});return operation}}}
 const origin='https://customvibe.co.za';
-function setup(){const DB=database();return {DB,SUBMISSIONS_ENABLED:'true',RESEND_API_KEY:random(),W3FORMS_ACCESS_KEY:'w3f_test_key',TURNSTILE_SECRET_KEY:random(),TURNSTILE_SITE_KEY:'test-site-key',SESSION_SECRET:random(),AUTH:{fetch:(url,init)=>security.fetch(new Request(url,init),{DB})},CATALOGUE:{fetch:async()=>Response.json(defaultContent)}};}
+function setup(){const DB=database();return {DB,SITE_GATE_ENABLED:'true',SUBMISSIONS_ENABLED:'true',RESEND_API_KEY:random(),W3FORMS_ACCESS_KEY:'w3f_test_key',TURNSTILE_SECRET_KEY:random(),TURNSTILE_SITE_KEY:'test-site-key',SESSION_SECRET:random(),AUTH:{fetch:(url,init)=>security.fetch(new Request(url,init),{DB})},CATALOGUE:{fetch:async()=>Response.json(defaultContent)}};}
 async function form(env){const r=await submissions(new Request(origin+'/api/forms'),env);const config=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],csrf:config.csrf};}
 const payload=()=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),name:'Visitor',email:'visitor@example.com',message:'A question about photo magnets.'});
 function post(path,context,data,extra={}){return new Request(origin+path,{method:'POST',headers:{origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.7',cookie:context.cookie,'X-CSRF-Token':context.csrf,...extra},body:JSON.stringify({payload:data,turnstile:'test-response'})});}
@@ -88,4 +88,13 @@ test('uncertain contacts remain held after one hour and old fresh drafts cannot 
  const network=async url=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'contact'});sends++;throw Error('timeout')};
  assert.equal((await submissions(post('/api/contact',context,data),env,network)).status,503);
  const now=Date.now();try{Date.now=()=>now+7200000;const refreshed=await form(env);assert.equal((await submissions(post('/api/contact',refreshed,data),env,network)).status,503);assert.equal(sends,1);assert.equal((await submissions(post('/api/contact',refreshed,{...data,id:crypto.randomUUID()}),env,network)).status,410);}finally{Date.now=realNow;}
+});
+
+test('gated test sending fails closed if the site gate flag is missing or disabled',async()=>{
+ for(const gate of [undefined,'false','invalid']){
+  const env=setup(),context=await form(env);env.SITE_GATE_ENABLED=gate;let networkCalls=0;
+  for(const kind of ['contact','order'])assert.equal((await (await submissions(new Request(origin+'/api/forms?kind='+kind),env)).json()).available,false);
+  for(const path of ['/api/contact','/api/order-request'])assert.equal((await submissions(post(path,context,payload()),env,async()=>{networkCalls++;throw Error('Must not call providers')})).status,503);
+  assert.equal(networkCalls,0);
+ }
 });

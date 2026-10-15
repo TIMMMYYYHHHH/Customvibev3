@@ -1,8 +1,8 @@
 # Email and unpaid request setup
 
-Keep the site password gate ON and sending OFF. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
+Keep the site password gate ON. Production sending is approved for controlled owner testing; preview and local sending stay OFF. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
 
-The migration destination is Cloudflare account `4f57d4e924674cb87b33d4c884745cf6`, owned by customvibe03@gmail.com, and Pages project `customvibe-business`. The installers verify that account and resource before asking for credentials and again before writing. They refuse the personal account and never use a default Wrangler login. Both production and preview must retain the gate, disabled submissions and `fail_open=false`.
+The migration destination is Cloudflare account `4f57d4e924674cb87b33d4c884745cf6`, owned by customvibe03@gmail.com, and Pages project `customvibe-business`. The installers verify that account and resource before asking for credentials and again before writing. They refuse the personal account and never use a default Wrangler login. Both production and preview must retain the gate and `fail_open=false`. Only production may enable submissions, and only behind the gate.
 
 ## Current decisions
 
@@ -61,7 +61,11 @@ Source configuration verified on 15 October 2026: free Cloudflare Email Routing 
 
 ## 5. Test behind the gate
 
-`SUBMISSIONS_ENABLED=false` remains committed throughout the account migration. Controlled sending tests require separate explicit approval after setup. During that approved window, measure maximum-size requests on Cloudflare and return submissions to false afterward. Do not upgrade a plan. Installing keys alone will not activate the forms or authorize testing.
+The owner explicitly approved gated testing on 15 October 2026. `wrangler.jsonc` keeps local defaults and preview sending disabled and explicitly enables production sending. Publishing verifies both environments before deployment, requires production provider credentials, and checks the actual production deployment and commit afterward. Credential maintenance follows the same gate, fail-closed and preview protections. Runtime form readiness also requires `SITE_GATE_ENABLED=true`.
+
+Keep the successful gated test mode available for the owner. No public launch, payments, real courier booking, paid resources or unrelated customer recipients are authorized. Use customvibe03@gmail.com for test contact details and acknowledgements and non-personal artwork. Measure maximum-size requests before considering normal submissions ready. Actual inbox delivery, provider dashboard delivery and free-runtime measurements remain pending.
+
+To disable production sending, set `env.production.vars.SUBMISSIONS_ENABLED` to `false`, commit and publish through the same workflow. Leave the gate on and preview off. A dashboard flag change alone does not prove an existing deployment changed. Verify the deployed snapshot after publishing. Preserve all migration rollback resources.
 
 - Contact form: send a clearly labelled test to the owner inbox. Confirm actual delivery and Reply reaches the entered customer address.
 - Unpaid order: use a non-personal sample photo, one crop, and a 3 x 3 puzzle. Confirm owner email has the correct quantity, catalogue subtotal, phone and preferred PUDO locker. Check all 1200 px pieces and proof match the browser design.
@@ -83,6 +87,6 @@ Opaque retry records expire after 48 hours and are cleaned hourly. No photo, cus
 
 ## Still blocks launch
 
-Sending domain is verified. Still required: Resend and W3Forms keys and contact dashboard settings; Turnstile; representative live request CPU measurements on the free Workers runtime; real inbox tests; owner business facts and policy review; PUDO costs/timing/collection rules; photo/email retention decision; mobile checks; separate explicit launch approval. Payment provider can remain pending only while the site clearly offers unpaid requests rather than paid checkout.
+Sending domain is verified. Resend, W3Forms and Turnstile credentials were verified present in both live environments. Still required: representative live request CPU measurements on the free Workers runtime; real inbox tests; owner business facts and policy review; PUDO costs/timing/collection rules; photo/email retention decision; mobile checks; separate explicit launch approval. Payment provider can remain pending only while the site clearly offers unpaid requests rather than paid checkout.
 
 Sources: [W3Forms API](https://w3forms.com/docs/api), [W3Forms form settings](https://w3forms.com/docs/customization), [W3Forms privacy](https://w3forms.com/privacy), [Resend attachments](https://resend.com/docs/dashboard/emails/attachments), [Resend retention](https://resend.com/security), [Turnstile validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/), [Cloudflare email routing](https://developers.cloudflare.com/email-service/get-started/route-emails/).

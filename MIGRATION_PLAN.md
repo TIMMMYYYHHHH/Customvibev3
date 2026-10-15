@@ -146,3 +146,12 @@ Automatic publishing targets main only. It builds, tests, verifies both environm
 Current preparation: both databases restored and verified, three private Workers deployed, both site environments and admin password credentials installed, first protected Pages deployment completed. The destination DNS zone is on Free with imported email/verification records. Source automatic builds are frozen. Nameservers and source domain bindings have not moved. Destination forwarding, security parity, provider credentials, live access tests and GitHub publishing verification are still required before cutover.
 
 Rollback must restore the protected customvibe-public Pages deployment and its source account resources. Never restore the ungated legacy customvibe Worker. Start the 48-hour retention clock only after a successful domain cutover and record exact UTC and Johannesburg times. Deletion requires later acceptance; no automatic cleanup is authorized.
+
+
+## Gated testing update, 15 October 2026
+
+This supersedes earlier sending-disabled instructions for the completed migration. The owner authorized updating safeguards and enabling contact forms and unpaid order requests behind the password gate, with preview sending off. The migrated checkout and business account remain the only deployment targets. Local defaults and preview remain sending-disabled. Production may send only with the gate explicitly on; deployment checks retain fail-closed protection, destination/account checks, private credentials and service bindings. Post-publish verification checks the deployed production settings and commit. Payments remain unavailable.
+
+Next owner step: one labelled contact test using customvibe03@gmail.com, then confirm W3Forms and actual Gmail delivery and Reply-To. Artwork orders, acknowledgement delivery, aliases, failure/retry tests and maximum-size free-runtime measurements remain pending. Business and policy decisions remain TODOs. Keep safe gated testing enabled for the owner, unless a defect requires disabling sending.
+
+The successful migration cutover was 15 October 2026 at 18:30:01 Africa/Johannesburg. Preserve the retained resources through at least 17 October 2026 at 18:30:01 and until separately approved for cleanup. Do not duplicate the migration chat reminder or restore the ungated legacy Worker.

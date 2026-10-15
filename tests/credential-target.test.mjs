@@ -40,11 +40,11 @@ test('inaccessible account and missing project fail without accepting credential
   await assert.rejects(verify({request}),/verification|resource/);
  }
 });
-test('open previews or enabled sending prevent credential installation',async()=>{
+test('open previews or preview sending prevent credential installation',async()=>{
  for(const field of ['fail_open','SUBMISSIONS_ENABLED']){
   const result=projectResult();
   if(field==='fail_open')result.deployment_configs.preview.fail_open=true;
-  else result.deployment_configs.production.env_vars.SUBMISSIONS_ENABLED.value='true';
+  else result.deployment_configs.preview.env_vars.SUBMISSIONS_ENABLED.value='true';
   await assert.rejects(verify({request:async(path)=>({success:true,result:path.endsWith(account)?{id:account}:result})}),/protection/);
  }
 });
@@ -102,4 +102,10 @@ test('transport does not expose credential-bearing network errors',async()=>{
 test('Pages supported configuration uses required environment pin and live identity',async()=>{
  await verify({config:{name:'customvibe-business'}});
  await assert.rejects(verify({config:{name:'customvibe-business'},env:{}}),/destination account/);
+});
+
+test('credential maintenance accepts gated production sending while preview stays off',async()=>{
+ const result=projectResult();result.deployment_configs.production.env_vars.SUBMISSIONS_ENABLED.value='true';
+ const verified=await verify({request:async path=>({success:true,result:path.endsWith(account)?{id:account}:result})});
+ await verified.installSecrets({RESEND_API_KEY:'test-value'});
 });
