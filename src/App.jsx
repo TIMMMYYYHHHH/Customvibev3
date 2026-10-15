@@ -7,6 +7,7 @@ import {CollectionReview} from './CollectionReview';
 import {renderPhoto} from './artwork';
 import {createStudio,studioReducer,createDesignItems,mergeStudioItems} from './studio-state.mjs';
 import {money,summarize} from './commerce.mjs';
+import {SubmissionProvider,useSubmissionSnapshot} from './FormService';
 import {Checkout} from './Checkout';
 import {SiteHeader,SiteFooter,HelpPage} from './SiteChrome';
 import TierNudge from './TierNudge';
@@ -22,7 +23,9 @@ import {canPurchase} from './content/model.mjs';
 import {currentPage,navigate,pagePath} from './routing.mjs';
 const routes=['home','collections','studio','puzzle','basket','checkout','help',...Object.keys(policies)];
 
-export function App({initialPage}){
+export function App(props){return <SubmissionProvider><AppContent {...props}/></SubmissionProvider>}
+function AppContent({initialPage}){
+ const orderState=useSubmissionSnapshot('order'),orderLocked=orderState.pending;
  const {content}=useContent();const PACKS=Object.fromEntries(content.products.map(p=>[p.id,p]));
  const [routeVersion,setRouteVersion]=useState(0);
  const [page,setPage]=useState(()=>initialPage||currentPage()),[basket,setBasket]=useState([]),[toast,setToast]=useState('');
@@ -42,7 +45,8 @@ export function App({initialPage}){
  },[page,photos,retry]);
  const displayBasket=basket.map(i=>['photo','puzzle'].includes(i.kind)?i:{...i,name:PACKS[i.kind]?.name||i.name,preview:PACKS[i.kind]?.image||i.preview});
  const timer=useRef();const sum=summarize([...basket.filter(i=>!['photo','puzzle'].includes(i.kind)),...photos.map(p=>({...p,kind:p.format==='puzzle'?'puzzle':'photo',gridSize:p.gridSize||3}))],content);const storefront=['home','collections'].includes(page);
- function go(next){if(next!=='checkout')setCheckoutDraft(d=>({...d,confirmed:false}));navigate(pagePath(next));setPage(next);window.scrollTo(0,0);}
+ useEffect(()=>{if(orderLocked&&['studio','puzzle','basket'].includes(page)){navigate('/checkout');setPage('checkout');}},[orderLocked,page]);
+ function go(next){if(orderLocked&&['studio','puzzle','basket'].includes(next))next='checkout';if(next!=='checkout')setCheckoutDraft(d=>({...d,confirmed:false}));navigate(pagePath(next));setPage(next);window.scrollTo(0,0);}
  // Section links update history without the browser's native hash jump.
  function navigateSection(route){
   const hash=route.startsWith('home/')?'/#'+route.slice(5):pagePath(route);
@@ -65,7 +69,7 @@ export function App({initialPage}){
  function notify(message){setToast(message);clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),4500);}
  function changeQuantity(item,delta){setBasket(b=>b.map(x=>x.id===item.id?{...x,qty:x.qty+delta}:x));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.map(p=>p.id===(item.sourceId||item.id)?{...p,qty:item.qty+delta}:p));}
  function removeItem(item){setBasket(b=>b.filter(x=>x.id!==item.id));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.filter(p=>p.id!==(item.sourceId||item.id))); }
- function addPack(kind){const pack=PACKS[kind];if(!canPurchase(pack)){notify('This collection is not available yet.');return;}setBasket(b=>b.some(i=>i.kind===kind)?b.map(i=>i.kind===kind?{...i,qty:i.qty+1}:i):[...b,{id:crypto.randomUUID(),kind,name:pack.name,qty:1,preview:pack.image,count:pack.count}]);notify(`${pack.name} added to your basket.`);}
+ function addPack(kind){if(orderLocked){notify('Your current request is saved. Return to checkout to view its status.');return;}const pack=PACKS[kind];if(!canPurchase(pack)){notify('This collection is not available yet.');return;}setBasket(b=>b.some(i=>i.kind===kind)?b.map(i=>i.kind===kind?{...i,qty:i.qty+1}:i):[...b,{id:crypto.randomUUID(),kind,name:pack.name,qty:1,preview:pack.image,count:pack.count}]);notify(`${pack.name} added to your basket.`);}
  const detailProduct=page.startsWith('products/')?content.products.find(p=>p.id===page.slice(9)&&p.status!=='hidden'):null;
  return <><SEO page={page} content={content}/><a className="global-skip" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus()}}>Skip to content</a>
  <SiteHeader page={page} count={sum.magnetQty} onSectionNavigate={navigateSection}/>
@@ -75,9 +79,9 @@ export function App({initialPage}){
  {['studio','puzzle','basket','checkout'].includes(page)&&<div className="purchase-progress"><StudioProgress step={page==='checkout'?'delivery':page==='basket'?'review':'make'} hasPhotos={photos.length>0||basket.some(i=>!['photo','puzzle'].includes(i.kind))} busy={collectionBusy} onStep={step=>go({make:'studio',review:'basket',delivery:'checkout'}[step])}/>{collectionBusy&&<p className="flow-loading" role="status">Preparing your collection…</p>}{collectionError&&<div className="error" role="alert">{collectionError}<button className="text-button" onClick={()=>setRetry(r=>r+1)}>Try again</button><button className="text-button" onClick={()=>go('studio')}>Back to the designer</button></div>}</div>}
 
  {storefront&&<Storefront page={page} onAddPack={addPack} basketCount={sum.magnetQty}/>}
- {['studio','puzzle'].includes(page)&&<Editor {...{studio,dispatchStudio,photos,setPhotos,basket,setBasket,go,notify}}/>}
- {(!collectionBusy||basket.length>0)&&!collectionError&&page==='basket'&&<CollectionReview basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
- {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft}/>}
+ {!orderLocked&&['studio','puzzle'].includes(page)&&<Editor {...{studio,dispatchStudio,photos,setPhotos,basket,setBasket,go,notify}}/>}
+ {(!collectionBusy||basket.length>0)&&!collectionError&&!orderLocked&&page==='basket'&&<CollectionReview basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
+ {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout photos={photos} basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft}/>}
  {page==='help'&&<HelpPage/>}
  {policies[page]&&<PolicyPage page={page}/>}
  {detailProduct&&<ProductPage product={detailProduct} onAddPack={addPack}/>}

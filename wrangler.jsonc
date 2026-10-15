@@ -3,7 +3,8 @@
   "compatibility_date": "2026-06-16",
   "pages_build_output_dir": "dist/client",
   "vars": {
-    "SITE_GATE_ENABLED": "true"
+    "SITE_GATE_ENABLED": "true",
+    "SUBMISSIONS_ENABLED": "false"
   },
   "services": [
     {

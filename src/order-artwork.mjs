@@ -1,0 +1,23 @@
+// Build only in memory. Only the customer's chosen crop is sent, with no original metadata.
+function printJpeg(data){
+ const binary=atob(data),parts=[binary.slice(0,2)];let at=2;
+ while(at<binary.length){const marker=binary.charCodeAt(at+1);if(marker===218){parts.push(binary.slice(at));return btoa(parts.join(''));}const length=(binary.charCodeAt(at+2)<<8)|binary.charCodeAt(at+3);if(binary.charCodeAt(at)!==255||length<2||at+2+length>binary.length)throw new Error('A design could not be prepared.');
+  // Browser canvas may append an ICC profile. Strip application metadata from print files.
+  if(!(marker>=225&&marker<=239)&&marker!==254)parts.push(binary.slice(at,at+2+length));at+=2+length;
+ }
+ throw new Error('A design could not be prepared.');
+}
+export async function prepareOrderItems(basket,photos,render){
+ const items=[];let length=0,count=0;
+ for(const item of basket){
+  const files=[];
+  if(['photo','puzzle'].includes(item.kind)){
+   const photo=photos.find(p=>p.id===item.sourceId);if(!photo)throw new Error('A photo is missing. Return to the designer before sending.');
+   const artwork=await render(photo,{puzzle:item.kind==='puzzle',gridSize:item.gridSize||3,size:1200});
+   const images=item.kind==='puzzle'?[item.preview,...artwork.tiles]:[artwork.url];
+   for(const image of images){if(!image.startsWith('data:image/jpeg;base64,'))throw new Error('A design could not be prepared. Please try another JPG or PNG.');const base64=printJpeg(image.slice('data:image/jpeg;base64,'.length));length+=base64.length;count++;if(length>2000000||count>60||base64.length>1400000)throw new Error('These designs are too large for one email. Please reduce the number of designs in this request.');files.push(base64);}
+  }
+  items.push({kind:item.kind,qty:item.qty,...(item.kind==='puzzle'?{gridSize:item.gridSize}:{}),files});
+ }
+ return items;
+}
