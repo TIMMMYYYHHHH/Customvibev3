@@ -1,0 +1,4 @@
+# TODO: add a monitored security contact before launch. This file is incomplete until Contact is set.
+Expires: 2027-04-15T00:00:00Z
+Preferred-Languages: en
+Canonical: https://customvibe.co.za/.well-known/security.txt

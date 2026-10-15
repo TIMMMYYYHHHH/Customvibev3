@@ -39,3 +39,7 @@ Do not delete old Worker or databases during migration. Before domain cutover ca
 ## Progress ledger
 
 Phase 0: backup refs verified on GitHub. Cloudflare OAuth refreshed using official Wrangler; missing access is an outstanding dependency. Phase 1 will keep production cutover pending until protected deployment passes checks.
+
+Ruling: free tier only, explicitly required by the user. Two dedicated D1 databases created after the user freed capacity. Never upgrade, buy storage or enable paid rules.
+
+- [ ] Owner to-do: replace both temporary passwords using scripts/set-password.mjs. Temporary credentials authorized by user on 15 October 2026; plaintext must never be stored or shown.

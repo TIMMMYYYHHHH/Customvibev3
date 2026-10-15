@@ -16,10 +16,10 @@ export default function MagnetCollections({Puzzle,onAddPack}) {
       <div className="catalog-grid">{matches.map(item=><article key={item.id}><ProductStatus product={item}/>
         {item.href?<a className="catalog-art" href={item.href} aria-label={'Create '+item.name}>{item.id==='puzzle'&&!item.image?<Puzzle/>:<CollectionPackPreview kind={item.id}/>}</a>:<button className="catalog-art" onClick={()=>setActive(item)} aria-label={'Explore '+item.name}><CollectionPackPreview kind={item.id}/></button>}
         <div className="catalog-card-copy"><p className="overline">{item.group}</p><h3>{item.name}</h3><p>{item.description}</p>{item.href?<a className="text-link" href={item.href}>{item.id==='puzzle'?'Create a 3 × 3 or 5 × 5 puzzle':'Use your own photos'}</a>:<button className="text-link" onClick={()=>setActive(item)}>Explore collection</button>}</div>
-      </article>)}</div>
+      <a className="text-button" href={'/products/'+item.id}>Product details</a></article>)}</div>
       {!matches.length&&<div className="collection-empty"><h3>No little squares found yet.</h3><p>Try another word, or explore the whole collection.</p><button className="action" onClick={()=>{setGroup(groups[0]);setQuery('')}}>Show all collections</button></div>}
     </section>
-    <section className="catalog-personal content"><div><p className="overline">THE MOST PERSONAL COLLECTION OF ALL</p><h2>Nothing quite like<br/>your own people.</h2><p>Bring your favourite photos. We’ll help turn them into little squares of everyday joy.</p></div><a className="action" href="#/studio">Make your photo magnets</a></section>
+    <section className="catalog-personal content"><div><p className="overline">THE MOST PERSONAL COLLECTION OF ALL</p><h2>Nothing quite like<br/>your own people.</h2><p>Bring your favourite photos. We’ll help turn them into little squares of everyday joy.</p></div><a className="action" href="/studio">Make your photo magnets</a></section>
     {active&&<ProductDetails product={content.products.find(p=>p.id===active.id)||active} onClose={()=>setActive(null)} onAddPack={onAddPack}/>}
   </div>;
 }

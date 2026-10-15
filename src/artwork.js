@@ -7,11 +7,15 @@ export function loadImage(src){
 export async function readPhoto(file){
  if(!['image/jpeg','image/png'].includes(file.type))throw new Error(`${file.name}: please choose a JPG or PNG.`);
  if(file.size>20*1024*1024)throw new Error(`${file.name}: use an image under 20 MB for this preview.`);
+ const bytes=new Uint8Array(await file.slice(0,12).arrayBuffer());
+ const png=[137,80,78,71,13,10,26,10].every((v,i)=>bytes[i]===v);
+ const jpeg=bytes[0]===255&&bytes[1]===216&&bytes[2]===255;
+ if(!(file.type==='image/png'?png:jpeg))throw new Error('The file contents do not match its image type.');
  const src=URL.createObjectURL(file);
- try{const img=await loadImage(src);return makePhoto(src,file.name,img.naturalWidth,img.naturalHeight);}catch(e){URL.revokeObjectURL(src);throw e;}
+ try{const img=await loadImage(src);if(img.naturalWidth*img.naturalHeight>40000000||Math.max(img.naturalWidth,img.naturalHeight)>12000)throw new Error("Use a photo below 40 megapixels and 12000 pixels per side.");return makePhoto(src,file.name,img.naturalWidth,img.naturalHeight);}catch(e){images.delete(src);URL.revokeObjectURL(src);throw e;}
 }
 export const makePhoto=(src,name,w,h)=>({id:crypto.randomUUID(),src,name,w,h,zoom:1,x:.5,y:.5,rotation:0,qty:1});
-export async function demoPhoto(src='/assets/sample-coast.png'){const img=await loadImage(src);return makePhoto(src,'A day on the coast',img.naturalWidth,img.naturalHeight);}
+export async function demoPhoto(src='/assets/sample-coast.webp'){const img=await loadImage(src);return makePhoto(src,'A day on the coast',img.naturalWidth,img.naturalHeight);}
 export async function renderPhoto(photo,{puzzle=false,gridSize=3,size=480}={}){
  const img=await loadImage(photo.src),rotate=photo.rotation||0;
  const source=document.createElement('canvas');source.width=rotate%180?img.naturalHeight:img.naturalWidth;source.height=rotate%180?img.naturalWidth:img.naturalHeight;

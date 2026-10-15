@@ -3,6 +3,7 @@ import {contentPlugin} from './scripts/content-store.mjs';
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  ssr: {noExternal: ['@fontsource-variable/fredoka','@fontsource-variable/dm-sans','@phosphor-icons/react']},
   build: {
     outDir: "dist/client",
     rollupOptions: { input: { main: "index.html", directions: "directions.html" } },

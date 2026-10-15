@@ -4,6 +4,30 @@
   "compatibility_date": "2026-06-16",
   "workers_dev": false,
   "preview_urls": false,
-  "assets": {"directory": "dist/admin", "binding": "ASSETS", "run_worker_first": true, "not_found_handling": "404-page"},
-  "services": [{"binding": "AUTH", "service": "customvibe-security"}]
+  "assets": {
+    "directory": "dist/admin",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "404-page"
+  },
+  "services": [
+    {
+      "binding": "AUTH",
+      "service": "customvibe-security"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "CONTENT_DB",
+      "database_name": "customvibe-content",
+      "database_id": "f9df9c71-87e4-41a7-9f39-c13fbc31ecdb",
+      "migrations_dir": "migrations/content"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "admin.customvibe.co.za",
+      "custom_domain": true
+    }
+  ]
 }

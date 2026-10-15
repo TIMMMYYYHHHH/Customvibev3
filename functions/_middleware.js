@@ -1,8 +1,14 @@
-import {gate,secure,unavailable} from '../server/auth.mjs';
+import {gate,secure,unavailable,random} from '../server/auth.mjs';
+import {renderDocument,sitemap} from '../server/render.mjs';
 export async function onRequest(context){const {request,env}=context;try{const url=new URL(request.url);if(url.protocol!=='https:'||url.hostname==='www.customvibe.co.za'){url.protocol='https:';if(url.hostname==='www.customvibe.co.za')url.hostname='customvibe.co.za';return secure(Response.redirect(url.toString(),308))}
  const auth=await gate(request,env,'site');if(auth.response)return secure(auth.response,{privateResponse:url.pathname!=='/robots.txt'});
  if(/^\/(?:api|admin|internal)(?:\/|$)/.test(url.pathname)||/(?:^|\/)(?:\.git|\.env|\.dev.vars|node_modules|src|server|backup)(?:[/.]|$)/i.test(url.pathname)||/\.(?:map|bak|sql|log)$/.test(url.pathname))return secure(new Response('Not found',{status:404}));
  if(!['GET','HEAD'].includes(request.method))return secure(new Response('Method not allowed',{status:405}));
- if(url.pathname==='/content.json'&&env.CATALOGUE){const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)return secure(unavailable());return secure(r,{privateResponse:env.SITE_GATE_ENABLED!=='false'})}
- return secure(await context.next(),{privateResponse:env.SITE_GATE_ENABLED!=='false'});
+ const privateResponse=env.SITE_GATE_ENABLED!=='false';
+ const catalogue=async()=>{if(!env.CATALOGUE)throw new Error('Missing binding');const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)throw new Error('Unavailable');return r.json()};
+ if(url.pathname==='/content.json')return secure(Response.json(await catalogue(),{headers:{'Cache-Control':'no-store'}}),{privateResponse});
+ if(url.pathname==='/sitemap.xml')return secure(new Response(sitemap(await catalogue()),{headers:{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'no-store'}}),{privateResponse});
+ // Native app routes and metadata use the live catalogue, including newly created products.
+ if(!url.pathname.split('/').at(-1).includes('.')){const nonce=random(),content=await catalogue();const template=await env.ASSETS.fetch(new Request(url.origin+'/'));if(!template.ok)throw new Error('Missing template');const {html,status}=renderDocument(await template.text(),url.pathname,content,nonce);return secure(new Response(request.method==='HEAD'?null:html,{status,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}}),{privateResponse,nonce})}
+ return secure(await context.next(),{privateResponse});
  }catch{return secure(unavailable())}}

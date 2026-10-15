@@ -1,9 +1,11 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {ContentProvider} from './content/ContentProvider';
+import {installNavigation} from './routing.mjs';
 import {App} from './App.jsx';
 import './shop-base.css';
 import './shop.css';
 import './studio.css';
 import './consistency.css';
-createRoot(document.getElementById('root')).render(<React.StrictMode><ContentProvider><App/></ContentProvider></React.StrictMode>);
+installNavigation();
+createRoot(document.getElementById('root')).render(<React.StrictMode><ContentProvider initialContent={document.getElementById('site-content')?JSON.parse(document.getElementById('site-content').textContent):undefined}><App/></ContentProvider></React.StrictMode>);

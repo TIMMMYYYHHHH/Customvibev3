@@ -4,5 +4,27 @@
   "compatibility_date": "2026-06-16",
   "workers_dev": false,
   "preview_urls": false,
-  "triggers": {"crons": ["17 * * * *"]}
+  "triggers": {
+    "crons": [
+      "17 * * * *"
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "customvibe-security",
+      "database_id": "e8d3a9ef-a162-4c05-b037-02b620733c41",
+      "migrations_dir": "migrations/security"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SITE_LOCKOUT",
+      "id": "e6ec3492bdfb427d91b2b6f224e04cd6"
+    },
+    {
+      "binding": "ADMIN_LOCKOUT",
+      "id": "79be755b427f43eeb4f8a3ac4f432cb2"
+    }
+  ]
 }

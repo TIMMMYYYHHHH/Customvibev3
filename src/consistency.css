@@ -253,3 +253,5 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 .storefront .thread-brand .chaos-price-grid .featured-price:hover,
 .storefront .thread-brand .chaos-price-grid .featured-price:focus-visible{background:var(--cv-action-hover);color:#fff}
 .storefront .thread-brand .scatter-0 .hero-accent{top:0;right:0;transform:translate(64%,-64%) rotate(45deg);transform-origin:center}
+
+.policy-page{max-width:900px!important;padding-top:56px;padding-bottom:72px}.policy-page h1{font-size:clamp(2.6rem,6vw,4.4rem);margin-bottom:40px}.policy-page section{margin:28px 0}.policy-page h2{font-size:1.45rem;margin-bottom:10px}.policy-page p{line-height:1.8;overflow-wrap:anywhere}.policy-page .contact-section{display:block;padding:0}.policy-page .contact-form{max-width:620px}

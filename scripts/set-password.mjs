@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Run locally in a terminal. Values go directly to Wrangler stdin, never to a file or stdout.
+import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {hashPassword,random} from '../server/auth.mjs';
 const scope=process.argv[2],project=process.argv[3];
@@ -9,6 +10,6 @@ let password=await hidden('New password (hidden): ');let confirm=await hidden('C
 if(password!==confirm||password.length<16||password.length>256){console.error('Passwords must match and contain 16 to 256 characters.');process.exit(1)}
 const salt=random(),hash=await hashPassword(password,salt);password='';confirm='';const secret=random();
 for(const [name,value] of (scope==='site'?[['SITE_PASSWORD_HASH',hash],['SITE_PASSWORD_SALT',salt],['SESSION_SECRET',secret]]:[['ADMIN_PASSWORD_HASH',hash],['ADMIN_PASSWORD_SALT',salt],['ADMIN_SESSION_SECRET',secret]])){
- const args=['wrangler',...(scope==='site'?['pages','secret','put',name,'--project-name',project]:['secret','put',name,'--name',project])];const r=spawnSync('npx',args,{input:value,encoding:'utf8',stdio:['pipe','pipe','pipe']});if(r.status!==0){console.error(`Setting ${name} failed. No secret output shown. Check Wrangler login, then rerun this script.`);process.exit(1)}console.log(`Set ${name}.`)
+ const args=[fileURLToPath(new URL('../node_modules/wrangler/bin/wrangler.js',import.meta.url)),...(scope==='site'?['pages','secret','put',name,'--project-name',project]:['secret','put',name,'--name',project,'--config','wrangler.admin.jsonc'])];const r=spawnSync(process.execPath,args,{input:value,encoding:'utf8',stdio:['pipe','pipe','pipe']});if(r.status!==0){console.error(`Setting ${name} failed. No secret output shown. Check Wrangler login, then rerun this script.`);process.exit(1)}console.log(`Set ${name}.`)
 }
 console.log('Credentials installed. Redeploy Pages for its new secrets to take effect. Existing sessions are invalidated.');
