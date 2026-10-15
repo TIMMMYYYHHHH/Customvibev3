@@ -13,3 +13,35 @@ test('explicit false disables site gate but never admin auth',async()=>{assert.e
 test('HMAC tokens reject tampering, wrong scope, expiry and wrong secret',async()=>{const claims={scope:'site',exp:Math.floor(Date.now()/1000)+60,jti:random(),csrf:random()};const token=await signToken(claims,secret);assert.deepEqual(await verifyToken(token,secret,'site'),claims);for(const [t,s,scope] of [[token+'x',secret,'site'],[token,random(),'site'],[token,secret,'admin']])assert.equal(await verifyToken(t,s,scope),null);assert.equal(await verifyToken(await signToken({...claims,exp:1},secret),secret,'site'),null)});
 test('login requires same origin, issues secure cookie and session can be revoked',async()=>{const e={...env,AUTH:services()};const first=(await gate(request('/auth/login'),e,'site')).response;const html=await first.text();const csrf=html.match(/name="csrf" value="([^"]+)"/)[1];const pre=first.headers.get('set-cookie').split(';')[0];const form=new URLSearchParams({password,csrf});assert.equal((await gate(request('/auth/login',{method:'POST',body:form,headers:{cookie:pre,origin:'https://attacker.invalid'}}),e,'site')).response.status,403);const r=(await gate(request('/auth/login',{method:'POST',body:form,headers:{cookie:pre,origin:'https://customvibe.co.za'}}),e,'site')).response;assert.equal(r.status,303);assert.match(r.headers.get('set-cookie'),/HttpOnly; Secure; SameSite=Lax/);const cookie=r.headers.get('set-cookie').split(';')[0];const logged=await gate(request('/',{headers:{cookie}}),e,'site');assert.equal(logged.response,null);assert.equal((await gate(request('/auth/logout',{method:'POST',body:new URLSearchParams({csrf:logged.session.csrf}),headers:{cookie,origin:'https://customvibe.co.za'}}),e,'site')).response.status,303);assert.equal((await gate(request('/',{headers:{cookie}}),e,'site')).response.status,401)});
 test('sixth login attempt is blocked before password hashing',async()=>{const e={...env,AUTH:services()};const first=(await gate(request(),e,'site')).response;const csrf=(await first.text()).match(/name="csrf" value="([^"]+)"/)[1];const cookie=first.headers.get('set-cookie').split(';')[0];let r;for(let i=0;i<6;i++)r=(await gate(request('/auth/login',{method:'POST',body:new URLSearchParams({password:random(),csrf}),headers:{cookie,origin:'https://customvibe.co.za'}}),e,'site')).response;assert.equal(r.status,429)});
+
+for(const scope of ['site','admin']){
+ const origin=scope==='admin'?'https://admin.customvibe.co.za':'https://customvibe.co.za';
+ const makeRequest=(path,options={})=>new Request(origin+path,{...options,headers:{'CF-Connecting-IP':'192.0.2.1',...options.headers}});
+ const environment=()=>({...env,ADMIN_PASSWORD_HASH:env.SITE_PASSWORD_HASH,ADMIN_PASSWORD_SALT:salt,ADMIN_SESSION_SECRET:secret,AUTH:services()});
+ test(`${scope}: background icon requests and a second tab do not invalidate an open login form`,async()=>{
+  const e=environment();
+  const first=(await gate(makeRequest('/'),e,scope)).response;
+  const csrf=(await first.text()).match(/name="csrf" value="([^"]+)"/)[1];
+  let cookie=first.headers.get('set-cookie').split(';')[0];
+  for(const path of ['/favicon.ico','/auth/login']){
+   const next=(await gate(makeRequest(path,{headers:{cookie}}),e,scope)).response;
+   const replacement=next.headers.get('set-cookie');
+   if(replacement)cookie=replacement.split(';')[0];
+  }
+  const login=(await gate(makeRequest('/auth/login',{method:'POST',headers:{cookie,origin},body:new URLSearchParams({password,csrf})}),e,scope)).response;
+  assert.equal(login.status,303);
+ });
+ test(`${scope}: background resources cannot issue a competing login cookie`,async()=>{
+  for(const destination of ['image','script','style','empty']){
+   const r=(await gate(makeRequest('/favicon.ico',{headers:{'Sec-Fetch-Dest':destination}}),environment(),scope)).response;
+   assert.equal(r.status,401);
+   assert.equal(r.headers.has('set-cookie'),false);
+  }
+ });
+ test(`${scope}: a mismatched login token is still forbidden`,async()=>{
+  const e=environment();const first=(await gate(makeRequest('/'),e,scope)).response;
+  const cookie=first.headers.get('set-cookie').split(';')[0];
+  const r=(await gate(makeRequest('/auth/login',{method:'POST',headers:{cookie,origin},body:new URLSearchParams({password,csrf:random()})}),e,scope)).response;
+  assert.equal(r.status,403);
+ });
+}

@@ -48,5 +48,11 @@ export async function gate(request,env,scope){const url=new URL(request.url),adm
  }
  if(request.method!=='GET'&&request.method!=='HEAD')return {response:new Response('Unauthorized',{status:401})};
  if(url.pathname.startsWith('/api/'))return {response:Response.json({error:'Unauthorized'},{status:401})};
+ // Background requests must not overwrite the cookie belonging to an open form.
+ const destination=request.headers.get('sec-fetch-dest');
+ if(destination&&destination!=='document')return {response:new Response('Unauthorized',{status:401})};
+ // Reuse the signed, unexpired challenge across tabs without extending its lifetime.
+ const existing=await verifyToken(cookie(request,pre),secret,scope+'-login');
+ if(existing)return {response:loginPage(scope,existing.csrf)};
  const csrf=random(),token=await signToken({scope:scope+'-login',jti:random(),csrf,exp:Math.floor(Date.now()/1000)+900},secret);const response=loginPage(scope,csrf);response.headers.set('Set-Cookie',cookieValue(pre,token,900));return {response};
  }catch{return {response:unavailable()}}}
