@@ -97,3 +97,38 @@ Outstanding owner decisions: business details and policy review; actual payment 
 - `SITE_GATE_ENABLED=true`, `SUBMISSIONS_ENABLED=false`. Forms stay unavailable pending the separate free Resend account, verified sending domain, keys, Turnstile and controlled runtime/inbox tests. No approval to launch.
 - Owner to-do retained: business identity and address, VAT, Information Officer/PAIA, delivery charges/timelines, cancellation and refunds, photo-email deletion period and final policy review. Bing skipped by owner; Google ownership owner-confirmed.
 - Rollback for this update: disable submissions, revert the email feature commits and redeploy Pages. The additive submissions table may remain without affecting prior login logic. Do not remove or reset the working site/admin secrets or disable the site gate.
+
+
+## Active launch checklist, 15 October 2026
+
+This supersedes older readiness notes above. Maintain this checklist internally and work through one owner step at a time in chat. The owner no longer wants the HTML guide. Never disable the site gate without separate launch approval. Free plans only.
+
+- [x] Owner confirms permanent site/admin passwords installed and both logins working.
+- [x] Unpaid request scope agreed: owner artwork email, customer acknowledgement, payment coming soon.
+- [x] CustomVibe Google account selected for services: customvibe03@gmail.com. Domain and Cloudflare stay in their current account.
+- [x] Separate Resend account signed in, customvibe.co.za verified. Added the provider's exact DKIM TXT and two DNS-only CNAME records plus monitoring DMARC. Preserved existing Cloudflare forwarding MX/SPF and Google verification.
+- [x] Privacy, security and orders aliases configured and destination verified. Actual inbox delivery remains to test.
+- [x] Google Search Console confirms verified owner. Manual actions and security issues show no issues detected. Submitted sitemap shows Couldn't fetch and zero discovered pages while the gate blocks access. Recheck and resubmit after approved launch.
+- [x] Google Business Profile eligibility checked. Owner confirms online orders and courier delivery only, so do not create an ineligible profile. No claim is made about any pre-existing profile.
+- [x] Bing skipped at owner's request.
+- [ ] Finish W3Forms sign-in in normal Chrome because Google sign-in fails in the interactive browser. Create the free text-only contact form with the specified Gmail recipient and production domain.
+- [ ] Install W3Forms form key privately using scripts/set-email.mjs w3forms. Contact messages use W3Forms, not Web3Forms. Earlier Web3Forms assessment does not apply to W3Forms.
+- [ ] Install a domain-restricted, sending-only Resend key privately using scripts/set-email.mjs email.
+- [ ] Configure free Turnstile and install its keys privately using scripts/set-email.mjs turnstile.
+- [x] Resend free transactional plan confirmed: 100/day, 3,000/month, pay-as-you-go disabled. Tracking not configured.
+- [ ] Review enforced TLS before real photo submissions; current Resend setting is Opportunistic.
+- [ ] Test contact, order artwork, customer acknowledgement and incoming aliases with labelled non-personal test data. Check actual inboxes, duplicates, errors and free-runtime CPU.
+- [ ] Finish owner business details, privacy/operator agreements, contact-message and photo-email deletion schedule, PUDO charges/timelines/collection rules, cancellation/refunds and final policies.
+- [ ] Measure mobile performance. Confirm SEO/security and all routes again after final deployment.
+- [ ] Obtain separate launch approval, then disable only the public gate and check public indexing/sitemap. Admin authentication stays on.
+
+W3Forms implementation: provider-specific form readiness, server-only key, existing Turnstile/CSRF/quota checks, whitelisted text fields and a single dispatch claim in existing D1. Unknown provider outcomes are held for manual delivery review to avoid duplicate messages. Migration 0003 only adds a dispatch flag, no customer data. Orders retain Resend idempotency. Keep SITE_GATE_ENABLED=true and SUBMISSIONS_ENABLED=false until controlled testing is ready.
+
+Rollback: disable submissions first, revert the W3Forms integration commit and redeploy Pages/security Worker if needed. The added contact_started column may safely remain. Do not undo working auth secrets, forwarding MX records, or the public gate. DNS verification records can remain while sending is disabled.
+
+
+### W3Forms preparation verification
+
+62 automated tests pass, including concurrent contacts, provider errors, lost claim acknowledgement, failed completion marking, and independent provider readiness. Public build and Pages Functions compilation pass. A local browser check confirms uncertain contact state and its reference survive navigation, with sending disabled and only one simulated dispatch. No live contact or order email has been sent yet.
+
+Migration 0003 applied to existing security D1. Private security Worker version: 7dc7ad86-e0be-4f43-ab76-baf5ea2c5fa2. No new paid resource or plan change. Provider credentials and real inbox tests remain pending.

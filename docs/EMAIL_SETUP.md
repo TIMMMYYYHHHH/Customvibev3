@@ -10,14 +10,14 @@ Keep the site password gate ON. All Cloudflare and email services stay on free p
 - Handmade magnets, intended delivery by PUDO lockers. Locker names entered by customers are preferences, not verified bookings.
 - Contact through the website form to the same Gmail inbox.
 - No customer photo storage in the site, D1, KV or R2. Email providers and Gmail necessarily process and retain attachments.
-- Business details, complete policies, delivery charges and timelines remain owner to-dos before launch. Bing is intentionally skipped. Google ownership is owner-confirmed; check indexing after launch.
+- Business details, complete policies, delivery charges and timelines remain owner to-dos before launch. Bing is intentionally skipped. Google ownership is verified in Search Console; indexing is still blocked by the gate. Google Business Profile is not applicable because the owner confirmed online orders and courier delivery only.
 
 ## 1. Separate free Resend account
 
-The existing connected account is full at three domains. The owner will create a separate free account for CustomVibe. Do not remove any existing domain or upgrade a plan.
+The old connected account is full at three domains. The separate CustomVibe account is signed in as customvibe03@gmail.com, and customvibe.co.za is now verified for sending. Do not use the old Resend connector to change this account. Do not remove unrelated domains or upgrade a plan.
 
 1. In the new account, add `customvibe.co.za` as a sending domain. Use the Europe region if available. Keep receiving disabled, because Cloudflare will handle inbound forwarding. Keep open and click tracking disabled.
-2. Add the exact DNS records Resend supplies in Cloudflare. DKIM is a TXT record. Return-path SPF/TXT and MX normally use the `send` subdomain. Do not overwrite root MX or create a second SPF record at an existing name. Copy provider values exactly.
+2. Add the exact DNS records Resend supplies in Cloudflare. DKIM is a TXT record. This account uses the Resend-managed CNAME records `send` and `rsend`, both DNS-only, plus a DKIM TXT record at `resend._domainkey`. A monitoring DMARC TXT record is present at `_dmarc`. Do not overwrite root MX or create a second SPF record at an existing name. Copy provider values exactly.
 3. Verify the domain in Resend. Use `orders@customvibe.co.za` as the sender. Replies go to customvibe03@gmail.com until aliases are verified.
 4. Create a sending-only API key restricted to this domain. Keep it in your password manager. Do not send it in chat.
 5. Run the local hidden-input installer:
@@ -30,7 +30,18 @@ CV_NODE=/Users/timothymorton/.cache/codex-runtimes/codex-primary-runtime/depende
 
 Paste the key only into the hidden terminal prompt. It is sent to the existing Pages project as `RESEND_API_KEY`, with no plaintext file or terminal output.
 
-## 2. Free Turnstile widget
+## 2. W3Forms contact form
+
+The owner selected **w3forms.com**, a different service from web3forms.com. W3Forms is for text enquiries only. Photos and unpaid requests use Resend. Google sign-in currently fails in the interactive browser, so the owner can complete sign-in in normal Chrome.
+
+1. Sign in with customvibe03@gmail.com and create a form named CustomVibe Contact on the free plan.
+2. Set notify email to customvibe03@gmail.com, Reply-To to `{{email}}`, allowed domain to `customvibe.co.za`, and leave CC, auto-response and webhooks off. Keep file uploads off. The site verifies Cloudflare Turnstile server-side; do not enable a second provider CAPTCHA without integrating it.
+3. Keep the access key private. W3Forms shows it only when created. Save it in a password manager, then run `"$CV_NODE" scripts/set-email.mjs w3forms` and paste into its hidden prompt. It installs `W3FORMS_ACCESS_KEY` in Pages without displaying or writing the value.
+4. Confirm a labelled test appears in the W3Forms dashboard and owner inbox, and that Reply reaches the submitted test email. Provider acceptance alone does not prove inbox delivery.
+
+W3Forms stores contact messages until deleted. Decide a deletion schedule before launch. It documents only short-window duplicate suppression, so our server claims each message once before dispatch. An uncertain result is held for a manual dashboard/inbox check rather than automatically resent. No message text or customer details are stored in our D1 retry records.
+
+## 3. Free Turnstile widget
 
 1. Cloudflare account > Turnstile > Add widget.
 2. Name: CustomVibe public forms. Hostname: `customvibe.co.za`. Use Managed mode. No pre-clearance is required. Do not add an unrestricted hostname or use test keys in production.
@@ -39,11 +50,11 @@ Paste the key only into the hidden terminal prompt. It is sent to the existing P
 
 The code checks Turnstile on the server, including the hostname and contact/order action. Until the provider keys and bindings are ready, forms remain unavailable instead of claiming success.
 
-## 3. Incoming email aliases
+## 4. Incoming email aliases
 
 Configured on 15 October 2026: free Cloudflare Email Routing is active for `privacy@customvibe.co.za`, `security@customvibe.co.za` and `orders@customvibe.co.za`, all forwarding to customvibe03@gmail.com. The owner verified the Gmail destination and all three rules show Active. Catch-all is disabled. Inbox delivery tests remain outstanding. Once aliases work, the public privacy/security contact can switch from the current confirmed Gmail to the aliases.
 
-## 4. Test behind the gate
+## 5. Test behind the gate
 
 `SUBMISSIONS_ENABLED=false` remains committed until setup is complete and we can test the free runtime. Tell the assistant when the domain and keys are ready. The assistant will enable controlled testing behind the site gate, measure maximum-size requests on Cloudflare, and revert submissions to false if they exceed the free CPU allowance. Do not upgrade a plan. Installing keys alone will not activate the forms.
 
@@ -55,7 +66,7 @@ Configured on 15 October 2026: free Cloudflare Email Routing is active for `priv
 - Check Turnstile failures, missing consent, large artwork and session expiry preserve a useful error without exposing internals.
 - Check the site gate remains enabled, admin remains separate, robots disallows all and Pages fail_open stays false.
 
-No email to a real customer should be used as a test without their permission. The code does not store photos for background retry. An uncertain failure must be retried in the same browser tab within 23 hours of its creation, using the same reference. New drafts must begin sending within one hour. After the retry window, contact CustomVibe with the reference instead of creating a duplicate.
+No email to a real customer should be used as a test without their permission. The code does not store photos for background retry. An uncertain order failure must be retried in the same browser tab within 23 hours of its creation, using the same reference. An uncertain contact dispatch requires a W3Forms dashboard/inbox check; do not send a replacement until its outcome is established. New drafts must begin sending within one hour. After the retry window, contact CustomVibe with the reference instead of creating a duplicate.
 
 ## Limits and retention
 
@@ -67,6 +78,6 @@ Opaque retry records expire after 48 hours and are cleaned hourly. No photo, cus
 
 ## Still blocks launch
 
-Verified sending domain and keys; Turnstile; representative live request CPU measurements on the free Workers runtime; real inbox tests; owner business facts and policy review; PUDO costs/timing/collection rules; photo/email retention decision; mobile checks; separate explicit launch approval. Payment provider can remain pending only while the site clearly offers unpaid requests rather than paid checkout.
+Sending domain is verified. Still required: Resend and W3Forms keys and contact dashboard settings; Turnstile; representative live request CPU measurements on the free Workers runtime; real inbox tests; owner business facts and policy review; PUDO costs/timing/collection rules; photo/email retention decision; mobile checks; separate explicit launch approval. Payment provider can remain pending only while the site clearly offers unpaid requests rather than paid checkout.
 
-Sources: [Resend attachments](https://resend.com/docs/dashboard/emails/attachments), [Resend retention](https://resend.com/security), [Turnstile validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/), [Cloudflare email routing](https://developers.cloudflare.com/email-service/get-started/route-emails/).
+Sources: [W3Forms API](https://w3forms.com/docs/api), [W3Forms form settings](https://w3forms.com/docs/customization), [W3Forms privacy](https://w3forms.com/privacy), [Resend attachments](https://resend.com/docs/dashboard/emails/attachments), [Resend retention](https://resend.com/security), [Turnstile validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/), [Cloudflare email routing](https://developers.cloudflare.com/email-service/get-started/route-emails/).
