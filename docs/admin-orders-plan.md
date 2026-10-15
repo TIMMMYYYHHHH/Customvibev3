@@ -91,6 +91,14 @@ Files: deployment configuration and existing setup scripts as needed; update thi
 - [ ] Tim signs in after the temporary lockout clears. Submit one owner-controlled mixed test, open its card without pasting a reference, check quantities/previews/downloads, move status and explicitly test a manual update email.
 - [ ] Record exactly what passed in the existing Hub tasks. Keep physical print checks, seven-day live expiry and production retention policy open until verified or decided.
 
+## Verification progress, 16 October 2026
+
+- Implemented Tasks 1 to 4 inline. Full suite: 118 tests pass. Public/admin builds pass.
+- Reviewed at 1440px and 390px using synthetic orders. Content editor styling, status control and manual preview checked.
+- Independent review found missing line prices and old upload-token compatibility. Both fixed with regression tests and re-reviewed.
+- Business protections verified. Additive D1 migration 0005 applied; security Worker published with hourly seven-day record cleanup.
+- Admin email credentials/owner recipient setup and live owner checks remain pending.
+
 ## Review before execution
 
 Implement inline in this chat, then review the complete change. Scope and test retention are approved; this build plan is ready for Tim's review before code changes. The layout can be inspected locally while live login is locked, without changing authentication.

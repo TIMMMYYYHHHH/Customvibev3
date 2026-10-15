@@ -58,3 +58,21 @@ test('authenticated admin can retrieve finalized artwork bytes, while a site coo
  assert.equal(await (await admin.fetch(request('/artwork'),env)).text(),'/');
  const wrong=await admin.fetch(new Request('https://admin.customvibe.co.za/api/artwork/'+data.id+'/1',{headers:{cookie:c.cookie}}),env);assert.equal(wrong.status,401);
 });
+test('new board captures one mixed order before mail and keeps quantities on retry',async()=>{
+ const env=setup();env.ORDER_RECORDS_ENABLED='true';const c=await form(env),data=payload();data.items.unshift({kind:'photo',qty:2,files:[{size:tile.length,sha256:tileHash}]});let sends=0;
+ const network=async(url)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});assert.equal(env.sql.prepare('SELECT count(*) AS n FROM orders').get().n,1);sends++;return Response.json({id:'accepted'});};
+ const {grant}=await(await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network)).json();
+ for(let i=0;i<11;i++)await submissions(post('/api/artwork/upload',c,tile,{'Content-Type':'image/jpeg','X-Artwork-Grant':grant,'X-Artwork-Index':String(i)}),env,network);
+ for(let i=0;i<2;i++)assert.equal((await submissions(post('/api/order-request',c,{payload:data,grant}),env,network)).status,200);
+ const r=env.sql.prepare('SELECT * FROM orders').get();assert.ok(r);const s=JSON.parse(r.snapshot);assert.equal(s.magnetQty,11);assert.deepEqual(s.items.map(i=>i.qty),[2,1]);assert.equal(s.items.flatMap(i=>i.files).length,11);assert.equal(r.owner_sent,1);assert.equal(r.receipt_sent,1);assert.equal(sends,2);
+});
+
+test('pre-dashboard artwork grants and recovery tokens survive added price snapshots',async()=>{
+ const {validateOrder}=await import('../server/submission-model.mjs');const {initArtwork,verifyArtworkGrant}=await import('../server/artwork-api.mjs');const env=setup(),data=payload(),order=validateOrder(data,defaultContent,true),legacy={...order,items:order.items.map(({lineCents,...i})=>i)};const session={jti:random(),csrf:random(),exp:Math.floor(Date.now()/1000)+3600};
+ const oldHash=Buffer.from(await crypto.subtle.sign('HMAC',await crypto.subtle.importKey('raw',new TextEncoder().encode(env.SESSION_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']),new TextEncoder().encode(JSON.stringify(legacy)))).toString('hex');
+ const first=await(await initArtwork(env,session,legacy,'192.0.2.1')).json();
+ const {verifyToken}=await import('../server/auth.mjs');const claims=await verifyToken(first.grant,env.SESSION_SECRET,'artwork');
+ const oldGrant=await signToken({...claims,hash:oldHash},env.SESSION_SECRET);assert.ok(await verifyArtworkGrant(oldGrant,env,session,order));
+ const recovery=await verifyToken(first.resume,env.SESSION_SECRET,'artwork-resume');const oldResume=await signToken({...recovery,hash:oldHash},env.SESSION_SECRET);
+ const fresh={...session,jti:random(),csrf:random()};assert.equal((await initArtwork(env,fresh,order,'192.0.2.1',oldResume)).status,200);
+});

@@ -1,5 +1,6 @@
+import {orderRecord} from './order-record.mjs';
 import {boundedBody,cookie,sameOrigin,constantEqual,random,signToken,verifyToken} from './auth.mjs';
-import {MAX_BODY,validateContact,validateOrder,orderEmails,artworkManifest} from './submission-model.mjs';
+import {MAX_BODY,validateContact,validateOrder,orderEmails,artworkManifest,fingerprintPayload} from './submission-model.mjs';
 import {privateUpload,initArtwork,verifyArtworkGrant,completeArtwork} from './artwork-api.mjs';
 const enc=new TextEncoder();
 const fail=(status,message)=>Response.json({error:message},{status});
@@ -16,7 +17,7 @@ export async function submissions(request,env,network=fetch){
   if(!ready(env,kind))return Response.json({available:false,paymentStatus:'coming-soon'});
   let token=cookie(request,name),session=await verifyToken(token,env.SESSION_SECRET,'form');
   if(!session){session={scope:'form',jti:random(),csrf:random(),exp:Math.floor(Date.now()/1000)+3600};token=await signToken(session,env.SESSION_SECRET);}
-  const r=Response.json({available:true,csrf:session.csrf,siteKey:env.TURNSTILE_SITE_KEY,paymentStatus:'coming-soon',maxEncodedArtwork:2000000,artworkStorage:kind==='order'&&env.ARTWORK_STORAGE_ENABLED==='true'});
+  const r=Response.json({available:true,csrf:session.csrf,siteKey:env.TURNSTILE_SITE_KEY,paymentStatus:'coming-soon',maxEncodedArtwork:2000000,orderRecords:kind==='order'&&env.ORDER_RECORDS_ENABLED==='true',artworkStorage:kind==='order'&&env.ARTWORK_STORAGE_ENABLED==='true'});
   r.headers.set('Set-Cookie',`${name}=${token}; Path=/; Max-Age=${Math.max(0,session.exp-Math.floor(Date.now()/1000))}; HttpOnly; Secure; SameSite=Lax`);return r;
  }
  if(request.method!=='POST')return fail(405,'Method not allowed');
@@ -46,7 +47,7 @@ export async function submissions(request,env,network=fetch){
    const grant=await verifyArtworkGrant(body.grant,env,session,submission);if(!grant)return fail(403,'Refresh the security check and retry this same request.');
    const completed=await completeArtwork(env,grant,submission);if(!completed.ok)return completed;
   }
-  const id=await digest(kind+':'+submission.id,env.SESSION_SECRET),fingerprint=await digest('payload:'+JSON.stringify(submission),env.SESSION_SECRET),key=await digest('forms-ip:'+ip,env.SESSION_SECRET);
+  const id=await digest(kind+':'+submission.id,env.SESSION_SECRET),fingerprint=await digest('payload:'+fingerprintPayload(submission),env.SESSION_SECRET),key=await digest('forms-ip:'+ip,env.SESSION_SECRET);
   const permit=await state(env,'reserve',{id,fingerprint,key,kind,createdAt:submission.createdAt});
   if(permit.expired)return fail(410,'This draft is too old to send as a new request. Contact CustomVibe with its reference before starting again.');
   if(permit.conflict)return fail(409,'This request changed. Contact us with your reference before sending it again.');
@@ -68,10 +69,16 @@ export async function submissions(request,env,network=fetch){
    }
    return Response.json({ok:true,reference:submission.id,status:'message-sent',receiptSent:null});
   }
+  const recordEnabled=env.ORDER_RECORDS_ENABLED==='true';
+  const recordCall=async(path,body)=>{const r=await env.AUTH.fetch('https://auth.internal/orders/'+path,{method:'POST',body:JSON.stringify({id:submission.id,...body})});if(!r.ok)throw Error('Order record unavailable');return r.json()};
+  if(recordEnabled)await recordCall('create',{fingerprint,snapshot:orderRecord(submission,privateArtwork),privateArtwork});
   const emails=orderEmails(submission,privateArtwork);
+  if(recordEnabled&&privateArtwork){for(const field of ['text','html'])emails.owner[field]=emails.owner[field].replace('/artwork?request=','/orders?order=');}
+
   if(!permit.ownerSent){await mail(emails.owner,`cv-${kind}-${submission.id}-owner`,env,network);await state(env,'mark',{id,stage:'owner_sent'});}
   let receiptSent=permit.receiptSent;
   if(kind==='order'&&!receiptSent){try{await mail(emails.customer,`cv-${kind}-${submission.id}-customer`,env,network);await state(env,'mark',{id,stage:'receipt_sent'});receiptSent=true;}catch{receiptSent=false;}}
+  if(recordEnabled){await recordCall('delivery',{stage:'owner_sent'});if(receiptSent)await recordCall('delivery',{stage:'receipt_sent'});}
   return Response.json({ok:true,reference:kind==='order'?'CV-'+submission.id:submission.id,status:kind==='order'?'unpaid-request':'message-sent',receiptSent:kind==='order'?receiptSent:null});
  }catch{return fail(503,'We could not confirm sending. Retry this same request to avoid duplicates. Keep this tab open.');}
 }

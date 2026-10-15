@@ -10,6 +10,7 @@ export function validateConfig(config){
  for(const name of ['local','production','preview']){
   const environment=name==='local'?config:config.env?.[name];
   requireSafe(environment?.vars?.SITE_GATE_ENABLED==='true'&&(name==='production'?['true','false']:['false']).includes(environment?.vars?.SUBMISSIONS_ENABLED),'Keep all environments gated; only production may send. Explicit production and preview settings are required.');
+  for(const flag of ['ARTWORK_STORAGE_ENABLED','ORDER_RECORDS_ENABLED'])requireSafe(environment?.vars?.[flag]===undefined||(name==='production'?['true','false']:['false']).includes(environment.vars[flag]),'Private storage and order capture must stay off in preview and local environments.');
   for(const [binding,service] of Object.entries(services))requireSafe(environment.services?.some(v=>v.binding===binding&&v.service===service),'Unexpected internal service binding.');
  }
 }

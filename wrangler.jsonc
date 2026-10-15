@@ -5,7 +5,8 @@
   "vars": {
     "SITE_GATE_ENABLED": "true",
     "SUBMISSIONS_ENABLED": "false",
-    "ARTWORK_STORAGE_ENABLED": "false"
+    "ARTWORK_STORAGE_ENABLED": "false",
+    "ORDER_RECORDS_ENABLED": "false"
   },
   "services": [
     {
@@ -22,7 +23,8 @@
       "vars": {
         "SITE_GATE_ENABLED": "true",
         "SUBMISSIONS_ENABLED": "true",
-        "ARTWORK_STORAGE_ENABLED": "true"
+        "ARTWORK_STORAGE_ENABLED": "true",
+        "ORDER_RECORDS_ENABLED": "true"
       },
       "services": [
         {
@@ -39,7 +41,8 @@
       "vars": {
         "SITE_GATE_ENABLED": "true",
         "SUBMISSIONS_ENABLED": "false",
-        "ARTWORK_STORAGE_ENABLED": "false"
+        "ARTWORK_STORAGE_ENABLED": "false",
+        "ORDER_RECORDS_ENABLED": "false"
       },
       "services": [
         {

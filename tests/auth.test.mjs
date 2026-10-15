@@ -45,3 +45,16 @@ for(const scope of ['site','admin']){
   assert.equal(r.status,403);
  });
 }
+
+test('admin login preserves only safe order/artwork return links',async()=>{
+ const e={...env,ADMIN_PASSWORD_HASH:env.SITE_PASSWORD_HASH,ADMIN_PASSWORD_SALT:salt,ADMIN_SESSION_SECRET:secret,AUTH:services()};
+ const origin='https://admin.customvibe.co.za';
+ const id=crypto.randomUUID(),path='/orders?order='+id;
+ const first=(await gate(new Request(origin+path),e,'admin')).response;
+ const html=await first.text(),csrf=html.match(/name="csrf" value="([^"]+)"/)[1],cookie=first.headers.get('set-cookie').split(';')[0];
+ assert.ok(html.includes('name="next" value="'+path+'"'));
+ for(const [next,expected] of [[path,path],['/artwork?request='+id,'/artwork?request='+id],['//evil.invalid','/'],['/orders?order='+id+'&evil=1','/'],['https://evil.invalid','/']]){
+  const r=(await gate(new Request(origin+'/auth/login',{method:'POST',headers:{cookie,origin,'CF-Connecting-IP':'192.0.2.1'},body:new URLSearchParams({password,csrf,next})}),e,'admin')).response;
+  assert.equal(r.status,303);assert.equal(r.headers.get('location'),expected);
+ }
+});

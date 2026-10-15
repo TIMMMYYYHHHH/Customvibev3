@@ -1,6 +1,6 @@
 import {ARTWORK_LIMITS as limits,artworkHash} from '../src/artwork-policy.mjs';
 import {validateJpeg as jpeg} from './jpeg.mjs';
-import {summarize,money} from '../src/commerce.mjs';
+import {summarize,money,photoPrice} from '../src/commerce.mjs';
 import {canPurchase} from '../src/content/model.mjs';
 export const MAX_BODY=2100000;
 export const DESTINATION='customvibe03@gmail.com';
@@ -28,6 +28,10 @@ export function validateOrder(x,catalogue,privateArtwork=false){
   return {kind:item.kind,name:product.name,qty:item.qty,...(gridSize?{gridSize}:{}),files};
  });
  const sum=summarize(items,catalogue);if(sum.unpriced||sum.magnetQty>100||!Number.isSafeInteger(sum.knownCents)||sum.knownCents<=0)invalid();
+ // Allocate the shared personalised bundle total proportionally, rounding cumulative cents.
+ // This preserves the submitted line prices without changing the overall bundle price.
+ let pieces=0,allocated=0;const personalTotal=photoPrice(sum.pricedQty,catalogue.pricing);
+ for(const item of items){if(['photo','puzzle'].includes(item.kind)){pieces+=item.qty*(item.kind==='puzzle'?item.gridSize**2:1);const total=Math.round(personalTotal*pieces/sum.pricedQty);item.lineCents=total-allocated;allocated=total;}else item.lineCents=catalogue.products.find(p=>p.id===item.kind).priceCents*item.qty;}
  return {...base,contact,locker,items,magnetQty:sum.magnetQty,subtotalCents:sum.knownCents,deliveryCents:null,paymentStatus:'unpaid',consent:true};
 }
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -43,3 +47,6 @@ export function orderEmails(order,privateArtwork=false){
 }
 
 export function artworkManifest(order){return order.items.flatMap((item,i)=>item.files.map((f,j)=>({...f,proof:item.kind==='puzzle'&&j===0,name:`design-${String(i+1).padStart(2,'0')}-${item.kind==='puzzle'?(j===0?'proof':`row-${Math.floor((j-1)/item.gridSize)+1}-col-${(j-1)%item.gridSize+1}`):'photo'}.jpg`})))}
+
+// Keep signed grants and retry identities compatible with requests begun before price snapshots.
+export function fingerprintPayload(submission){return JSON.stringify(Array.isArray(submission.items)?{...submission,items:submission.items.map(({lineCents,...item})=>item)}:submission)}

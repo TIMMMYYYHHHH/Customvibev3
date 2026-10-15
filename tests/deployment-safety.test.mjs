@@ -35,3 +35,5 @@ test('disabling sending can recover from missing provider keys in currently enab
  p.deployment_configs.preview.env_vars.SUBMISSIONS_ENABLED.value='true';
  assert.throws(()=>validateProject(p,{requireSendingCredentials:false}));
 });
+
+test('preview and local environments cannot enable private order capture',()=>{for(const name of ['local','preview'])for(const flag of ['ORDER_RECORDS_ENABLED','ARTWORK_STORAGE_ENABLED']){const c=config();(name==='local'?c:c.env[name]).vars[flag]='true';assert.throws(()=>validateConfig(c));}});

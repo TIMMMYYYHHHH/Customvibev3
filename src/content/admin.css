@@ -1,6 +1,6 @@
-.shop-shell .admin-page{padding-block:36px 50px}
+:is(.shop-shell,.cv-admin) .admin-page{padding-block:36px 50px}
 .admin-heading{display:flex;justify-content:space-between;align-items:center;gap:25px}
-.shop-shell .admin-heading h1{font-size:clamp(34px,4vw,54px);margin:12px 0;line-height:1.08}
+:is(.shop-shell,.cv-admin) .admin-heading h1{font-size:clamp(34px,4vw,54px);margin:12px 0;line-height:1.08}
 .admin-heading em{font-style:normal;color:#ae2e5b}
 .admin-scope{padding:16px 20px;background:#e4f1e9;border-radius:10px;font-size:13px!important;line-height:1.6;margin:24px 0!important;max-width:900px}
 .admin-toolbar{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #26133d25;padding-bottom:16px;margin-bottom:24px}
@@ -8,7 +8,7 @@
 .admin-tabs button{min-height:44px;padding:10px 18px;border-radius:30px;font-weight:650}
 .admin-tabs button[aria-pressed=true]{background:#26133d;color:white}
 .admin-save-state{font-size:12px;color:#655972}
-.shop-shell .admin-fields{border:0;padding:0;margin:0;min-width:0}
+:is(.shop-shell,.cv-admin) .admin-fields{border:0;padding:0;margin:0;min-width:0}
 .admin-catalogue{display:grid;grid-template-columns:245px minmax(0,1fr);gap:32px;align-items:start}
 .admin-product-list{display:grid;gap:6px}
 .admin-product-list>button:not(.button){padding:12px 15px;text-align:left;border-radius:8px;border:1px solid transparent;min-height:62px}
@@ -16,7 +16,7 @@
 .admin-product-list small{display:block;color:#6a5775;font-size:12px;margin-top:4px}
 .admin-product-list>.button{margin-bottom:15px}
 .admin-product-form{background:#f7f3fa;border-radius:14px;padding:28px}
-.shop-shell .admin-page h2{font-size:32px;margin:0 0 20px;line-height:1.15}
+:is(.shop-shell,.cv-admin) .admin-page h2{font-size:32px;margin:0 0 20px;line-height:1.15}
 .admin-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .admin-page label{display:flex;flex-direction:column;gap:7px;font-weight:600;font-size:13px;margin:0 0 16px}
 .admin-page :is(input:not([type=file]):not([type=checkbox]),select,textarea){width:100%;min-height:46px;padding:10px 12px;border:1px solid #8e7c9c;border-radius:7px;background:#fffdf8;color:#26133d;font:400 15px/1.4 'DM Sans Variable',sans-serif}
