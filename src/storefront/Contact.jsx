@@ -44,7 +44,7 @@ export default function Contact(){
    </div>
    <div className="contact-field"><label htmlFor="contact-message">Your message</label><textarea {...fieldProps('message')} rows={5} maxLength={5000} placeholder="What’s on your mind?"/>{error('message')}</div>
    </fieldset>
-   {!service.result&&<><p className="small-copy">Your message is emailed to CustomVibe through Resend. Please keep photos out of this form. Read our <a href="/privacy">privacy policy</a>.</p><FormSecurity service={service} kind="contact"/><button className="action" type="submit" disabled={service.busy||!service.token||!service.config?.available}>{service.busy?'Sending…':service.pending?'Retry same message':'Send message'}</button></>}
+   {!service.result&&<><p className="small-copy">W3Forms stores your message and emails it to CustomVibe. Please keep photos out of this form. Read our <a href="/privacy">privacy policy</a>.</p><FormSecurity service={service} kind="contact"/><button className="action" type="submit" disabled={service.manualReview||service.busy||!service.token||!service.config?.available}>{service.manualReview?'Contact us to check delivery':service.busy?'Sending…':service.pending?'Check or retry message':'Send message'}</button>{service.pending&&service.attempt&&<p className="small-copy">Message reference: {service.attempt.id}</p>}</>}
    {service.result&&<p className="contact-status" role="status">Your message has been sent for delivery to CustomVibe. Thank you. Reference: {service.result.reference}</p>}
    {status&&<p className="contact-status" role="alert">{status}</p>}
   </form>

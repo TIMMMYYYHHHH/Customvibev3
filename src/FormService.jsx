@@ -15,26 +15,26 @@ function loadTurnstile(){
 }
 export function useFormService(kind){
  const state=useContext(SubmissionContext)[kind];
- const {pending,busy,result,error,attempt}=useSyncExternalStore(state.subscribe,state.getSnapshot,state.getSnapshot);
+ const {pending,busy,result,error,attempt,manualReview}=useSyncExternalStore(state.subscribe,state.getSnapshot,state.getSnapshot);
  const [config,setConfig]=useState(null),[token,setToken]=useState(''),[cycle,setCycle]=useState(0);
  const cancelled=useRef(false),setError=React.useCallback(error=>state.update({error}),[state]);
- useEffect(()=>{cancelled.current=false;const controller=new AbortController();fetch('/api/forms',{signal:controller.signal,cache:'no-store'}).then(async r=>{if(!r.ok)throw new Error('Reload the page and sign in again before sending.');return r.headers.get('content-type')?.includes('application/json')?r.json():{available:false}}).then(c=>{if(!cancelled.current)setConfig(c)}).catch(e=>{if(e.name!=='AbortError'&&!cancelled.current)setError(e.message)});return()=>{cancelled.current=true;controller.abort();};},[]);
+ useEffect(()=>{cancelled.current=false;const controller=new AbortController();fetch('/api/forms?kind='+kind,{signal:controller.signal,cache:'no-store'}).then(async r=>{if(!r.ok)throw new Error('Reload the page and sign in again before sending.');return r.headers.get('content-type')?.includes('application/json')?r.json():{available:false}}).then(c=>{if(!cancelled.current)setConfig(c)}).catch(e=>{if(e.name!=='AbortError'&&!cancelled.current)setError(e.message)});return()=>{cancelled.current=true;controller.abort();};},[]);
  async function submit(build){
-  if(state.getSnapshot().busy||state.getSnapshot().result||!config?.available||!token)return;
+  if(state.getSnapshot().busy||state.getSnapshot().result||state.getSnapshot().manualReview||!config?.available||!token)return;
   state.update({busy:true,error:''});let sent=false;
   try{
    if(!state.getSnapshot().attempt){const payload=await build();state.update({attempt:{...payload,id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000)},pending:true});}
    sent=true;
    const response=await fetch(kind==='order'?'/api/order-request':'/api/contact',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':config.csrf},body:JSON.stringify({payload:state.getSnapshot().attempt,turnstile:token,website:''}),signal:AbortSignal.timeout(60000)});
    const body=await response.json();
-   if(response.status===403){const fresh=await fetch('/api/forms',{cache:'no-store'});if(fresh.ok&&fresh.headers.get('content-type')?.includes('application/json'))setConfig(await fresh.json());}
-   if(!response.ok||!body.ok){state.rejected(response.status,body.error||'Sending could not be confirmed. Retry the same request.');return;}
+   if(response.status===403){const fresh=await fetch('/api/forms?kind='+kind,{cache:'no-store'});if(fresh.ok&&fresh.headers.get('content-type')?.includes('application/json'))setConfig(await fresh.json());}
+   if(!response.ok||!body.ok){if(body.manualReview)state.update({manualReview:true});state.rejected(response.status,body.error||'Sending could not be confirmed. Retry the same request.');return;}
    state.update({result:body});
   }catch(e){state.update({uncertain:state.getSnapshot().uncertain||sent,error:e.name==='TimeoutError'?'Sending could not be confirmed. Keep this tab open and retry the same request.':e.message||'Sending could not be confirmed. Please retry.'});}
   finally{setToken('');setCycle(n=>n+1);state.update({busy:false});}
  }
 
- return {config,token,setToken,error,setError,busy,result,cycle,pending,attempt,submit};
+ return {config,token,setToken,error,setError,busy,result,cycle,pending,attempt,manualReview,submit};
 }
 export function FormSecurity({service,kind}){
  const container=useRef(),widget=useRef();const {config,cycle,setToken,setError}=service;

@@ -2,6 +2,11 @@ const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 export async function submissionState(request,env){
  const body=await request.json(),path=new URL(request.url).pathname,now=Math.floor(Date.now()/1000);
  if(!env.DB||!hex(body.id))return new Response(null,{status:400});
+ if(path==='/submissions/claim-contact'){
+  const claimed=await env.DB.prepare("UPDATE submissions SET contact_started=1 WHERE id=? AND kind='contact' AND expires>? AND contact_started=0 AND owner_sent=0 RETURNING id").bind(body.id,now).first();
+  const row=await env.DB.prepare("SELECT owner_sent FROM submissions WHERE id=? AND kind='contact' AND expires>?").bind(body.id,now).first();
+  return Response.json({claimed:!!claimed,ownerSent:!!row?.owner_sent});
+ }
  if(path==='/submissions/mark'){
   if(!['owner_sent','receipt_sent'].includes(body.stage))return new Response(null,{status:400});
   await env.DB.prepare(`UPDATE submissions SET ${body.stage}=1 WHERE id=? AND expires>?`).bind(body.id,now).run();return Response.json({ok:true});
