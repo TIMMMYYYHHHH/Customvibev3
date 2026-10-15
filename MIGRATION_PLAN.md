@@ -71,3 +71,29 @@ Exact local credential commands from this repository (Node.js installed):
     node scripts/set-password.mjs admin customvibe-admin
 
 Site secrets: SITE_PASSWORD_HASH, SITE_PASSWORD_SALT, SESSION_SECRET. Admin secrets: ADMIN_PASSWORD_HASH, ADMIN_PASSWORD_SALT, ADMIN_SESSION_SECRET. Script prompts invisibly and sends derived values directly to Cloudflare. It never writes plaintext or secret output to disk. No leaked credential requiring emergency rotation was found.
+
+## Owner update: 15 October 2026, launch preparation
+
+The owner confirms both passwords replaced and both logins working after the CSRF fix (65ba0c4). Keep SITE_GATE_ENABLED=true. This is not launch approval. Business identity, address, VAT, Information Officer/PAIA and full commercial terms remain an owner to-do, deferred for now. Google domain verification is owner-confirmed; Bing is explicitly out of scope. Sitemap submission is owner-reported, but indexing remains blocked while the gate is on and must be checked again after launch.
+
+Agreed scope: unpaid order requests, not sales or payment acceptance. Show Payments coming soon. The owner receives design attachments and request details at customvibe03@gmail.com; the customer receives an acknowledgement stating no payment was taken and the request is not yet accepted. Handcrafted magnets; PUDO lockers are the delivery preference. Delivery prices, times, locker availability and bookings still require confirmation. Do not present demo locations as live lockers.
+
+No customer photo storage in D1, KV, R2, localStorage, queues or application logs. Render the chosen crops in browser memory and pass bounded JPEG attachments through a server endpoint to the email provider. Email delivery necessarily involves Cloudflare, the sending provider and the recipient's mailbox, which retain/process data under their policies; never promise that no third party handles photos. Only opaque request digests, send-state flags and quota counters may be retained in the existing security database for retry protection, with expiry. Preserve the browser draft on errors. Email-provider acceptance is not proof of inbox delivery.
+
+Implementation: a shared contact/order API behind the existing site gate, separate form CSRF cookie, server-side Turnstile with action/hostname validation, strict schemas and JPEG dimensions/signatures, trusted catalogue pricing, bounded payloads, per-IP and global quotas, and provider idempotency. Reuse the security service/database for counters and opaque retry state. No new database or paid resource. Render owner/receipt emails from validated fields; recipients and sender are server-controlled. Never accept card details. Contact remains a real form.
+
+Resend account inspection confirms 3/3 domains in use, 100 emails/day and 3,000/month. CustomVibe is not a verified sender yet. No domain will be removed or plan upgraded without the owner's specific direction. Web3Forms free cannot support the requested server-side proxy/Turnstile combination; prepare Resend for contact and order email. Email activation remains fail-closed until sending credentials/domain and Turnstile are ready.
+
+Planned forwarding aliases: privacy@customvibe.co.za, security@customvibe.co.za and orders@customvibe.co.za to customvibe03@gmail.com. Use the confirmed Gmail as the public contact until forwarding is verified. Never claim unverified aliases are operational.
+
+Outstanding owner decisions: business details and policy review; actual payment provider; PUDO tariff, lead times and collection rules; mailbox photo/order retention and deletion procedure; free sender-domain capacity; final email/Turnstile tests; explicit launch approval.
+
+### Email readiness update, 15 October 2026
+
+- Cloudflare Email Routing enabled. Gmail destination verified by owner. The privacy, security and orders aliases all show Active, forwarding to customvibe03@gmail.com; catch-all disabled. Real inbox delivery tests remain.
+- Unpaid request flow, owner JPEG attachments and customer acknowledgements implemented. Existing security D1 stores only opaque request fingerprints and send flags. No photo bucket or new database.
+- Review fixes: preserve request state across navigation, prevent editing a reserved order, unlock initial validation errors, inspect complete baseline JPEG marker structure and reject metadata, atomically reserve quota, recover existing requests for 23 hours within Resend's 24-hour idempotency window.
+- Artwork cap reduced to 2 MB encoded / about 1.5 MB JPEG to reduce free-runtime CPU pressure. Resolution remains 1200 pixels per print square. Real maximum-size CPU measurement remains mandatory before enabling normal submissions.
+- `SITE_GATE_ENABLED=true`, `SUBMISSIONS_ENABLED=false`. Forms stay unavailable pending the separate free Resend account, verified sending domain, keys, Turnstile and controlled runtime/inbox tests. No approval to launch.
+- Owner to-do retained: business identity and address, VAT, Information Officer/PAIA, delivery charges/timelines, cancellation and refunds, photo-email deletion period and final policy review. Bing skipped by owner; Google ownership owner-confirmed.
+- Rollback for this update: disable submissions, revert the email feature commits and redeploy Pages. The additive submissions table may remain without affecting prior login logic. Do not remove or reset the working site/admin secrets or disable the site gate.
