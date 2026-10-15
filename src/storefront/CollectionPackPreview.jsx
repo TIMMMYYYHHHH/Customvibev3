@@ -18,7 +18,7 @@ export default function CollectionPackPreview({kind}){
  const {content}=useContent();const item=content.products.find(p=>p.id===kind);
  const original=defaultContent.products.find(p=>p.id===kind);
  if(kind==='puzzle')return <div className="collection-pack-stage"><img loading="lazy" src={content.images.puzzle} alt="Coastal photo for a square magnet puzzle"/></div>;
- if(!packs[kind]||item?.image!==original?.image)return <div className="collection-pack-stage custom-pack-image"><img src={item?.image} alt={item?.name||'Magnet collection'}/></div>;
+ if(!packs[kind]||item?.image!==original?.image)return <div className="collection-pack-stage custom-pack-image"><img loading="lazy" src={item?.image} alt={item?.name||'Magnet collection'}/></div>;
  const pack=packs[kind];
  const layout=pack.faces.length===4?'four':pack.faces.length===1?'single':'';
  return <div className="collection-pack-stage"><div className={`collection-pack-preview ${kind} ${layout}`} role="img" aria-label={pack.label}>{pack.faces.map(([x,y,width,height=width],i)=><MagnetPiece key={i}><svg className="collection-pack-face" viewBox={`${x} ${y} ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true" focusable="false"><image href={`/assets/${pack.image}`} width="1254" height="1254"/></svg></MagnetPiece>)}</div></div>;

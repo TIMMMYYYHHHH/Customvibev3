@@ -5,6 +5,10 @@ export async function onRequest(context){const {request,env}=context;try{const u
  if(/^\/(?:api|admin|internal)(?:\/|$)/.test(url.pathname)||/(?:^|\/)(?:\.git|\.env|\.dev.vars|node_modules|src|server|backup)(?:[/.]|$)/i.test(url.pathname)||/\.(?:map|bak|sql|log)$/.test(url.pathname))return secure(new Response('Not found',{status:404}));
  if(!['GET','HEAD'].includes(request.method))return secure(new Response('Method not allowed',{status:405}));
  const privateResponse=env.SITE_GATE_ENABLED!=='false';
+ const aliases={'/index.html':'/','/design':'/studio','/design.html':'/studio','/quote':'/checkout','/quote.html':'/checkout','/directions.html':'/','/happy-chaos':'/','/colour-pop':'/','/keepsake-edit':'/'};
+ const target=aliases[url.pathname]||(/\.html$/.test(url.pathname)?url.pathname.replace(/\/index\.html$|\.html$/,'')||'/':null);
+ if(target){url.pathname=target;return secure(Response.redirect(url.toString(),301),{privateResponse})}
+
  const catalogue=async()=>{if(!env.CATALOGUE)throw new Error('Missing binding');const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)throw new Error('Unavailable');return r.json()};
  if(url.pathname==='/content.json')return secure(Response.json(await catalogue(),{headers:{'Cache-Control':'no-store'}}),{privateResponse});
  if(url.pathname==='/sitemap.xml')return secure(new Response(sitemap(await catalogue()),{headers:{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'no-store'}}),{privateResponse});
