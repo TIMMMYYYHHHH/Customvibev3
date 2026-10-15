@@ -1,0 +1,2 @@
+import React from 'react';import {policies} from './policies.mjs';import Contact from './storefront/Contact';
+export default function PolicyPage({page}){const policy=policies[page];return <main className="section policy-page"><p className="eyebrow">GOOD TO KNOW</p><h1>{policy.title}</h1>{policy.sections.map(([title,text])=><section key={title}><h2>{title}</h2><p>{text}</p></section>)}{page==='contact'&&<Contact/>}<a className="text-button" href="/">Back to CustomVibe</a></main>}
