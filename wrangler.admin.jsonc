@@ -20,7 +20,7 @@
     {
       "binding": "CONTENT_DB",
       "database_name": "customvibe-content",
-      "database_id": "f9df9c71-87e4-41a7-9f39-c13fbc31ecdb",
+      "database_id": "8883d934-89f5-4da0-97a1-f7624d008a33",
       "migrations_dir": "migrations/content"
     }
   ],
@@ -29,5 +29,6 @@
       "pattern": "admin.customvibe.co.za",
       "custom_domain": true
     }
-  ]
+  ],
+  "account_id": "4f57d4e924674cb87b33d4c884745cf6"
 }

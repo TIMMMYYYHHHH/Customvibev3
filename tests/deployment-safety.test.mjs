@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateConfig,validateProject} from '../scripts/check-deployment.mjs';
+const config=()=>({name:'customvibe-business',account_id:'4f57d4e924674cb87b33d4c884745cf6',pages_build_output_dir:'dist/client',vars:{SITE_GATE_ENABLED:'true',SUBMISSIONS_ENABLED:'false'},services:[{binding:'AUTH',service:'customvibe-security'},{binding:'CATALOGUE',service:'customvibe-catalogue'}]});
+const project=()=>({name:'customvibe-business',production_branch:'main',deployment_configs:Object.fromEntries(['production','preview'].map(name=>[name,{fail_open:false,env_vars:{SITE_GATE_ENABLED:{value:'true'},SUBMISSIONS_ENABLED:{value:'false'},...Object.fromEntries(['SITE_PASSWORD_HASH','SITE_PASSWORD_SALT','SESSION_SECRET'].map(k=>[k,{type:'secret_text'}]))},services:{AUTH:{service:'customvibe-security'},CATALOGUE:{service:'customvibe-catalogue'}}}]))});
+test('accepts protected business project and configuration',()=>{validateConfig(config());validateProject(project())});
+test('rejects source account and wrong output directory',()=>{for(const patch of [{account_id:'source'},{pages_build_output_dir:'dist'}])assert.throws(()=>validateConfig({...config(),...patch}))});
+test('rejects a build that turns off gate or enables sending',()=>{for(const patch of [{SITE_GATE_ENABLED:'false'},{SUBMISSIONS_ENABLED:'true'}]){const c=config();Object.assign(c.vars,patch);assert.throws(()=>validateConfig(c))}});
+test('rejects wrong or missing internal service bindings',()=>{const c=config();c.services[0].service='other';assert.throws(()=>validateConfig(c));const p=project();delete p.deployment_configs.preview.services.AUTH;assert.throws(()=>validateProject(p))});
+test('requires private credentials in both environments',()=>{const p=project();delete p.deployment_configs.preview.env_vars.SESSION_SECRET;assert.throws(()=>validateProject(p))});
+test('rejects fail-open, sending-enabled or ungated live environment',()=>{for(const field of ['fail_open','SITE_GATE_ENABLED','SUBMISSIONS_ENABLED']){const p=project(),c=p.deployment_configs.production;if(field==='fail_open')c.fail_open=true;else c.env_vars[field].value=field==='SITE_GATE_ENABLED'?'false':'true';assert.throws(()=>validateProject(p))}});
+test('requires Direct Upload project on main',()=>{assert.throws(()=>validateProject({...project(),source:{type:'github'}}));assert.throws(()=>validateProject({...project(),production_branch:'other'}))});
+test('Pages configuration omits unsupported account_id while wrong explicit IDs remain rejected',()=>{const c=config();delete c.account_id;validateConfig(c)});

@@ -1,6 +1,8 @@
 # Email and unpaid request setup
 
-Keep the site password gate ON. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
+Keep the site password gate ON and sending OFF. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
+
+The migration destination is Cloudflare account `4f57d4e924674cb87b33d4c884745cf6`, owned by customvibe03@gmail.com, and Pages project `customvibe-business`. The installers verify that account and resource before asking for credentials and again before writing. They refuse the personal account and never use a default Wrangler login. Both production and preview must retain the gate, disabled submissions and `fail_open=false`.
 
 ## Current decisions
 
@@ -20,15 +22,18 @@ The old connected account is full at three domains. The separate CustomVibe acco
 2. Add the exact DNS records Resend supplies in Cloudflare. DKIM is a TXT record. This account uses the Resend-managed CNAME records `send` and `rsend`, both DNS-only, plus a DKIM TXT record at `resend._domainkey`. A monitoring DMARC TXT record is present at `_dmarc`. Do not overwrite root MX or create a second SPF record at an existing name. Copy provider values exactly.
 3. Verify the domain in Resend. Use `orders@customvibe.co.za` as the sender. Replies go to customvibe03@gmail.com until aliases are verified.
 4. Create a sending-only API key restricted to this domain. Keep it in your password manager. Do not send it in chat.
-5. Run the local hidden-input installer:
+5. From the migration checkout, with the temporary credential helper still running, run the local hidden-input installer:
 
 ```sh
-cd /Users/timothymorton/.codex/.chatgpt-projects/g-p-6acf844518448191a0201022d78e5e97/research/customvibev3
+export CLOUDFLARE_ACCOUNT_ID=4f57d4e924674cb87b33d4c884745cf6
+export CUSTOMVIBE_MIGRATION_SOCKET=/private/tmp/customvibe-migration-01a13fb6.sock
 CV_NODE=/Users/timothymorton/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node
 "$CV_NODE" scripts/set-email.mjs email
 ```
 
-Paste the key only into the hidden terminal prompt. It is sent to the existing Pages project as `RESEND_API_KEY`, with no plaintext file or terminal output.
+Paste the key only into the hidden terminal prompt. It is sent to the destination Pages project as `RESEND_API_KEY` in both environments, with no plaintext file or terminal output. For later maintenance without the temporary helper, an explicitly supplied destination `CLOUDFLARE_API_TOKEN` is required. Enter it through a secure hidden prompt, never as a literal command or project file.
+
+The owner approved Enforced TLS only if available on the dedicated account's free plan. Confirm that setting before real photo delivery. Do not upgrade or enable paid overages.
 
 ## 2. W3Forms contact form
 
@@ -43,20 +48,20 @@ W3Forms stores contact messages until deleted. Decide a deletion schedule before
 
 ## 3. Free Turnstile widget
 
-1. Cloudflare account > Turnstile > Add widget.
+1. In the business Cloudflare account customvibe03@gmail.com, open Turnstile > Add widget. The source account's widget does not transfer.
 2. Name: CustomVibe public forms. Hostname: `customvibe.co.za`. Use Managed mode. No pre-clearance is required. Do not add an unrestricted hostname or use test keys in production.
 3. Run `"$CV_NODE" scripts/set-email.mjs turnstile` from the same terminal. Enter the site key and secret key at their hidden prompts.
-4. In Workers & Pages > customvibe-public > Deployments, retry the latest production deployment after both installers finish. Keep `SITE_GATE_ENABLED=true`.
+4. In Workers & Pages > customvibe-business > Deployments, redeploy the approved migration version after the installers finish. Keep `SITE_GATE_ENABLED=true` and `SUBMISSIONS_ENABLED=false`. Do not enable automatic builds until the destination branch and bindings are verified.
 
 The code checks Turnstile on the server, including the hostname and contact/order action. Until the provider keys and bindings are ready, forms remain unavailable instead of claiming success.
 
 ## 4. Incoming email aliases
 
-Configured on 15 October 2026: free Cloudflare Email Routing is active for `privacy@customvibe.co.za`, `security@customvibe.co.za` and `orders@customvibe.co.za`, all forwarding to customvibe03@gmail.com. The owner verified the Gmail destination and all three rules show Active. Catch-all is disabled. Inbox delivery tests remain outstanding. Once aliases work, the public privacy/security contact can switch from the current confirmed Gmail to the aliases.
+Source configuration verified on 15 October 2026: free Cloudflare Email Routing is active for `privacy@customvibe.co.za`, `security@customvibe.co.za` and `orders@customvibe.co.za`, all forwarding to customvibe03@gmail.com. The owner verified the Gmail destination and all three rules show Active. Catch-all is disabled. These must be recreated and verified in the destination account during cutover; DNS export alone does not transfer forwarding rules. Inbox delivery tests remain outstanding. Once aliases work, the public privacy/security contact can switch from the current confirmed Gmail to the aliases.
 
 ## 5. Test behind the gate
 
-`SUBMISSIONS_ENABLED=false` remains committed until setup is complete and we can test the free runtime. Tell the assistant when the domain and keys are ready. The assistant will enable controlled testing behind the site gate, measure maximum-size requests on Cloudflare, and revert submissions to false if they exceed the free CPU allowance. Do not upgrade a plan. Installing keys alone will not activate the forms.
+`SUBMISSIONS_ENABLED=false` remains committed throughout the account migration. Controlled sending tests require separate explicit approval after setup. During that approved window, measure maximum-size requests on Cloudflare and return submissions to false afterward. Do not upgrade a plan. Installing keys alone will not activate the forms or authorize testing.
 
 - Contact form: send a clearly labelled test to the owner inbox. Confirm actual delivery and Reply reaches the entered customer address.
 - Unpaid order: use a non-personal sample photo, one crop, and a 3 x 3 puzzle. Confirm owner email has the correct quantity, catalogue subtotal, phone and preferred PUDO locker. Check all 1200 px pieces and proof match the browser design.

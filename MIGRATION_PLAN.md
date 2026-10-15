@@ -111,10 +111,10 @@ This supersedes older readiness notes above. Maintain this checklist internally 
 - [x] Google Search Console confirms verified owner. Manual actions and security issues show no issues detected. Submitted sitemap shows Couldn't fetch and zero discovered pages while the gate blocks access. Recheck and resubmit after approved launch.
 - [x] Google Business Profile eligibility checked. Owner confirms online orders and courier delivery only, so do not create an ineligible profile. No claim is made about any pre-existing profile.
 - [x] Bing skipped at owner's request.
-- [ ] Finish W3Forms sign-in in normal Chrome because Google sign-in fails in the interactive browser. Create the free text-only contact form with the specified Gmail recipient and production domain.
-- [ ] Install W3Forms form key privately using scripts/set-email.mjs w3forms. Contact messages use W3Forms, not Web3Forms. Earlier Web3Forms assessment does not apply to W3Forms.
+- [x] Owner confirms W3Forms sign-in and contact form creation in normal Chrome. Owner confirms notification recipient, domain and contact settings saved. Dashboard delivery verification remains pending.
+- [x] Owner confirms W3Forms form key installed privately using scripts/set-email.mjs w3forms. Contact messages use W3Forms, not Web3Forms. Earlier Web3Forms assessment does not apply to W3Forms. Verify secret presence without reading its value before activation.
 - [ ] Install a domain-restricted, sending-only Resend key privately using scripts/set-email.mjs email.
-- [ ] Configure free Turnstile and install its keys privately using scripts/set-email.mjs turnstile.
+- [x] Owner confirms Turnstile widget created and both keys installed privately using scripts/set-email.mjs turnstile. Prepared settings were CustomVibe public forms, customvibe.co.za only, Managed, pre-clearance off. Verify secret presence without reading values, widget settings and live challenge flow before activation.
 - [x] Resend free transactional plan confirmed: 100/day, 3,000/month, pay-as-you-go disabled. Tracking not configured.
 - [ ] Review enforced TLS before real photo submissions; current Resend setting is Opportunistic.
 - [ ] Test contact, order artwork, customer acknowledgement and incoming aliases with labelled non-personal test data. Check actual inboxes, duplicates, errors and free-runtime CPU.
@@ -132,3 +132,17 @@ Rollback: disable submissions first, revert the W3Forms integration commit and r
 62 automated tests pass, including concurrent contacts, provider errors, lost claim acknowledgement, failed completion marking, and independent provider readiness. Public build and Pages Functions compilation pass. A local browser check confirms uncertain contact state and its reference survive navigation, with sending disabled and only one simulated dispatch. No live contact or order email has been sent yet.
 
 Migration 0003 applied to existing security D1. Private security Worker version: 7dc7ad86-e0be-4f43-ab76-baf5ea2c5fa2. No new paid resource or plan change. Provider credentials and real inbox tests remain pending.
+
+## Business-account migration update, 15 October 2026
+
+This section supersedes earlier statements that CustomVibe hosting must remain in the personal Cloudflare account. The owner approved moving hosting to customvibe03@gmail.com while keeping GitHub and GoDaddy in their existing accounts. No public launch or real contact/order submission is approved.
+
+Destination account: 4f57d4e924674cb87b33d4c884745cf6. Pages: customvibe-business (customvibe-business.pages.dev). Private Workers: customvibe-security, customvibe-catalogue and customvibe-admin. Destination D1 and KV IDs are recorded in the Worker configurations. Pages does not accept account_id in its configuration: the credential scripts and publishing workflow require the explicit destination environment value and verify the live account before writing.
+
+The owner selected GitHub Actions publishing because Cloudflare does not permit one GitHub repository to be connected to Pages projects in two accounts. The original protected source Pages project must remain available for 48 hours after cutover. Destination Pages uses Direct Upload. Converting to Cloudflare's built-in Git builds would require a replacement project. Standard GitHub-hosted runner execution is free for this public repository. The workflow uses no paid larger runners, caches or artifact storage.
+
+Automatic publishing targets main only. It builds, tests, verifies both environment protection settings and required credentials, deploys Pages Functions, then checks protection again. Its dedicated GitHub secret is CUSTOMVIBE_PAGES_DEPLOY_TOKEN, with business-account Pages Edit and Account Settings Read. Worker deployments remain separately controlled. The site gate remains true and submissions remain false; a future approved launch must explicitly revise these deployment guards.
+
+Current preparation: both databases restored and verified, three private Workers deployed, both site environments and admin password credentials installed, first protected Pages deployment completed. The destination DNS zone is on Free with imported email/verification records. Source automatic builds are frozen. Nameservers and source domain bindings have not moved. Destination forwarding, security parity, provider credentials, live access tests and GitHub publishing verification are still required before cutover.
+
+Rollback must restore the protected customvibe-public Pages deployment and its source account resources. Never restore the ungated legacy customvibe Worker. Start the 48-hour retention clock only after a successful domain cutover and record exact UTC and Johannesburg times. Deletion requires later acceptance; no automatic cleanup is authorized.
