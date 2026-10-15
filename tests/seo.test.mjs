@@ -4,3 +4,6 @@ test('public pages have unique titles, a canonical, one H1 and complete metadata
 test('sitemap excludes admin, checkout and basket and includes product pages',async()=>{const xml=await read('sitemap.xml');assert.doesNotMatch(xml,/admin|basket|checkout|#\//);assert.match(xml,/products\/photos/)});
 test('all routes including assets pass through middleware',async()=>{assert.deepEqual(JSON.parse(await read('_routes.json')),{version:1,include:['/*'],exclude:[]})});
 test('public javascript bundle contains no admin editor or local write helper',async()=>{const files=await readdir('dist/client/assets');const js=(await Promise.all(files.filter(f=>f.endsWith('.js')).map(f=>read('assets/'+f)))).join('');assert.equal(/customvibe-admin-draft|X-CustomVibe-Admin|\/api\/content/.test(js),false)});
+
+test('public output keeps the private delivery inbox out of customer assets',async()=>{const files=await readdir('dist/client',{recursive:true});for(const file of files.filter(f=>/\.(html|js|json|txt)$/.test(f))){assert.equal((await read(file)).includes('customvibe03@gmail.com'),false,file)}});
+test('contact has a dedicated form and public hello address',async()=>{const html=await read('contact.html');assert.match(html,/mailto:hello@customvibe.co.za/);assert.match(html,/aria-label="Contact us"/);assert.doesNotMatch(html,/TODO:|GOOD TO KNOW|policy-page/)});

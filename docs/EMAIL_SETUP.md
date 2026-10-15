@@ -90,3 +90,15 @@ Opaque retry records expire after 48 hours and are cleaned hourly. No photo, cus
 Sending domain is verified. Resend, W3Forms and Turnstile credentials were verified present in both live environments. Still required: representative live request CPU measurements on the free Workers runtime; real inbox tests; owner business facts and policy review; PUDO costs/timing/collection rules; photo/email retention decision; mobile checks; separate explicit launch approval. Payment provider can remain pending only while the site clearly offers unpaid requests rather than paid checkout.
 
 Sources: [W3Forms API](https://w3forms.com/docs/api), [W3Forms form settings](https://w3forms.com/docs/customization), [W3Forms privacy](https://w3forms.com/privacy), [Resend attachments](https://resend.com/docs/dashboard/emails/attachments), [Resend retention](https://resend.com/security), [Turnstile validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/), [Cloudflare email routing](https://developers.cloudflare.com/email-service/get-started/route-emails/).
+
+## Contact routing and gated test evidence, 15 October 2026
+
+- Owner confirmed the first contact form showed success and arrived in the business inbox.
+- Cloudflare Email Routing now has active hello, privacy, security and orders aliases at customvibe.co.za, all forwarding to the existing verified owner inbox. Catch-all remains disabled.
+- Public website text, fallback messages and security.txt use domain aliases. The owner notification recipient remains private and unchanged. Customer order acknowledgements reply to orders@customvibe.co.za.
+- TODO: test direct delivery to hello from a different owner-controlled inbox.
+- TODO: configure and test manual replies using the domain address. Forwarding alone does not change Gmail's outgoing From address.
+- TODO: test an unpaid order using non-personal artwork, confirm owner attachments and customer acknowledgement, and check Reply-To.
+- TODO: business telephone or WhatsApp, business hours and public business address. Legal identity and policy decisions remain launch blockers in the existing policy checklist.
+- Keep the password gate on, production sending enabled only for gated testing, preview/local sending off, and payments unavailable. This is not a launch approval.
+- Retain migration rollback resources through at least 17 October 2026 18:30:01 Africa/Johannesburg. No cleanup without separate approval. The existing reminder remains in the migration chat.

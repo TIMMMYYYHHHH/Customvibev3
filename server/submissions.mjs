@@ -40,7 +40,7 @@ export async function submissions(request,env,network=fetch){
   if(permit.conflict)return fail(409,'This request changed. Contact us with your reference before sending it again.');
   if(!permit.allowed)return fail(429,'The sending limit has been reached. Keep your draft and try again later.');
   if(kind==='contact'){
-   const uncertain=()=>Response.json({error:'We could not confirm your message. Email customvibe03@gmail.com with this reference so we can check before you send it again.',manualReview:true,reference:submission.id},{status:503});
+   const uncertain=()=>Response.json({error:'We could not confirm your message. Email hello@customvibe.co.za with this reference so we can check before you send it again.',manualReview:true,reference:submission.id},{status:503});
    if(!permit.ownerSent){
     // W3Forms has no documented durable idempotency contract. Claim once before
     // calling it; ambiguous outcomes require an inbox/dashboard check, not resend.

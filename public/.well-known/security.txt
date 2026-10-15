@@ -1,4 +1,4 @@
-Contact: mailto:customvibe03@gmail.com
+Contact: mailto:security@customvibe.co.za
 Expires: 2027-04-15T00:00:00Z
 Preferred-Languages: en
 Canonical: https://customvibe.co.za/.well-known/security.txt

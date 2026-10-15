@@ -16,6 +16,7 @@ import {useContent} from './content/ContentProvider';
 import SEO from './SEO.jsx';
 import ProductPage from './ProductPage';
 import PolicyPage from './PolicyPage';
+import ContactPage from './ContactPage';
 import {policies} from './policies.mjs';
 import {canPurchase} from './content/model.mjs';
 
@@ -73,7 +74,7 @@ function AppContent({initialPage}){
  const detailProduct=page.startsWith('products/')?content.products.find(p=>p.id===page.slice(9)&&p.status!=='hidden'):null;
  return <><SEO page={page} content={content}/><a className="global-skip" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus()}}>Skip to content</a>
  <SiteHeader page={page} count={sum.magnetQty} onSectionNavigate={navigateSection}/>
- <div className={storefront?'':'shop-shell'}>
+ <div className={storefront||page==='contact'?'':'shop-shell'}>
 
  <div id="main-content" tabIndex={-1}>
  {['studio','puzzle','basket','checkout'].includes(page)&&<div className="purchase-progress"><StudioProgress step={page==='checkout'?'delivery':page==='basket'?'review':'make'} hasPhotos={photos.length>0||basket.some(i=>!['photo','puzzle'].includes(i.kind))} busy={collectionBusy} onStep={step=>go({make:'studio',review:'basket',delivery:'checkout'}[step])}/>{collectionBusy&&<p className="flow-loading" role="status">Preparing your collection…</p>}{collectionError&&<div className="error" role="alert">{collectionError}<button className="text-button" onClick={()=>setRetry(r=>r+1)}>Try again</button><button className="text-button" onClick={()=>go('studio')}>Back to the designer</button></div>}</div>}
@@ -83,7 +84,8 @@ function AppContent({initialPage}){
  {(!collectionBusy||basket.length>0)&&!collectionError&&!orderLocked&&page==='basket'&&<CollectionReview basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
  {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout photos={photos} basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft}/>}
  {page==='help'&&<HelpPage/>}
- {policies[page]&&<PolicyPage page={page}/>}
+ {page==='contact'&&<ContactPage/>}
+ {page!=='contact'&&policies[page]&&<PolicyPage page={page}/>}
  {detailProduct&&<ProductPage product={detailProduct} onAddPack={addPack}/>}
 
  {!routes.includes(page)&&!detailProduct&&<main className="section empty-basket"><h1>Let’s find your way back.</h1><button className="button" onClick={()=>go('home')}>Back to CustomVibe</button></main>}
