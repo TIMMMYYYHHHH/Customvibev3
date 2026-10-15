@@ -1,0 +1,13 @@
+.artwork-page{box-sizing:border-box;width:100%;max-width:920px;margin:auto;padding:32px 24px 64px;color:#35233f;font-family:'DM Sans Variable',sans-serif}
+.artwork-page h1,.artwork-page h2{font-family:'Fredoka Variable',sans-serif;font-weight:500;line-height:1.2}
+.artwork-page h1{font-size:clamp(2rem,5vw,3rem);margin:0 0 20px}
+.artwork-page p{line-height:1.6}
+.artwork-page form{margin:28px 0 36px}
+.artwork-page label{font-weight:600;min-width:0}
+.artwork-page input{box-sizing:border-box;border:1px solid #927b9b;border-radius:10px;background:#fffdf8;color:inherit;font:inherit;margin-top:8px}
+.artwork-find{border:0;border-radius:10px;background:#8c2754;color:white;padding:13px 20px;font:inherit;font-weight:600;cursor:pointer}
+.artwork-find:disabled{opacity:.6;cursor:wait}
+.artwork-page a{color:#8c2754;text-underline-offset:4px}
+.artwork-page :focus-visible{outline:3px solid #8c2754;outline-offset:4px}
+.artwork-page [role=alert]{padding:16px;background:#fff0e9;border-left:4px solid #9b302b}
+.artwork-page li{padding:10px 0;border-bottom:1px solid #e4dbe7}

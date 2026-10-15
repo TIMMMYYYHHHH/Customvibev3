@@ -4,7 +4,8 @@
   "pages_build_output_dir": "dist/client",
   "vars": {
     "SITE_GATE_ENABLED": "true",
-    "SUBMISSIONS_ENABLED": "false"
+    "SUBMISSIONS_ENABLED": "false",
+    "ARTWORK_STORAGE_ENABLED": "false"
   },
   "services": [
     {
@@ -20,7 +21,8 @@
     "production": {
       "vars": {
         "SITE_GATE_ENABLED": "true",
-        "SUBMISSIONS_ENABLED": "true"
+        "SUBMISSIONS_ENABLED": "true",
+        "ARTWORK_STORAGE_ENABLED": "true"
       },
       "services": [
         {
@@ -36,7 +38,8 @@
     "preview": {
       "vars": {
         "SITE_GATE_ENABLED": "true",
-        "SUBMISSIONS_ENABLED": "false"
+        "SUBMISSIONS_ENABLED": "false",
+        "ARTWORK_STORAGE_ENABLED": "false"
       },
       "services": [
         {

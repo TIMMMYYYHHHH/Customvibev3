@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Local artwork size diagnostic</title>
+<h1>Local artwork size diagnostic</h1><p>Public sample and generated test pattern only. No sending or storage.</p><pre id="result">Checking...</pre>
+<script type="module">
+import {loadImage,makePhoto,renderPhoto} from '../../src/artwork.js';
+import {prepareOrderItems,preparePrivateArtwork} from '../../src/order-artwork.mjs';
+const results=[];
+const pattern=document.createElement('canvas');pattern.width=1800;pattern.height=1800;
+const ctx=pattern.getContext('2d'),pixels=ctx.createImageData(1800,1800);let seed=123456;
+for(let i=0;i<pixels.data.length;i+=4){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const n=seed>>>24;pixels.data[i]=n;pixels.data[i+1]=n;pixels.data[i+2]=n;pixels.data[i+3]=255;}
+ctx.putImageData(pixels,0,0);
+for(const [name,src] of [['Public coast sample','/assets/sample-coast.webp'],['Generated high-detail stress pattern',pattern.toDataURL('image/png')]]){
+ const img=await loadImage(src),photo=makePhoto(src,name,img.naturalWidth,img.naturalHeight);
+ for(const gridSize of [1,3,5]){
+  const puzzle=gridSize>1,preview=await renderPhoto(photo,{puzzle,gridSize}),art=await renderPhoto(photo,{puzzle,gridSize,size:1200});
+  const images=puzzle?[preview.url,...art.tiles]:[art.url];
+  const lengths=images.map(x=>x.split(',')[1].length),total=lengths.reduce((a,b)=>a+b,0);
+  let outcome='accepted';try{await prepareOrderItems([{kind:puzzle?'puzzle':'photo',qty:1,sourceId:photo.id,gridSize,preview:preview.url}],[photo],()=>art);}catch(e){outcome=e.message;}
+  let privateOutcome='accepted',privateBytes=0;try{const prepared=await preparePrivateArtwork([{kind:puzzle?'puzzle':'photo',qty:1,sourceId:photo.id,gridSize,preview:preview.url}],[photo],()=>art);privateBytes=prepared.uploads.reduce((n,b)=>n+b.length,0)}catch(e){privateOutcome=e.message}
+  results.push({privateOutcome,privateBytes,name,gridSize,files:images.length,encodedTotal:total,approxRawMB:Number((total*.75/1000000).toFixed(3)),largestEncodedFile:Math.max(...lengths),combinedLimitExceeded:total>2000000,perFileLimitExceeded:Math.max(...lengths)>1400000,outcome});
+  document.querySelector('#result').textContent=JSON.stringify(results,null,2);
+ }
+}
+document.querySelector('#result').dataset.complete='true';
+</script></html>

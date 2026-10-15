@@ -2,6 +2,8 @@ import {gate,secure,sameOrigin,constantEqual,boundedBody,unavailable} from '../s
 import {readContent,saveContent} from '../server/content.mjs';
 import fallback from '../data/site-content.json' with {type:'json'};
 export default {async fetch(request,env){try{const url=new URL(request.url);if(url.protocol!=='https:')return secure(Response.redirect('https://'+url.host+url.pathname+url.search,308),{admin:true});const auth=await gate(request,env,'admin');if(auth.response)return secure(auth.response,{admin:true});const reply=r=>secure(r,{admin:true});
+ const artwork=url.pathname.match(/^\/api\/artwork\/([a-f0-9-]{36})(?:\/(\d{1,2}))?$/);
+ if(artwork){if(request.method!=='GET')return reply(new Response('Method not allowed',{status:405}));return reply(await env.AUTH.fetch('https://auth.internal/artwork/'+(artwork[2]===undefined?'detail':'download'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:artwork[1],...(artwork[2]===undefined?{}:{index:Number(artwork[2])})})}));}
  if(url.pathname==='/api/session'&&request.method==='GET')return reply(Response.json({csrf:auth.session.csrf,expiresAt:auth.session.exp}));
  if(url.pathname==='/content.json'&&request.method==='GET')return reply(Response.json(await readContent(env.CONTENT_DB,fallback)));
  if(url.pathname==='/api/content'){
@@ -14,5 +16,5 @@ export default {async fetch(request,env){try{const url=new URL(request.url);if(u
  }
  if(url.pathname.startsWith('/api/')||url.pathname.startsWith('/internal/')||url.pathname.includes('..')||/\.(?:map|sql|log|bak)$/.test(url.pathname))return reply(new Response('Not found',{status:404}));
  if(!['GET','HEAD'].includes(request.method))return reply(new Response('Method not allowed',{status:405}));
- return reply(await env.ASSETS.fetch(request));
+ return reply(await env.ASSETS.fetch(url.pathname==='/artwork'?new Request(url.origin+'/',request):request));
  }catch{return secure(unavailable(),{admin:true})}}};

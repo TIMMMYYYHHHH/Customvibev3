@@ -23,13 +23,20 @@ export function useFormService(kind){
   if(state.getSnapshot().busy||state.getSnapshot().result||state.getSnapshot().manualReview||!config?.available||!token)return;
   state.update({busy:true,error:''});let sent=false;
   try{
-   if(!state.getSnapshot().attempt){const payload=await build();state.update({attempt:{...payload,id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000)},pending:true});}
+   if(!state.getSnapshot().attempt){const {uploads,...payload}=await build();state.update({uploads,resume:null,attempt:{...payload,id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000)},pending:true});}
+   let grant;
+   if(kind==='order'&&config.artworkStorage){
+    const check=async response=>{const body=await response.json();if(!response.ok||!body.ok){if(response.status===403){const fresh=await fetch('/api/forms?kind=order',{cache:'no-store'});if(fresh.ok)setConfig(await fresh.json());}if(response.status===400)state.rejected(400,body.error||'Check your request details.');throw new Error(body.error||'Artwork upload could not finish. Keep this tab open and retry.')}return body};
+    const init=await check(await fetch('/api/artwork/init',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':config.csrf},body:JSON.stringify({payload:state.getSnapshot().attempt,turnstile:token,resume:state.getSnapshot().resume,website:''}),signal:AbortSignal.timeout(60000)}));grant=init.grant;state.update({resume:init.resume});
+    const uploads=state.getSnapshot().uploads||[];
+    for(let index=0;index<uploads.length;index++)await check(await fetch('/api/artwork/upload',{method:'POST',headers:{'Content-Type':'image/jpeg','X-CSRF-Token':config.csrf,'X-Artwork-Grant':grant,'X-Artwork-Index':String(index)},body:uploads[index],signal:AbortSignal.timeout(60000)}));
+   }
    sent=true;
-   const response=await fetch(kind==='order'?'/api/order-request':'/api/contact',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':config.csrf},body:JSON.stringify({payload:state.getSnapshot().attempt,turnstile:token,website:''}),signal:AbortSignal.timeout(60000)});
+   const response=await fetch(kind==='order'?'/api/order-request':'/api/contact',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':config.csrf},body:JSON.stringify({payload:state.getSnapshot().attempt,turnstile:token,grant,website:''}),signal:AbortSignal.timeout(60000)});
    const body=await response.json();
    if(response.status===403){const fresh=await fetch('/api/forms?kind='+kind,{cache:'no-store'});if(fresh.ok&&fresh.headers.get('content-type')?.includes('application/json'))setConfig(await fresh.json());}
    if(!response.ok||!body.ok){if(body.manualReview)state.update({manualReview:true});state.rejected(response.status,body.error||'Sending could not be confirmed. Retry the same request.');return;}
-   state.update({result:body});
+   state.update({result:body,uploads:null});
   }catch(e){state.update({uncertain:state.getSnapshot().uncertain||sent,error:e.name==='TimeoutError'?'Sending could not be confirmed. Keep this tab open and retry the same request.':e.message||'Sending could not be confirmed. Please retry.'});}
   finally{setToken('');setCycle(n=>n+1);state.update({busy:false});}
  }

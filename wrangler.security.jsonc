@@ -27,5 +27,11 @@
       "id": "05f525369d3c42a8a0dcbcc71c8d0471"
     }
   ],
-  "account_id": "4f57d4e924674cb87b33d4c884745cf6"
+  "account_id": "4f57d4e924674cb87b33d4c884745cf6",
+  "r2_buckets": [
+    {
+      "binding": "ARTWORK",
+      "bucket_name": "customvibe-test-artwork"
+    }
+  ]
 }

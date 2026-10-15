@@ -3,7 +3,7 @@ import {renderDocument,sitemap} from '../server/render.mjs';
 import {submissions} from '../server/submissions.mjs';
 export async function onRequest(context){const {request,env}=context;try{const url=new URL(request.url);if(url.protocol!=='https:'||url.hostname==='www.customvibe.co.za'){url.protocol='https:';if(url.hostname==='www.customvibe.co.za')url.hostname='customvibe.co.za';return secure(Response.redirect(url.toString(),308))}
  const auth=await gate(request,env,'site');if(auth.response)return secure(auth.response,{privateResponse:url.pathname!=='/robots.txt'});
- if(['/api/forms','/api/contact','/api/order-request'].includes(url.pathname))return secure(await submissions(request,env));
+ if(['/api/forms','/api/contact','/api/order-request','/api/artwork/init','/api/artwork/upload'].includes(url.pathname))return secure(await submissions(request,env));
  if(/^\/(?:api|admin|internal)(?:\/|$)/.test(url.pathname)||/(?:^|\/)(?:\.git|\.env|\.dev.vars|node_modules|src|server|backup)(?:[/.]|$)/i.test(url.pathname)||/\.(?:map|bak|sql|log)$/.test(url.pathname))return secure(new Response('Not found',{status:404}));
  if(!['GET','HEAD'].includes(request.method))return secure(new Response('Method not allowed',{status:405}));
  const privateResponse=env.SITE_GATE_ENABLED!=='false';

@@ -1,3 +1,4 @@
+import {ARTWORK_LIMITS as limits} from './artwork-policy.mjs';
 // Build only in memory. Only the customer's chosen crop is sent, with no original metadata.
 function printJpeg(data){
  const binary=atob(data),parts=[binary.slice(0,2)];let at=2;
@@ -7,17 +8,19 @@ function printJpeg(data){
  }
  throw new Error('A design could not be prepared.');
 }
-export async function prepareOrderItems(basket,photos,render){
- const items=[];let length=0,count=0;
+export async function prepareOrderItems(basket,photos,render,privateArtwork=false){
+ const items=[],uploads=[];let length=0,count=0;
  for(const item of basket){
   const files=[];
   if(['photo','puzzle'].includes(item.kind)){
    const photo=photos.find(p=>p.id===item.sourceId);if(!photo)throw new Error('A photo is missing. Return to the designer before sending.');
    const artwork=await render(photo,{puzzle:item.kind==='puzzle',gridSize:item.gridSize||3,size:1200});
    const images=item.kind==='puzzle'?[item.preview,...artwork.tiles]:[artwork.url];
-   for(const image of images){if(!image.startsWith('data:image/jpeg;base64,'))throw new Error('A design could not be prepared. Please try another JPG or PNG.');const base64=printJpeg(image.slice('data:image/jpeg;base64,'.length));length+=base64.length;count++;if(length>2000000||count>60||base64.length>1400000)throw new Error('These designs are too large for one email. Please reduce the number of designs in this request.');files.push(base64);}
+   for(const image of images){if(!image.startsWith('data:image/jpeg;base64,'))throw new Error('A design could not be prepared. Please try another JPG or PNG.');const base64=printJpeg(image.slice('data:image/jpeg;base64,'.length));if(privateArtwork){const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));length+=bytes.length;count++;if(bytes.length>limits.fileBytes||length>limits.requestBytes||count>limits.files)throw new Error('This test request exceeds the artwork limit: 4 MB per file, 32 MB in total and 60 files. Keep your designs and contact us for help.');const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');files.push({size:bytes.length,sha256});uploads.push(bytes);continue;}length+=base64.length;count++;if(length>2000000||count>60||base64.length>1400000)throw new Error('These designs are too large for one email. Please reduce the number of designs in this request.');files.push(base64);}
   }
   items.push({kind:item.kind,qty:item.qty,...(item.kind==='puzzle'?{gridSize:item.gridSize}:{}),files});
  }
- return items;
+ return privateArtwork?{items,uploads}:items;
 }
+
+export const preparePrivateArtwork=(basket,photos,render)=>prepareOrderItems(basket,photos,render,true);
