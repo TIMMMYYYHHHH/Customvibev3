@@ -26,7 +26,7 @@ Sender, Reply-To, recipient selection, private artwork access, 14-day retention,
 - Independent review identified a catalogue pack count issue. A new regression failed before correction and passed afterward, without changing saved records or fingerprints.
 - Actual HTML was rendered in a local gallery using fictional data only. Desktop and 390px mobile checks covered all six variants, embedded image loading and a long-content fixture, with no horizontal overflow.
 - Public/admin builds passed. Final full suite: 144 automated tests passed. `git diff --check` passed. Publication evidence follows below.
-- No real email sent, no production order stage changed and no accepted update resent. A separately authorised fresh-message inbox check remains needed for Gmail/Outlook/Apple Mail, forced dark mode and the delivered inline images. Prior successful delivery and Reply-To remain historical evidence only.
+- At initial publication, no real email was sent, no production order stage changed and no accepted update was resent. The subsequently authorised Gmail check is recorded below. Outlook/Apple Mail and forced dark mode remain unverified.
 
 ## Scope still tracked separately
 
@@ -40,3 +40,16 @@ Local review: run `node scripts/preview-email-design.mjs`, then serve `docs/emai
 - Business admin Worker: `61e7f598-90eb-431c-a07c-64551802731e`.
 - Protected Pages publication: [workflow 38938316022](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38938316022), successful including both builds, 144 tests and before/after gate checks.
 - After Tim restored admin access, signed-in live verification passed: the deployed preview showed the recorded recipient, saved New order stage, correct magnet count, truthful unpaid facts and From our tribe to yours. The already accepted update on CV-000001 remained blocked from duplicate preview/send with its accepted history intact. Previewing a different unattempted order left its stage and history unchanged; the preview was cancelled without sending. No order stage or email history was modified. Actual inbox rendering/delivery remains a separate authorised fresh-message check.
+
+## Fresh-order Gmail check, 16 October 2026
+
+Tim authorised one fresh live unpaid order to his confirmed email, approved placeholder contact/delivery details and a non-personal solid-colour sample image, and explicitly confirmed the checkout's private 14-day storage consent. The normal storefront submitted once at 19:48 SAST, creating `CV-7MPC-PSSM-4AKM-4R9A`: one photo magnet, R50 subtotal, no payment or delivery booking.
+
+- Both the customer acknowledgement and owner notification arrived in their intended Gmail inboxes, each with one matching search result. This is actual inbox evidence, separate from the admin's provider-accepted result.
+- Both displayed the inline logo, branded heading, From our tribe to yours. line and Little Thread decoration. Desktop screenshots showed rounded outer and inner panels, readable order details and truthful Unpaid wording. Customer Gmail used a dark interface around the light email; this does not verify forced email dark mode.
+- Customer Reply-To was the orders address; owner Reply-To was the customer address. Gmail showed `rsend.customvibe.co.za` as mailed-by, `customvibe.co.za` as signed-by, and TLS for both.
+- The owner's artwork action targeted the matching authenticated admin order. Live admin showed New order, unpaid, one image/one copy, R50 subtotal, both provider accepted and artwork expiry on 30 October at 19:48. No manual update was sent and no existing order stage or history was changed.
+- Phone inbox rendering confirmation was requested from Tim and remains pending. Outlook, Apple Mail, image blocking and forced dark mode remain unverified. The existing local 390px layout checks do not replace these client checks.
+- Found a minor singular-copy issue: the one-magnet summary says “1 magnets in total”, and the owner introduction says “1 magnets”. Correction is tracked as the shared email-review subtask “Correct singular magnet wording in emails”. No resend is needed to verify that copy correction.
+
+The fresh-order check remains In progress for phone confirmation. The broad email-review parent remains open for inventory reconciliation, the tracked correction, remaining client checks and linked-scope/final acceptance. No customer contact details or artwork were copied into Founders Hub.
