@@ -1,3 +1,4 @@
+import {readSelect} from './read.mjs';
 import {ARTWORK_LIMITS as limits,artworkId,artworkHash} from '../src/artwork-policy.mjs';
 import {validateJpeg} from '../server/jpeg.mjs';
 const fail=(status,error)=>Response.json({error},{status});
@@ -58,7 +59,7 @@ export async function artworkService(request,env){
  const body=await request.json();
  if(path==='/artwork/init')return init(body,env);
  if(!artworkId(body.id))return fail(400,'Invalid reference.');
- const row=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(body.id).first();
+ const row=await (['/artwork/detail','/artwork/download'].includes(path)?readSelect(env.DB,'SELECT * FROM artwork_requests WHERE id=?',[body.id]):env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(body.id).first());
  if(!row)return fail(404,'Artwork not found or removed.');if(row.expires<=epoch())return fail(410,'This artwork has expired.');
  if(path==='/artwork/complete'){
   if(row.owner!==body.owner)return fail(403,'Artwork belongs to another session.');

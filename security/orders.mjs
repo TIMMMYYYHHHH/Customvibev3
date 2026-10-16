@@ -1,3 +1,4 @@
+import {readSelect} from './read.mjs';
 import {requestReference} from '../src/request-reference.mjs';
 import {artworkId,artworkHash,ARTWORK_LIMITS} from '../src/artwork-policy.mjs';
 export const ORDER_STATUSES=['new','in_progress','ready_to_ship','shipped'];
@@ -11,11 +12,11 @@ export async function orderService(request,env){
  if(!env.DB||!b||typeof b!=='object')return fail(400,'Invalid request.');
  if(path==='list'){
   const before=b.before===undefined?Number.MAX_SAFE_INTEGER:Number(b.before);if(!Number.isSafeInteger(before)||before<1)return fail(400,'Invalid page.');
-  const rows=(await env.DB.prepare('SELECT * FROM orders WHERE expires>? AND seq<? ORDER BY seq DESC LIMIT 51').bind(time,before).all()).results;
+  const rows=(await readSelect(env.DB,'SELECT * FROM orders WHERE expires>? AND seq<? ORDER BY seq DESC LIMIT 51',[time,before],'all')).results;
   return Response.json({orders:rows.slice(0,50).map(r=>{const v=view(r);return {...v,snapshot:{contact:{name:v.snapshot.contact.name},magnetQty:v.snapshot.magnetQty,paymentStatus:'unpaid'}}}),next:rows.length>50?rows[49].seq:null});
  }
  if(!artworkId(b.id))return fail(400,'Invalid reference.');
- let row=await env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first();
+ let row=await (path==='detail'?readSelect(env.DB,'SELECT * FROM orders WHERE id=?',[b.id]):env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first());
  if(path==='create'){
   if(!artworkHash(b.fingerprint)||!validSnapshot(b.snapshot)||JSON.stringify(b.snapshot).length>40000||(b.snapshot.reference!==undefined&&b.snapshot.reference!==requestReference({id:b.id,referenceVersion:1})))return fail(400,'Invalid order.');
   if(row)return row.expires<=time?fail(410,'Order expired.'):row.fingerprint!==b.fingerprint||row.snapshot!==JSON.stringify(b.snapshot)?fail(409,'Order changed.'):Response.json({ok:true,reference:reference(row)});
@@ -27,7 +28,7 @@ export async function orderService(request,env){
  }
  if(!row)return fail(404,'Order not found. Older requests may only have artwork.');
  if(row.expires<=time)return fail(410,'This order has expired.');
- if(path==='detail')return Response.json({...view(row),history:(await env.DB.prepare('SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC').bind(b.id).all()).results,updates:(await env.DB.prepare('SELECT version,status,state,created,updated FROM order_updates WHERE order_id=? ORDER BY version DESC').bind(b.id).all()).results});
+ if(path==='detail')return Response.json({...view(row),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,'SELECT version,status,state,created,updated FROM order_updates WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results});
  if(path==='claim-update'){
   if(!Number.isSafeInteger(b.version)||b.version!==row.version)return fail(409,'Order changed.');
   const existing=await env.DB.prepare('SELECT state FROM order_updates WHERE order_id=? AND version=?').bind(b.id,b.version).first();if(existing)return Response.json({claimed:false,state:existing.state});

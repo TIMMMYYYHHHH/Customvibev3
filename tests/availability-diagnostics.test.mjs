@@ -90,3 +90,38 @@ test('database schema and quota errors are not retried, and login reservations a
  const response=await security.fetch(new Request('https://auth.internal/reserve',{method:'POST',body:JSON.stringify({scope:'admin',key:'b'.repeat(64)})}),{DB,ADMIN_LOCKOUT:{get:async()=>null}});
  assert.equal(response.status,503);assert.equal(writes,1);
 });
+
+test('order and artwork SELECT recovery preserves records and does not replay quota writes',async t=>{
+ const {default:security}=await import('../security/index.mjs');
+ const {artworkEnv}=await import('./helpers/artwork.mjs');
+ t.mock.method(console,'warn',()=>{});t.mock.method(console,'error',()=>{});
+ for(const route of ['orders/detail','artwork/detail']){
+  const env=artworkEnv(),id=crypto.randomUUID(),expiry=Math.floor(Date.now()/1000)+3600;
+  env.sql.prepare('INSERT INTO orders(id,fingerprint,snapshot,created,expires) VALUES (?,?,?,?,?)').run(id,'a'.repeat(64),JSON.stringify({contact:{name:'Fixture'},magnetQty:1}),1,expiry);
+  env.sql.prepare('INSERT INTO artwork_requests(id,owner,manifest,bytes,created,expires,finalized,reservation) VALUES (?,?,?,?,?,?,1,?)').run(id,'b'.repeat(64),'[]',0,1,expiry,'fixture');
+  const original=env.DB.prepare;let failures=0;const attempts=new Map();
+  env.DB.prepare=(sql)=>{const stmt=original(sql);return {bind(...params){const bound=stmt.bind(...params);return {...bound,first:async()=>{attempts.set(sql,(attempts.get(sql)||0)+1);if(/^SELECT/.test(sql)&&attempts.get(sql)===1){failures++;throw Error('D1_ERROR: transient failure')}return bound.first()},all:async()=>{attempts.set(sql,(attempts.get(sql)||0)+1);if(/^SELECT/.test(sql)&&attempts.get(sql)===1){failures++;throw Error('D1_ERROR: transient failure')}return bound.all()}}}}};
+  const response=await security.fetch(new Request('https://auth.internal/'+route,{method:'POST',body:JSON.stringify({id})}),env);
+  assert.equal(response.status,200);assert.ok(failures>0);assert.equal(env.sql.prepare('SELECT count(*) AS n FROM orders').get().n,1);assert.equal(env.sql.prepare('SELECT count(*) AS n FROM artwork_usage').get().n,0);
+ }
+});
+
+test('preview uses one order snapshot and preserves upstream failure without retrying sends',async()=>{
+ const {ordersAPI}=await import('../admin/orders-api.mjs');
+ const id=crypto.randomUUID(),url='https://admin.customvibe.co.za/api/orders/'+id+'/preview';let calls=0;
+ const order={reference:'CV-FIXTURE',status:'new',version:0,snapshot:{contact:{name:'Fixture',email:'fixture@example.invalid'},magnetQty:1}};
+ const env={AUTH:{fetch:async()=>{calls++;return Response.json(order)}}};
+ const response=await ordersAPI(new Request(url),env,{});
+ assert.equal(response.status,200);assert.equal((await response.json()).to,'fixture@example.invalid');assert.equal(calls,1);
+ env.AUTH.fetch=async()=>new Response('Unavailable',{status:503});assert.equal((await ordersAPI(new Request(url),env,{})).status,503);
+});
+
+test('read helper refuses writes and artwork download quota failures are never replayed',async t=>{
+ const {readSelect}=await import('../security/read.mjs');
+ await assert.rejects(readSelect({},'INSERT INTO attempts VALUES (?)',[1]),/Read-only/);
+ const {default:security}=await import('../security/index.mjs');
+ t.mock.method(console,'error',()=>{});let quotaWrites=0,objectReads=0;
+ const DB={prepare:sql=>({bind:()=>({first:async()=>{if(sql.startsWith('SELECT'))return {finalized:1,expires:Math.floor(Date.now()/1000)+60,manifest:'[{"name":"design-01-photo.jpg"}]'};quotaWrites++;throw Error('D1_ERROR: transient failure')}})})};
+ const result=await security.fetch(new Request('https://auth.internal/artwork/download',{method:'POST',body:JSON.stringify({id:crypto.randomUUID(),index:0})}),{DB,ARTWORK:{get:async()=>{objectReads++}}});
+ assert.equal(result.status,503);assert.equal(quotaWrites,1);assert.equal(objectReads,0);
+});

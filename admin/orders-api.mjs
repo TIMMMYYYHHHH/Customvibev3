@@ -1,10 +1,11 @@
-import {sendOrderUpdate,previewOrderUpdate} from './order-mail.mjs';
+import {orderUpdateEmail} from '../server/order-update-email.mjs';
+import {sendOrderUpdate} from './order-mail.mjs';
 import {boundedBody,sameOrigin,constantEqual} from '../server/auth.mjs';
 export const orderCall=(env,path,body)=>env.AUTH.fetch('https://auth.internal/orders/'+path,{method:'POST',body:JSON.stringify(body)});
 export async function ordersAPI(request,env,session){
  const url=new URL(request.url),match=url.pathname.match(/^\/api\/orders(?:\/([a-f0-9-]{36})(?:\/(status|preview|send))?)?$/);
  if(!match)return Response.json({error:'Not found.'},{status:404});
- if(request.method==='GET'&&match[2]==='preview'){const r=await orderCall(env,'detail',{id:match[1]});if(!r.ok)return r;return Response.json(await previewOrderUpdate(env,match[1]));}
+ if(request.method==='GET'&&match[2]==='preview'){const r=await orderCall(env,'detail',{id:match[1]});if(!r.ok)return r;return Response.json(orderUpdateEmail(await r.json()));}
  if(request.method==='GET'&&!match[2])return orderCall(env,match[1]?'detail':'list',match[1]?{id:match[1]}:{...(url.searchParams.has('before')?{before:url.searchParams.get('before')}:{})});
  if(request.method!=='POST'||!['status','send'].includes(match[2]))return new Response(null,{status:405});
  if(!sameOrigin(request)||!await constantEqual(request.headers.get('X-CSRF-Token')||'',session.csrf))return new Response('Forbidden',{status:403});
