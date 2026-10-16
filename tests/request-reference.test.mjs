@@ -14,7 +14,7 @@ test('new references agree across receipt, owner email, record and manual update
  const reference=emails.customer.subject.split(' ').at(-1);
  assert.match(reference,/^CV-(?:[0-9A-HJKMNP-TV-Z]{4}-){3}[0-9A-HJKMNP-TV-Z]{4}$/);
  assert.ok(reference.length<25);assert.equal(snapshot.reference,reference);
- for(const email of [emails.owner,emails.customer]){assert.ok(email.subject.includes(reference));assert.ok(email.text.includes('Reference: '+reference));assert.ok(email.html.includes(reference));assert.match(email.text,/unpaid request/);}
+ for(const email of [emails.owner,emails.customer]){assert.ok(email.subject.includes(reference));assert.ok(email.text.includes('Reference: '+reference));assert.ok(email.html.includes(reference));assert.match(email.text,/Unpaid|UNPAID/);}
  assert.ok(emails.owner.text.includes('/artwork?request='+id));
  const env=artworkEnv(),body={id,fingerprint:'a'.repeat(64),snapshot};
  assert.equal((await call(env,'create',body)).status,200);

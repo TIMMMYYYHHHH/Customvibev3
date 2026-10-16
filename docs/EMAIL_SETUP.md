@@ -1,4 +1,4 @@
-# Email and unpaid request setup
+# Email and unpaid order setup
 
 Keep the site password gate ON. The live site uses normal production behaviour with payments disabled; preview and local sending stay OFF. See [operating-mode.md](operating-mode.md) for the latest policy. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
 
@@ -8,13 +8,17 @@ The migration destination is Cloudflare account `4f57d4e924674cb87b33d4c884745cf
 
 Status updates remain manual through Preview update and Send update in order details. No owner-recipient allowlist is used. Saving a stage does not send an email. The historical seven-day setup notes below are superseded by the 14-day policy in operating-mode.md.
 
-- Send unpaid order requests with cropped artwork to customvibe03@gmail.com.
-- Send customers an acknowledgement, explicitly saying no payment was taken and the request is not yet accepted.
+- Send unpaid order notifications with private artwork access to customvibe03@gmail.com.
+- Current live payment-disabled flow must remain truthful about unpaid status. Intended paid production checkout completes an order and sends its confirmation only after verified successful gateway payment. Pending/failed/cancelled payments do neither. There is no separate owner-acceptance step. The local proposal shows a labelled fictional paid order; payment integration remains pending in “Choose a payment provider and approve paid-checkout scope”. Later stage emails stay manual.
 - Online payments: coming soon. No card form, payment link or implied paid status.
 - Handmade magnets, intended delivery by PUDO lockers. Locker names entered by customers are preferences, not verified bookings.
 - Contact through the website form to the same Gmail inbox.
 - Live artwork uses private R2 downloads and associated private D1 request records. Current retention is 14 days. Original photos and unsent drafts remain in browser memory. Email providers and Gmail retain their email copies.
 - Business details, complete policies, delivery charges and timelines remain owner to-dos before launch. Bing is intentionally skipped. Google ownership is verified in Search Console; indexing is still blocked by the gate. Google Business Profile is not applicable because the owner confirmed online orders and courier delivery only.
+
+## Shared design
+
+Tim approved the shared website-matched design on 16 October. All six code-owned Resend templates now share it, including inline static brand images and matching plain text. Current payment-disabled messages retain truthful unpaid facts. See [email-design-verification.md](email-design-verification.md) for scope, evidence and remaining inbox checks. W3Forms styling and Gmail saved replies remain separate.
 
 ## 1. Separate free Resend account
 

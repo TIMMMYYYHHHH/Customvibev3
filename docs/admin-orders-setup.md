@@ -4,13 +4,15 @@ Current operating policy: [production behaviour behind the site lock](operating-
 
 The live admin is https://admin.customvibe.co.za/orders . The website remains password-protected and admin sign-in remains separate. Payments are disabled. Orders, artwork, contact forms and customer emails otherwise use the normal production workflow.
 
+Intended production checkout: complete the order and send its confirmation only after verified successful gateway payment. There is no separate owner-acceptance step. Pending/failed payment does not create a completed order or send confirmation. Later stage emails remain manual. Current live payments stay disabled; the paid-order design preview does not change existing records, stages or send history.
+
 ## Customer email
 
 The production admin Worker requires the existing `RESEND_API_KEY` secret and `ADMIN_SEND_ENABLED=true`. `scripts/set-admin-email.mjs` securely installs the sending key in the verified business Worker. No owner-address allowlist is required; updates go to the customer address stored on the order. The old `ADMIN_TEST_RECIPIENTS` secret is ignored and can be removed during routine credential cleanup.
 
 Choose **Email update** on an Orders card to open and focus the existing Customer update section. The recipient and saved stage are visible before previewing. On mobile this section appears before artwork. You can also open the request normally. Save any intended stage change, click **Preview update**, review the recipient/message and click **Send update**. This is available at every stage. Saving or dragging a stage never sends automatically. One send attempt is recorded per order version to prevent duplicates. An accepted, failed or uncertain attempt stays in history. **View send history** jumps to Activity & send history; the shortcut does not bypass an attempted update or trigger a send. Check the provider before retrying an uncertain delivery; do not change stages merely to bypass duplicate protection.
 
-Email availability is independent of the website gate. Local fixtures and preview deployments do not send. The admin send endpoint remains restricted to its production hostname, authenticated session and same-origin CSRF-checked requests. Shared free-tier message allowances remain in place.
+Email availability is independent of the website gate. Local fixtures and preview deployments do not send. The admin send endpoint remains restricted to its production hostname, authenticated session and same-origin CSRF-checked requests. Shared free-tier message allowances remain in place. The six Resend templates use the approved shared design; the existing admin preview continues to show the matching plain-text message. See [email-design-verification.md](email-design-verification.md).
 
 ## Artwork and request records
 

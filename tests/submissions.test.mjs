@@ -8,14 +8,14 @@ const input=()=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),c
 test('orders use catalogue prices and fixed unpaid status, never client totals',()=>{
  const raw=input();raw.total=1;raw.paymentStatus='paid';const order=validateOrder(raw,defaultContent);
  assert.equal(order.subtotalCents,defaultContent.pricing.single*2);assert.equal(order.paymentStatus,'unpaid');assert.equal(order.deliveryCents,null);
- const emails=orderEmails(order);assert.equal(emails.owner.to[0],'customvibe03@gmail.com');assert.equal(emails.customer.to[0],'customer@example.com');assert.equal(emails.customer.reply_to,'orders@customvibe.co.za');assert.doesNotMatch(JSON.stringify(emails.customer),/customvibe03@gmail\.com/);assert.equal(emails.owner.attachments.length,1);assert.match(emails.customer.text,/No payment/);assert.match(emails.customer.text,/not yet accepted/);
+ const emails=orderEmails(order);assert.equal(emails.owner.to[0],'customvibe03@gmail.com');assert.equal(emails.customer.to[0],'customer@example.com');assert.equal(emails.customer.reply_to,'orders@customvibe.co.za');assert.doesNotMatch(JSON.stringify(emails.customer),/customvibe03@gmail\.com/);assert.equal(emails.owner.attachments.filter(a=>!a.content_id).length,1);assert.match(emails.customer.text,/No payment/);assert.doesNotMatch(emails.customer.text,/not yet accepted/);
 });
 test('orders reject spoofed images, malformed quantities, unknown products and missing consent',()=>{
  for(const mutate of [x=>x.items[0].files=['PHN2Zy8+'],x=>x.items[0].qty=-1,x=>x.items[0].qty=1.5,x=>x.items[0].kind='invisible-pack',x=>x.consent=false,x=>x.contact.email='a@example.com\r\nBcc: attacker@example.com',x=>x.createdAt=1]){const raw=input();mutate(raw);assert.throws(()=>validateOrder(raw,defaultContent));}
 });
 test('puzzle requests require each piece and a proof, with deterministic attachment names',()=>{
  const raw=input();raw.items=[{kind:'puzzle',qty:1,gridSize:3,files:Array.from({length:10},jpeg)}];
- const order=validateOrder(raw,defaultContent);assert.equal(order.magnetQty,9);const files=orderEmails(order).owner.attachments;
+ const order=validateOrder(raw,defaultContent);assert.equal(order.magnetQty,9);const files=orderEmails(order).owner.attachments.filter(a=>!a.content_id);
  assert.equal(files[0].filename,'design-01-proof.jpg');assert.equal(files[1].filename,'design-01-row-1-col-1.jpg');assert.equal(files[9].filename,'design-01-row-3-col-3.jpg');
  raw.items[0].files.pop();assert.throws(()=>validateOrder(raw,defaultContent));
 });

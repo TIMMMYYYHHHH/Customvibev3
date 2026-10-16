@@ -8,7 +8,7 @@ function setup(){const storage={...artworkEnv(),ADMIN_LOCKOUT:{get:async()=>null
 async function form(env){const r=await submissions(new Request(origin+'/api/forms'),env);return {...await r.json(),cookie:r.headers.get('set-cookie').split(';')[0]}}
 const payload=()=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'customer@example.com',phone:'0821234567'},locker:{name:'Test locker',area:'Durban'},consent:true,items:[{kind:'puzzle',qty:1,gridSize:3,files:Array.from({length:10},()=>({size:tile.length,sha256:tileHash}))}]});
 function post(path,c,body,headers={}){return new Request(origin+path,{method:'POST',headers:{origin,cookie:c.cookie,'X-CSRF-Token':c.csrf,'CF-Connecting-IP':'192.0.2.1','Content-Type':'application/json',...headers},body:typeof body==='string'||body instanceof Uint8Array?body:JSON.stringify(body)})}
-test('private puzzle submission requires verified uploads, keeps email free of attachments and retries safely',async()=>{
+test('private puzzle submission requires verified uploads, keeps customer artwork out of attachments and retries safely',async()=>{
  const env=setup(),c=await form(env),data=payload(),mails=[];assert.equal(c.artworkStorage,true);
  const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});mails.push(JSON.parse(init.body));return Response.json({id:'accepted'})};
  const initial=await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network);assert.equal(initial.status,200);const {grant}=await initial.json();assert.ok(grant);
@@ -17,7 +17,7 @@ test('private puzzle submission requires verified uploads, keeps email free of a
  const other=await form(env);
  assert.equal((await submissions(post('/api/artwork/upload',other,tile,{'Content-Type':'image/jpeg','X-Artwork-Grant':grant,'X-Artwork-Index':'0'}),env,network)).status,403);
  for(let i=0;i<10;i++)assert.equal((await submissions(post('/api/artwork/upload',c,tile,{'Content-Type':'image/jpeg','X-Artwork-Grant':grant,'X-Artwork-Index':String(i)}),env,network)).status,200);
- assert.equal((await final()).status,200);assert.equal((await final()).status,200);assert.equal(mails.length,2);assert.equal(mails[0].attachments,undefined);assert.match(mails[0].text,new RegExp('https://admin.customvibe.co.za/artwork\\?request='+data.id));assert.match(mails[1].text,/No payment/);assert.equal(mails[1].reply_to,'orders@customvibe.co.za');assert.equal(env.objects.size,10);
+ assert.equal((await final()).status,200);assert.equal((await final()).status,200);assert.equal(mails.length,2);assert.ok(mails[0].attachments.every(a=>a.content_id&&a.filename.startsWith('customvibe-')));assert.match(mails[0].text,new RegExp('https://admin.customvibe.co.za/artwork\\?request='+data.id));assert.match(mails[1].text,/No payment/);assert.equal(mails[1].reply_to,'orders@customvibe.co.za');assert.equal(env.objects.size,10);
  assert.equal((await submissions(post('/api/order-request',c,{payload:{...data,items:[{...data.items[0],qty:2}]},grant}),env,network)).status,403);
 });
 test('private init rejects preview, missing challenge, cross-origin and disabled sending before storage',async()=>{

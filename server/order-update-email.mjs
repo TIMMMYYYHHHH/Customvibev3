@@ -1,9 +1,16 @@
-export const statusLabels={new:'New request',in_progress:'In progress',ready_to_ship:'Ready to ship',shipped:'Shipped'};
-const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+import {emailLayout,paragraph,note,details,row,signoff,unpaid} from './email-layout.mjs';
+export const statusLabels={new:'New order',in_progress:'In progress',ready_to_ship:'Ready to ship',shipped:'Shipped'};
+const copy={
+ new:['We have your order.','We have received your magnet order and will check your artwork and delivery details.','We will check your artwork and keep you updated as your magnets take shape.'],
+ in_progress:['Your magnets are in progress.','We are working on your magnets.','We will let you know when your magnets are ready to ship.'],
+ ready_to_ship:['Your magnets are ready to ship.','Your magnets are ready to ship.','We will let you know when they have been dispatched.'],
+ shipped:['Your magnets have been dispatched.','Your magnets have been dispatched.','Reply to this email if you need help with your delivery.']
+};
 export function orderUpdateEmail(order){
  const label=statusLabels[order.status];if(!label)throw Error('Invalid status');
- const subject=`CustomVibe update ${order.reference}: ${label}`;
- const messages={new:'We have received your magnet request and will review your artwork and delivery details.',in_progress:'We are working on your magnets.',ready_to_ship:'Your magnets are ready to ship. We will let you know when they have been dispatched.',shipped:'Your magnets have been dispatched. Please contact us if you need help with your delivery.'};
- const text=`Hi ${order.snapshot.contact.name},\n\n${messages[order.status]}\n\nReference: ${order.reference}\nStatus: ${label}\nMagnet count: ${order.snapshot.magnetQty}.\n\nNo payment has been taken through the website. Reply to this email if you have any questions.\n\nCustomVibe`;
- return {from:'CustomVibe <orders@customvibe.co.za>',to:order.snapshot.contact.email,reply_to:'orders@customvibe.co.za',subject,text,html:`<!doctype html><html><body style="font:16px Arial,sans-serif;color:#35233f;background:#fffdf8"><main style="max-width:600px;margin:auto;padding:32px"><h1>${escape(label)}</h1><div style="white-space:pre-wrap;line-height:1.6">${escape(text)}</div></main></body></html>`,version:order.version};
+ const [heading,message,next]=copy[order.status],subject=`CustomVibe update ${order.reference}: ${label}`;
+ const footer='Questions about your magnets? Reply to this email and include your order reference.';
+ const text=`Hi ${order.snapshot.contact.name},\n\n${message}\n\nReference: ${order.reference}\nCurrent stage: ${label}\nMagnet count: ${order.snapshot.magnetQty}\n\n${next}\n\n${unpaid}\n\n${footer}\n\n${signoff}\nCustomVibe`;
+ const design=emailLayout({subject,preheader:message,kind:order.status,heading,label:'Customer update',reference:order.reference,body:paragraph(`Hi ${order.snapshot.contact.name},`)+paragraph(message)+details(row('Current stage',label)+row('Magnet count',order.snapshot.magnetQty))+note('What happens next',next)+paragraph(unpaid),footer});
+ return {from:'CustomVibe <orders@customvibe.co.za>',to:order.snapshot.contact.email,reply_to:'orders@customvibe.co.za',subject,text,...design,version:order.version};
 }
