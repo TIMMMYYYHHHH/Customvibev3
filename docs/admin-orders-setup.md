@@ -23,3 +23,7 @@ Migration 0006 extends still-active seven-day owner records to the new period wi
 ## Verification
 
 Verify authenticated order access, previews, ZIP quantities, stage persistence, manual preview/send and visible send history. Confirm actual inbox delivery and Reply-To when a real send is requested. Store content save and reload are separate from email delivery. Physical print quality and maximum-size runtime checks remain separately tracked in Founders Hub. Migration-resource cleanup still needs its own approval.
+
+## Publishing the existing admin
+
+The protected GitHub workflow has an optional manual **publish_admin** checkbox, default off. On main, enabling it publishes Pages and the existing business admin Worker using the existing business publishing secret. A read-only guard verifies the admin target, gate, authentication service, manual-send availability and required credential presence before and after deployment. If that credential lacks Worker permissions, stop and arrange the existing business deployment access; do not use a personal-account Wrangler login or broaden permissions automatically. No migrations or record changes are part of this publication.

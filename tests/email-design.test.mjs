@@ -43,3 +43,21 @@ test('catalogue quantities cannot be misrepresented as individual magnets',()=>{
  assert.match(mail.text,/Alphabet pack: 2 units/);assert.match(mail.text,/52 magnets in total/);
  assert.doesNotMatch(mail.html,/>2<\/td>/);
 });
+test('essential email headings and branding remain readable without image loading',()=>{
+ const pair=orderEmails(fixture(),true);
+ const variants=[pair.customer,pair.owner,...['new','in_progress','ready_to_ship','shipped'].map(status=>orderUpdateEmail({reference:'CV-000042',status,version:1,snapshot:fixture()}))];
+ for(const mail of variants){
+  const withoutImages=mail.html.replace(/<img\b[^>]*>/g,'');
+  const heading=withoutImages.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/)?.[1].replace(/<[^>]+>/g,'').trim();
+  assert.ok(heading?.length>10,'Order heading must be live text, not a fixed-background image');
+  assert.match(withoutImages,/From our tribe to yours\./);
+  assert.match(withoutImages,/>CustomVibe<\/span>/);
+ }
+});
+test('one magnet is singular in customer and owner HTML and plain text',()=>{
+ const one={...fixture(),items:[{kind:'photo',name:'Photo magnet',qty:1,files:[]}],magnetQty:1};
+ for(const mail of Object.values(orderEmails(one,true))){
+  assert.doesNotMatch(mail.text,/\b1 magnets\b/);assert.doesNotMatch(mail.html,/\b1 magnets\b/);
+  assert.match(mail.text,/1 magnet in total/);assert.match(mail.html,/1 magnet in total/);
+ }
+});

@@ -1,9 +1,9 @@
-// Creates the local, deterministic source sheet for the static email graphics.
-// Render each .asset at 1:1 in the browser and save its clipped PNG under server/email-assets/.
-// Graphics are 2x their email display size. No customer data, remote assets or network.
-import {readFile,writeFile} from 'node:fs/promises';
-const b64=async path=>(await readFile(new URL(path,import.meta.url))).toString('base64');
-const fredoka=await b64('../src/assets/fonts/fredoka-latin-wght-normal.woff2'),hand=await b64('../public/assets/fonts/PatrickHand-Regular.ttf'),icon=await b64('../public/assets/brand-icon.png');
-const titles={ack:['Your order is','with us.'],owner:['A new magnet','order.'],new:['We have your','order.'],in_progress:['Your magnets are','in progress.'],ready_to_ship:['Your magnets are','ready to ship.'],shipped:['Your magnets have','been dispatched.']};
-const sheet=`<!doctype html><meta charset="utf-8"><title>Email brand assets</title><style>@font-face{font-family:Fredoka;src:url(data:font/woff2;base64,${fredoka});font-weight:300 700}@font-face{font-family:Hand;src:url(data:font/ttf;base64,${hand})}body{margin:0;background:#ddd}.asset{background:#fffdf8;color:#26133d;overflow:hidden;margin-bottom:20px;width:1048px}.brand{width:440px;height:80px;display:flex;align-items:center;gap:16px;font:700 60px/1 Fredoka;letter-spacing:-2px}.brand img{width:64px;height:64px}.hero{font:650 92px/1.02 Fredoka;letter-spacing:-2.8px;height:200px}.hero span{color:#bf2258}.thread{height:200px}.thread p{font:48px/1.25 Hand;margin:0;color:#6b5a76}</style><div id="brand" class="asset brand"><img src="data:image/png;base64,${icon}" alt="">customvibe</div>${Object.entries(titles).map(([key,lines])=>`<div id="${key}" class="asset hero">${lines[0]}<br><span>${lines[1]}</span></div>`).join('')}<div id="thread" class="asset thread"><p>From our tribe to yours.</p><svg viewBox="0 0 500 55" width="1048" height="110" style="display:block;margin-top:25px"><path d="M0 35 C100 8 174 55 242 30 C280 14 256 0 249 17 C239 40 330 50 500 17" fill="none" stroke="#bf2258" stroke-width="3" stroke-linecap="round"/><path d="M433 20 C429 15 422 11 423 7 C424 1 431 2 433 7 C436 1 442 2 442 7 C442 12 436 17 433 20" fill="#fffdf8" stroke="#bf2258" stroke-width="2.5" stroke-linejoin="round"/></svg></div>`;
-await writeFile(new URL('../docs/email-template-review/asset-source.html',import.meta.url),sheet);
+// Regenerate decorative email artwork only. The wordmark, heading and signoff are live HTML.
+// Uses sharp from the authoring environment; normal builds use checked-in PNGs.
+import {copyFile,writeFile} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+const sharp=createRequire(import.meta.url)('sharp');
+await copyFile(new URL('../public/icon-192.png',import.meta.url),new URL('../server/email-assets/icon.png',import.meta.url));
+// Transparent canvas, no cream rectangle or light outline. Mid-tone berry works on light and dark.
+const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -3 506 58" width="1048" height="120"><path d="M0 35 C100 8 174 55 242 30 C280 14 256 0 249 17 C239 40 330 50 500 17" fill="none" stroke="#a66b83" stroke-width="2.5" stroke-linecap="round"/><path d="M433 20 C429 15 422 11 423 7 C424 1 431 2 433 7 C436 1 442 2 442 7 C442 12 436 17 433 20" fill="none" stroke="#a66b83" stroke-width="2.5" stroke-linejoin="round"/></svg>`;
+await writeFile(new URL('../server/email-assets/thread.png',import.meta.url),await sharp(Buffer.from(svg)).png().toBuffer());
