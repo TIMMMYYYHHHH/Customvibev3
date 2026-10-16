@@ -1,3 +1,5 @@
+> Historical implementation plan. The latest owner policy is [operating-mode.md](operating-mode.md): normal live behaviour behind the lock, payments off, manual customer updates without a test-address allowlist, and 14-day artwork/request retention.
+
 # Private test artwork
 
 Approved scope: R2 private bucket, authenticated admin downloads, seven-day testing retention, free allowances only. No launch, payments, preview sending or rollback cleanup.
@@ -16,7 +18,7 @@ Limits: 4,000,000 bytes/file, 32,000,000/request, 60 files/request, 100 magnets.
 - [x] Add gated init/upload endpoints, session-bound grants and manifest-only order sending. Test wrong session, preview off, incomplete files, replay, corruption, expiry and partial email failures.
 - [x] Update browser artwork preparation and resumable upload flow without reducing quality. Add owner-only admin request/download UI and accurate testing privacy copy. Test 3x3 and 5x5 public sample exports.
 - [ ] Run full tests/builds, independent review, and private/gated runtime checks. Configure only the migrated account, verify lifecycle and access, then deploy through existing authorized mechanism if credentials permit. Never expose credentials or broaden access silently.
-- [ ] Update Founders Hub with verified setup and remaining live inbox/download checks.
+- [x] Update Founders Hub with verified setup and remaining live inbox/download checks.
 
 ## Execution notes
 
@@ -29,3 +31,7 @@ Retry review: definitive validation errors unlock the form. Signed resume tokens
 Final local checks: 100 automated tests pass; public and admin builds pass. Review findings fixed. Founders Hub parent and Cloudflare storage service updated; method-agreement subtask complete. Deployment is awaiting destination-only credential access. No live storage binding or sending-mode change applied.
 
 Deployment progress: destination-only helper verified. Migration 0004 applied; security Worker deployed as 2ec50d7e-a1d2-427a-bbe1-36eb095913c9 with private R2 binding and hourly cleanup; admin Worker deployed as 8d67bc5e-5d91-46d7-843f-db6c85644c15. Fresh 100/100 tests and both builds pass. Production artwork flag prepared true; local/preview false. Pages publication and live owner request/download checks remain pending.
+
+Verified deployment: GitHub run 38811478814 succeeded for f4fa324. Pages ed298f30-6362-4fde-89b0-64cc21e3d2e8 has gate on, sending on and artwork on. Both live environments fail closed; preview sending false and artwork unset (disabled), with explicit false in source. R2 public development URL and custom domains disabled; lifecycle remains 604800 seconds. Live admin browser shows sign-in. Direct API probes were blocked by the browsing/network layer, so do not claim those as origin authorization tests. Owner sign-in, real puzzle upload, inbox/download, CPU and print verification remain pending. See private-artwork-deployment.json.
+
+Founders Hub: deployment recorded in existing Artwork & email parent and Cloudflare data service. Puzzle/print test subtask changed from Blocked to In progress, with live 3x3 verification still pending. Next owner step: sign in to https://admin.customvibe.co.za/artwork with the existing admin password, then open Artwork if login returns to the catalogue. No live emails or artwork uploads performed during this deployment turn.

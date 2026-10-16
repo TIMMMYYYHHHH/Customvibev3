@@ -1,5 +1,5 @@
 import {requestReference} from '../src/request-reference.mjs';
-import {artworkId,artworkHash} from '../src/artwork-policy.mjs';
+import {artworkId,artworkHash,ARTWORK_LIMITS} from '../src/artwork-policy.mjs';
 export const ORDER_STATUSES=['new','in_progress','ready_to_ship','shipped'];
 const now=()=>Math.floor(Date.now()/1000);
 const fail=(status,error)=>Response.json({error},{status});
@@ -18,15 +18,15 @@ export async function orderService(request,env){
  let row=await env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first();
  if(path==='create'){
   if(!artworkHash(b.fingerprint)||!validSnapshot(b.snapshot)||JSON.stringify(b.snapshot).length>40000||(b.snapshot.reference!==undefined&&b.snapshot.reference!==requestReference({id:b.id,referenceVersion:1})))return fail(400,'Invalid order.');
-  if(row)return row.expires<=time?fail(410,'Test order expired.'):row.fingerprint!==b.fingerprint||row.snapshot!==JSON.stringify(b.snapshot)?fail(409,'Order changed.'):Response.json({ok:true,reference:reference(row)});
-  let expires=time+604800;
+  if(row)return row.expires<=time?fail(410,'Order expired.'):row.fingerprint!==b.fingerprint||row.snapshot!==JSON.stringify(b.snapshot)?fail(409,'Order changed.'):Response.json({ok:true,reference:reference(row)});
+  let expires=time+ARTWORK_LIMITS.retentionSeconds;
   if(b.privateArtwork){const a=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(b.id).first();if(!a?.finalized||a.expires<=time)return fail(409,'Complete artwork first.');const files=b.snapshot.items.flatMap(i=>i.files),manifest=JSON.parse(a.manifest);if(files.length!==manifest.length||files.some((f,n)=>f.index!==n||f.name!==manifest[n].name||f.size!==manifest[n].size||f.proof!==manifest[n].proof))return fail(409,'Artwork does not match order.');expires=Math.min(expires,a.expires);}
   // This single insert checks the display label atomically. No migration or legacy rewrite.
   await env.DB.prepare("INSERT INTO orders(id,fingerprint,snapshot,created,expires) SELECT ?,?,?,?,? WHERE ? IS NULL OR NOT EXISTS (SELECT 1 FROM orders WHERE json_extract(snapshot,'$.reference')=?) ON CONFLICT(id) DO NOTHING").bind(b.id,b.fingerprint,JSON.stringify(b.snapshot),time,expires,b.snapshot.reference??null,b.snapshot.reference??null).run();
   row=await env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first();if(!row)return fail(409,'Request reference needs review. Keep this draft and contact CustomVibe.');return row.fingerprint===b.fingerprint&&row.snapshot===JSON.stringify(b.snapshot)?Response.json({ok:true,reference:reference(row)}):fail(409,'Order changed.');
  }
  if(!row)return fail(404,'Order not found. Older requests may only have artwork.');
- if(row.expires<=time)return fail(410,'This test order has expired.');
+ if(row.expires<=time)return fail(410,'This order has expired.');
  if(path==='detail')return Response.json({...view(row),history:(await env.DB.prepare('SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC').bind(b.id).all()).results,updates:(await env.DB.prepare('SELECT version,status,state,created,updated FROM order_updates WHERE order_id=? ORDER BY version DESC').bind(b.id).all()).results});
  if(path==='claim-update'){
   if(!Number.isSafeInteger(b.version)||b.version!==row.version)return fail(409,'Order changed.');

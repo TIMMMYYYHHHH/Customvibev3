@@ -3,11 +3,9 @@ const call=(env,path,b)=>env.AUTH.fetch('https://auth.internal/orders/'+path,{me
 const fail=(status,error)=>Response.json({error},{status});
 export async function previewOrderUpdate(env,id){const r=await call(env,'detail',{id});if(!r.ok)throw Error('Order is unavailable.');return orderUpdateEmail(await r.json());}
 export async function sendOrderUpdate(env,id,version,network=fetch){
- if(env.ADMIN_SEND_ENABLED!=='true'||env.SITE_GATE_ENABLED!=='true'||env.SUBMISSIONS_ENABLED!=='true'||!env.RESEND_API_KEY)return fail(503,'Manual email sending is disabled.');
+ if(env.ADMIN_SEND_ENABLED!=='true'||!env.RESEND_API_KEY)return fail(503,'Customer email is unavailable. Check the admin email settings.');
  const detail=await call(env,'detail',{id});if(!detail.ok)return detail;const order=await detail.json();
  if(!Number.isSafeInteger(version)||version!==order.version)return fail(409,'Order changed. Review a fresh email preview.');
- const allowed=(env.ADMIN_TEST_RECIPIENTS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
- if(!allowed.includes(order.snapshot.contact.email.toLowerCase()))return fail(403,'This test recipient is not enabled for manual updates.');
  const preview=orderUpdateEmail(order),claim=await call(env,'claim-update',{id,version});if(!claim.ok)return claim;
  if(!(await claim.json()).claimed)return fail(409,'This update was already attempted. Check its history before doing anything else.');
  let state='uncertain';

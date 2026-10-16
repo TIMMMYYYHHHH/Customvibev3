@@ -5,7 +5,7 @@ import {MAX_BODY,validateContact,validateOrder,orderEmails,artworkManifest,finge
 import {privateUpload,initArtwork,verifyArtworkGrant,completeArtwork} from './artwork-api.mjs';
 const enc=new TextEncoder();
 const fail=(status,message)=>Response.json({error:message},{status});
-const ready=(env,kind)=>env.SITE_GATE_ENABLED==='true'&&env.SUBMISSIONS_ENABLED==='true'&&(kind==='contact'?env.W3FORMS_ACCESS_KEY:env.RESEND_API_KEY&&env.CATALOGUE)&&env.TURNSTILE_SECRET_KEY&&env.TURNSTILE_SITE_KEY&&/^[a-f0-9]{64}$/.test(env.SESSION_SECRET||'')&&env.AUTH;
+const ready=(env,kind)=>env.SUBMISSIONS_ENABLED==='true'&&(kind==='contact'?env.W3FORMS_ACCESS_KEY:env.RESEND_API_KEY&&env.CATALOGUE)&&env.TURNSTILE_SECRET_KEY&&env.TURNSTILE_SITE_KEY&&/^[a-f0-9]{64}$/.test(env.SESSION_SECRET||'')&&env.AUTH;
 async function digest(value,secret){const key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(value))),b=>b.toString(16).padStart(2,'0')).join('');}
 async function state(env,path,body){const r=await env.AUTH.fetch('https://auth.internal/submissions/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('Unavailable');return r.json();}
 async function mail(payload,id,env,network){const r=await network('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':id},body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)});if(!r.ok)throw new Error('Email unavailable');const result=await r.json();if(typeof result.id!=='string')throw new Error('Email unavailable');}

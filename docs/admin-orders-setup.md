@@ -1,23 +1,23 @@
-# Gated admin order testing
+# Admin orders and customer updates
 
-Admin: https://admin.customvibe.co.za/orders
+Current operating policy: [production behaviour behind the site lock](operating-mode.md).
 
-New submissions appear on the board. Earlier tests remain available under Artwork lookup. Test contact details, submitted item prices, stages and update history expire no later than seven days after capture; hourly cleanup deletes expired records. Artwork keeps its existing seven-day lifecycle.
+The live admin is https://admin.customvibe.co.za/orders . The website remains password-protected and admin sign-in remains separate. Payments are disabled. Orders, artwork, contact forms and customer emails otherwise use the normal production workflow.
 
-## Manual updates
+## Customer email
 
-Run `node scripts/set-admin-email.mjs` in a local interactive Terminal. Enter the business Cloudflare token, existing CustomVibe Resend sending key, and owner-controlled test addresses at the hidden prompts. The script verifies the business account and admin Worker before storing RESEND_API_KEY and ADMIN_TEST_RECIPIENTS as Worker secrets. It does not save or print values locally.
+The production admin Worker requires the existing `RESEND_API_KEY` secret and `ADMIN_SEND_ENABLED=true`. `scripts/set-admin-email.mjs` securely installs the sending key in the verified business Worker. No owner-address allowlist is required; updates go to the customer address stored on the order. The old `ADMIN_TEST_RECIPIENTS` secret is ignored and can be removed during routine credential cleanup.
 
-Sending additionally requires the exact production admin hostname and ADMIN_SEND_ENABLED, SITE_GATE_ENABLED and SUBMISSIONS_ENABLED set to true. Missing configuration fails closed. Local fixtures never send. Preview/local public capture remains off, payments remain unavailable and the site password gate stays on.
+Open an order, save its stage, click **Preview update**, review the recipient/message and click **Send update**. This is available at every stage. Saving or dragging a stage never sends automatically. One send attempt is recorded per order version to prevent duplicates. An accepted, failed or uncertain attempt stays in history. Check the provider before retrying an uncertain delivery; do not change stages merely to bypass duplicate protection.
 
-Moving a stage sends nothing. Preview update then Send update dispatches one server-generated test message for that order version. Provider acceptance is not proof of inbox receipt. Failed or uncertain attempts are held for review, not blindly resent. Status changes do not extend retention. Shared email reservations remain capped at 80/day and 2,400/month.
+Email availability is independent of the website gate. Local fixtures and preview deployments do not send. The admin send endpoint remains restricted to its production hostname, authenticated session and same-origin CSRF-checked requests. Shared free-tier message allowances remain in place.
 
-## Owner check after publication
+## Artwork and request records
 
-1. Send a fresh mixed test using an approved owner-controlled address.
-2. Open its card without copying a reference. Verify photo quantity 2, one 3x3 set and 11 magnets.
-3. Check previews and the ZIP instruction file. Confirm unique files and print quantities.
-4. Move to In progress. Confirm no automatic email.
-5. Preview then Send update once. Confirm inbox delivery and reply address.
+Artwork, associated contact/request details, submitted prices, stages and update history expire after 14 days. For requests with artwork, the earlier artwork upload time controls expiry. Hourly cleanup deletes expired data; the private R2 bucket has a matching 14-day lifecycle rule. Stage changes do not extend retention. Original photos and unsent drafts remain in browser memory.
 
-Physical print quality, live seven-day expiry and production retention policy remain open. Do not remove retained migration resources without separate approval.
+Migration 0006 extends still-active seven-day owner records to the new period without reviving expired data or altering order stages/history. Set the bucket lifecycle to 14 days before applying that migration and deploying the security Worker.
+
+## Verification
+
+Verify authenticated order access, previews, ZIP quantities, stage persistence, manual preview/send and visible send history. Confirm actual inbox delivery and Reply-To when a real send is requested. Store content save and reload are separate from email delivery. Physical print quality and maximum-size runtime checks remain separately tracked in Founders Hub. Migration-resource cleanup still needs its own approval.

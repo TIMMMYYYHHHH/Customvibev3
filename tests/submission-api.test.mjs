@@ -90,11 +90,15 @@ test('uncertain contacts remain held after one hour and old fresh drafts cannot 
  const now=Date.now();try{Date.now=()=>now+7200000;const refreshed=await form(env);assert.equal((await submissions(post('/api/contact',refreshed,data),env,network)).status,503);assert.equal(sends,1);assert.equal((await submissions(post('/api/contact',refreshed,{...data,id:crypto.randomUUID()}),env,network)).status,410);}finally{Date.now=realNow;}
 });
 
-test('gated test sending fails closed if the site gate flag is missing or disabled',async()=>{
- for(const gate of [undefined,'false','invalid']){
-  const env=setup(),context=await form(env);env.SITE_GATE_ENABLED=gate;let networkCalls=0;
-  for(const kind of ['contact','order'])assert.equal((await (await submissions(new Request(origin+'/api/forms?kind='+kind),env)).json()).available,false);
-  for(const path of ['/api/contact','/api/order-request'])assert.equal((await submissions(post(path,context,payload()),env,async()=>{networkCalls++;throw Error('Must not call providers')})).status,503);
-  assert.equal(networkCalls,0);
+test('submission readiness follows its sending configuration independently of the website gate',async()=>{
+ for(const gate of ['true','false']){
+  const env=setup();env.SITE_GATE_ENABLED=gate;
+  for(const kind of ['contact','order'])assert.equal((await (await submissions(new Request(origin+'/api/forms?kind='+kind),env)).json()).available,true);
+  const context=await form(env);let sent=0;
+  const response=await submissions(post('/api/contact',context,payload()),env,async url=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'contact'});sent++;return Response.json({success:true});});
+  assert.equal(response.status,200);assert.equal(sent,1);
+  env.SUBMISSIONS_ENABLED='false';
+  assert.equal((await (await submissions(new Request(origin+'/api/forms'),env)).json()).available,false);
+  assert.equal((await submissions(post('/api/contact',context,payload()),env,async()=>{throw Error('Disabled sending must not call providers')})).status,503);
  }
 });

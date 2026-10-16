@@ -29,7 +29,7 @@ async function init(body,env){
  const reservation=crypto.randomUUID(),available=budget.map(()=>'(COALESCE((SELECT amount FROM artwork_usage WHERE id=?),0)+?<=?)').join(' AND ');
  const insert=env.DB.prepare(`INSERT INTO artwork_requests(id,owner,manifest,bytes,created,expires,reservation) SELECT ?,?,?,?,?,?,? WHERE ${available} ON CONFLICT(id) DO NOTHING`).bind(body.id,body.owner,m.json,m.bytes,now,now+limits.retentionSeconds,reservation,...budget.flat());
  await env.DB.batch([insert,...budget.map(([id,cost])=>env.DB.prepare('INSERT INTO artwork_usage(id,amount) SELECT ?,? WHERE EXISTS(SELECT 1 FROM artwork_requests WHERE id=? AND reservation=?) ON CONFLICT(id) DO UPDATE SET amount=amount+excluded.amount').bind(id,cost,body.id,reservation)),...m.files.map((_,i)=>env.DB.prepare('INSERT INTO artwork_files(request_id,slot) SELECT ?,? WHERE EXISTS(SELECT 1 FROM artwork_requests WHERE id=? AND reservation=?) ON CONFLICT DO NOTHING').bind(body.id,i,body.id,reservation))]);
- const row=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(body.id).first();return row?response(row):fail(429,'The test artwork allowance is full. Keep your draft and try later.');
+ const row=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(body.id).first();return row?response(row):fail(429,'The artwork allowance is full. Keep your draft and try later.');
 }
 async function upload(request,env){
  const id=request.headers.get('X-Artwork-Id'),owner=request.headers.get('X-Artwork-Owner'),raw=request.headers.get('X-Artwork-Index');
@@ -43,7 +43,7 @@ async function upload(request,env){
  const lease=crypto.randomUUID(),now=epoch();
  const claim=await env.DB.prepare('UPDATE artwork_files SET tries=tries+1,lease=?,lease_until=? WHERE request_id=? AND slot=? AND ready=0 AND tries<3 AND lease_until<=? RETURNING slot').bind(lease,now+120,id,index,now).first();
  if(!claim)return fail(409,'An upload is still processing or its retry limit was reached.');
- if(!await operation(env)){await env.DB.prepare('UPDATE artwork_files SET lease_until=0 WHERE request_id=? AND slot=? AND lease=?').bind(id,index,lease).run();return fail(429,'The test storage operation allowance is full.');}
+ if(!await operation(env)){await env.DB.prepare('UPDATE artwork_files SET lease_until=0 WHERE request_id=? AND slot=? AND lease=?').bind(id,index,lease).run();return fail(429,'The storage operation allowance is full.');}
  try{
   await env.ARTWORK.put(objectKey(id,index),bytes,{httpMetadata:{contentType:'image/jpeg'},sha256:file.sha256});
   const retained=await env.DB.prepare('SELECT expires FROM artwork_requests WHERE id=?').bind(id).first();
@@ -59,7 +59,7 @@ export async function artworkService(request,env){
  if(path==='/artwork/init')return init(body,env);
  if(!artworkId(body.id))return fail(400,'Invalid reference.');
  const row=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(body.id).first();
- if(!row)return fail(404,'Artwork not found or removed.');if(row.expires<=epoch())return fail(410,'This test artwork has expired.');
+ if(!row)return fail(404,'Artwork not found or removed.');if(row.expires<=epoch())return fail(410,'This artwork has expired.');
  if(path==='/artwork/complete'){
   if(row.owner!==body.owner)return fail(403,'Artwork belongs to another session.');
   if(body.files&&JSON.stringify(body.files)!==row.manifest)return fail(409,'Artwork manifest changed.');
@@ -72,7 +72,7 @@ export async function artworkService(request,env){
  if(path==='/artwork/detail')return Response.json({id:row.id,created:row.created,expires:row.expires,files:files.map(({name,size},index)=>({index,name,size}))});
  if(path==='/artwork/download'){
   if(!Number.isInteger(body.index)||!files[body.index])return fail(404,'File not found.');
-  if(!await operation(env))return fail(429,'The test download allowance is full.');
+  if(!await operation(env))return fail(429,'The download allowance is full.');
   const object=await env.ARTWORK.get(objectKey(body.id,body.index));if(!object)return fail(404,'File no longer available.');
   return new Response(object.body,{headers:{'Content-Type':'image/jpeg','Content-Disposition':`attachment; filename="${files[body.index].name}"`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}});
  }

@@ -4,8 +4,8 @@ import security from '../security/index.mjs';
 import {artworkEnv,manifest,tile} from './helpers/artwork.mjs';
 const call=(env,path,data)=>security.fetch(new Request('https://auth.internal/artwork/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),env);
 const upload=(env,m,bytes=tile)=>security.fetch(new Request('https://auth.internal/artwork/upload',{method:'POST',headers:{'X-Artwork-Id':m.id,'X-Artwork-Owner':m.owner,'X-Artwork-Index':'0','Content-Type':'image/jpeg'},body:bytes}),env);
-test('private artwork is immutable, session-owned, finalized only after complete upload, and expires after seven days',async()=>{
- const env=artworkEnv(),m=await manifest();const init=await call(env,'init',m);assert.equal(init.status,200);const start=await init.json();assert.ok(start.expires>=Math.floor(Date.now()/1000)+604799);
+test('private artwork is immutable, session-owned, finalized only after complete upload, and expires after fourteen days',async()=>{
+ const env=artworkEnv(),m=await manifest();const init=await call(env,'init',m);assert.equal(init.status,200);const start=await init.json();assert.ok(start.expires>=Math.floor(Date.now()/1000)+1209599);
  assert.equal((await call(env,'complete',m)).status,409);
  assert.equal((await upload(env,{...m,owner:'c'.repeat(64)})).status,403);
  assert.equal((await upload(env,m)).status,200);assert.equal(env.objects.size,1);

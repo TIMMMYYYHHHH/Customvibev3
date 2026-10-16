@@ -1,17 +1,19 @@
 # Email and unpaid request setup
 
-Keep the site password gate ON. Production sending is approved for controlled owner testing; preview and local sending stay OFF. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
+Keep the site password gate ON. The live site uses normal production behaviour with payments disabled; preview and local sending stay OFF. See [operating-mode.md](operating-mode.md) for the latest policy. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
 
-The migration destination is Cloudflare account `4f57d4e924674cb87b33d4c884745cf6`, owned by customvibe03@gmail.com, and Pages project `customvibe-business`. The installers verify that account and resource before asking for credentials and again before writing. They refuse the personal account and never use a default Wrangler login. Both production and preview must retain the gate and `fail_open=false`. Only production may enable submissions, and only behind the gate.
+The migration destination is Cloudflare account `4f57d4e924674cb87b33d4c884745cf6`, owned by customvibe03@gmail.com, and Pages project `customvibe-business`. The installers verify that account and resource before asking for credentials and again before writing. They refuse the personal account and never use a default Wrangler login. Both production and preview must retain the gate and `fail_open=false`. Only production enables submissions. The gate stays on until separately approved for public launch, but runtime sending does not depend on the gate flag.
 
 ## Current decisions
+
+Status updates remain manual through Preview update and Send update in order details. No owner-recipient allowlist is used. Saving a stage does not send an email. The historical seven-day setup notes below are superseded by the 14-day policy in operating-mode.md.
 
 - Send unpaid order requests with cropped artwork to customvibe03@gmail.com.
 - Send customers an acknowledgement, explicitly saying no payment was taken and the request is not yet accepted.
 - Online payments: coming soon. No card form, payment link or implied paid status.
 - Handmade magnets, intended delivery by PUDO lockers. Locker names entered by customers are preferences, not verified bookings.
 - Contact through the website form to the same Gmail inbox.
-- Current live attachment mode has no customer photo storage in the site, D1, KV or R2. The approved private-artwork replacement below is prepared locally but not yet deployed. Email providers and Gmail retain existing attachments.
+- Live artwork uses private R2 downloads and associated private D1 request records. Current retention is 14 days. Original photos and unsent drafts remain in browser memory. Email providers and Gmail retain their email copies.
 - Business details, complete policies, delivery charges and timelines remain owner to-dos before launch. Bing is intentionally skipped. Google ownership is verified in Search Console; indexing is still blocked by the gate. Google Business Profile is not applicable because the owner confirmed online orders and courier delivery only.
 
 ## 1. Separate free Resend account
@@ -59,9 +61,9 @@ The code checks Turnstile on the server, including the hostname and contact/orde
 
 Source configuration verified on 15 October 2026: free Cloudflare Email Routing is active for `privacy@customvibe.co.za`, `security@customvibe.co.za` and `orders@customvibe.co.za`, all forwarding to customvibe03@gmail.com. The owner verified the Gmail destination and all three rules show Active. Catch-all is disabled. These must be recreated and verified in the destination account during cutover; DNS export alone does not transfer forwarding rules. Inbox delivery tests remain outstanding. Once aliases work, the public privacy/security contact can switch from the current confirmed Gmail to the aliases.
 
-## 5. Test behind the gate
+## 5. Production behaviour behind the gate
 
-The owner explicitly approved gated testing on 15 October 2026. `wrangler.jsonc` keeps local defaults and preview sending disabled and explicitly enables production sending. Publishing verifies both environments before deployment, requires production provider credentials, and checks the actual production deployment and commit afterward. Credential maintenance follows the same gate, fail-closed and preview protections. Runtime form readiness also requires `SITE_GATE_ENABLED=true`.
+The owner explicitly approved gated testing on 15 October 2026. `wrangler.jsonc` keeps local defaults and preview sending disabled and explicitly enables production sending. Publishing verifies both environments before deployment, requires production provider credentials, and checks the actual production deployment and commit afterward. Credential maintenance follows the same gate, fail-closed and preview protections. Runtime form readiness follows sending configuration and credentials independently of the site gate.
 
 Keep the successful gated test mode available for the owner. No public launch, payments, real courier booking, paid resources or unrelated customer recipients are authorized. Use customvibe03@gmail.com for test contact details and acknowledgements and non-personal artwork. Measure maximum-size requests before considering normal submissions ready. Actual inbox delivery, provider dashboard delivery and free-runtime measurements remain pending.
 
@@ -152,3 +154,5 @@ Maintain [Custom Vibe in Founders Hub](https://foundershub.kznwebstudio.co.za/?p
 - Deploy database migration 0004, security Worker with private bucket binding, then admin Worker. Verify protected endpoints before enabling private storage in production and publishing Pages. Retest one gated 3x3 request, owner admin link, ten downloaded files, customer acknowledgement and expiry. Keep all rollback resources.
 
 Deployment update: approved destination token verified privately. Migration 0004, private storage binding, hourly cleanup and protected admin downloads deployed. Production-only artwork enablement is prepared for the existing GitHub Pages publishing workflow. Gate remains on, preview sending and uploads off. Fresh tests: 100/100; both builds pass. Live 3x3 inbox/download and print checks remain pending. Earlier deployment-pending entries above describe the prior state.
+
+Verified publication: f4fa324 / Pages ed298f30-6362-4fde-89b0-64cc21e3d2e8; GitHub run 38811478814 succeeded. Production private artwork enabled, gate on, preview sending off, both environments fail closed. Admin sign-in required in live browser. Seven-day private bucket lifecycle and hourly cleanup verified. No live puzzle or owner download pass yet; no rollback resources removed.

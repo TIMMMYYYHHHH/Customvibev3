@@ -1,3 +1,7 @@
+# Current operating policy
+
+The 16 October owner decision in [docs/operating-mode.md](docs/operating-mode.md) supersedes historical test-only sending restrictions and seven-day retention below. Keep the site gate on and payments off; normal customer emails remain manual and artwork/request retention is 14 days. The following migration record is preserved as history.
+
 # CustomVibe Migration Implementation Plan
 
 Date: 15 October 2026. Specification: the user's Migration, Auth, SEO, Security Audit request in this chat. Execution: sequential, inline, with verification before publishing. The user authorizes migration, commits and main pushes and asks that ambiguities be resolved with stated assumptions.

@@ -1,3 +1,5 @@
+> Historical implementation plan. The latest owner policy is [operating-mode.md](operating-mode.md): normal live behaviour behind the lock, payments off, manual customer updates without a test-address allowlist, and 14-day artwork/request retention.
+
 # Admin order dashboard implementation plan
 
 > For agentic workers: use superpowers:executing-plans to implement this plan inline, task by task. Do not delegate implementation unless Tim chooses delegation.
@@ -97,7 +99,9 @@ Files: deployment configuration and existing setup scripts as needed; update thi
 - Reviewed at 1440px and 390px using synthetic orders. Content editor styling, status control and manual preview checked.
 - Independent review found missing line prices and old upload-token compatibility. Both fixed with regression tests and re-reviewed.
 - Business protections verified. Additive D1 migration 0005 applied; security Worker published with hourly seven-day record cleanup.
-- Admin email credentials/owner recipient setup and live owner checks remain pending.
+- Published commit 28aad26bafe193b10072c171454bc1225fb9c217 via successful protected-site workflow 38819690857. Security version 71b54fe5-c1a6-43a5-bc69-82e6fcbedd9f; admin version d853f1cd-0f0c-4be5-836a-7d204316648b.
+- Live checks: both environments gated and fail-closed, preview sending off, production order capture on; signed-out admin page/API/assets and site hosts all return 401. R2 seven-day deletion rule remains enabled.
+- Admin email credentials/owner recipient setup and live owner checks remain pending. No live manual updates sent.
 
 ## Review before execution
 
