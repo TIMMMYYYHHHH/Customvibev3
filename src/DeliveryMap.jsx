@@ -1,10 +1,13 @@
 import React,{useState} from 'react';
+import {MapTrifold} from '@phosphor-icons/react';
+import {mapLinks} from './locker-map.mjs';
 export function DeliveryMap({location}){
- const [failed,setFailed]=useState(false);
  const [enabled,setEnabled]=useState(false);
- const lat=location?.lat??-29.815,lon=location?.lon??31.025;
- const bbox=location?[lon-.025,lat-.017,lon+.025,lat+.017]:[30.92,-29.94,31.16,-29.68];
- const params=new URLSearchParams({bbox:bbox.join(','),layer:'mapnik',...(location?{marker:`${lat},${lon}`}:{})});
- const href=`https://www.openstreetmap.org/${location?`?mlat=${lat}&mlon=${lon}`:''}#map=${location?14:11}/${lat}/${lon}`;
- return <section className="delivery-map" aria-label="Collection area map"><div className="delivery-map-heading"><div><h3>{location?location.name:'Around Durban'}</h3><p>{location?'Collection area':'Choose an area to see it on the map.'}</p></div><a href={href} target="_blank" rel="noreferrer">View larger map</a></div>{enabled?<iframe key={location?.id||'overview'} title={location?`Map of ${location.name}`:'Map of the Durban collection areas'} src={`https://www.openstreetmap.org/export/embed.html?${params}`} loading="lazy" referrerPolicy="no-referrer" onLoad={()=>setFailed(false)} onError={()=>setFailed(true)}/>:<button type="button" onClick={()=>setEnabled(true)}>Load map from OpenStreetMap</button>}{failed&&<p className="map-error" role="status">The map couldn’t load. You can still select an area or open the larger map.</p>}</section>;
+ const links=mapLinks(location);
+ return <section className="locker-map" aria-label="Area map">
+  <div className="locker-map-heading"><div><p className="eyebrow">A LITTLE CLOSER TO YOU</p><h3>{links.hasPin?'Your locker on the map':'Explore the area'}</h3></div><MapTrifold size={28} aria-hidden="true"/></div>
+  {enabled?<iframe key={links.embed} title={links.hasPin?`Map of ${location.name}`:'Map of South Africa, without locker locations'} src={links.embed} referrerPolicy="strict-origin-when-cross-origin"/>:<div className="locker-map-cover"><MapTrifold size={48} weight="duotone" aria-hidden="true"/><h4>A handy look around.</h4><p>{links.hasPin?'See where your preferred locker is located.':'Browse the area. Find actual locker locations in the courier’s finder.'}</p><button className="button" type="button" onClick={()=>setEnabled(true)}>Show area map</button><small>Loads OpenStreetMap. Your order details stay here.</small></div>}
+  <div className="locker-map-footer"><span>{links.hasPin?'Location only. Availability still needs confirmation.':'Area map only. Locker pins are not shown.'}</span><a href={links.full} target="_blank" rel="noopener noreferrer">Open larger map</a>{enabled&&<button type="button" className="text-button" onClick={()=>setEnabled(false)}>Hide map</button>}</div>
+  {enabled&&<p className="locker-map-help">Map not loading? You can still enter your locker below or open the courier’s finder.</p>}
+ </section>;
 }

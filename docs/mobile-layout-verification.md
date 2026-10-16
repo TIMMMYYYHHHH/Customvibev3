@@ -30,4 +30,4 @@ Founders Hub: **Fix mobile layout and verify all pages** and **Fix homepage line
 
 Application bc0d571 published through protected Pages run [38980556377](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38980556377). Public/admin builds, 164 tests and pre/post protection checks passed. The admin Worker was not redeployed. Live 393px home showed seven mobile connectors, Help had no horizontal overflow and the collection dialog restored focus after closing. The live 1440px story retained the desktop layout.
 
-The historical optional-map criterion does not apply to current checkout, which links to PUDO and does not render the unused DeliveryMap component. No map feature was added.
+At the time of this mobile-layout review, checkout linked to PUDO and did not render DeliveryMap. The subsequent independent map-layout work is recorded in [locker-map-readiness.md](locker-map-readiness.md).
