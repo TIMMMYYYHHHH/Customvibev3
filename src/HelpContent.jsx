@@ -4,6 +4,7 @@ import {useContent} from './content/ContentProvider';
 import {money} from './commerce.mjs';
 export function questions(pricing){return [
  {id:'size',topic:'magnets',featured:true,q:'What size are the magnets?',a:'Every photo magnet is a 7.5 × 7.5 cm square, with your photo printed edge to edge.'},
+ {id:'handmade',topic:'magnets',q:'Where are my magnets made?',a:'Handmade in Durban. We print your chosen photos, make your magnets and check each one by hand before it leaves us.'},
  {id:'different',topic:'magnets',featured:true,q:'Can I use a different photo on every magnet?',a:'Yes. Upload your favourites and crop each one separately. You can also choose more than one copy of a photo.'},
  {id:'puzzles',topic:'magnets',featured:true,q:'How do the picture puzzles work?',a:'One square crop becomes a 3 × 3 grid of 9 magnets or a 5 × 5 grid of 25 magnets. Every piece is square. The finished picture measures 22.5 cm or 37.5 cm square before gaps.'},
  {id:'mix',topic:'magnets',featured:true,q:'Can I mix photo magnets and puzzles?',a:'Yes. Choose a format for each photo in the designer. Every puzzle piece counts toward the same magnet pricing and bundle discounts.'},

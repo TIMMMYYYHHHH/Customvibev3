@@ -63,7 +63,7 @@ function Story(){
       <><div className="story-photo"><MagnetPhoto i={active}/><BrandDoodle className="photo-accent story-accent mint"/><span className="photo-scribble">{['good times','the big day','beach days','my people','date night'][active]}</span></div><span className="story-scribble">Tiny<br/>moments.<br/>Big joy.</span></>
    <div className="photo-options" aria-label="Choose a real magnet example">{photos.map((p,i)=><button aria-label={'View '+p[1]+' magnet'} aria-pressed={active===i} onClick={()=>choose(i)} key={p[0]}><img src={content.images[`hero${i}`]} alt="" loading="lazy"/></button>)}</div>
   </div>
-  <div className="story-copy"><p className="overline">REAL MAGNETS. REAL MEMORIES.</p><h2>A fridge full of your favourite weirdos.</h2><p>The wedding. That day at the beach. Dinner with your favourite person. Bring the photos you love out of your camera roll and into your everyday.</p><BuilderLink>Choose your favourites</BuilderLink></div>
+  <div className="story-copy"><p className="overline">REAL MAGNETS. REAL MEMORIES.</p><h2>A fridge full of your favourite weirdos.</h2><p>The wedding. That day at the beach. Dinner with your favourite person. Bring the photos you love out of your camera roll and into your everyday.</p><p><strong>Handmade in Durban.</strong> We print your chosen photos, make your magnets and check each one by hand before it leaves us.</p><BuilderLink>Choose your favourites</BuilderLink></div>
  </section>;
 }
 
