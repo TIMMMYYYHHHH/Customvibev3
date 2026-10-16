@@ -1,3 +1,4 @@
+import {CaretDown,Check} from '@phosphor-icons/react';
 import React, {useId, useRef, useState} from 'react';
 
 // Keep selection separate from Save stage. Keyboard navigation never saves an order.
@@ -27,8 +28,8 @@ export default function StageSelect({id, label, value, options, onChange, disabl
  return <div className="cv-stage-select" onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))setOpen(false)}}>
   <label id={controlId+'-label'} htmlFor={controlId}>{label}</label>
   <button id={controlId} className="cv-stage-trigger" type="button" role="combobox" aria-labelledby={controlId+'-label'} aria-haspopup="listbox" aria-expanded={expanded} aria-controls={expanded?listId:undefined} aria-activedescendant={expanded?`${listId}-${active}`:undefined} disabled={disabled} onKeyDown={keyDown} onClick={()=>expanded?setOpen(false):show()}>
-   <span>{options[selected].label}</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+   <span>{options[selected].label}</span><CaretDown size={18} aria-hidden="true"/>
   </button>
-  {expanded&&<ul id={listId} role="listbox" aria-labelledby={controlId+'-label'} className="cv-stage-options">{options.map((option,index)=><li id={`${listId}-${index}`} key={option.value} role="option" aria-selected={option.value===value} className={index===active?'is-active':''} onMouseDown={event=>event.preventDefault()} onMouseMove={()=>setActive(index)} onClick={()=>choose(index)}>{option.label}{option.value===value&&<span aria-hidden="true">✓</span>}</li>)}</ul>}
+  {expanded&&<ul id={listId} role="listbox" aria-labelledby={controlId+'-label'} className="cv-stage-options">{options.map((option,index)=><li id={`${listId}-${index}`} key={option.value} role="option" aria-selected={option.value===value} className={index===active?'is-active':''} onMouseDown={event=>event.preventDefault()} onMouseMove={()=>setActive(index)} onClick={()=>choose(index)}>{option.label}{option.value===value&&<Check size={18} aria-hidden="true"/>}</li>)}</ul>}
  </div>;
 }

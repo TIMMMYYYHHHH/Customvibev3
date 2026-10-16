@@ -7,3 +7,44 @@ body{margin:0;background:#faf8f4}.cv-admin{--ink:#35233f;--berry:#8c2754;--line:
 .cv-admin .cv-btn,.cv-admin .button{border-radius:10px}
 .cv-admin .admin-heading em{font-style:normal}
 @media(max-width:760px){.cv-admin-header nav{gap:8px}.cv-admin-header nav a{flex:1;text-align:center;padding:10px}.cv-admin-brand{font-size:29px}}
+
+/* Shared brand rhythm across Orders, Store content and older artwork links. */
+.cv-admin{--display:'Fredoka Variable',sans-serif;--body:'DM Sans Variable',sans-serif;font-synthesis:none}
+.cv-admin .section.admin-page,.cv-admin :is(.cv-orders,.artwork-page){max-width:1600px;padding:36px 40px 64px}
+.cv-admin .cv-page-heading h1,.cv-admin .admin-page .admin-heading h1,.cv-admin .artwork-page h1{font:700 clamp(32px,4vw,46px)/1.12 var(--display);letter-spacing:-.025em;margin:8px 0 16px}
+.cv-admin .admin-page .admin-fields h2,.cv-admin .artwork-page h2{font-size:28px;line-height:1.2;margin:0 0 20px}
+.cv-admin :is(.cv-eyebrow,.eyebrow){font:700 11px/1.5 var(--body);letter-spacing:1.6px;color:var(--berry);margin:0}
+.cv-admin .admin-heading em{color:var(--berry)}
+.cv-admin :is(.cv-board-tools label,.cv-stage-select>label,.cv-order-sidebar label){font-size:14px}
+.cv-admin .admin-page :is(input:not([type=file]):not([type=checkbox]),textarea),.cv-admin .cv-board-tools input,.cv-admin .artwork-page input,.cv-admin .admin-page .cv-stage-trigger,.cv-admin .cv-stage-trigger{font:400 15px/1.4 var(--body);min-height:48px;border-radius:8px;padding:12px 14px}
+.cv-admin .cv-stage-trigger{gap:20px}
+.cv-admin svg{flex-shrink:0;vertical-align:middle}
+.cv-admin .cv-card-move>span{display:flex;align-items:center}
+.cv-admin .cv-stage-options li{align-items:center}
+.cv-admin .admin-form-grid{gap:0 20px}
+.cv-admin .admin-check input{min-height:20px;width:20px;height:20px;padding:0;margin:0;flex:none}
+.cv-admin .admin-image{gap:16px;padding:24px 0}
+.cv-admin .admin-upload{max-width:100%}
+.cv-admin .admin-success{align-items:flex-start}
+.cv-admin .admin-success svg{margin-top:2px}
+.cv-admin .admin-savebar{gap:12px 20px}
+.cv-admin .admin-price-examples h3{font-size:22px;margin:0 0 16px}
+.cv-admin .artwork-page>p,.cv-admin .artwork-page section>p{max-width:70ch}
+.cv-admin .artwork-page form{max-width:800px;gap:16px;margin:28px 0 36px}
+.cv-admin .artwork-downloads{list-style:none;padding:0;margin:24px 0;max-width:960px}
+.cv-admin .artwork-downloads li{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:8px 0;margin:0;overflow-wrap:anywhere}
+.cv-admin .artwork-downloads a{display:inline-flex;align-items:center;min-height:44px;max-width:100%}
+.cv-admin .artwork-downloads small{color:#6e6075;font-size:12px}
+@media(max-width:1100px){.cv-admin .section.admin-page,.cv-admin :is(.cv-orders,.artwork-page){padding:30px 24px 56px}}
+@media(max-width:760px){
+ .cv-admin .section.admin-page,.cv-admin :is(.cv-orders,.artwork-page){padding:28px 20px 48px}
+ .cv-admin .admin-page .admin-heading{gap:20px}
+ .cv-admin .admin-page .admin-toolbar{gap:16px}
+ .cv-admin .artwork-page form{gap:12px}
+ .cv-admin .artwork-page form .cv-btn{width:100%}
+ .cv-admin .admin-image{gap:12px}
+ .cv-admin .admin-savebar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 0}
+ .cv-admin .admin-savebar>.button{grid-column:1/-1}
+ .cv-admin .admin-savebar>.text-button{justify-content:center;flex-wrap:wrap;gap:4px;padding:2px;min-width:0;font-size:12px;line-height:1.3;text-align:center}
+}
+@media(max-width:360px){.cv-admin .admin-image,.cv-admin .admin-image-grid .admin-image{grid-template-columns:1fr}.cv-admin .admin-image-preview{width:90px}}

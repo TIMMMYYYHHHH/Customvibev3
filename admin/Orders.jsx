@@ -1,4 +1,5 @@
 import React,{useEffect,useRef,useState} from 'react';
+import {Plus,Minus} from '@phosphor-icons/react';
 import StageSelect from './StageSelect';
 import StageFeedback from './StageFeedback';
 import {createStageMover} from './stage-move.mjs';
@@ -13,7 +14,7 @@ function OrderCard({order,locked,onMove,onDrag,onDragEnd}){
  return <article className="cv-order-card" draggable={!locked} onDragStart={event=>{if(event.target.closest('button,[role=combobox]')){event.preventDefault();return}event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',order.id);onDrag(order.id)}} onDragEnd={onDragEnd} aria-label={`${order.reference}, ${order.snapshot.contact.name}`}>
   <a className="cv-order-open" draggable={!locked} href={'/orders?order='+order.id}><div className="cv-card-meta"><span className="cv-reference">{order.reference}</span><span className="cv-unpaid">Unpaid</span></div><h3>{order.snapshot.contact.name}</h3><strong>{order.snapshot.magnetQty} {order.snapshot.magnetQty===1?'magnet':'magnets'}</strong><footer><time dateTime={new Date(order.created*1000).toISOString()}>{new Date(order.created*1000).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}</time><span>Open request</span></footer></a>
   {(!order.ownerSent||!order.receiptSent)&&<small className="cv-email-note">Email delivery needs checking</small>}
-  <button className="cv-card-move" type="button" aria-expanded={expanded} disabled={locked} onClick={()=>setExpanded(!expanded)}>Move request <span aria-hidden="true">{expanded?'−':'+'}</span></button>
+  <button className="cv-card-move" type="button" aria-expanded={expanded} disabled={locked} onClick={()=>setExpanded(!expanded)}>Move request <span aria-hidden="true">{expanded?<Minus size={18}/>:<Plus size={18}/>}</span></button>
   {expanded&&<div className="cv-card-move-controls"><StageSelect label={'Move '+order.reference+' to'} value={target} onChange={setTarget} disabled={locked} options={stages}/><button className="cv-btn" type="button" disabled={locked||target===order.status} onClick={()=>{onMove(order,target);setExpanded(false)}}>Save stage</button></div>}
  </article>;
 }
