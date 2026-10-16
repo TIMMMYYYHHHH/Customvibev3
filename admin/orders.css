@@ -44,5 +44,10 @@
 .cv-design{border-radius:16px;box-shadow:0 3px 0 #35233f05}
 .cv-order-sidebar section{border-radius:14px}
 .cv-order-sidebar section:first-child{background:#f4edf6;border-color:#dbcae3}
+/* Keep artwork thumbnails compact, including requests with only one image. */
+.cv-file-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),180px));gap:12px;align-items:start}
+.cv-file>div{padding:10px 10px 4px;overflow-wrap:anywhere}
+.cv-file a{display:flex;align-items:center;min-height:44px}
+@media(max-width:480px){.cv-file-grid{grid-template-columns:repeat(2,minmax(0,180px));gap:10px}}
 @media(min-width:1101px){.cv-board:has(>.cv-column:only-child){grid-template-columns:minmax(0,420px)}}
 @media(max-width:760px){.cv-board-tools>label{flex-basis:100%}.cv-board-tools>.cv-stage-select{flex-basis:100%}.cv-column{padding:0 12px 14px}.cv-order-card h3{font-size:24px}.cv-board-help{line-height:1.6}.cv-page-heading{margin-bottom:28px}.cv-stage-feedback{font-size:13px}.cv-recovery-actions .cv-btn{width:100%}}
