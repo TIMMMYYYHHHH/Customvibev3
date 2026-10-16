@@ -45,3 +45,7 @@ This supersedes the earlier incomplete interpretation that submission alone comp
 ## Wording alignment, 17 October 2026
 
 The current payment-disabled flow calls placed records orders, with Unpaid shown separately and no later owner-acceptance step. Checkout, confirmation, help, admin, print instructions and order errors match the existing six email messages. Technical request IDs and stored stage keys remain unchanged. See [wording-verification.md](wording-verification.md). The future gateway rule above remains separately scoped.
+
+## Order references and admin previews
+
+Owner decision, 17 October 2026: use server-assigned sequential order numbers such as CV-000004. Keep older emailed references traceable and searchable without rewriting saved orders or send history. The admin preview renders the same HTML used for the manual email, with recipient, subject and a separate Send update action. Browser previews do not establish Gmail phone rendering acceptance.

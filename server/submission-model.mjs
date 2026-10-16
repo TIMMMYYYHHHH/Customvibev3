@@ -16,7 +16,7 @@ function email(v){const s=line(v,254);if(!/^[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+
 function identity(x){if(!plain(x)||typeof x.id!=='string'||!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/.test(x.id)||!Number.isSafeInteger(x.createdAt)||x.createdAt<Math.floor(Date.now()/1000)-82800||x.createdAt>Math.floor(Date.now()/1000)+60)invalid();return {id:x.id,createdAt:x.createdAt};}
 export function validateContact(x){return {...identity(x),name:line(x.name,100),email:email(x.email),message:text(x.message,5000)};}
 export function validateOrder(x,catalogue,privateArtwork=false){
- const base=identity(x);if(x.referenceVersion!==undefined){if(x.referenceVersion!==1)invalid();base.referenceVersion=1;}if(!plain(x.contact)||!plain(x.locker)||x.consent!==true||!Array.isArray(x.items)||!x.items.length||x.items.length>30)invalid();
+ const base=identity(x);if(x.referenceVersion!==undefined){if(![1,2].includes(x.referenceVersion))invalid();base.referenceVersion=x.referenceVersion;}if(!plain(x.contact)||!plain(x.locker)||x.consent!==true||!Array.isArray(x.items)||!x.items.length||x.items.length>30)invalid();
  const contact={name:line(x.contact.name,100),email:email(x.contact.email),phone:line(x.contact.phone,30)};
  if(!/^\+?[\d ()-]{7,30}$/.test(contact.phone)||contact.phone.replace(/\D/g,'').length<7||contact.phone.replace(/\D/g,'').length>15)invalid();
  const locker={name:line(x.locker.name,140),area:line(x.locker.area,140)};let totalBytes=0,fileCount=0;
@@ -37,8 +37,9 @@ export function validateOrder(x,catalogue,privateArtwork=false){
  for(const item of items){if(['photo','puzzle'].includes(item.kind)){pieces+=item.qty*(item.kind==='puzzle'?item.gridSize**2:1);const total=Math.round(personalTotal*pieces/sum.pricedQty);item.lineCents=total-allocated;allocated=total;}else item.lineCents=catalogue.products.find(p=>p.id===item.kind).priceCents*item.qty;}
  return {...base,contact,locker,items,magnetQty:sum.magnetQty,subtotalCents:sum.knownCents,deliveryCents:null,paymentStatus:'unpaid',consent:true};
 }
-export function orderEmails(order,privateArtwork=false){
- const reference=requestReference(order),summary=emailOrderSummary(order);
+export function orderEmails(order,privateArtwork=false,assignedReference){
+ if(order.referenceVersion===2&&!/^CV-[0-9]{6,}$/.test(assignedReference||''))throw Error('Order number has not been assigned');
+ const reference=order.referenceVersion===2?assignedReference:requestReference(order),summary=emailOrderSummary(order);
  const next='We will check your artwork and confirm production timing, delivery cost and next steps.';
  const customerSubject=`Your CustomVibe order ${reference}`,ownerSubject=`New unpaid order ${reference}`;
  const customerFooter='Need to change something? Reply to this email and keep your reference handy. Please do not submit the same order again.';

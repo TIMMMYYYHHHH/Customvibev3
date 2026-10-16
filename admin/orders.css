@@ -64,3 +64,14 @@
 .cv-update-recipient dd{font-weight:600}
 .cv-admin .cv-update-history{display:flex;align-items:center;min-height:44px;margin-top:8px;color:var(--berry);font-size:13px}
 @media(max-width:760px){.cv-order-sidebar section.cv-customer-update{order:-1}.cv-email-preview .cv-btn{width:100%;margin-top:8px}}
+
+.cv-email-dialog{width:min(740px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--line);border-radius:16px;background:#fffdf8;color:var(--ink);overflow:auto;box-shadow:0 20px 70px #23152f33}
+.cv-email-dialog::backdrop{background:#23152f88}
+.cv-email-dialog>header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line)}
+.cv-email-dialog>header h2{margin:0;font-size:26px}
+.cv-email-envelope{padding:16px 24px}.cv-email-envelope dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;font-size:14px}.cv-email-envelope dt{font-weight:600}.cv-email-envelope dd{margin:0;overflow-wrap:anywhere}.cv-email-envelope p{font-size:12px;color:#6e6075;margin:12px 0 0}
+.cv-email-dialog iframe{display:block;width:100%;height:min(62dvh,740px);min-height:300px;border:0;background:#f5f1ed}
+.cv-email-plain{padding:16px 24px}.cv-email-plain summary{cursor:pointer;text-decoration:underline;font-size:13px}.cv-email-plain pre{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.6 'DM Sans Variable',sans-serif}
+.cv-email-dialog>footer{position:sticky;bottom:0;display:flex;gap:12px;padding:16px 24px;background:#fffdf8;border-top:1px solid var(--line)}
+.cv-previous-reference{font-size:12px;color:#75677c;overflow-wrap:anywhere}
+@media(max-width:600px){.cv-email-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:12px}.cv-email-dialog>header,.cv-email-envelope,.cv-email-plain,.cv-email-dialog>footer{padding:14px}.cv-email-dialog>header h2{font-size:23px}.cv-email-dialog>footer .cv-btn{flex:1}.cv-email-envelope dl{display:block}.cv-email-envelope dd{margin:4px 0 10px}}

@@ -71,15 +71,17 @@ export async function submissions(request,env,network=fetch){
    return Response.json({ok:true,reference:submission.id,status:'message-sent',receiptSent:null});
   }
   const recordEnabled=env.ORDER_RECORDS_ENABLED==='true';
+  if(submission.referenceVersion===2&&!recordEnabled)return fail(503,'Order numbers are temporarily unavailable. Keep this tab open and retry.');
+  let assignedReference;
   const recordCall=async(path,body)=>{const r=await env.AUTH.fetch('https://auth.internal/orders/'+path,{method:'POST',body:JSON.stringify({id:submission.id,...body})});if(!r.ok)throw Object.assign(Error('Order record unavailable'),{status:r.status});return r.json()};
-  if(recordEnabled){try{await recordCall('create',{fingerprint,snapshot:orderRecord(submission,privateArtwork),privateArtwork});}catch(error){if(error.status===409)return fail(409,'This order reference needs review. Keep this draft and contact CustomVibe with its reference before sending again.');throw error;}}
-  const emails=orderEmails(submission,privateArtwork);
+  if(recordEnabled){try{assignedReference=(await recordCall('create',{fingerprint,snapshot:orderRecord(submission,privateArtwork),privateArtwork})).reference;}catch(error){if(error.status===409)return fail(409,'This order reference needs review. Keep this draft and contact CustomVibe with its reference before sending again.');throw error;}}
+  const emails=orderEmails(submission,privateArtwork,assignedReference);
   if(recordEnabled&&privateArtwork){for(const field of ['text','html'])emails.owner[field]=emails.owner[field].replace('/artwork?request=','/orders?order=');}
 
   if(!permit.ownerSent){await mail(emails.owner,`cv-${kind}-${submission.id}-owner`,env,network);await state(env,'mark',{id,stage:'owner_sent'});}
   let receiptSent=permit.receiptSent;
   if(kind==='order'&&!receiptSent){try{await mail(emails.customer,`cv-${kind}-${submission.id}-customer`,env,network);await state(env,'mark',{id,stage:'receipt_sent'});receiptSent=true;}catch{receiptSent=false;}}
   if(recordEnabled){await recordCall('delivery',{stage:'owner_sent'});if(receiptSent)await recordCall('delivery',{stage:'receipt_sent'});}
-  return Response.json({ok:true,reference:requestReference(submission),status:kind==='order'?'unpaid-request':'message-sent',receiptSent:kind==='order'?receiptSent:null});
+  return Response.json({ok:true,reference:submission.referenceVersion===2?assignedReference:requestReference(submission),status:kind==='order'?'unpaid-request':'message-sent',receiptSent:kind==='order'?receiptSent:null});
  }catch{return fail(503,'We could not confirm sending. Retry here without changing your details to avoid duplicates. Keep this tab open.');}
 }

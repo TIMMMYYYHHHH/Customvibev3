@@ -23,7 +23,7 @@ export function useFormService(kind){
   if(state.getSnapshot().busy||state.getSnapshot().result||state.getSnapshot().manualReview||!config?.available||!token)return;
   state.update({busy:true,error:''});let sent=false;
   try{
-   if(!state.getSnapshot().attempt){const {uploads,...payload}=await build();state.update({uploads,resume:null,attempt:{...payload,...(kind==='order'?{referenceVersion:1}:{}),id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000)},pending:true});}
+   if(!state.getSnapshot().attempt){const {uploads,...payload}=await build();state.update({uploads,resume:null,attempt:{...payload,...(kind==='order'?{referenceVersion:config.orderRecords?2:1}:{}),id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000)},pending:true});}
    let grant;
    if(kind==='order'&&config.artworkStorage){
     const check=async response=>{const body=await response.json();if(!response.ok||!body.ok){if(response.status===403){const fresh=await fetch('/api/forms?kind=order',{cache:'no-store'});if(fresh.ok)setConfig(await fresh.json());}if(response.status===400)state.rejected(400,body.error||'Check your order details.');throw new Error(body.error||'Artwork upload could not finish. Keep this tab open and retry.')}return body};
