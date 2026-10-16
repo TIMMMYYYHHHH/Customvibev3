@@ -7,7 +7,7 @@ Owner decision: 16 October 2026. This supersedes historical test-only restrictio
 - Keep the public website password gate on and separate server-side admin authentication active. This is not public-launch approval.
 - Keep payments disabled. Show accurate unpaid status; do not fabricate a payment or courier booking.
 - Run implemented contact, request, artwork, catalogue and customer-email flows normally on the live domain. Do not label them as gated tests or restrict customer emails to an owner allowlist.
-- Keep status emails manual. Order details already provide Preview update and Send update for each saved stage. Stage changes never send automatically. A dashboard-card shortcut and a shared email-template review are follow-up work, not prerequisites for existing manual sending.
+- Keep status emails manual. Order details already provide Preview update and Send update for each saved stage. Stage changes never send automatically. Orders cards provide an Email update shortcut to this same flow. Shared email-template review remains separately tracked.
 - Retain artwork and associated request records for 14 days. Requests with artwork expire from the upload start time. Hourly cleanup and the private R2 lifecycle must agree. The 0006 migration extends only active owner records and never revives expired records.
 - Retain authentication, authorization, CSRF, validation, private downloads, duplicate prevention and existing free-tier service quotas. Local fixtures and preview deployments do not send real messages or modify production records.
 
@@ -32,5 +32,5 @@ The repository AGENTS.md holds the lasting working rules. The root project AGENT
 - Security Worker version: `67c59a0f-ba19-4d2f-a15b-187b75dd97c2`, hourly cleanup still scheduled. Admin Worker version after banner correction: `20c8f91f-957f-4d77-a666-cb28a24fe37f`.
 - Website publication `5181281` passed workflow [38892851760](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38892851760), including build, tests and before/after gate protection checks.
 - Signed-in live order CV-000001 shows normal unpaid wording and artwork expiry on 30 October, matching the 14-day policy. Its current stage and accepted email history were preserved. No extra email was sent for this deployment. Existing duplicate-send protection remains visible for an already attempted update.
-- Repository instructions, setup/privacy copy and Founders Hub guidance updated. The owner must copy the prepared Project instructions addition into the ChatGPT project settings because the generated root mirror is read-only.
-- Automatic status emails remain deferred. A clearer manual-send shortcut can be handled as follow-up work; the existing order detail Preview update / Send update flow remains available.
+- Repository instructions, setup/privacy copy and Founders Hub guidance updated. The owner confirmed in the continuation chat on 16 October that the Project instructions were updated. The supplied current instructions match the repository policy; Founders Hub rules alignment and its parent are complete.
+- Automatic status emails remain deferred. The Orders dashboard shortcut reuses the existing order detail Preview update / Send update flow. See [manual-email-access-verification.md](manual-email-access-verification.md) for implementation and verification.
