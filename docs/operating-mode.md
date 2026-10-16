@@ -25,4 +25,12 @@ The repository AGENTS.md holds the lasting working rules. The root project AGENT
 
 ## Execution record
 
-Implementation and deployment evidence will be recorded here after verification. Do not infer live publication from local files.
+16 October 2026 verification:
+
+- 139 automated tests passed, including sending without an owner allowlist, duplicate/uncertain send handling, stage/email separation and 14-day migration expiry. Public and admin builds passed.
+- Private R2 lifecycle changed to 14 days and confirmed after reload. Public bucket access remains disabled. Migration 0006 applied successfully to the business security database.
+- Security Worker version: `67c59a0f-ba19-4d2f-a15b-187b75dd97c2`, hourly cleanup still scheduled. Admin Worker version after banner correction: `20c8f91f-957f-4d77-a666-cb28a24fe37f`.
+- Website publication `5181281` passed workflow [38892851760](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38892851760), including build, tests and before/after gate protection checks.
+- Signed-in live order CV-000001 shows normal unpaid wording and artwork expiry on 30 October, matching the 14-day policy. Its current stage and accepted email history were preserved. No extra email was sent for this deployment. Existing duplicate-send protection remains visible for an already attempted update.
+- Repository instructions, setup/privacy copy and Founders Hub guidance updated. The owner must copy the prepared Project instructions addition into the ChatGPT project settings because the generated root mirror is read-only.
+- Automatic status emails remain deferred. A clearer manual-send shortcut can be handled as follow-up work; the existing order detail Preview update / Send update flow remains available.
