@@ -23,7 +23,7 @@
 ## Task 2: Preview, verification and publication
 - [x] Keep the existing admin plain-text preview and send controls. Render actual HTML in a local verification gallery without broadening admin UI or CSP scope.
 - [x] Run public/admin builds; inspect actual fixture rendering at desktop and mobile sizes.
-- [ ] Independent review, resolve findings, commit only scoped files, deploy business admin and protected Pages.
+- [x] Independent review, resolve findings, commit only scoped files, deploy business admin and protected Pages.
 - [ ] Verify live preview without sending or changing stages. Update Hub task/service records and verify persistence.
 
 ## Execution notes
@@ -32,3 +32,5 @@ Owner already approved implementation and routine deployment. Continue inline wi
 Implementation scope decision: keep the existing admin plain-text preview, which already uses the exact sender renderer and all message facts. A new HTML viewer would broaden this design task into an admin interaction/security change; the local gallery provides visual verification.
 
 Final review: one catalogue-pack quantity finding corrected. Regression observed failing then passing. Full suite: 144/144. Public/admin builds passed. Browser actual-render checks: six variants and long data at 390px, no horizontal overflow, all inline images resolved. No unresolved code-review findings.
+
+Publication succeeded: application0967af7, protected workflow38938316022, admin Worker61e7f598-90eb-431c-a07c-64551802731e. Live signed-in preview needs a fresh owner sign-in; inbox rendering remains open separately.

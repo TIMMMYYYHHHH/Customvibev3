@@ -33,3 +33,10 @@ Sender, Reply-To, recipient selection, private artwork access, 14-day retention,
 W3Forms contact HTML is provider-controlled; no provider change or further contact test was requested. Gmail saved templates/signature are not yet inventoried. Customer artwork thumbnails remain under Improve order emails with design previews. Website-wide order terminology and payment integration remain in their existing board tasks. The broad email-review parent stays open until required inventory, inbox checks and final acceptance are reconciled.
 
 Local review: run `node scripts/preview-email-design.mjs`, then serve `docs/email-template-review` locally. Actual-render gallery: `/implemented/`. Original approved paid proposal remains in the local review directory and is explicitly fictional.
+
+## Publication, 16 October 2026
+
+- Application commit: `0967af7`.
+- Business admin Worker: `61e7f598-90eb-431c-a07c-64551802731e`.
+- Protected Pages publication: [workflow 38938316022](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38938316022), successful including both builds, 144 tests and before/after gate checks.
+- Fresh signed-in admin preview/history verification remains pending because the prior admin session expired. No history or stage was changed. Tim was asked to sign in; inbox verification remains a separate fresh-message check.
