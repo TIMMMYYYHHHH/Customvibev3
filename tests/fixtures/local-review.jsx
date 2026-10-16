@@ -1,6 +1,7 @@
 // Developer-only fixture, never a production build entry. No real email or uploads.
 import React from 'react';import {createRoot} from 'react-dom/client';import {App} from '../../src/App';import {ContentProvider} from '../../src/content/ContentProvider';import {defaultContent} from '../../src/content/model.mjs';import {installNavigation} from '../../src/routing.mjs';import {requestReference} from '../../src/request-reference.mjs';
 import '../../src/shop-base.css';import '../../src/shop.css';import '../../src/studio.css';import '../../src/consistency.css';
+import '../../src/mobile.css';
 if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw new Error('Local review only');
 const requests=new Map();let attempts=0,previousId=null;
 window.turnstile={render:(el,options)=>{queueMicrotask(()=>options.callback('synthetic-local-check'));return 1},remove:()=>{}};
