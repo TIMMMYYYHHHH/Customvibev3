@@ -40,3 +40,14 @@
 .storefront .contact-page a:focus-visible{outline:3px solid #ae2e5b;outline-offset:4px;border-radius:2px}
 @media(max-width:800px){.storefront .contact-page .contact-section{padding:36px 0;gap:32px}.storefront .contact-page .contact-intro{padding-top:0}.storefront .contact-page .contact-intro h1{font-size:clamp(40px,7vw,54px)}.storefront .contact-page .contact-form{padding:28px}.storefront .contact-help{gap:28px}.storefront .contact-page{padding-bottom:40px}}
 @media(max-width:500px){.storefront .contact-page .contact-form{padding:24px 20px}.storefront .contact-help{grid-template-columns:1fr}.storefront .contact-direct{margin-top:22px}.storefront .contact-form-heading h2{font-size:25px}}
+
+/* Scope every modal rule above the page typography and reset styles. */
+.storefront dialog.contact-success-modal{box-sizing:border-box;width:min(440px,calc(100% - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid #d6ced4;border-radius:16px 32px 16px 16px;margin:auto;padding:32px;background:#fffdf8;color:#26133d;box-shadow:0 20px 70px #26133d33;text-align:left}
+.storefront dialog.contact-success-modal::backdrop{background:#26133d88}
+.storefront dialog.contact-success-modal .contact-success-status{display:flex;align-items:center;gap:10px;font:650 13px/1.4 'DM Sans Variable',sans-serif;color:#315942;margin:0 0 20px}
+.storefront dialog.contact-success-modal .contact-success-mark{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:#e0f1e8;color:#315942;font:650 17px/1 'DM Sans Variable',sans-serif}
+.storefront dialog.contact-success-modal h2{font:550 32px/1.12 'Fredoka Variable',sans-serif;letter-spacing:-.02em;margin:0 0 16px}
+.storefront dialog.contact-success-modal p{font:400 16px/1.6 'DM Sans Variable',sans-serif;overflow-wrap:anywhere;margin:0;color:#514756}
+.storefront dialog.contact-success-modal .action{display:flex;align-items:center;justify-content:center;margin:28px 0 0;min-height:48px;width:100%;border:0;border-radius:8px;background:#7d3150;color:white;font:650 15px/1.4 'DM Sans Variable',sans-serif;padding:14px 20px;cursor:pointer}
+.storefront dialog.contact-success-modal .action:focus-visible{outline:3px solid #a52f58;outline-offset:4px}
+@media(max-width:500px){.storefront dialog.contact-success-modal{padding:24px}.storefront dialog.contact-success-modal h2{font-size:30px}}

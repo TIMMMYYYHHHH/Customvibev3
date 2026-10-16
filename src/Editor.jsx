@@ -15,7 +15,7 @@ export function CropView({photo,onChange,puzzle=false,gridSize=3,onRendered,onEr
 }
 
 export function StudioProgress({step,hasPhotos,busy,onStep}){
- return <nav className="studio-progress" aria-label="Design progress"><ol>{[['make','Make'],['review','Review'],['delivery','Delivery']].map(([id,label],i)=><li key={id} className={step===id?'current':''}><button aria-current={step===id?'step':undefined} disabled={busy||(i>0&&!hasPhotos)} onClick={()=>onStep(id)}><span>{i+1}</span>{label}</button></li>)}</ol></nav>;
+ return <nav className="studio-progress" aria-label="Design progress"><ol>{[['make','Make'],['review','Basket'],['delivery','Request']].map(([id,label],i)=><li key={id} className={step===id?'current':''}><button aria-current={step===id?'step':undefined} disabled={busy||(i>0&&!hasPhotos)} onClick={()=>onStep(id)}><span>{i+1}</span>{label}</button></li>)}</ol></nav>;
 }
 
 export function Editor({studio,dispatchStudio,photos,setPhotos,setBasket,go}){
@@ -51,7 +51,7 @@ export function Editor({studio,dispatchStudio,photos,setPhotos,setBasket,go}){
     {magnetCount>0&&<div className="studio-discount"><TierNudge quantity={magnetCount} designer onAdd={()=>input.current.click()}/></div>}
    </aside>
   </div>
-  <div className="studio-review-bar"><div className="studio-review-summary"><SquaresFour size={34} weight="fill"/><div><strong>{magnetCount?`${magnetCount} ${magnetCount===1?'magnet':'magnets'} in your collection`:'Your collection starts here'}</strong><small>{qty} photo {qty===1?'magnet':'magnets'}{puzzleCount?` · ${puzzleCount} ${puzzleCount===1?'puzzle':'puzzles'}`:''}</small></div></div><div className="studio-price"><span className="studio-mobile-count">{magnetCount} {magnetCount===1?'magnet':'magnets'}</span><strong>{magnetCount?money(photoPrice(magnetCount,content.pricing)):'No photos yet'}</strong><small>Delivery additional</small></div><button className="button" disabled={busy||!photo||!rendered} onClick={()=>go('basket')}>Review my collection</button></div>
+  <div className="studio-review-bar"><div className="studio-review-summary"><SquaresFour size={34} weight="fill"/><div><strong>{magnetCount?`${magnetCount} ${magnetCount===1?'magnet':'magnets'} in your basket`:'Your basket starts here'}</strong><small>{qty} photo {qty===1?'magnet':'magnets'}{puzzleCount?` · ${puzzleCount} ${puzzleCount===1?'puzzle':'puzzles'}`:''}</small></div></div><div className="studio-price"><span className="studio-mobile-count">{magnetCount} {magnetCount===1?'magnet':'magnets'}</span><strong>{magnetCount?money(photoPrice(magnetCount,content.pricing)):'No photos yet'}</strong><small>Delivery additional</small></div><button className="button" disabled={busy||!photo||!rendered} onClick={()=>go('basket')}>View basket</button></div>
 
  </main>;
 }

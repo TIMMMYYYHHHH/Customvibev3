@@ -33,3 +33,7 @@ test('revising a format replaces the old design and preserves premade packs',()=
  assert.deepEqual(mergeStudioItems([old,pack],[next]),[pack,next]);
  assert.deepEqual(mergeStudioItems([old,pack],[]),[pack]);
 });
+test('starting another request resets photos, selection and puzzle defaults',()=>{
+ const state={...createStudio(),photos:[photo],selected:photo.id,defaultFormat:'puzzle',step:'review'};
+ assert.deepEqual(studioReducer(state,{type:'reset'}),createStudio());assert.equal(state.photos.length,1);
+});

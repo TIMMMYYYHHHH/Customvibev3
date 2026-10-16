@@ -1,15 +1,18 @@
-import React,{useRef,useState} from 'react';
+import React,{useEffect,useRef,useState} from 'react';
 import {BrandDoodle} from './ReferenceThread';
 import './contact.css';
 import {useFormService,FormSecurity} from '../FormService';
 
 export default function Contact({standalone=false}){
  const Heading=standalone?'h1':'h2';
- const form=useRef(null);
+ const form=useRef(null),dialog=useRef(null),submitButton=useRef(null),restoreFocus=useRef(false);
  const service=useFormService('contact');
  const [values,setValues]=useState(()=>service.attempt||{name:'',email:'',message:''});
  const [errors,setErrors]=useState({});
  const [status,setStatus]=useState('');
+ useEffect(()=>{if(service.result&&!dialog.current?.open)dialog.current?.showModal();},[service.result]);
+ useEffect(()=>{if(!service.result&&restoreFocus.current){restoreFocus.current=false;form.current?.elements.namedItem('name')?.focus();}},[service.result]);
+ function dismissSuccess(){if(service.resetCompleted()){restoreFocus.current=true;dialog.current?.close();setValues({name:'',email:'',message:''});setErrors({});setStatus('');}}
  function validate(name,value){
   if(!value.trim())return {name:'Please enter your name.',email:'Please enter your email address.',message:'Tell us a little about how we can help.'}[name];
   if(name==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()))return 'Enter an email address like you@example.com.';
@@ -47,9 +50,12 @@ export default function Contact({standalone=false}){
    </div>
    <div className="contact-field"><label htmlFor="contact-message">Your message</label><textarea {...fieldProps('message')} rows={5} maxLength={5000} placeholder="What’s on your mind?"/>{error('message')}</div>
    </fieldset>
-   {!service.result&&<><p className="small-copy">Please keep photos and payment details out of this form. W3Forms stores your message and emails it to CustomVibe. Read our <a href="/privacy">privacy policy</a>.</p><FormSecurity service={service} kind="contact"/><button className="action" type="submit" disabled={service.manualReview||service.busy||!service.token||!service.config?.available}>{service.manualReview?'Contact us to check delivery':service.busy?'Sending…':service.pending?'Check or retry message':'Send message'}</button>{service.pending&&service.attempt&&<p className="small-copy">Message reference: {service.attempt.id}</p>}</>}
-   {service.result&&<p className="contact-status" role="status">Your message has been sent for delivery to CustomVibe. Thank you. Reference: {service.result.reference}</p>}
+   {!service.result&&<><p className="small-copy">Read how we handle your information in our <a href="/privacy">privacy policy</a>.</p><FormSecurity service={service} kind="contact"/><button ref={submitButton} className="action" type="submit" disabled={service.manualReview||service.busy||!service.token||!service.config?.available}>{service.manualReview?'Message needs checking':service.busy?'Sending message…':service.pending?'Check or retry message':'Send message'}</button></>}
+   {service.result&&<button ref={submitButton} className="action" type="button" onClick={()=>dialog.current?.showModal()}>View confirmation</button>}
    {status&&<p className="contact-status" role="alert">{status}</p>}
   </form>
+  {service.result&&<dialog ref={dialog} className="contact-success-modal" aria-labelledby="contact-success-title" aria-describedby="contact-success-description" onCancel={event=>{event.preventDefault();dismissSuccess();}} onKeyDown={event=>{if(event.key==='Tab'){event.preventDefault();dialog.current?.querySelector('button')?.focus();}}}>
+   <div className="contact-success-status"><span className="contact-success-mark" aria-hidden="true">✓</span><span>Thank you for your note</span></div><h2 id="contact-success-title">Message received.</h2><p id="contact-success-description">Your message has been accepted by our submission service. This confirms submission, not inbox delivery.</p><button className="action" type="button" autoFocus onClick={dismissSuccess}>Close confirmation</button>
+  </dialog>}
  </section>;
 }

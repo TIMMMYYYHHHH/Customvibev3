@@ -32,3 +32,6 @@ export async function renderPhoto(photo,{puzzle=false,gridSize=3,size=480}={}){
  }
  return {canvas,url:canvas.toDataURL('image/jpeg',.92),tiles,sourceWidth:source.width,sourceHeight:source.height,crop:r};
 }
+
+// Release completed request originals only when the customer starts another request.
+export function releasePhotos(photos){const sources=new Set([...photos.map(photo=>photo.src),...[...images.keys()].filter(src=>src.startsWith('blob:'))]);for(const src of sources){images.delete(src);if(src?.startsWith('blob:'))URL.revokeObjectURL(src);}}

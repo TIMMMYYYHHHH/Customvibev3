@@ -1,7 +1,7 @@
 import React,{useState,useEffect,useRef,useContext} from 'react';
 
-import '@fontsource-variable/fredoka';
-import '@fontsource-variable/dm-sans';
+import '../fonts.css';
+
 import {demoPhoto,renderPhoto} from '../artwork';
 import {MagnetPreview} from '../MagnetPreview';
 import CollectionPackPreview from './CollectionPackPreview';

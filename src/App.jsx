@@ -1,10 +1,10 @@
 import React,{useEffect,useLayoutEffect,useState,useRef,useReducer} from 'react';
 import {Bag,Plus,Minus,X,Check,Trash,ArrowLeft} from '@phosphor-icons/react';
-import '@fontsource-variable/fredoka';
-import '@fontsource-variable/dm-sans';
+import './fonts.css';
+
 import {Editor,StudioProgress} from './Editor';
 import {CollectionReview} from './CollectionReview';
-import {renderPhoto} from './artwork';
+import {renderPhoto,releasePhotos} from './artwork';
 import {createStudio,studioReducer,createDesignItems,mergeStudioItems} from './studio-state.mjs';
 import {money,summarize} from './commerce.mjs';
 import {SubmissionProvider,useSubmissionSnapshot} from './FormService';
@@ -17,6 +17,7 @@ import SEO from './SEO.jsx';
 import ProductPage from './ProductPage';
 import PolicyPage from './PolicyPage';
 import ContactPage from './ContactPage';
+import Contact from './storefront/Contact';
 import {policies} from './policies.mjs';
 import {canPurchase} from './content/model.mjs';
 
@@ -67,6 +68,7 @@ function AppContent({initialPage}){
   });
   return()=>cancelAnimationFrame(frame);
  },[page,routeVersion]);
+ function startNewRequest(){releasePhotos(photos);setBasket([]);dispatchStudio({type:'reset'});setCheckoutDraft({query:'',locker:null,step:1,contact:{name:'',email:'',phone:''},confirmed:false});setCollectionError('');setToast('');navigate('/studio');setPage('studio');window.scrollTo(0,0);}
  function notify(message){setToast(message);clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),4500);}
  function changeQuantity(item,delta){setBasket(b=>b.map(x=>x.id===item.id?{...x,qty:x.qty+delta}:x));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.map(p=>p.id===(item.sourceId||item.id)?{...p,qty:item.qty+delta}:p));}
  function removeItem(item){setBasket(b=>b.filter(x=>x.id!==item.id));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.filter(p=>p.id!==(item.sourceId||item.id))); }
@@ -82,7 +84,7 @@ function AppContent({initialPage}){
  {storefront&&<Storefront page={page} onAddPack={addPack} basketCount={sum.magnetQty}/>}
  {!orderLocked&&['studio','puzzle'].includes(page)&&<Editor {...{studio,dispatchStudio,photos,setPhotos,basket,setBasket,go,notify}}/>}
  {(!collectionBusy||basket.length>0)&&!collectionError&&!orderLocked&&page==='basket'&&<CollectionReview basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
- {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout photos={photos} basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft}/>}
+ {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout photos={photos} basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft} onStartNew={startNewRequest}/>}
  {page==='help'&&<HelpPage/>}
  {page==='contact'&&<ContactPage/>}
  {page!=='contact'&&policies[page]&&<PolicyPage page={page}/>}
@@ -91,6 +93,7 @@ function AppContent({initialPage}){
  {!routes.includes(page)&&!detailProduct&&<main className="section empty-basket"><h1>Let’s find your way back.</h1><button className="button" onClick={()=>go('home')}>Back to CustomVibe</button></main>}
  </div>
  </div>
+ {page!=='contact'&&page!=='home'&&<div className="storefront"><div className="concept happy-chaos thread-brand"><Contact/></div></div>}
  <SiteFooter/>
  {toast&&<div className="app-toast" role="status"><Check size={20}/><span>{toast}</span><button aria-label="Dismiss notification" onClick={()=>setToast('')}><X size={18}/></button></div>}
  </>;

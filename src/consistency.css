@@ -255,3 +255,128 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 .storefront .thread-brand .scatter-0 .hero-accent{top:0;right:0;transform:translate(64%,-64%) rotate(45deg);transform-origin:center}
 
 .policy-page{max-width:900px!important;padding-top:56px;padding-bottom:72px}.policy-page h1{font-size:clamp(2.6rem,6vw,4.4rem);margin-bottom:40px}.policy-page section{margin:28px 0}.policy-page h2{font-size:1.45rem;margin-bottom:10px}.policy-page p{line-height:1.8;overflow-wrap:anywhere}.policy-page .contact-section{display:block;padding:0}.policy-page .contact-form{max-width:620px}
+
+/* Shared navigation uses a defined row at every width. Keep primary actions
+   and the menu reachable without letting navigation squeeze the wordmark. */
+.unified-header .header-inner{width:min(1400px,calc(100% - 40px));gap:22px}
+.unified-header .site-wordmark,.unified-header .site-basket,.unified-header .site-create{flex-shrink:0}
+.unified-header nav{gap:clamp(14px,1.5vw,24px)}
+@media(max-width:1200px){
+ .unified-header .header-inner{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:12px}
+ .unified-header .site-wordmark{grid-column:1;grid-row:1;justify-self:start}
+ .unified-header .site-basket{grid-column:2;grid-row:1;margin:0}
+ .unified-header .site-create{grid-column:3;grid-row:1}
+ .unified-header .site-menu{grid-column:4;grid-row:1;display:flex;min-width:44px;min-height:44px}
+ .unified-header nav{display:none;grid-column:1/-1;grid-row:2;order:initial;width:100%;margin:0;padding:8px 0 12px;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 20px;border-top:1px solid #26133d18}
+ .unified-header nav.is-open{display:grid}
+ .unified-header nav a{font-size:14px;min-height:44px;white-space:normal}
+}
+@media(max-width:600px){
+ .unified-header .header-inner{width:calc(100% - 32px);grid-template-columns:minmax(0,1fr) auto auto;gap:10px}
+ .unified-header .site-create{display:none}
+ .unified-header .site-menu{grid-column:3}
+ .unified-header .site-wordmark{font-size:24px;gap:6px}
+ .unified-header .site-wordmark img{width:27px;height:27px}
+ .unified-header nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .unified-header .site-basket>span{display:none}
+ .footer-map{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .footer-map nav>a{min-height:44px;overflow-wrap:anywhere}
+}
+@media(max-width:360px){.unified-header .site-wordmark{font-size:22px}.unified-header .header-inner{gap:6px}}
+
+/* The form and summary share the same page grid. Group borders and measured
+   spacing make the three decisions readable before the unpaid submission. */
+.shop-shell .delivery-flow-page{width:calc(100% - var(--cv-gutter)*2);max-width:1280px;padding:28px 0 64px}
+.shop-shell .delivery-heading h1{margin:10px 0 14px;max-width:720px}
+.shop-shell .delivery-heading>div>p:last-child{font-size:16px;line-height:1.6;max-width:650px}
+.request-explainer{display:flex;align-items:flex-start;gap:12px;background:var(--mint);border:1px solid #47715525;border-radius:10px;padding:16px 18px;margin-top:20px;font-size:14px;line-height:1.6;max-width:680px}
+.request-explainer strong{display:block;margin-bottom:3px}
+.request-explainer p{margin:0}
+.request-explainer svg{flex-shrink:0;margin-top:2px}
+.shop-shell .delivery-flow-page form{min-width:0}
+.shop-shell .delivery-flow-page fieldset{margin:0 0 28px;padding:22px 24px 24px;border:1px solid #26133d26;border-radius:12px;background:#fffdf8;min-width:0}
+.shop-shell .delivery-flow-page legend{padding:0 8px;margin:0 -8px;font-size:25px;line-height:1.2;max-width:100%}
+.shop-shell .delivery-flow-page fieldset>p{font-size:14px;line-height:1.65;margin-bottom:14px}
+.shop-shell .delivery-flow-page .fields{gap:18px;margin:0}
+.shop-shell .delivery-flow-page .fields label{min-width:0;font-size:13px;gap:8px}
+.shop-shell .delivery-flow-page input:not([type=checkbox]){font-size:16px;min-height:50px;background:#fffdf8}
+.shop-shell .delivery-location>p>a{display:inline-flex;align-items:center;min-height:44px;text-underline-offset:4px}
+.shop-shell .delivery-flow-page .order-consent{font-size:14px;line-height:1.65;padding:14px;background:#f1eafb80;border-radius:8px}
+.shop-shell .delivery-flow-page .order-consent input{flex:0 0 22px;width:22px;height:22px;accent-color:var(--cv-action)}
+.shop-shell .delivery-summary{padding:28px;border:1px solid #26133d0d;border-radius:14px;min-width:0}
+.shop-shell .delivery-summary h2{font-size:34px;margin:3px 0 8px}
+.shop-shell .delivery-summary .delivery-item>div:last-child{min-width:0;overflow-wrap:anywhere}
+.delivery-area-status{line-height:1.5;align-items:start}
+.delivery-area-status>*{min-width:0;overflow-wrap:anywhere}
+.delivery-area-status strong{max-width:55%}
+.shop-shell .delivery-summary dl>div{line-height:1.5}
+.shop-shell .delivery-summary dd{max-width:58%;overflow-wrap:anywhere}
+.shop-shell .delivery-summary .total{flex-wrap:wrap}
+.shop-shell .delivery-summary .payment-coming-soon{margin:18px 0 6px;font-size:14px;line-height:1.6;border-radius:10px}
+.shop-shell .delivery-summary>.button{min-height:50px;font-size:16px}
+.shop-shell .delivery-summary .delivery-next-note{font-size:13px;line-height:1.6;margin:18px 0 10px}
+.shop-shell .delivery-summary>.text-button{margin-top:4px;white-space:normal;text-align:left}
+.shop-shell .test-complete{width:calc(100% - var(--cv-gutter)*2);max-width:850px;min-height:0;margin:36px auto 60px;padding:44px;border:1px solid #26133d18;border-radius:18px;gap:18px}
+.shop-shell .test-complete>svg{color:#365e48;background:var(--mint);box-sizing:content-box;padding:14px;border-radius:50%}
+.shop-shell .test-complete h1{font-size:clamp(36px,4.5vw,56px);line-height:1.06;max-width:650px}
+.shop-shell .test-complete>p{line-height:1.6}
+.completion-details{width:100%;max-width:620px;margin:6px 0;padding:24px;text-align:left;background:#fffdf8;border:1px solid #26133d16;border-radius:12px}
+.shop-shell .completion-details p+p{margin-top:14px}
+.completion-details>p:first-child strong{display:block;font-size:18px;letter-spacing:.02em;color:var(--ink)}
+.confirmation-next{width:100%;max-width:620px;text-align:left;border-radius:12px;padding:22px 24px;background:var(--mint);font-size:15px;line-height:1.65}
+.shop-shell .confirmation-next h2{font-size:25px;margin:0 0 12px}
+.confirmation-next ol{padding-left:22px;margin:0}
+.confirmation-next li+li{margin-top:10px}
+.confirmation-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin-top:8px;width:100%}
+.confirmation-actions>.button{flex:1 1 200px;max-width:290px}
+@media(min-width:1001px){
+ .shop-shell .delivery-flow-page{gap:30px 36px;grid-template-columns:minmax(0,1fr) 350px}
+}
+@media(max-width:1000px){
+ .shop-shell .delivery-flow-page .checkout-grid{gap:12px}
+ .shop-shell .delivery-summary{max-width:none}
+ .shop-shell .delivery-heading{margin-bottom:28px}
+}
+@media(max-width:600px){
+ .shop-shell .delivery-flow-page{padding-top:20px;padding-bottom:40px}
+ .shop-shell .delivery-heading h1{font-size:36px}
+ .shop-shell .delivery-flow-page fieldset{padding:18px 16px 20px;margin-bottom:24px}
+ .shop-shell .delivery-flow-page legend{font-size:23px}
+ .shop-shell .delivery-flow-page .fields{grid-template-columns:minmax(0,1fr);gap:18px}
+ .shop-shell .delivery-flow-page .order-consent{padding:12px;gap:10px}
+ .request-explainer{padding:14px;font-size:14px}
+ .shop-shell .delivery-summary{padding:24px 20px}
+ .shop-shell .test-complete{padding:28px 20px;margin:24px auto 40px}
+ .completion-details,.confirmation-next{padding:20px 16px}
+ .confirmation-actions{flex-direction:column}
+ .confirmation-actions>.button{flex:auto;max-width:none;width:100%}
+}
+.request-explainer{display:block}
+.confirmation-actions>.text-button{justify-content:center;min-height:48px}
+/* Tablet editing keeps the crop legible before putting tools alongside it. */
+@media(min-width:601px) and (max-width:1000px){
+ .studio-workbench{grid-template-columns:minmax(0,1fr) 290px;gap:22px}
+ .studio-library{grid-column:1/-1;border-right:0;border-bottom:1px solid #26133d18;padding:0 0 16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+ .studio-library-title{margin-right:auto}
+ .shop-shell .studio-add{width:auto;margin:0;padding-inline:14px}
+ .studio-thumbnails{order:3;display:flex;flex-wrap:nowrap;width:100%;max-height:none;overflow-x:auto;padding:4px}
+ .studio-thumbnails button{flex:0 0 70px}
+ .studio-library>small,.studio-library>p{display:none}
+ .shop-shell .studio-library .studio-remove{margin:0;min-height:44px}
+ .studio-review-bar{flex-wrap:wrap}
+ .studio-review-bar>.button{width:100%}
+}
+@media(min-width:601px) and (max-width:760px){
+ .studio-workbench{grid-template-columns:minmax(0,1fr)}
+ .studio-stage{max-width:500px;margin-inline:auto}
+ .studio-inspector{width:100%}
+}
+.shop-shell .studio-reset,.shop-shell .studio-adjust-heading .studio-reset{min-height:44px;padding:6px 2px;font-size:12px}
+.shop-shell .studio-zoom button,.shop-shell .collection-icon{min-width:44px;min-height:44px}
+@media(max-width:380px){
+ .studio-progress li+li:before{width:12px;margin-inline:7px}
+ .studio-progress button{gap:6px;font-size:11px}
+ .studio-progress button span{width:28px;height:28px}
+ .has-photo .studio-review-bar{grid-template-columns:minmax(0,1fr) auto}
+ .shop-shell .has-photo .studio-review-bar>.button{padding-inline:10px;font-size:12px}
+}

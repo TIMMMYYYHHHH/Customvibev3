@@ -419,3 +419,60 @@
 @media(min-width:651px) and (max-width:800px){
  .storefront .thread-brand .questions{grid-template-columns:1fr;gap:28px}
 }
+
+/* Responsive composition: copy determines the narrow hero height, and the
+   equal-size photo magnets occupy real grid rows instead of fixed offsets. */
+.storefront .thread-brand .photo-options button{flex:1;min-width:44px;min-height:44px}
+.storefront .thread-brand .product-info .text-link,.storefront .grid-switch button{min-height:44px}
+@media(max-width:900px){
+ .storefront .thread-brand .thread-flow{padding-top:0}
+ .storefront .thread-brand .chapter-hero{width:100%;container-type:inline-size}
+ .storefront .thread-brand .chaos-hero{width:min(650px,100%);height:auto;min-height:0;padding:32px 30px 38px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px;row-gap:46px;align-items:start}
+ .storefront .thread-brand .chaos-title{position:relative;inset:auto;grid-column:1/-1;width:100%;margin-bottom:6px}
+ .storefront .thread-brand .chaos-title h1{font-size:clamp(38px,7.4cqw,66px);margin:20px 0;line-height:1.02}
+ .storefront .thread-brand .chaos-title>.overline{font-size:11px;max-width:100%;line-height:1.5}
+ .storefront .thread-brand .chaos-title>p:not(.overline){font-size:clamp(17px,3.5cqw,21px);margin-bottom:24px}
+ .storefront .thread-brand .chaos-title>.action{font-size:18px;min-height:52px;padding:14px 25px}
+ .storefront .thread-brand .chaos-title>small{font-size:12px;margin:18px 0 0}
+ .storefront .thread-brand .chaos-hero .scattered{position:relative;inset:auto;width:100%;max-width:230px;justify-self:center}
+ .storefront .thread-brand .scatter-1,.storefront .thread-brand .scatter-3{margin-top:16px}
+ .storefront .thread-brand .chaos-hero .scatter-4{grid-column:1/-1;width:calc((100% - 40px)/2);margin-top:-4px}
+ .storefront .thread-brand .scattered>span{font-size:22px;margin-top:8px}
+ .storefront .thread-brand .chapter-hero .thread-heart{left:50%!important;top:69%!important;width:28px}
+ .storefront .thread-brand .story{grid-template-columns:1fr;gap:36px;padding:48px 0}
+ .storefront .thread-brand .story-copy{max-width:560px;margin-inline:auto}
+ .storefront .thread-brand .chapter-story .story-image{max-width:360px;grid-template-columns:minmax(0,1fr);margin:15px auto 0}
+ .storefront .thread-brand .story-scribble{grid-column:1;grid-row:1;justify-self:end;width:110px;margin:0 0 30px;font-size:24px}
+ .storefront .thread-brand .story-photo{grid-row:2}
+ .storefront .thread-brand .photo-options{grid-row:3;max-width:300px}
+ .storefront .thread-brand .story-copy h2{font-size:clamp(36px,5vw,48px)}
+ .storefront .thread-brand .story-copy>p:not(.overline){font-size:17px;max-width:none}
+ .storefront .thread-brand .make-it{grid-template-columns:1fr;gap:28px;padding:30px 0 50px}
+ .storefront .thread-brand .make-it .tray{width:min(100%,480px);margin:0 auto}
+ .storefront .thread-brand .make-it>div{max-width:560px;margin:auto}
+ .storefront .thread-brand .reviews{grid-template-columns:1fr;gap:28px}
+ .storefront .thread-brand .questions{grid-template-columns:minmax(0,1fr);gap:28px}
+}
+@media(min-width:541px) and (max-width:900px){
+ .storefront .thread-brand .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 24px}
+ .storefront .thread-brand .product-grid article:nth-child(n){padding-top:0}
+ .storefront .thread-brand .product-info p{font-size:15px}
+ .storefront .thread-brand .section-heading{align-items:start;gap:24px}
+ .storefront .thread-brand .section-heading>p{font-size:16px;max-width:240px}
+ .storefront .thread-brand .chaos-price-grid{gap:14px}
+ .storefront .thread-brand .chaos-price-grid article{padding:24px 12px}
+ .storefront .thread-brand .chaos-price-grid .action{font-size:15px;padding-inline:8px}
+}
+@media(max-width:540px){
+ .storefront .thread-brand .chaos-hero{padding:28px 28px 36px;column-gap:32px;row-gap:38px}
+ .storefront .thread-brand .chaos-title h1{font-size:clamp(35px,10.5cqw,52px);margin:20px -10px}
+ .storefront .thread-brand .chaos-title>p:not(.overline){font-size:17px;margin-inline:-8px}
+ .storefront .thread-brand .chaos-hero .scatter-4{width:calc((100% - 32px)/2)}
+ .storefront .thread-brand .scattered>span{font-size:20px}
+ .storefront .thread-brand .hero-accent{width:26px;height:26px}
+ .storefront .thread-brand .chapter-story .story-image{max-width:min(265px,calc(100% - 32px))}
+ .storefront .thread-brand .collections .section-heading>p{font-size:17px}
+ .storefront .thread-brand .reviews-source{align-items:start;flex-wrap:wrap;gap:8px}
+ .storefront .reviews-source a,.storefront .review>a{display:inline-flex;align-items:center;min-height:44px}
+}
+.storefront .thread-brand .photo-options{max-width:100%;gap:clamp(4px,1.5vw,8px)}

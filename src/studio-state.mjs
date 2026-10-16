@@ -1,5 +1,6 @@
 export const createStudio=()=>({photos:[],selected:null,defaultFormat:'photo',step:'make'});
 export function studioReducer(state,action){
+ if(action.type==='reset')return createStudio();
  if(action.type==='settings')return {...state,...action.patch};
  if(action.type==='update-photo')return {...state,photos:state.photos.map(p=>p.id===action.id?{...p,...action.patch}:p)};
  if(action.type==='photos'){

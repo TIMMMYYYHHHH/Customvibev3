@@ -1,3 +1,4 @@
+import {requestReference} from '../src/request-reference.mjs';
 import {orderRecord} from './order-record.mjs';
 import {boundedBody,cookie,sameOrigin,constantEqual,random,signToken,verifyToken} from './auth.mjs';
 import {MAX_BODY,validateContact,validateOrder,orderEmails,artworkManifest,fingerprintPayload} from './submission-model.mjs';
@@ -49,11 +50,11 @@ export async function submissions(request,env,network=fetch){
   }
   const id=await digest(kind+':'+submission.id,env.SESSION_SECRET),fingerprint=await digest('payload:'+fingerprintPayload(submission),env.SESSION_SECRET),key=await digest('forms-ip:'+ip,env.SESSION_SECRET);
   const permit=await state(env,'reserve',{id,fingerprint,key,kind,createdAt:submission.createdAt});
-  if(permit.expired)return fail(410,'This draft is too old to send as a new request. Contact CustomVibe with its reference before starting again.');
-  if(permit.conflict)return fail(409,'This request changed. Contact us with your reference before sending it again.');
+  if(permit.expired)return fail(410,kind==='contact'?'This message is too old to send. Email hello@customvibe.co.za with the address you used and approximate submission time before trying again.':'This draft is too old to send as a new request. Contact CustomVibe with its reference before starting again.');
+  if(permit.conflict)return fail(409,kind==='contact'?'This message changed. Email hello@customvibe.co.za with the address you used and approximate submission time before trying again.':'This request changed. Contact us with your reference before sending it again.');
   if(!permit.allowed)return fail(429,'The sending limit has been reached. Keep your draft and try again later.');
   if(kind==='contact'){
-   const uncertain=()=>Response.json({error:'We could not confirm your message. Email hello@customvibe.co.za with this reference so we can check before you send it again.',manualReview:true,reference:submission.id},{status:503});
+   const uncertain=()=>Response.json({error:'We could not confirm your message. Email hello@customvibe.co.za with the address you used and approximate submission time so we can check before you send it again.',manualReview:true,reference:submission.id},{status:503});
    if(!permit.ownerSent){
     // W3Forms has no documented durable idempotency contract. Claim once before
     // calling it; ambiguous outcomes require an inbox/dashboard check, not resend.
@@ -70,8 +71,8 @@ export async function submissions(request,env,network=fetch){
    return Response.json({ok:true,reference:submission.id,status:'message-sent',receiptSent:null});
   }
   const recordEnabled=env.ORDER_RECORDS_ENABLED==='true';
-  const recordCall=async(path,body)=>{const r=await env.AUTH.fetch('https://auth.internal/orders/'+path,{method:'POST',body:JSON.stringify({id:submission.id,...body})});if(!r.ok)throw Error('Order record unavailable');return r.json()};
-  if(recordEnabled)await recordCall('create',{fingerprint,snapshot:orderRecord(submission,privateArtwork),privateArtwork});
+  const recordCall=async(path,body)=>{const r=await env.AUTH.fetch('https://auth.internal/orders/'+path,{method:'POST',body:JSON.stringify({id:submission.id,...body})});if(!r.ok)throw Object.assign(Error('Order record unavailable'),{status:r.status});return r.json()};
+  if(recordEnabled){try{await recordCall('create',{fingerprint,snapshot:orderRecord(submission,privateArtwork),privateArtwork});}catch(error){if(error.status===409)return fail(409,'This request reference needs review. Keep this draft and contact CustomVibe with its reference before sending again.');throw error;}}
   const emails=orderEmails(submission,privateArtwork);
   if(recordEnabled&&privateArtwork){for(const field of ['text','html'])emails.owner[field]=emails.owner[field].replace('/artwork?request=','/orders?order=');}
 
@@ -79,6 +80,6 @@ export async function submissions(request,env,network=fetch){
   let receiptSent=permit.receiptSent;
   if(kind==='order'&&!receiptSent){try{await mail(emails.customer,`cv-${kind}-${submission.id}-customer`,env,network);await state(env,'mark',{id,stage:'receipt_sent'});receiptSent=true;}catch{receiptSent=false;}}
   if(recordEnabled){await recordCall('delivery',{stage:'owner_sent'});if(receiptSent)await recordCall('delivery',{stage:'receipt_sent'});}
-  return Response.json({ok:true,reference:kind==='order'?'CV-'+submission.id:submission.id,status:kind==='order'?'unpaid-request':'message-sent',receiptSent:kind==='order'?receiptSent:null});
+  return Response.json({ok:true,reference:requestReference(submission),status:kind==='order'?'unpaid-request':'message-sent',receiptSent:kind==='order'?receiptSent:null});
  }catch{return fail(503,'We could not confirm sending. Retry this same request to avoid duplicates. Keep this tab open.');}
 }

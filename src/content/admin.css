@@ -43,3 +43,12 @@
 .admin-success{display:flex;align-items:center;gap:10px;background:#e4f1e9;padding:16px;border-radius:9px;margin-bottom:20px!important}
 @media(max-width:1000px){.admin-image-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.admin-heading{align-items:start;flex-direction:column;gap:15px}.admin-toolbar{align-items:start;flex-direction:column;gap:12px}.admin-tabs{gap:3px}.admin-tabs button{padding:10px 13px;font-size:13px}.admin-catalogue{grid-template-columns:1fr;gap:20px}.admin-product-list{display:flex;overflow-x:auto;padding-bottom:8px;gap:8px}.admin-product-list>button{flex:0 0 160px;margin:0!important}.admin-product-form{padding:20px}.admin-form-grid{grid-template-columns:1fr;gap:0}.admin-image{grid-template-columns:80px minmax(0,1fr);gap:14px}.admin-image-grid .admin-image{grid-template-columns:90px minmax(0,1fr)}.admin-savebar{gap:10px 20px;padding:12px 0}.admin-savebar .button{width:100%}}
+.admin-form-grid>.cv-stage-select{min-width:0;margin-bottom:16px}
+.admin-page .cv-stage-select>label{margin-bottom:7px}
+.admin-page .cv-stage-trigger{min-height:46px;gap:24px;padding:10px 14px;font-weight:400}
+.admin-page .cv-stage-options{font-weight:400}
+.admin-product-form{box-shadow:0 4px 0 #35233f06}
+.admin-product-list>button.selected{border-color:#d2a8b9!important;background:#f6e9ef!important}
+.admin-save-state{padding:7px 12px;background:#eee6f1;border-radius:20px;color:#584263}
+.admin-savebar{box-shadow:0 -10px 22px #faf8f4}
+@media(max-width:760px){.admin-catalogue{gap:22px}.admin-form-grid{grid-template-columns:1fr}.admin-page .cv-stage-select{margin-bottom:16px}.admin-product-form{padding:20px}}

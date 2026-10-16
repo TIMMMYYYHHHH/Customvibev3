@@ -19,3 +19,6 @@ test-results/
 *.bak
 *.sqlite*
 *.db
+
+# Local read-only screenshot baseline; never publish.
+.review-baseline/
