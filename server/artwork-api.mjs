@@ -9,7 +9,7 @@ const call=(env,path,body)=>env.AUTH.fetch('https://auth.internal/artwork/'+path
 const owner=(env,session)=>hash('artwork-owner:'+session.jti,env.SESSION_SECRET);
 export async function initArtwork(env,session,submission,ip,resumeToken){
  const fingerprint=await hash(fingerprintPayload(submission),env.SESSION_SECRET);let artworkOwner=await owner(env,session);
- if(resumeToken){const recovery=await verifyToken(resumeToken,env.SESSION_SECRET,'artwork-resume');if(!recovery||recovery.id!==submission.id||recovery.hash!==fingerprint||!artworkHash(recovery.owner))return fail(403,'This request recovery token is invalid or expired. Contact us with the reference before starting again.');artworkOwner=recovery.owner;}
+ if(resumeToken){const recovery=await verifyToken(resumeToken,env.SESSION_SECRET,'artwork-resume');if(!recovery||recovery.id!==submission.id||recovery.hash!==fingerprint||!artworkHash(recovery.owner))return fail(403,'We could not resume this order. Contact us with the reference before starting again.');artworkOwner=recovery.owner;}
  const response=await call(env,'init',{id:submission.id,owner:artworkOwner,key:await hash('artwork-ip:'+ip,env.SESSION_SECRET),files:artworkManifest(submission)});
  if(!response.ok)return response;
  const {expires}=await response.json();
@@ -25,7 +25,7 @@ export async function verifyArtworkGrant(token,env,session,submission){
 }
 export async function privateUpload(request,env,session){
  const grant=await verifyArtworkGrant(request.headers.get('X-Artwork-Grant'),env,session);
- if(!grant)return fail(403,'Refresh the security check and retry this same request.');
+ if(!grant)return fail(403,'Refresh the security check and retry this same order.');
  // The trusted service chooses the object key. Never pass through caller owner or ID headers.
  return env.AUTH.fetch('https://auth.internal/artwork/upload',{method:'POST',headers:{'Content-Type':request.headers.get('content-type')||'','X-Artwork-Id':grant.id,'X-Artwork-Owner':grant.owner,'X-Artwork-Index':request.headers.get('X-Artwork-Index')||''},body:request.body,duplex:'half'});
 }

@@ -11,7 +11,7 @@ export function createStageMover(request,onState,onSaved){
    if(reconcile){
     const current=await request(root);
     if(current.version===order.version+1&&current.status===target){onSaved(current);report('saved');pending=null;return;}
-    if(current.version!==order.version||current.status!==order.status)throw Object.assign(Error('This request changed elsewhere. Reload it before choosing a stage.'),{status:409});
+    if(current.version!==order.version||current.status!==order.status)throw Object.assign(Error('This order changed elsewhere. Reload it before choosing a stage.'),{status:409});
    }
    await request(root+'/status',{status:target,version:order.version});
    // Read the authoritative state and history, including any subsequent change.

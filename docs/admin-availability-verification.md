@@ -1,5 +1,9 @@
 # Admin availability recovery
 
+## Current owner decision, 17 October 2026
+
+Tim chose to leave the availability investigation and stability follow-up Blocked and return later. Do not contact Cloudflare or resume diagnostics until he resumes this work. The report below remains unsent. Phone email acceptance stays on hold. Independent wording work may proceed.
+
 ## Evidence, 16 October 2026
 
 A normal authenticated Orders GET returned 503. Privacy-safe diagnostics on admin version `056240e9-234a-4e65-8f46-962d6fb5e8fe` identified `auth_status`, upstream HTTP 503. Security version `1353eb50-04d3-4d3d-b68d-16712dd2e936` identified a D1 database exception during `security_status`, the session-revocation SELECT, taking about 2.9 seconds. Later identical checks succeeded in about 0.16 seconds without changing data or configuration. The error was caught, so Cloudflare's execution outcome of `ok` did not imply HTTP success.

@@ -68,7 +68,7 @@ export async function artworkService(request,env){
   if(pending.n)return fail(409,'Some artwork has not finished uploading.');
   await env.DB.prepare('UPDATE artwork_requests SET finalized=1 WHERE id=?').bind(body.id).run();return Response.json({ok:true,expires:row.expires});
  }
- if(!row.finalized)return fail(404,'This request has not been submitted.');
+ if(!row.finalized)return fail(404,'These designs have not been submitted.');
  const files=JSON.parse(row.manifest);
  if(path==='/artwork/detail')return Response.json({id:row.id,created:row.created,expires:row.expires,files:files.map(({name,size},index)=>({index,name,size}))});
  if(path==='/artwork/download'){

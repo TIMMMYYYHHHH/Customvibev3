@@ -10,7 +10,7 @@ import {MagnetPreview} from './MagnetPreview';
 export function CollectionReview({basket,packs,go,onEdit,onQuantity,onRemove}){
  const {content}=useContent();const sum=summarize(basket,content);
  return <main className="basket-page section collection-review-page">
-  <div className="section-heading"><div><p className="eyebrow">A LITTLE LOOK BEFORE YOUR REQUEST</p><h1>Your basket.</h1><p>All your magnets and puzzles, together.</p></div><button className="back-to-designer" onClick={()=>go('studio')}><ArrowLeft size={18}/>Back to the designer</button></div>
+  <div className="section-heading"><div><p className="eyebrow">A LITTLE LOOK BEFORE YOU ORDER</p><h1>Your basket.</h1><p>All your magnets and puzzles, together.</p></div><button className="back-to-designer" onClick={()=>go('studio')}><ArrowLeft size={18}/>Back to the designer</button></div>
   {!basket.length?<div className="empty-basket"><Bag size={44}/><h2>A little room for your favourites.</h2><p>Add photos in the designer to start your basket.</p><button className="button" onClick={()=>go('studio')}>Open the designer</button></div>:<div className="basket-layout collection-layout">
    <div className="collection-cards">{basket.map((item,index)=>{
     const editable=['photo','puzzle'].includes(item.kind);
@@ -23,7 +23,7 @@ export function CollectionReview({basket,packs,go,onEdit,onQuantity,onRemove}){
      </div>
     </article>;
    })}</div>
-   <aside className="basket-summary"><h2>Your basket total</h2><p>{sum.magnetQty} {sum.magnetQty===1?'magnet':'magnets'} in your basket</p><CollectionPrice sum={sum}/><TierNudge quantity={sum.pricedQty} onAdd={()=>go('studio')}/><button className="button" disabled={sum.unpriced} onClick={()=>go('checkout')}>Continue to request</button></aside>
+   <aside className="basket-summary"><h2>Your basket total</h2><p>{sum.magnetQty} {sum.magnetQty===1?'magnet':'magnets'} in your basket</p><CollectionPrice sum={sum}/><TierNudge quantity={sum.pricedQty} onAdd={()=>go('studio')}/><button className="button" disabled={sum.unpriced} onClick={()=>go('checkout')}>Continue to checkout</button></aside>
   </div>}
  </main>;
 }

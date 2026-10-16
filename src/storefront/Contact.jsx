@@ -55,7 +55,7 @@ export default function Contact({standalone=false}){
    {status&&<p className="contact-status" role="alert">{status}</p>}
   </form>
   {service.result&&<dialog ref={dialog} className="contact-success-modal" aria-labelledby="contact-success-title" aria-describedby="contact-success-description" onCancel={event=>{event.preventDefault();dismissSuccess();}} onKeyDown={event=>{if(event.key==='Tab'){event.preventDefault();dialog.current?.querySelector('button')?.focus();}}}>
-   <div className="contact-success-status"><span className="contact-success-mark" aria-hidden="true">✓</span><span>Thank you for your note</span></div><h2 id="contact-success-title">Message received.</h2><p id="contact-success-description">Your message has been accepted by our submission service. This confirms submission, not inbox delivery.</p><button className="action" type="button" autoFocus onClick={dismissSuccess}>Close confirmation</button>
+   <div className="contact-success-status"><span className="contact-success-mark" aria-hidden="true">✓</span><span>Thank you for your note</span></div><h2 id="contact-success-title">Message received.</h2><p id="contact-success-description">Your message has been submitted. We’ll reply using the email address you provided.</p><button className="action" type="button" autoFocus onClick={dismissSuccess}>Close confirmation</button>
   </dialog>}
  </section>;
 }

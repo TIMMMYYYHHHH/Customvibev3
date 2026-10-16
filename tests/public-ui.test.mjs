@@ -8,9 +8,9 @@ const {SiteHeader}=await vite.ssrLoadModule('/src/SiteChrome.jsx');
 const {StudioProgress}=await vite.ssrLoadModule('/src/Editor.jsx');
 const {default:Contact}=await vite.ssrLoadModule('/src/storefront/Contact.jsx');
 const wrap=child=>renderToStaticMarkup(React.createElement(ContentProvider,{initialContent:defaultContent},React.createElement(SubmissionProvider,null,child)));
-test('public navigation and progress name the basket and unpaid request consistently',()=>{
+test('public navigation and progress name the basket and checkout consistently',()=>{
  const header=wrap(React.createElement(SiteHeader,{page:'home'}));assert.match(header,/>Contact us<\/a>/);assert.match(header,/href="\/contact"/);
- const progress=wrap(React.createElement(StudioProgress,{step:'review',hasPhotos:true,onStep:()=>{}}));assert.match(progress,/>Basket<\/button>/);assert.match(progress,/>Request<\/button>/);assert.doesNotMatch(progress,/>Review<\/button>/);
+ const progress=wrap(React.createElement(StudioProgress,{step:'review',hasPhotos:true,onStep:()=>{}}));assert.match(progress,/>Basket<\/button>/);assert.match(progress,/>Checkout<\/button>/);assert.doesNotMatch(progress,/>Review<\/button>/);
 });
 test('contact form has a privacy link without provider copy, photos warning or reference',()=>{
  const contact=wrap(React.createElement(Contact,{standalone:true}));assert.match(contact,/href="\/privacy"/);assert.doesNotMatch(contact,/W3Forms|keep photos|payment details|Message reference/);assert.match(contact,/aria-label="Contact us"/);

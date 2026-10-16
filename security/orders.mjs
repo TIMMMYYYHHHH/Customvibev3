@@ -24,9 +24,9 @@ export async function orderService(request,env){
   if(b.privateArtwork){const a=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(b.id).first();if(!a?.finalized||a.expires<=time)return fail(409,'Complete artwork first.');const files=b.snapshot.items.flatMap(i=>i.files),manifest=JSON.parse(a.manifest);if(files.length!==manifest.length||files.some((f,n)=>f.index!==n||f.name!==manifest[n].name||f.size!==manifest[n].size||f.proof!==manifest[n].proof))return fail(409,'Artwork does not match order.');expires=Math.min(expires,a.expires);}
   // This single insert checks the display label atomically. No migration or legacy rewrite.
   await env.DB.prepare("INSERT INTO orders(id,fingerprint,snapshot,created,expires) SELECT ?,?,?,?,? WHERE ? IS NULL OR NOT EXISTS (SELECT 1 FROM orders WHERE json_extract(snapshot,'$.reference')=?) ON CONFLICT(id) DO NOTHING").bind(b.id,b.fingerprint,JSON.stringify(b.snapshot),time,expires,b.snapshot.reference??null,b.snapshot.reference??null).run();
-  row=await env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first();if(!row)return fail(409,'Request reference needs review. Keep this draft and contact CustomVibe.');return row.fingerprint===b.fingerprint&&row.snapshot===JSON.stringify(b.snapshot)?Response.json({ok:true,reference:reference(row)}):fail(409,'Order changed.');
+  row=await env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first();if(!row)return fail(409,'Order reference needs review. Keep this draft and contact CustomVibe.');return row.fingerprint===b.fingerprint&&row.snapshot===JSON.stringify(b.snapshot)?Response.json({ok:true,reference:reference(row)}):fail(409,'Order changed.');
  }
- if(!row)return fail(404,'Order not found. Older requests may only have artwork.');
+ if(!row)return fail(404,'Order not found. Older orders may only have artwork.');
  if(row.expires<=time)return fail(410,'This order has expired.');
  if(path==='detail')return Response.json({...view(row),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,'SELECT version,status,state,created,updated FROM order_updates WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results});
  if(path==='claim-update'){
