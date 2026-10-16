@@ -40,7 +40,7 @@ The repository AGENTS.md holds the lasting working rules. The root project AGENT
 
 Production checkout rule: only server-verified successful payment completes an order and triggers the order confirmation email. Pending, failed, cancelled or unverified payment must not complete an order or send its confirmation. A browser return to a success URL alone is not proof of payment. Payment callbacks and confirmation sends must remain idempotent. There is no separate owner-acceptance step; later status updates remain manual. Payments on the currently locked live site stay disabled until separately approved. Design previews may show clearly labelled fictional paid orders, but must never send or imply the live gateway exists.
 
-This supersedes the earlier incomplete interpretation that submission alone completes an order. The local proposed emails show a fictional paid production order. The Current comparison remains the deployed payment-disabled copy. Live payment integration is not implemented or approved by this design decision. Founders Hub tracks the dependency in “Choose a payment provider and approve paid-checkout scope”; cross-surface copy remains in “Make wording consistent across website, admin and emails”.
+This supersedes the earlier incomplete interpretation that submission alone completes an order. The local proposed emails show a fictional paid production order. The Current comparison remains the deployed payment-disabled copy. Live payment integration is not implemented or approved by this design decision. Founders Hub tracks the dependency in “Confirm Yoco test and paid-checkout scope”; cross-surface copy remains in “Make wording consistent across website, admin and emails”.
 
 ## Wording alignment, 17 October 2026
 
@@ -49,3 +49,7 @@ The current payment-disabled flow calls placed records orders, with Unpaid shown
 ## Order references and admin previews
 
 Owner decision, 17 October 2026: use server-assigned sequential order numbers such as CV-000004. Keep older emailed references traceable and searchable without rewriting saved orders or send history. The admin preview renders the same HTML used for the manual email, with recipient, subject and a separate Send update action. Browser previews do not establish Gmail phone rendering acceptance.
+
+## Provider readiness, 17 October 2026
+
+Tim selected Yoco as the payment gateway to test. Founders Hub tracks account details and test-access preparation in Required business information, alongside the existing Google Business requirements and PUDO locker account setup. Live payment collection remains disabled and separately approved. PUDO setup and the locker map are waiting for Tim to gather the registration details; no account or live data connection was completed.
