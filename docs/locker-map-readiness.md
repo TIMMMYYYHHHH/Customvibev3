@@ -40,3 +40,9 @@ The public courier locator cannot be relied on as a cross-site iframe, so the cu
 - No email, new order, order-stage change or courier booking used for verification.
 
 Live publication and final deployed checks are recorded in Founders Hub activity after deployment.
+
+### Published verification
+
+Application commit `8f2b27e` published through [protected workflow 38983715542](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38983715542). Public/admin builds, 167 tests, business destination checks and post-publication protection checks passed. No admin Worker was deployed.
+
+The signed-in live storefront loaded the matching `main-TnKJPSf0.js` bundle. At 393 px, checkout initially contained no map iframe; Show area map then loaded real OpenStreetMap geography with visible attribution. Manual locker entry updated both the new preference panel and existing basket summary. No sample search or pins appeared. The public brand icon was used only in an unsent browser draft, and a final reload cleared that draft to an empty basket. No contact details, order, email, stage change or courier booking was submitted.
