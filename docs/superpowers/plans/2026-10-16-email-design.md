@@ -24,7 +24,7 @@
 - [x] Keep the existing admin plain-text preview and send controls. Render actual HTML in a local verification gallery without broadening admin UI or CSP scope.
 - [x] Run public/admin builds; inspect actual fixture rendering at desktop and mobile sizes.
 - [x] Independent review, resolve findings, commit only scoped files, deploy business admin and protected Pages.
-- [ ] Verify live preview without sending or changing stages. Update Hub task/service records and verify persistence.
+- [x] Verify live preview without sending or changing stages. Update Hub task/service records and verify persistence.
 
 ## Execution notes
 Owner already approved implementation and routine deployment. Continue inline without another approval gate. Inbox delivery requires a fresh authorised example, not resending an accepted order version. W3Forms styling, Gmail saved replies, embedded customer thumbnails and gateway integration remain separately tracked.
@@ -33,4 +33,4 @@ Implementation scope decision: keep the existing admin plain-text preview, which
 
 Final review: one catalogue-pack quantity finding corrected. Regression observed failing then passing. Full suite: 144/144. Public/admin builds passed. Browser actual-render checks: six variants and long data at 390px, no horizontal overflow, all inline images resolved. No unresolved code-review findings.
 
-Publication succeeded: application0967af7, protected workflow38938316022, admin Worker61e7f598-90eb-431c-a07c-64551802731e. Live signed-in preview needs a fresh owner sign-in; inbox rendering remains open separately.
+Publication succeeded: application0967af7, protected workflow38938316022, admin Worker61e7f598-90eb-431c-a07c-64551802731e. Signed-in live preview and unchanged history verified after Tim restored access. Duplicate protection still blocks the previously accepted update. No emails sent or stages changed; inbox rendering remains open separately.
