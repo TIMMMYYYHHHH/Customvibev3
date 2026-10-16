@@ -1,8 +1,9 @@
+import {reportUnavailable} from '../server/availability.mjs';
 import {ordersAPI} from './orders-api.mjs';
 import {gate,secure,sameOrigin,constantEqual,boundedBody,unavailable} from '../server/auth.mjs';
 import {readContent,saveContent} from '../server/content.mjs';
 import fallback from '../data/site-content.json' with {type:'json'};
-export default {async fetch(request,env){try{const url=new URL(request.url);if(url.protocol!=='https:')return secure(Response.redirect('https://'+url.host+url.pathname+url.search,308),{admin:true});// Only public brand files are available before sign-in, never application assets or data.
+export default {async fetch(request,env){let phase='admin_request';try{const url=new URL(request.url);if(url.protocol!=='https:')return secure(Response.redirect('https://'+url.host+url.pathname+url.search,308),{admin:true});// Only public brand files are available before sign-in, never application assets or data.
  if(['/favicon.png','/icon-180.png','/admin-brand/fonts.css','/admin-brand/fredoka.woff2','/admin-brand/dm-sans.woff2'].includes(url.pathname))return secure(['GET','HEAD'].includes(request.method)?await env.ASSETS.fetch(request):new Response('Method not allowed',{status:405}),{admin:true});
  const auth=await gate(request,env,'admin');if(auth.response)return secure(auth.response,{admin:true});const reply=r=>secure(r,{admin:true});
  if(url.pathname==='/api/orders'||url.pathname.startsWith('/api/orders/'))return reply(await ordersAPI(request,env,auth.session));
@@ -20,5 +21,6 @@ export default {async fetch(request,env){try{const url=new URL(request.url);if(u
  }
  if(url.pathname.startsWith('/api/')||url.pathname.startsWith('/internal/')||url.pathname.includes('..')||/\.(?:map|sql|log|bak)$/.test(url.pathname))return reply(new Response('Not found',{status:404}));
  if(!['GET','HEAD'].includes(request.method))return reply(new Response('Method not allowed',{status:405}));
+ phase='admin_assets';
  return reply(await env.ASSETS.fetch(['/artwork','/orders','/content'].includes(url.pathname)?new Request(url.origin+'/',request):request));
- }catch{return secure(unavailable(),{admin:true})}}};
+ }catch(error){reportUnavailable(phase,error);return secure(unavailable(),{admin:true})}}};
