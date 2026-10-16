@@ -17,4 +17,16 @@ Public, SSR/prerender and admin builds passed. Existing suite: 159 tests passed,
 
 Local browser checks used synthetic fixtures with all form calls intercepted: checkout and confirmation, unpaid messaging, desktop order details, the manual-update entry point/history and the 390px admin layout. No real email or production order was created, and no stage/history was changed.
 
-Publication and live verification are recorded below after deployment. Intermittent availability and phone email acceptance remain separately Blocked at the owner's request.
+## Publication
+
+- Application: `2c8472c87f10f3d44302c28b4b07b3dc78771c69`.
+- Protected Pages [workflow 38974270469](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38974270469) succeeded with all builds, 159 tests and before/after protection checks.
+- Admin Worker: `54dfff86-abd1-4c70-a6c4-70259f8658a8`, asset `index-Djc8w0DM.js`.
+- Security Worker: `c3cbd143-0ce8-4cd2-91cf-918ffa1008ff`.
+- Existing business admin protection guard passed before and after publication. No migration, resource or setting changes.
+
+## Live check
+
+The signed-in storefront shows the revised photo FAQ, Checkout progress label and From our tribe to yours. footer. Tim refreshed the normal admin session. Live Orders shows Find an order, Refresh orders, Open order, Move order and Unpaid orders. CV-000001 remains In progress with its 14-day expiry, two accepted manual updates and disabled duplicate preview; the revised Customer order email label is visible. The board also correctly shows 1 magnet for the existing fresh-order record. No stages, history or records were changed. Checkout submission/confirmation were verified only in the isolated synthetic fixture, without creating another live order.
+
+Intermittent availability and phone email acceptance remain separately Blocked at the owner's request. No availability investigation was resumed.
