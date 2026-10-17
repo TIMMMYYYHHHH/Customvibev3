@@ -27,9 +27,15 @@ After the changes, the only border-left declaration in active customer/admin CSS
 - Existing isolated form-check fixture: checkout unpaid/payment notices, validation failure, uncertain retry and successful completion checked. 1280px desktop and 393px phone views inspected. Synthetic requests only, no email or production records.
 - Existing isolated admin fixture: invalid artwork ID, content-save success, stage failure and recovery controls checked. 393px phone error remains readable with full-width recovery buttons.
 - Browsed home, collections, Help, privacy, terms, returns, shipping and empty basket; shared product, contact and authentication templates reviewed.
-- 174 tests passed. Public/SSR/prerender and admin builds passed before the final completion/pricing CSS refinements; final release build checks recorded below.
+- 174 tests passed. Final public/SSR/prerender and admin builds passed after the completion/pricing CSS refinements.
 - Existing business admin destination, website gate, authentication binding, manual-send availability and credential presence verified before publication.
 
 ## Publication
 
-Pending protected publication and live appearance checks. This work does not establish physical print acceptance, phone email acceptance, resolved admin availability, public launch approval or live payment approval. Those remain in their existing tasks.
+Application dcc5734 published through [protected Pages run 38990638802](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38990638802). Tests, public/admin builds and before/after protection checks passed. The business admin was published separately using the existing business-only access helper: version d591e786-6718-4adb-aae7-0b9b89309c28. Admin protection checks passed before and after. No configuration, database or email workflow changes were made.
+
+Live 393px customer checks verified the designer's best-rate text, basket and checkout, including inline unpaid/payment guidance, crop warnings and order limits. Only a synthetic photo was loaded into browser memory. No order or email was submitted.
+
+The admin session had expired at the live artwork check, and the separate sign-in screen appeared as expected. Signed-in visual verification remains pending owner sign-in; local admin error/success/recovery rendering and deployed protection are verified. This is distinct from the separate, owner-paused admin availability investigation.
+
+This work does not establish physical print acceptance, phone email acceptance, resolved admin availability, public launch approval or live payment approval. Those remain in their existing tasks.
