@@ -1,3 +1,13 @@
+# Coming soon worktable design QA, 17 October 2026
+
+Final result: passed.
+
+The owner-attached worktable reference supersedes the mistaken fridge selection. Compared the source and implemented screenshot at 1536 x 1024, login closed. Centred headline, lilac label, tabletop composition, hands, ribbon, tissue and footer match; original product photos and the actual brand logo intentionally replace generated imagery. Mobile verified at 390px and 320px with no horizontal overflow. All assets load; password dialog opens, focuses correctly, closes and restores focus; no console warnings or errors. No unresolved P0/P1/P2 issues.
+
+See docs/coming-soon/design-qa.md for current implementation, evidence paths, asset-generation prompt and preserved superseded history. Previous unrelated admin QA follows unchanged.
+
+---
+
 # Admin board light-mode design QA
 
 Date: 17 October 2026

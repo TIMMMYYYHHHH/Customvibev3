@@ -1,4 +1,29 @@
-# Coming soon entry page
+# Coming soon worktable correction
+
+Date: 17 October 2026
+Final result: passed (local implementation and browser QA).
+
+## Current owner decision
+
+The owner supplied the exact intended screenshot after clarifying that the displayed image order had been misunderstood. The centred worktable image supersedes the earlier mint-fridge interpretation. Use the attachment, also represented by project output/coming-soon-images-v3/02-handmade-reveal.png, as the visual target. The history below is preserved as superseded work, not an approved design decision.
+
+## Implementation
+
+Centred two-line slogan, lilac coming-soon label, handmade-magnet wording, outlined top Log in button and centred footer. The worktable scene preserves the hands, berry ribbon, mint tissue and small heart. Four original product cutouts are overlaid unchanged: sunglasses, group, beach and wedding. All interface text remains semantic, editable HTML using the existing Fredoka/DM Sans and actual brand logo.
+
+The background was generated with the built-in image tool by editing the supplied reference: remove all text, UI and four magnets; preserve the exact worktable, hands, ribbon, tissue, heart, lighting and composition, leaving clear space for live text and original product overlays. Source asset: project output/coming-soon-assets/worktable-background.png, 1536 x 1024. Production asset: public/coming-soon/worktable.webp.
+
+Only the page markup, styles and explicitly named presentation asset list changed. The website gate, separate admin authentication, payment controls and customer workflows retain their existing behavior. Versioned CSS avoids reusing the previous layout from browser cache. The retired fridge image no longer bypasses the gate.
+
+## Verification
+
+Reference and local screenshot compared at 1536 x 1024 with login closed. Headline placement, two-line hierarchy, lilac label, hand/product arrangement, materials and footer match. Intentional differences: original brand logo and four real product photos replace illustrative generated imagery. No unresolved P0/P1/P2 differences. Phone checks at 390 x 844 and 320 x 740 have no horizontal overflow; all imagery loads, Log in focuses Password, Escape closes and restores focus. No browser errors or warnings.
+
+Evidence: project output/coming-soon-implementation/worktable-desktop.jpg and worktable-mobile.jpg. Focused auth/presentation tests pass (17). Full build and suite results are recorded in the release workflow and Founders Hub.
+
+---
+
+# Superseded mint-fridge implementation history
 
 Owner selected the first revision 3 image, the mint fridge, on 17 October 2026 and requested actual CustomVibe magnets.
 
