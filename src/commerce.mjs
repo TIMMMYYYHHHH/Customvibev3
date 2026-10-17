@@ -43,7 +43,6 @@ export function orderCapacity(items,content){
  const magnets=summarize(items,content).magnetQty;
  const files=items.reduce((n,item)=>n+(item.kind==='photo'?1:item.kind==='puzzle'?(item.gridSize||3)**2+1:0),0);
  const issues=[];
- if(magnets>ORDER_LIMITS.magnets)issues.push(`Remove ${magnets-ORDER_LIMITS.magnets} ${magnets-ORDER_LIMITS.magnets===1?'magnet':'magnets'} or reduce copies to stay within ${ORDER_LIMITS.magnets} magnets per order.`);
  if(items.length>ORDER_LIMITS.entries)issues.push(`Keep up to ${ORDER_LIMITS.entries} designs or collection entries per order.`);
  if(files>ARTWORK_LIMITS.files)issues.push(`These designs need ${files} artwork files. Keep up to ${ARTWORK_LIMITS.files}; use fewer puzzle designs or a smaller puzzle grid.`);
  return {magnets,files,entries:items.length,issues,allowed:issues.length===0};

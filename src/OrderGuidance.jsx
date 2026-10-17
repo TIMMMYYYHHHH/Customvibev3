@@ -17,8 +17,8 @@ export function OrderCapacity({items,content}){
  const capacity=orderCapacity(items,content);
  return <section id="order-limits" className="order-capacity" aria-label="Order limits">
   <strong>Room in this order</strong>
-  <p>{capacity.magnets} / {ORDER_LIMITS.magnets} magnets · {capacity.entries} / {ORDER_LIMITS.entries} entries · {capacity.files} / {ARTWORK_LIMITS.files} artwork files</p>
+  <p>{capacity.magnets} magnets · {capacity.entries} / {ORDER_LIMITS.entries} entries · {capacity.files} / {ARTWORK_LIMITS.files} artwork files</p>
   {!capacity.allowed&&<div className="capacity-warning" role="alert">{capacity.issues.map(issue=><p key={issue}>{issue}</p>)}<p>Your designs stay here while you make changes.</p></div>}
-  <details><summary>How the limits work</summary><p>Each photo design uses one artwork file. A 3 × 3 puzzle uses 10 files; a 5 × 5 uses 26, including its layout proof. Extra copies reuse those files but count as more magnets. Collection packs also count toward the magnet limit.</p><p>Prepared artwork: up to {ARTWORK_LIMITS.fileBytes/1000000} MB per file and {ARTWORK_LIMITS.requestBytes/1000000} MB per order. We check the final file sizes before uploading. For a larger order, <a href="mailto:hello@customvibe.co.za">contact us</a> before preparing your photos.</p></details>
+  <details><summary>How the limits work</summary><p>Each photo design uses one artwork file. A 3 × 3 puzzle uses 10 files; a 5 × 5 uses 26, including its layout proof. Extra copies reuse those files. There is no fixed magnet quantity cap; the limits apply to designs and prepared artwork.</p><p>Prepared artwork: up to {ARTWORK_LIMITS.fileBytes/1000000} MB per file and {ARTWORK_LIMITS.requestBytes/1000000} MB per order. We check the final file sizes before uploading. If your artwork needs more room, <a href="mailto:hello@customvibe.co.za">contact us</a> before preparing your photos.</p></details>
  </section>;
 }

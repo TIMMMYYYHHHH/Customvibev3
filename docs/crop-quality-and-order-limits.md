@@ -1,5 +1,12 @@
 # Crop quality and order limits
 
+## Current quantity policy, 17 October 2026
+
+The owner removed the inherited 100-magnet cap. Orders above 100 are permitted for photo copies, puzzles and collection packs. Quantities must be positive safe integers, and totals must remain safely representable. The 30-entry, 60-file, 4 MB/file and 32 MB/request limits, storage quotas and 14-day retention remain unchanged. Copies reuse each design's files. Designer, basket, checkout, Help and server validation use this policy. Earlier 100/101 boundary evidence below is historical and superseded by this decision.
+
+Regression coverage accepts 101 and 1,000 photo copies, 125 puzzle magnets with 26 files, and 101 alphabet packs; it still rejects 31 entries, 61 files, files above 4 MB and totals above 32 MB. Production and live verification will be recorded after checks complete.
+
+
 17 October 2026. Board: Artwork & email > Protect print quality for larger orders > Add crop-resolution warnings and clear order limits.
 
 ## Existing behaviour inspected

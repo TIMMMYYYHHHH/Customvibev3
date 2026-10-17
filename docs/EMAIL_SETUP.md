@@ -85,7 +85,7 @@ No email to a real customer should be used as a test without their permission. T
 
 ## Limits and retention
 
-Artwork per request is capped at about 1.5 MB raw / 2 MB Base64, 60 attachments and 100 magnets. Large collections must be split before submission. The owner receives chosen crops and puzzle pieces, not the original uncropped uploads or EXIF metadata. Acknowledge low-resolution source images before production; export resolution does not add source detail.
+Historical attachment-only limits (superseded by private storage and the 17 October 2026 removal of the magnet quantity cap): about 1.5 MB raw / 2 MB Base64, 60 attachments and 100 magnets. Large collections must be split before submission. The owner receives chosen crops and puzzle pieces, not the original uncropped uploads or EXIF metadata. Acknowledge low-resolution source images before production; export resolution does not add source detail.
 
 The app permits five new submissions per IP per 15 minutes, 80 reserved email messages per UTC day, and 2,400 per calendar month. Orders reserve two messages, contacts one. These conservative app limits stay below a dedicated Resend free account's 100/day and 3,000/month allowance. Reserved sends that later fail may consume slots. Requests rejected by the IP limiter do not consume the global budget. Other use of the same account also consumes its quota; do not enable paid overages.
 
@@ -151,7 +151,7 @@ Maintain [Custom Vibe in Founders Hub](https://foundershub.kznwebstudio.co.za/?p
 
 - Approved: private admin downloads and seven-day test retention. Created `customvibe-test-artwork` in the migrated business account using Standard storage. Public development URL and custom domains remain disabled. Whole-bucket lifecycle `delete-test-artwork-after-7-days` is enabled. No artwork uploaded yet.
 - Implemented locally: separate bounded JPEG uploads, verified immutable manifests, Turnstile/CSRF/session grants, tab-memory recovery tokens, protected admin request lookup/downloads, attachment-free owner request links and expiry cleanup. Original photos and customer contact fields are not stored in R2/D1.
-- Limits: 4 MB/file, 32 MB/request, 60 files and 100 magnets; 500 MB retained, 100 MB uploaded/day, 500 MB/month, 20 requests/day, 400/month and 10,000 R2 operations/month. These application limits do not govern unrelated account usage.
+- Limits: 4 MB/file, 32 MB/request, 60 files and 30 design or collection entries, with no fixed magnet quantity cap; 500 MB retained, 100 MB uploaded/day, 500 MB/month, 20 requests/day, 400/month and 10,000 R2 operations/month. These application limits do not govern unrelated account usage.
 - Verification: 100 automated tests pass; public and admin builds pass. Browser exports pass for 3x3 and 5x5 public coast and generated stress samples, up to 18.18 MB with unchanged JPEG quality. Independent review corrections cover invalid details, session renewal and late upload expiry. Physical print quality and live Worker CPU remain unverified.
 - Deployment pending. `ARTWORK_STORAGE_ENABLED=false` in every local Pages environment until backend migration/bindings are deployed and checked. Site gate stays on, preview sending off, payments unavailable. Existing live attachment flow remains unchanged.
 - Temporary migration helper is no longer running. `scripts/artwork-access.py` is a destination-only hidden-token helper for approved Worker deployment and D1 migration. It does not use personal-account Wrangler credentials or print/save the token. Owner must supply access privately in Terminal.

@@ -42,7 +42,7 @@ export async function submissions(request,env,network=fetch){
   let submission;try{
    if(kind==='contact')submission=validateContact(body.payload);
    else{const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)throw new Error('Unavailable');submission=validateOrder(body.payload,await r.json(),privateArtwork);}
-  }catch{return fail(400,'Check your details, products and artwork. Orders allow up to 100 magnets. Check the artwork file limits.');}
+  }catch{return fail(400,'Check your details, products and artwork. Check the design and artwork file limits.');}
   if(privateArtwork){
    if(url.pathname==='/api/artwork/init')return initArtwork(env,session,submission,ip,body.resume);
    const grant=await verifyArtworkGrant(body.grant,env,session,submission);if(!grant)return fail(403,'Refresh the security check and retry this same order.');

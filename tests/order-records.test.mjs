@@ -29,3 +29,10 @@ test('stored item prices preserve submitted bundle allocation after catalogue ch
  assert.deepEqual((await(await call(env,'detail',{id:b.id})).json()).snapshot.items,snapshot.items);
  assert.notEqual(validateOrder(input,catalogue,true).subtotalCents,snapshot.subtotalCents);
 });
+
+test('order records preserve quantities above 100 without weakening numeric validation',async()=>{
+ const env=artworkEnv(),b=record();b.snapshot.items[0].qty=1000;b.snapshot.magnetQty=1000;b.snapshot.subtotalCents=4000000;
+ assert.equal((await call(env,'create',b)).status,200);
+ const detail=await(await call(env,'detail',{id:b.id})).json();assert.equal(detail.snapshot.magnetQty,1000);assert.equal(detail.snapshot.items[0].qty,1000);
+ for(const qty of [0,-1,1.5,Number.MAX_SAFE_INTEGER+1]){const bad=record();bad.snapshot.items[0].qty=qty;assert.equal((await call(env,'create',bad)).status,400);}
+});

@@ -10,7 +10,7 @@ Keep 1200px print crops and the existing JPEG quality. Send each file separately
 
 Admin sign-in gates request lookup and file downloads. Owner emails contain an admin request link instead of attachments; customer acknowledgements retain unpaid wording. Access expires seven days after initialization. Hourly cleanup removes expired objects and metadata; an R2 seven-day lifecycle is a backup (Cloudflare physical lifecycle deletion can lag). Downloads never extend retention.
 
-Limits: 4,000,000 bytes/file, 32,000,000/request, 60 files/request, 100 magnets. Atomically reserve at most 500,000,000 retained bytes, 100,000,000 new bytes/day and 500,000,000/month; 20 new requests/day, 400/month, five/IP/15min. Reserve at most 10,000 R2 read/write operations/month before use, with three write attempts/file. Cleanup uses free delete operations. Admission stops when quotas or dependencies are unavailable. Existing unrelated account use is outside these application quotas.
+Limits: 4,000,000 bytes/file, 32,000,000/request, 60 files/request and 30 design or collection entries. No fixed magnet quantity cap (owner decision, 17 October 2026); quantities and totals must remain valid safe integers. Atomically reserve at most 500,000,000 retained bytes, 100,000,000 new bytes/day and 500,000,000/month; 20 new requests/day, 400/month, five/IP/15min. Reserve at most 10,000 R2 read/write operations/month before use, with three write attempts/file. Cleanup uses free delete operations. Admission stops when quotas or dependencies are unavailable. Existing unrelated account use is outside these application quotas.
 
 ## Implementation plan
 

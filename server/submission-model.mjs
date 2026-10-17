@@ -21,7 +21,7 @@ export function validateOrder(x,catalogue,privateArtwork=false){
  if(!/^\+?[\d ()-]{7,30}$/.test(contact.phone)||contact.phone.replace(/\D/g,'').length<7||contact.phone.replace(/\D/g,'').length>15)invalid();
  const locker={name:line(x.locker.name,140),area:line(x.locker.area,140)};let totalBytes=0,fileCount=0;
  const items=x.items.map(item=>{
-  if(!plain(item)||!Number.isInteger(item.qty)||item.qty<1||item.qty>ORDER_LIMITS.magnets)invalid();
+  if(!plain(item)||!Number.isSafeInteger(item.qty)||item.qty<1)invalid();
   const personal=['photo','puzzle'].includes(item.kind),product=catalogue.products.find(p=>p.id===(item.kind==='photo'?'photos':item.kind));
   if(!product||product.status!=='available'||(!personal&&!canPurchase(product)))invalid();
   const gridSize=item.kind==='puzzle'?item.gridSize:undefined;if(item.kind==='puzzle'&&![3,5].includes(gridSize))invalid();
@@ -30,7 +30,7 @@ export function validateOrder(x,catalogue,privateArtwork=false){
   const files=item.files.map((f,i)=>{fileCount++;if(privateArtwork){if(!plain(f)||!Number.isSafeInteger(f.size)||f.size<20||f.size>limits.fileBytes||!artworkHash(f.sha256))invalid();totalBytes+=f.size;if(totalBytes>limits.requestBytes||fileCount>limits.files)invalid();return {size:f.size,sha256:f.sha256}}totalBytes+=typeof f==='string'?f.length:0;if(totalBytes>2000000||fileCount>60)invalid();return jpeg(f,item.kind==='puzzle'&&i===0)});
   return {kind:item.kind,name:product.name,qty:item.qty,...(gridSize?{gridSize}:{}),files};
  });
- const sum=summarize(items,catalogue);if(sum.unpriced||sum.magnetQty>ORDER_LIMITS.magnets||!Number.isSafeInteger(sum.knownCents)||sum.knownCents<=0)invalid();
+ const sum=summarize(items,catalogue);if(sum.unpriced||!Number.isSafeInteger(sum.magnetQty)||!Number.isSafeInteger(sum.knownCents)||sum.knownCents<=0)invalid();
  // Allocate the shared personalised bundle total proportionally, rounding cumulative cents.
  // This preserves the submitted line prices without changing the overall bundle price.
  let pieces=0,allocated=0;const personalTotal=photoPrice(sum.pricedQty,catalogue.pricing);

@@ -5,7 +5,7 @@ test('capacity counts copies as magnets but shares their artwork files',()=>{
  assert.equal(typeof commerce.orderCapacity,'function');
  const capacity=commerce.orderCapacity([{kind:'puzzle',gridSize:5,qty:4}]);
  assert.equal(capacity.magnets,100);assert.equal(capacity.files,26);assert.equal(capacity.allowed,true);
- assert.equal(commerce.orderCapacity([{kind:'puzzle',gridSize:5,qty:5}]).allowed,false);
+ assert.equal(commerce.orderCapacity([{kind:'puzzle',gridSize:5,qty:5}]).allowed,true);
 });
 test('capacity includes puzzle proofs and rejects 61 files before upload',()=>{
  assert.equal(typeof commerce.orderCapacity,'function');
@@ -20,5 +20,10 @@ test('capacity enforces entry count and includes premade pack magnets',()=>{
  assert.equal(commerce.orderCapacity([...photos,{kind:'photo',qty:1}]).allowed,false);
  const content={products:[{id:'alphabet',count:26}]};
  assert.equal(commerce.orderCapacity([{kind:'alphabet',qty:3},{kind:'photo',qty:22}],content).allowed,true);
- assert.equal(commerce.orderCapacity([{kind:'alphabet',qty:3},{kind:'photo',qty:23}],content).allowed,false);
+ assert.equal(commerce.orderCapacity([{kind:'alphabet',qty:3},{kind:'photo',qty:23}],content).allowed,true);
+});
+
+test('large repeat quantities use the same file capacity',()=>{
+ const capacity=commerce.orderCapacity([{kind:'photo',qty:1000}]);
+ assert.equal(capacity.allowed,true);assert.equal(capacity.magnets,1000);assert.equal(capacity.files,1);
 });

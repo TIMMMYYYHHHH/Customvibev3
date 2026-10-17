@@ -30,3 +30,33 @@ test('JPEG validation rejects missing tables, post-scan metadata and trailing da
   const raw=input();raw.items[0].files=[bad.toString('base64')];assert.throws(()=>validateOrder(raw,defaultContent));
  }
 });
+
+test('server accepts more than 100 magnets while retaining accurate prices and shared files',()=>{
+ for(const qty of [101,1000]){
+  const raw=input();raw.items[0].qty=qty;
+  const order=validateOrder(raw,defaultContent);assert.equal(order.magnetQty,qty);assert.equal(order.subtotalCents,qty*4000);assert.equal(order.items[0].files.length,1);
+ }
+ const catalogue=structuredClone(defaultContent),pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;
+ const raw=input();raw.items=[{kind:'alphabet',qty:101,files:[]}];
+ const order=validateOrder(raw,catalogue,true);assert.equal(order.magnetQty,2626);assert.equal(order.subtotalCents,1010000);
+});
+test('private orders retain file, total-byte and entry limits without a magnet cap',()=>{
+ const file=size=>({size,sha256:'a'.repeat(64)});
+ const raw=input();raw.items=[{kind:'photo',qty:1000,files:[file(4000000)]}];
+ assert.equal(validateOrder(raw,defaultContent,true).magnetQty,1000);
+ raw.items[0].files=[file(4000001)];assert.throws(()=>validateOrder(raw,defaultContent,true));
+ raw.items=Array.from({length:8},()=>({kind:'photo',qty:1000,files:[file(4000000)]}));
+ assert.equal(validateOrder(raw,defaultContent,true).magnetQty,8000);
+ raw.items.push({kind:'photo',qty:1,files:[file(20)]});assert.throws(()=>validateOrder(raw,defaultContent,true));
+ raw.items=Array.from({length:6},()=>({kind:'puzzle',gridSize:3,qty:10,files:Array.from({length:10},()=>file(20))}));
+ assert.equal(validateOrder(raw,defaultContent,true).magnetQty,540);
+ raw.items.push({kind:'photo',qty:1,files:[file(20)]});assert.throws(()=>validateOrder(raw,defaultContent,true));
+ raw.items=Array.from({length:30},()=>({kind:'photo',qty:1000,files:[file(20)]}));
+ assert.equal(validateOrder(raw,defaultContent,true).magnetQty,30000);
+ raw.items.push(raw.items[0]);assert.throws(()=>validateOrder(raw,defaultContent,true));
+});
+test('orders still reject malformed or numerically unsafe quantities and totals',()=>{
+ for(const qty of [0,-1,1.5,'101',NaN,Infinity,Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER+1]){
+  const raw=input();raw.items[0].qty=qty;assert.throws(()=>validateOrder(raw,defaultContent));
+ }
+});
