@@ -30,3 +30,9 @@ test('QR matrices decode to exact intended payload with four-module quiet zone',
   assert.equal(jsQR(rgba,size,size)?.data,payload);
  }
 });
+
+import {fitLines} from '../src/designs/render.mjs';
+test('normalised QR links validate again or fail in the editor',()=>{
+ for(const count of [20,40]){const input={title:'Scan',url:'https://example.com/'+'é'.repeat(count)};try{const v=validateTemplate('qr',input);assert.deepEqual(validateTemplate('qr',v),v)}catch(e){assert.match(e.message,/link/);assert.ok(count===40)}}
+});
+test('literal credential lines preserve every space',()=>{const ctx={measureText:s=>({width:s.length*10})};assert.deepEqual(fitLines(ctx,'Guest  Room\n pass  word ',{width:1000,height:200,maxSize:54,literal:true}).lines,['Guest  Room',' pass  word ']);});

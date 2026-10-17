@@ -1,10 +1,21 @@
+import {proofRows,reusableProofFiles} from '../src/proof-manifest.mjs';
 import {artworkId,artworkHash,ARTWORK_LIMITS} from '../src/artwork-policy.mjs';
 import {artworkDigest,artworkService} from './artwork.mjs';
 const now=()=>Math.floor(Date.now()/1000),fail=(status,error)=>Response.json({error},{status});
 const callArtwork=(env,path,b)=>artworkService(new Request('https://internal/artwork/'+path,{method:'POST',body:JSON.stringify(b)}),env);
 export async function proofDetail(env,id){const s=await env.DB.prepare('SELECT * FROM proof_state WHERE order_id=?').bind(id).first();if(!s)return {status:'awaiting_design',revision:0};const r=await env.DB.prepare('SELECT manifest FROM proof_revisions WHERE order_id=? AND revision=?').bind(id,s.revision).first();return {status:s.status,revision:s.revision,digest:s.digest,approvedAt:s.approved_at,items:r?JSON.parse(r.manifest):[],events:(await env.DB.prepare('SELECT revision,kind,created,message FROM proof_events WHERE order_id=? ORDER BY id DESC').bind(id).all()).results};}
-function expectedFiles(snapshot){return snapshot.items.flatMap((item,n)=>{const count=item.kind==='puzzle'?item.gridSize**2+1:item.designMode==='assisted'?1:item.files.length||1;return Array.from({length:count},(_,j)=>({itemId:item.id||`item-${n+1}`,name:item.files[j]?.name||`design-${String(n+1).padStart(2,'0')}-${item.kind}-${j+1}.jpg`,proof:item.kind==='puzzle'&&j===0}));});}
-function mapFiles(snapshot,requestId,files){const expected=expectedFiles(snapshot);if(files.length!==expected.length||files.some((f,n)=>f.proof!==expected[n].proof))throw Error('Provide every final magnet and puzzle preview.');let at=0;return snapshot.items.map((item,n)=>({id:item.id||`item-${n+1}`,name:item.name,kind:item.kind,qty:item.qty,...(item.gridSize?{gridSize:item.gridSize}:{}),files:expected.filter(e=>e.itemId===(item.id||`item-${n+1}`)).map(()=>{const f=files[at];return {requestId,index:at++,name:f.name,size:f.size,sha256:f.sha256,proof:f.proof}})}));}
+function mapFiles(snapshot,requestId,files,selection,reusable=[]){
+ const expected=proofRows(snapshot),choices=selection||files.map((_,upload)=>({upload})),used=new Set();
+ if(choices.length!==expected.length)throw Error('Provide every final magnet and puzzle preview.');
+ const resolved=choices.map((choice,n)=>{
+  if(Number.isSafeInteger(choice?.upload)){
+   const i=choice.upload,f=files[i];if(!f||used.has(i)||f.proof!==expected[n].proof||f.name!==expected[n].name)throw Error('Check the replacement artwork positions.');used.add(i);return {requestId,index:i,name:f.name,size:f.size,sha256:f.sha256,proof:f.proof};
+  }
+  const f=reusable[n];if(!f||choice?.requestId!==f.requestId||choice?.index!==f.index)throw Error('Only unchanged artwork from this design position can be reused.');return f;
+ });
+ if(used.size!==files.length)throw Error('Every uploaded file must belong to the final design.');
+ let at=0;return snapshot.items.map((item,n)=>({id:item.id||`item-${n+1}`,name:item.name,kind:item.kind,qty:item.qty,...(item.gridSize?{gridSize:item.gridSize}:{}),files:expected.filter(e=>e.itemId===(item.id||`item-${n+1}`)).map(()=>resolved[at++])}));
+}
 async function session(env,id){if(!artworkHash(id))return null;return env.DB.prepare('SELECT s.*,p.digest,p.status,o.expires AS order_expires FROM proof_sessions s JOIN proof_state p ON p.order_id=s.order_id AND p.revision=s.revision AND p.token_hash=s.token_hash JOIN orders o ON o.id=s.order_id WHERE s.id=? AND s.expires>? AND o.expires>?').bind(id,now(),now()).first();}
 export async function proofService(request,env){
  const b=await request.json(),action=new URL(request.url).pathname.slice('/proofs/'.length),time=now();
@@ -32,23 +43,25 @@ export async function proofService(request,env){
  const order=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND expires>?').bind(b.id,time).first();if(!order)return fail(410,'Order unavailable or expired.');const snapshot=JSON.parse(order.snapshot);
  if(action==='detail')return Response.json(await proofDetail(env,b.id));
  if(!snapshot.approvalRequired)return fail(409,'This historical order uses the original workflow.');
+ // An immutable publish identity makes a lost success response safe to retry.
+ if(action==='publish'&&artworkId(b.requestId)&&b.requestId!==b.id){const prior=await env.DB.prepare('SELECT revision,digest FROM proof_revisions WHERE order_id=? AND publish_id=?').bind(b.id,b.requestId).first();if(prior)return Response.json({ok:true,...prior});}
  if(!Number.isSafeInteger(b.version)||b.version!==order.version)return fail(409,'Order changed. Reload it first.');
  if(action==='check-link'){const p=await env.DB.prepare('SELECT token_hash,status FROM proof_state WHERE order_id=?').bind(b.id).first();return p?.status==='awaiting_approval'&&p.token_hash===b.tokenHash?Response.json({ok:true}):fail(409,'The review link changed. Preview again.');}
  if(action==='prepare'){
   if(!artworkId(b.requestId)||b.requestId===b.id||!artworkHash(b.owner))return fail(400,'Invalid upload.');
-  let mapped;try{mapped=mapFiles(snapshot,b.requestId,b.files)}catch(e){return fail(400,e.message)}
+  let mapped;try{mapped=mapFiles(snapshot,b.requestId,b.files,b.selection,reusableProofFiles({id:b.id,snapshot,proof:await proofDetail(env,b.id)}))}catch(e){return fail(400,e.message)}
   return callArtwork(env,'init',{id:b.requestId,owner:b.owner,key:b.owner,files:b.files,parentOrder:b.id});
  }
  if(action==='seed'||action==='publish'){
   if((action==='seed'||b.requestId===b.id)&&snapshot.items.some(i=>i.designMode==='assisted'||!i.files.length))return fail(409,'Finish every design before publishing a proof.');
   const requestId=action==='seed'?b.id:b.requestId;if(!artworkId(requestId))return fail(400,'Invalid artwork.');
   const a=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=? AND finalized=1 AND expires>?').bind(requestId,time).first();if(!a||(requestId!==b.id&&a.parent_order!==b.id)||a.expires>order.expires)return fail(409,'Complete this order’s artwork upload first.');
-  let items;try{items=mapFiles(snapshot,requestId,JSON.parse(a.manifest))}catch(e){return fail(400,e.message)}
+  let items;try{items=mapFiles(snapshot,requestId,JSON.parse(a.manifest),action==='seed'?undefined:b.selection,reusableProofFiles({id:b.id,snapshot,proof:await proofDetail(env,b.id)}))}catch(e){return fail(400,e.message)}
   const manifest=JSON.stringify(items),digest=await artworkDigest(new TextEncoder().encode(manifest)),current=await proofDetail(env,b.id),revision=current.revision+1;
   if(action==='seed'&&current.revision)return fail(409,'A proof already exists.');
   const updated=await env.DB.batch([
    env.DB.prepare("UPDATE orders SET version=version+1,status='new' WHERE id=? AND version=? AND expires>? AND status<>'shipped' RETURNING version").bind(b.id,b.version,time),
-   env.DB.prepare('INSERT INTO proof_revisions(order_id,revision,digest,manifest,created) SELECT ?,?,?,?,? WHERE changes()>0').bind(b.id,revision,digest,manifest,time),
+   env.DB.prepare('INSERT INTO proof_revisions(order_id,revision,digest,manifest,created,publish_id) SELECT ?,?,?,?,?,? WHERE changes()>0').bind(b.id,revision,digest,manifest,time,action==='publish'&&requestId!==b.id?requestId:null),
    env.DB.prepare("INSERT INTO proof_state(order_id,revision,digest,status) SELECT ?,?,?,'awaiting_approval' WHERE changes()>0 ON CONFLICT(order_id) DO UPDATE SET revision=excluded.revision,digest=excluded.digest,status=excluded.status,token_hash=NULL,approved_at=NULL").bind(b.id,revision,digest),
    env.DB.prepare("INSERT INTO proof_events(order_id,revision,kind,created) SELECT ?,?,'published',? WHERE changes()>0").bind(b.id,revision,time)
   ]);return updated[0].results.length?Response.json({ok:true,revision,digest,version:b.version+1}):fail(409,'Order changed or has shipped.');

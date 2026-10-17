@@ -1,18 +1,19 @@
 import {printJpeg} from './jpeg.mjs';
 import {colours,validateTemplate,templateIds,qrPayload,qrMatrix} from './templates.mjs';
 const ink='#291438';
-export function fitLines(ctx,text,{width,height,maxSize=100,minSize=38,family='"DM Sans Variable", sans-serif',weight=600}){
+export function fitLines(ctx,text,{width,height,maxSize=100,minSize=38,family='"DM Sans Variable", sans-serif',weight=600,literal=false}){
  for(let size=maxSize;size>=minSize;size-=2){
   ctx.font=`${weight} ${size}px ${family}`;const lines=[];
   for(const paragraph of text.split('\n')){
+   if(literal){lines.push(paragraph);continue;}
    let line='';for(const word of paragraph.split(/\s+/)){const next=line?`${line} ${word}`:word;if(ctx.measureText(next).width>width&&line){lines.push(line);line=word;}else line=next;}lines.push(line);
   }
   if(lines.length*size*1.25<=height&&lines.every(line=>ctx.measureText(line).width<=width))return {lines,size};
  }
  throw new Error('This wording does not fit clearly. Shorten it or add spaces, then try again.');
 }
-function text(ctx,value,x,y,width,height,maxSize=100,minSize=38,heading=false){
- const {lines,size}=fitLines(ctx,value,{width,height,maxSize,minSize,family:heading?'"Fredoka Variable", sans-serif':'"DM Sans Variable", sans-serif',weight:heading?600:500});
+function text(ctx,value,x,y,width,height,maxSize=100,minSize=38,heading=false,literal=false){
+ const {lines,size}=fitLines(ctx,value,{width,height,maxSize,minSize,family:heading?'"Fredoka Variable", sans-serif':'"DM Sans Variable", sans-serif',weight:heading?600:500,literal});
  ctx.fillStyle=ink;ctx.textAlign='center';ctx.textBaseline='middle';lines.forEach((line,i)=>ctx.fillText(line,x,y+(i-(lines.length-1)/2)*size*1.25));
 }
 function picture(ctx,name){
@@ -41,7 +42,7 @@ export async function renderDesign(design,{size=1200,logo}={}){
   const m=qrMatrix(qrPayload(template,v)),scale=Math.floor(640/(m.size+8)),side=(m.size+8)*scale,start=Math.round((1200-side)/2),top=290;
   ctx.fillStyle='#FFF';ctx.fillRect(start,top,side,side);ctx.fillStyle='#000';
   for(let y=0;y<m.size;y++)for(let x=0;x<m.size;x++)if(m.data[y*m.size+x])ctx.fillRect(start+(x+4)*scale,top+(y+4)*scale,scale,scale);
-  const caption=template==='wifi'?`${v.network}\n${v.security==='nopass'?'Open network':v.password}`:v.details||'Scan to connect';text(ctx,caption,600,1000,1000,190,54,38);
+  const caption=template==='wifi'?`"${v.network}"\n${v.security==='nopass'?'Open network':'"'+v.password+'"'}`:v.details||'Scan to connect';text(ctx,caption,600,1000,1000,190,54,38,false,template==='wifi');
  }else if(['business','information'].includes(template)){
   if(logo){const image=new Image();image.src=logo;await image.decode();const ratio=Math.min(360/image.width,240/image.height);ctx.drawImage(image,600-image.width*ratio/2,100,image.width*ratio,image.height*ratio);}
   text(ctx,v.title,600,logo?470:280,1000,280,130,60,true);text(ctx,v.details,600,logo?860:770,980,logo?380:580,76,38);

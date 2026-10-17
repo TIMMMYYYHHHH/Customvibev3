@@ -15,10 +15,11 @@ export function validateTemplate(id,input={}){
  if(id==='qr'){
   values.url=field(input.url,'link',240);let url;try{url=new URL(values.url);}catch{throw new Error('Enter a complete https:// or http:// link.');}
   if(!['http:','https:'].includes(url.protocol)||url.username||url.password)throw new Error('Use a public http:// or https:// link without a password.');
-  values.url=url.href;values.details=field(input.details,'details',60,false);
+  values.url=field(url.href,'encoded link',240);values.details=field(input.details,'details',60,false);
  }
  if(id==='wifi'){
   values.network=field(input.network,'network name',32,true,false);values.password=field(input.password,'password',63,input.security!=='nopass',false);
+  if(/[\r\n\t]/.test(values.network+values.password))throw new Error('Network names and passwords must be on one line without tabs.');
   values.security=input.security||'WPA';if(!['WPA','WEP','nopass'].includes(values.security))throw new Error('Choose a Wi-Fi security type.');
   if(values.security==='nopass')values.password='';
  }

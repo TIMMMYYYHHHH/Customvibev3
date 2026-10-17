@@ -58,3 +58,9 @@ test('admin login preserves only safe order/artwork return links',async()=>{
   assert.equal(r.status,303);assert.equal(r.headers.get('location'),expected);
  }
 });
+
+test('private review sign-in preserves fragment through same-origin form action',async()=>{
+ const e={...env,AUTH:services()};const r=(await gate(request('/proof'),e,'site')).response,html=await r.text();assert.match(html,/<script src="\/proof-signin.js"><\/script>/);assert.match(html,/name="next" value="\/proof"/);
+ const script=(await gate(request('/proof-signin.js'),{},'site')).response;assert.equal(script.status,200);assert.equal(script.headers.get('cache-control'),'no-store');const form={action:''},location={hash:'#private-review-token'};new Function('document','location',await script.text())({querySelector:()=>form},location);assert.equal(form.action,'/proof#private-review-token');
+ const csrf=html.match(/name="csrf" value="([^"]+)"/)[1],cookie=r.headers.get('set-cookie').split(';')[0];const login=(await gate(request('/proof',{method:'POST',body:new URLSearchParams({password,csrf,next:'/proof'}),headers:{cookie,origin:'https://customvibe.co.za'}}),e,'site')).response;assert.equal(login.status,303);assert.equal(login.headers.get('location'),'/proof');
+});
