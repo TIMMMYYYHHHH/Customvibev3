@@ -1,0 +1,865 @@
+{
+  "environment": "local workerd with local D1/R2, not hosted Cloudflare timing",
+  "runtime": "v24.19.0",
+  "measuredAt": "2026-10-17T02:28:59.425Z",
+  "hostedCpuMeasured": false,
+  "hostedMemoryMeasured": false,
+  "results": [
+    {
+      "name": "60 files at 32 MB",
+      "files": 60,
+      "bytes": 32000000,
+      "init": {
+        "phase": "init",
+        "status": 200,
+        "elapsedMs": 22.19404099999997,
+        "statements": 69,
+        "calls": 3,
+        "reads": 0,
+        "writes": 0
+      },
+      "complete": {
+        "phase": "complete",
+        "status": 200,
+        "elapsedMs": 2.5110830000000988,
+        "statements": 3,
+        "calls": 3,
+        "reads": 0,
+        "writes": 0
+      },
+      "upload": {
+        "count": 60,
+        "totalMs": 932.8507519999996,
+        "medianMs": 14.507416999999919,
+        "p95Ms": 20.333291000000145,
+        "maxMs": 36.181375,
+        "maxD1Statements": 4,
+        "maxD1Calls": 3
+      },
+      "retry": {
+        "phase": "upload",
+        "status": 200,
+        "elapsedMs": 5.68420900000001,
+        "statements": 1,
+        "calls": 1,
+        "reads": 0,
+        "writes": 0
+      },
+      "totals": {
+        "statements": 384,
+        "calls": 192,
+        "r2Writes": 60,
+        "r2Reads": 1
+      },
+      "boundaryChecks": "61 files, 32 MB + 1 byte and 4 MB + 1 byte rejected before DB; exhausted retained-storage quota rejects without R2 writes",
+      "phases": [
+        {
+          "phase": "init",
+          "status": 200,
+          "elapsedMs": 22.19404099999997,
+          "statements": 69,
+          "calls": 3,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 36.181375,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.78591700000004,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.989708999999948,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.383791999999971,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.087791000000038,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.990583999999899,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.75695799999994,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.507416999999919,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.476707999999917,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.853542000000061,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.17266600000005,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.717667000000006,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.083999999999946,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 17.731541000000107,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.276792000000114,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.880416999999852,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.991833000000042,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.67491700000005,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.63133300000004,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.271749999999884,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.39045800000008,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 19.199124999999867,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 20.333291000000145,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 24.283666999999923,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 18.261875000000146,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.644958000000088,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 17.27562499999999,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.296708999999964,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.008708999999953,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 16.879874999999856,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.493167000000085,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.753332999999884,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.374416999999994,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.696582999999919,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 17.16533400000003,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.471083000000135,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.955459000000019,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 18.087125000000015,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.731416999999965,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.68337500000007,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.541958000000022,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.446165999999948,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.065458999999919,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.213124999999991,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.976791999999932,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 26.148167000000058,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 20.21266700000001,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.15254200000004,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.701540999999906,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 16.63666699999999,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.213624999999865,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.921082999999953,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.450833000000102,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.427792000000181,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.790958000000046,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 13.092333000000053,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 14.499124999999822,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 15.458124999999882,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 12.759499999999889,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 18.710000000000036,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "complete",
+          "status": 200,
+          "elapsedMs": 2.5110830000000988,
+          "statements": 3,
+          "calls": 3,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "download",
+          "status": 200,
+          "elapsedMs": 4.057749999999942,
+          "statements": 2,
+          "calls": 2,
+          "reads": 1,
+          "writes": 0
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 5.68420900000001,
+          "statements": 1,
+          "calls": 1,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 400,
+          "elapsedMs": 1.275041999999985,
+          "statements": 0,
+          "calls": 0,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 400,
+          "elapsedMs": 0.8456670000000486,
+          "statements": 0,
+          "calls": 0,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 429,
+          "elapsedMs": 4.512958000000026,
+          "statements": 69,
+          "calls": 3,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 400,
+          "elapsedMs": 1.0455420000000686,
+          "statements": 0,
+          "calls": 0,
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    },
+    {
+      "name": "eight 4 MB files",
+      "files": 8,
+      "bytes": 32000000,
+      "init": {
+        "phase": "init",
+        "status": 200,
+        "elapsedMs": 10.62087500000007,
+        "statements": 17,
+        "calls": 3,
+        "reads": 0,
+        "writes": 0
+      },
+      "complete": {
+        "phase": "complete",
+        "status": 200,
+        "elapsedMs": 2.7835829999999078,
+        "statements": 3,
+        "calls": 3,
+        "reads": 0,
+        "writes": 0
+      },
+      "upload": {
+        "count": 8,
+        "totalMs": 626.1364159999994,
+        "medianMs": 79.66033299999981,
+        "p95Ms": 88.70229199999994,
+        "maxMs": 88.70229199999994,
+        "maxD1Statements": 4,
+        "maxD1Calls": 3
+      },
+      "retry": {
+        "phase": "upload",
+        "status": 200,
+        "elapsedMs": 7.630415999999968,
+        "statements": 1,
+        "calls": 1,
+        "reads": 0,
+        "writes": 0
+      },
+      "totals": {
+        "statements": 72,
+        "calls": 36,
+        "r2Writes": 8,
+        "r2Reads": 1
+      },
+      "boundaryChecks": "61 files, 32 MB + 1 byte and 4 MB + 1 byte rejected before DB; exhausted retained-storage quota rejects without R2 writes",
+      "phases": [
+        {
+          "phase": "init",
+          "status": 200,
+          "elapsedMs": 10.62087500000007,
+          "statements": 17,
+          "calls": 3,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 82.72116700000015,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 88.70229199999994,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 70.75679199999968,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 82.91416600000002,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 79.66033299999981,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 73.55737499999987,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 75.62112500000012,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 72.20316599999978,
+          "statements": 4,
+          "calls": 3,
+          "reads": 0,
+          "writes": 1
+        },
+        {
+          "phase": "complete",
+          "status": 200,
+          "elapsedMs": 2.7835829999999078,
+          "statements": 3,
+          "calls": 3,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "download",
+          "status": 200,
+          "elapsedMs": 6.780416000000059,
+          "statements": 2,
+          "calls": 2,
+          "reads": 1,
+          "writes": 0
+        },
+        {
+          "phase": "upload",
+          "status": 200,
+          "elapsedMs": 7.630415999999968,
+          "statements": 1,
+          "calls": 1,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 400,
+          "elapsedMs": 3.9680419999999685,
+          "statements": 0,
+          "calls": 0,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 400,
+          "elapsedMs": 1.0483750000003056,
+          "statements": 0,
+          "calls": 0,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 429,
+          "elapsedMs": 7.591875000000073,
+          "statements": 17,
+          "calls": 3,
+          "reads": 0,
+          "writes": 0
+        },
+        {
+          "phase": "init",
+          "status": 400,
+          "elapsedMs": 1.1238330000001042,
+          "statements": 0,
+          "calls": 0,
+          "reads": 0,
+          "writes": 0
+        }
+      ]
+    }
+  ]
+}

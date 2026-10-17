@@ -40,3 +40,31 @@ test('an upload finishing during expiry cleanup cannot leave late artwork behind
  const r=await artworkService(new Request('https://auth.internal/artwork/upload',{method:'POST',headers:{'Content-Type':'image/jpeg','X-Artwork-Id':m.id,'X-Artwork-Owner':m.owner,'X-Artwork-Index':'0'},body:tile}),env);
  assert.equal(r.status,410);assert.equal(env.objects.size,0);
 });
+
+test('a maximum-file order uploads one file with bounded database payload and call overhead',async()=>{
+ const env=artworkEnv(),m=await manifest();m.files=Array.from({length:60},(_,i)=>({...m.files[0],name:`design-${String(i+1).padStart(2,'0')}-photo.jpg`}));
+ assert.equal((await call(env,'init',m)).status,200);
+ const original=env.DB;let calls=0,responseBytes=0;const originals=new WeakMap();
+ const track=result=>{responseBytes+=JSON.stringify(result).length;return result};
+ function wrap(s){const w={bind:(...args)=>wrap(s.bind(...args)),first:async()=>{calls++;return track(await s.first())},all:async()=>{calls++;return track(await s.all())},run:async()=>{calls++;return track(await s.run())}};originals.set(w,s);return w;}
+ env.DB={prepare:sql=>wrap(original.prepare(sql)),batch:async statements=>{calls++;return track(await original.batch(statements.map(s=>originals.get(s))))}};
+ assert.equal((await upload(env,m)).status,200);assert.equal(env.objects.size,1);
+ assert.ok(responseBytes<2048,`One file should not transfer the whole order manifest (${responseBytes} bytes)`);
+ assert.ok(calls<=3,`Fresh upload must fit three D1 round trips (${calls})`);
+});
+
+test('concurrent file uploads cannot overspend the last storage operation',async()=>{
+ const env=artworkEnv(),m=await manifest();m.files=[m.files[0],{...m.files[0],name:'design-02-photo.jpg'}];await call(env,'init',m);
+ env.sql.prepare('INSERT INTO artwork_usage(id,amount) VALUES (?,9999)').run('ops:'+new Date().toISOString().slice(0,7));
+ const send=index=>security.fetch(new Request('https://auth.internal/artwork/upload',{method:'POST',headers:{'Content-Type':'image/jpeg','X-Artwork-Id':m.id,'X-Artwork-Owner':m.owner,'X-Artwork-Index':String(index)},body:tile}),env);
+ const results=await Promise.all([send(0),send(1)]);assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(env.objects.size,1);
+ assert.equal(env.sql.prepare('SELECT amount FROM artwork_usage WHERE id=?').get('ops:'+new Date().toISOString().slice(0,7)).amount,10000);
+ assert.equal(env.sql.prepare('SELECT count(*) AS n FROM artwork_files WHERE ready=0 AND lease_until=0').get().n,1);
+});
+
+test('an upload that lost its lease cannot report success or delete retained artwork',async()=>{
+ const env=artworkEnv(),m=await manifest();await call(env,'init',m);const put=env.ARTWORK.put;
+ env.ARTWORK.put=async(...args)=>{env.sql.prepare('UPDATE artwork_files SET lease=? WHERE request_id=?').run('newer-upload',m.id);return put(...args)};
+ assert.equal((await upload(env,m)).status,503);assert.equal(env.objects.size,1);
+ assert.equal(env.sql.prepare('SELECT ready FROM artwork_files WHERE request_id=?').get(m.id).ready,0);
+});

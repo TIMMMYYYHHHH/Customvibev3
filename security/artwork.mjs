@@ -35,21 +35,30 @@ async function init(body,env){
 async function upload(request,env){
  const id=request.headers.get('X-Artwork-Id'),owner=request.headers.get('X-Artwork-Owner'),raw=request.headers.get('X-Artwork-Index');
  if(!artworkId(id)||!artworkHash(owner)||!/^\d{1,2}$/.test(raw||'')||request.headers.get('content-type')!=='image/jpeg')return fail(400,'Invalid upload.');
- const index=Number(raw),row=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(id).first();
+ const index=Number(raw);
+ // Return only this immutable manifest entry, not every file in the order.
+ const row=await env.DB.prepare('SELECT r.owner,r.expires,json_extract(r.manifest,?) AS file,f.ready FROM artwork_requests r LEFT JOIN artwork_files f ON f.request_id=r.id AND f.slot=? WHERE r.id=?').bind('$['+index+']',index,id).first();
  if(!row||row.owner!==owner)return fail(403,'Artwork session not found.');if(row.expires<=epoch())return fail(410,'Artwork expired.');
- const file=JSON.parse(row.manifest)[index];if(!file)return fail(400,'Unknown artwork file.');
- const current=await env.DB.prepare('SELECT * FROM artwork_files WHERE request_id=? AND slot=?').bind(id,index).first();
- if(current?.ready)return Response.json({ok:true});
+ const file=row.file&&JSON.parse(row.file);if(!file)return fail(400,'Unknown artwork file.');
+ if(row.ready)return Response.json({ok:true});
  let bytes;try{bytes=await boundedBytes(request,file.size);if(bytes.length!==file.size||await artworkDigest(bytes)!==file.sha256)throw Error('Mismatch');validateJpeg(bytes,file.proof,limits.fileBytes)}catch{return fail(400,'The artwork file could not be verified.')}
  const lease=crypto.randomUUID(),now=epoch();
- const claim=await env.DB.prepare('UPDATE artwork_files SET tries=tries+1,lease=?,lease_until=? WHERE request_id=? AND slot=? AND ready=0 AND tries<3 AND lease_until<=? RETURNING slot').bind(lease,now+120,id,index,now).first();
- if(!claim)return fail(409,'An upload is still processing or its retry limit was reached.');
- if(!await operation(env)){await env.DB.prepare('UPDATE artwork_files SET lease_until=0 WHERE request_id=? AND slot=? AND lease=?').bind(id,index,lease).run();return fail(429,'The storage operation allowance is full.');}
+ // The operation belongs only to the lease acquired by this atomic batch.
+ // A competing/repeated upload cannot spend quota without winning that lease.
+ const claims=await env.DB.batch([
+  env.DB.prepare('UPDATE artwork_files SET tries=tries+1,lease=?,lease_until=? WHERE request_id=? AND slot=? AND ready=0 AND tries<3 AND lease_until<=? RETURNING slot').bind(lease,now+120,id,index,now),
+  env.DB.prepare('INSERT INTO artwork_usage(id,amount) SELECT ?,1 WHERE EXISTS(SELECT 1 FROM artwork_files WHERE request_id=? AND slot=? AND lease=?) ON CONFLICT(id) DO UPDATE SET amount=amount+1 WHERE amount<? RETURNING amount').bind('ops:'+new Date().toISOString().slice(0,7),id,index,lease,limits.monthlyOperations)
+ ]);
+ if(!claims[0].results.length)return fail(409,'An upload is still processing or its retry limit was reached.');
+ if(!claims[1].results.length){await env.DB.prepare('UPDATE artwork_files SET lease_until=0 WHERE request_id=? AND slot=? AND lease=?').bind(id,index,lease).run();return fail(429,'The storage operation allowance is full.');}
  try{
   await env.ARTWORK.put(objectKey(id,index),bytes,{httpMetadata:{contentType:'image/jpeg'},sha256:file.sha256});
+  // Publish only while this lease and its retained request are still valid.
+  const published=await env.DB.prepare('UPDATE artwork_files SET ready=1,lease_until=0 WHERE request_id=? AND slot=? AND lease=? AND EXISTS(SELECT 1 FROM artwork_requests WHERE id=? AND expires>?) RETURNING slot').bind(id,index,lease,id,epoch()).first();
+  if(published)return Response.json({ok:true});
   const retained=await env.DB.prepare('SELECT expires FROM artwork_requests WHERE id=?').bind(id).first();
   if(!retained||retained.expires<=epoch()){await env.ARTWORK.delete(objectKey(id,index));return fail(410,'Artwork expired while uploading.');}
-  await env.DB.prepare('UPDATE artwork_files SET ready=1,lease_until=0 WHERE request_id=? AND slot=? AND lease=?').bind(id,index,lease).run();return Response.json({ok:true});
+  return fail(503,'Upload could not be confirmed. Keep this tab open and retry shortly.');
  }catch{return fail(503,'Upload could not be confirmed. Keep this tab open and retry shortly.');}
 }
 export async function artworkService(request,env){
