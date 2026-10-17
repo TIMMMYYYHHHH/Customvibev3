@@ -67,7 +67,13 @@
 .admin-workroom .cv-detail :is(.cv-file a,.cv-update-history){color:var(--ink)}
 .admin-workroom :is(.cv-btn,.button):disabled{background:var(--control-bg);color:#726973;opacity:1;box-shadow:none}
 
-.admin-workroom .occasion-recommendation{display:flex;flex-wrap:wrap;gap:2px 8px;margin:8px 0 0;font:400 12px/1.5 var(--body);color:#6e6075}
-.admin-workroom .occasion-recommendation strong{color:var(--ink);font-weight:600}
-.admin-workroom .occasion-recommendation span:last-child{flex-basis:100%}
-.admin-workroom #schedule-panel .occasion-recommendation{display:grid;gap:5px;margin:16px 0 24px;font-size:13px}
+
+/* Date rules share the existing flat form controls. */
+.rule-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+.rule-grid .field { min-width: 0; }
+.rule-grid input { min-width: 0; width: 100%; }
+.rule-summary { font-size: .9rem; line-height: 1.6; }
+.calculated-dates { border-top: 1px solid var(--line, #ded8df); padding-top: 16px; margin-top: 20px; }
+.calculated-dates h3 { margin: 0 0 8px; }
+.calculated-dates input[readonly] { background: #f0eeeb; color: #35233f; }
+@media (max-width: 420px) { .rule-grid { grid-template-columns: 1fr; } }

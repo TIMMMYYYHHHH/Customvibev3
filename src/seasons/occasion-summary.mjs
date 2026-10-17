@@ -1,3 +1,4 @@
+import {ruleLabel} from './date-rules.mjs';
 import {visibleOccasions,occasion,instances,resolveAt,millis,yearOf,validRange,hasTheme,formatDate,isThemeReady,readinessIssue,scheduledInstances,statusOf,setThemeProgress,themeProgress} from './model.mjs';
 
 export function timeRemaining(end,at){
@@ -12,15 +13,15 @@ export function occasionSummary(state,id,at){
  const campaigns=state.campaigns.filter(c=>c.occasion===id);
  const horizon=Math.max(year+8,...campaigns.map(c=>yearOf(c.start)));
  const candidates=campaigns.flatMap(c=>instances(c,year-1,horizon)).filter(c=>millis(c.end)>now).sort((a,b)=>millis(a.start)-millis(b.start));
- const eligible=c=>c.published&&c.enabled&&(!definition.moving||c.datesReviewed);
+ const eligible=c=>c.published&&c.enabled&&(!definition.moving||c.dateRule||c.datesReviewed);
  const active=resolved.campaign?.occasion===id;
  const current=active?resolved.campaign:null;
  const next=candidates.find(eligible);
  const campaign=current||next||candidates[0]||[...campaigns].sort((a,b)=>millis(b.end)-millis(a.end))[0];
  const manual=active&&resolved.reason==='Manual override';
- const needsReview=definition.moving&&!campaign?.datesReviewed;
+ const needsReview=definition.moving&&!campaign?.dateRule&&!campaign?.datesReviewed;
  const start=manual?state.override.from:campaign?.start,end=manual?state.override.until:campaign?.end;
- const repeat=definition.moving?'One time only · Review dates each year':campaign?.repeat==='annual'?'Every year':'One time only';
+ const repeat=(definition.moving&&!campaign?.dateRule?'One time only · Review dates each year':campaign?.repeat==='annual'?'Every year':'One time only')+(campaign?.dateRule?' · '+ruleLabel(campaign.dateRule):'');
  const created=hasTheme(state,id),visibleActive=active&&created;
  let status='Not scheduled',detail='Will not go live until you enable a schedule.',kind='off';
  if(visibleActive){status=state.clock?.simulated?'Active in preview':'Live now';kind='live';detail=manual?'Turned on manually'+(end?' · Ends in '+timeRemaining(end,at):' · Until switched off'):'Ends in '+timeRemaining(end,at)}
@@ -83,7 +84,7 @@ export function campaignLabels(state,c,at){
  else if(same){kind='live';detail=(state.clock?.simulated?'Active in preview · ':'')+'Ends in '+timeRemaining(resolved.until,at)}
  else if(!enabled){detail='Will stay off until a schedule is enabled.'}
  else if(!validRange(c)){kind='attention';detail='Blocked: choose valid start and end dates.'}
- else if(occasion(c.occasion,state).moving&&!c.datesReviewed){kind='attention';detail='Blocked: confirm the dates.'}
+ else if(occasion(c.occasion,state).moving&&!c.dateRule&&!c.datesReviewed){kind='attention';detail='Blocked: confirm the dates.'}
  else if(millis(candidate.end)<=millis(at)){detail='Saved dates have ended. Choose new dates to use this schedule.'}
  else if(!isThemeReady(state,c.occasion)){kind='attention';detail='Blocked: '+(!created?'theme not created.':progress==='review'?'awaiting review.':progress==='changes-needed'?'changes needed.':'theme must be Ready to use.')}
  else if(state.mode==='off'){kind='paused';detail='Automatic starts are paused. Resume the schedule to continue.'}

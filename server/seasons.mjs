@@ -1,3 +1,4 @@
+import {ruleDates} from '../src/seasons/date-rules.mjs';
 import {seedState,OCCASIONS,visibleOccasions,hasTheme,isThemeReady,THEME_STAGES,validatePublish,millis,nowSAST,resolveAt,occasion} from '../src/seasons/model.mjs';
 import {iconDefinition,ICON_PRESETS} from '../src/seasons/occasion-summary.mjs';
 import {sameOrigin,constantEqual,boundedBody} from './auth.mjs';
@@ -25,9 +26,10 @@ export function validateSeasonState(input){
  for(const [key,value]of Object.entries(input.themeProgress)){if(!ids.has(key)||!stages.includes(value)||value==='ready'&&!hasTheme(s,key))fail('A theme must be installed before it can be Ready to use.');s.themeProgress[key]=value}
  const cleanCampaign=c=>{
   if(!record(c)||!id(c.id)||!ids.has(c.occasion)||!date(c.start)||!date(c.end)||!bool(c.enabled)||!bool(c.published)||!bool(c.datesReviewed)||!bool(c.decorations)||!bool(c.motion)||!['none','annual'].includes(c.repeat)||!record(c.copy))fail('Invalid campaign settings.');
-  if(occasion(c.occasion,s).moving&&c.repeat==='annual')fail('Review moving occasions each year.');
+  if(occasion(c.occasion,s).moving&&!c.dateRule&&c.repeat==='annual')fail('Review moving occasions each year.');
+  if(c.dateRule){const dates=ruleDates(c.dateRule);if(!dates||dates.start!==c.start||dates.end!==c.end)fail('Invalid occasion rule or calculated dates.')}
   const copy={};for(const key of ['eyebrow','headline','body','button']){if(!text(c.copy[key],key==='button'?100:1000))fail('Wording is too long.');copy[key]=c.copy[key]}
-  return {id:c.id,occasion:c.occasion,start:c.start,end:c.end,enabled:c.enabled,published:c.published,datesReviewed:c.datesReviewed,decorations:c.decorations,motion:c.motion,repeat:c.repeat,copy};
+  return {id:c.id,occasion:c.occasion,start:c.start,end:c.end,enabled:c.enabled,published:c.published,datesReviewed:c.datesReviewed,decorations:c.decorations,motion:c.motion,repeat:c.repeat,...(c.dateRule?{dateRule:Object.fromEntries(['kind','year','month','day','ordinal','weekday','startDays','endDays','startTime','endTime'].filter(k=>c.dateRule[k]!==undefined).map(k=>[k,c.dateRule[k]]))}:{}),copy};
  };
  if(!Array.isArray(input.campaigns)||input.campaigns.length>120)fail('Too many campaigns.');s.campaigns=input.campaigns.map(cleanCampaign);
  const cids=new Set(s.campaigns.map(c=>c.id));if(cids.size!==s.campaigns.length||[...ids].some(key=>!s.campaigns.some(c=>c.occasion===key)))fail('Every occasion needs a unique campaign.');

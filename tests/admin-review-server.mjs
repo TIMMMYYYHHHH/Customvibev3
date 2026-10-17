@@ -1,10 +1,11 @@
 // Loopback-only verification server. In-memory database and synthetic auth, never production bindings.
-import http from 'node:http';import {createServer} from 'vite';import {readFile} from 'node:fs/promises';import {resolve,extname} from 'node:path';import {DatabaseSync} from 'node:sqlite';import admin from '../admin/worker.mjs';import {random,signToken} from '../server/auth.mjs';
+import http from 'node:http';import {createServer} from 'vite';import {readFile,writeFile} from 'node:fs/promises';import {resolve,extname} from 'node:path';import {DatabaseSync} from 'node:sqlite';import admin from '../admin/worker.mjs';import {random,signToken} from '../server/auth.mjs';
 const sql=new DatabaseSync(':memory:');sql.exec('CREATE TABLE content (id INTEGER PRIMARY KEY, revision INTEGER, body TEXT)');const db={prepare(q){let args=[];return {bind(...v){args=v;return this},async first(){return sql.prepare(q).get(...args)||null},async run(){return {meta:sql.prepare(q).run(...args)}}}},async batch(rows){sql.exec('BEGIN');try{const out=[];for(const r of rows)out.push(await r.run());sql.exec('COMMIT');return out}catch(e){sql.exec('ROLLBACK');throw e}}};
 // Optional UI-observed owner choices are copied only into this disposable local database.
 // This is not a production backup, migration or replacement seed.
+const planningPath=process.argv.find(a=>a.startsWith('--date-rules-review='))?.slice('--date-rules-review='.length);
 const reviewPath=process.argv.find(a=>a.startsWith('--occasion-review='))?.slice('--occasion-review='.length);
-if(reviewPath){
+if(reviewPath&&!planningPath){
  const review=JSON.parse(await readFile(resolve(reviewPath),'utf8'));
  const {seedState,OCCASIONS}=await import('../src/seasons/model.mjs');
  const {saveSeasons}=await import('../server/seasons.mjs');
@@ -17,6 +18,14 @@ if(reviewPath){
  const christmas=state.campaigns.find(c=>c.occasion==='christmas');
  if(review.christmasDraftCopy)state.drafts[christmas.id]={...structuredClone(christmas),copy:review.christmasDraftCopy};
  await saveSeasons(db,state,'Local review: copied observed occasion icons, removals and Christmas draft wording.');
+}
+if(planningPath){
+ const {prepareLocalDatePlanning}=await import('./fixtures/occasion-date-planning.mjs');
+ const {nowSAST}=await import('../src/seasons/model.mjs');
+ const {saveSeasons}=await import('../server/seasons.mjs');
+ const state=prepareLocalDatePlanning(JSON.parse(await readFile(resolve(planningPath),'utf8')),nowSAST());
+ state.revision=0;
+ await saveSeasons(db,state,'Local review: populated empty occasion dates. All schedules off; other settings preserved.');
 }
 const secret=random(),csrf=random(),token=await signToken({scope:'admin',csrf,jti:random(),exp:Math.floor(Date.now()/1000)+7200},secret);
 const root=resolve('dist/admin'),types={'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2'};
@@ -32,6 +41,7 @@ http.createServer(async(req,res)=>{
    if(!['/api/session','/api/seasons','/api/content','/content.json','/preview-content.json'].includes(path)){res.writeHead(403);res.end('Unavailable in local review');return}
    const chunks=[];for await(const c of req)chunks.push(c);const headers={...req.headers,cookie:'__Host-cv-admin='+token};if(headers.origin)headers.origin='https://admin.local';
    const r=await admin.fetch(new Request('https://admin.local'+req.url,{method:req.method,headers,body:['GET','HEAD'].includes(req.method)?undefined:Buffer.concat(chunks)}),env);
+   if(planningPath&&path==='/api/seasons'&&req.method==='PUT'&&r.ok){const saved=await r.clone().json();await writeFile(resolve(planningPath),JSON.stringify(saved,null,2))}
    res.writeHead(r.status,{'Content-Type':r.headers.get('Content-Type')||'application/json','Cache-Control':'no-store'});res.end(Buffer.from(await r.arrayBuffer()));return;
   }
   const pages={'/':'tests/fixtures/admin-orders.html','/orders':'tests/fixtures/admin-orders.html','/content':'tests/fixtures/admin-orders.html','/themes':'admin/themes.html','/preview':'admin/preview.html'};
