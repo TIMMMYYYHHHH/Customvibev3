@@ -1,3 +1,15 @@
+# Exact original photo restoration
+
+17 October 2026. Owner rejected the regenerated photo content from the preceding revision. That approach is superseded.
+
+The four original product cutouts are copied byte-for-byte to the explicitly public coming-soon assets. Both responsive scenes render those files in independent SVG image layers, aligned to the existing physical magnet planes. Original photo content is not regenerated, recoloured or retouched. SVG viewBoxes trim transparent product padding; affine transforms scale and angle the photos for the scene. Foreground finger clips preserve the visible grip and existing scene contact shadows. The background remains generated scenery.
+
+A regression test compares all four served source buffers against the originals and checks that both scenes reference each product. All 18 focused authentication and presentation tests pass. Browser checks at 320x568, 390x844, 768x1024, 1280x720 and 1920x1080 confirm correct responsive scene selection and no horizontal overflow; widescreen desktop still fits without scrolling. Desktop and mobile screenshots were compared with the original photographs. Evidence: project output/coming-soon-implementation/originals-desktop-local.jpg, originals-mobile-local.jpg and originals-measurements.json.
+
+This changes only presentation assets and rendering. Website/admin protection, payments and customer workflows remain unchanged. Full deployment checks repeat builds, test suite and protection verification.
+
+---
+
 # Responsive composition correction
 
 17 October 2026. Local implementation and browser checks passed.

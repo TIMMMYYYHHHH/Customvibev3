@@ -28,3 +28,5 @@ Coming soon entry: preserve the selected centred worktable layout (the owner-sup
 Coming soon refinement: desktop must fit a 16:9 viewport without scrolling. Preserve natural square magnet corners, with no rounded CSS clipping. The hand-held product must be visibly gripped with foreground finger overlap, not pasted above every finger.
 
 Coming soon responsive direction: compose all four magnets into one consistent photographic scene with matching perspective, lighting and contact shadows. Use a dedicated close-up on phones and portrait tablets instead of shrinking the desktop scene. Keep text editable and legible, allow natural vertical scrolling on short screens, prevent horizontal overflow and avoid empty space after the footer.
+
+Exact product-photo rule: never regenerate or retouch the photo content on coming-soon magnets. Render byte-identical original product image files as independent layers; use scene-aligned transforms and foreground hand masks for natural placement. Generated scenery may remain behind the originals, but generated faces or photo content are not an acceptable substitute.
