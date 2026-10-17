@@ -5,6 +5,14 @@ const fail=(status,error)=>Response.json({error},{status});
 const epoch=()=>Math.floor(Date.now()/1000);
 const objectKey=(id,index)=>`${id}/${index}.jpg`;
 export async function boundedBytes(request,max){
+ // workerd enforces the exact length natively, avoiding a JavaScript chunk copy.
+ if(typeof FixedLengthStream!=='undefined'){
+  if(!request.body)throw Error('Missing image');
+  const {readable,writable}=new FixedLengthStream(max);
+  const [,buffer]=await Promise.all([request.body.pipeTo(writable),new Response(readable).arrayBuffer()]);
+  return new Uint8Array(buffer);
+ }
+ // Portable fallback for local Node tests; the caller also checks exact size.
  const reader=request.body?.getReader();if(!reader)throw Error('Missing image');const parts=[];let size=0;
  while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>max){await reader.cancel();throw Error('Image too large')}parts.push(value)}
  const bytes=new Uint8Array(size);let at=0;for(const part of parts){bytes.set(part,at);at+=part.length}return bytes;

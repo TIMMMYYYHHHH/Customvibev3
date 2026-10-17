@@ -35,6 +35,13 @@ const results=[];
    }
    assert.equal((await call('init',{id,owner,key,files})).response.status,200);
    const init=phases.at(-1);
+   // Exercise the actual workerd reader, not only manifest admission checks.
+   for(const delta of [-1,1]){
+    const invalid=new Uint8Array(sizes[0]+delta);
+    assert.equal((await call('upload',invalid,{'Content-Type':'image/jpeg','X-Artwork-Id':id,'X-Artwork-Owner':owner,'X-Artwork-Index':'0'})).response.status,400);
+    assert.equal(phases.at(-1).writes,0);
+   }
+
    for(let i=0;i<files.length;i++)assert.equal((await call('upload',cache.get(sizes[i]),{'Content-Type':'image/jpeg','X-Artwork-Id':id,'X-Artwork-Owner':owner,'X-Artwork-Index':String(i)})).response.status,200);
    assert.equal((await call('complete',{id,owner,files})).response.status,200);
    const complete=phases.at(-1);
@@ -52,7 +59,7 @@ const results=[];
    assert.equal(phases.at(-1).writes,0);
    assert.equal((await call('init',{id:randomUUID(),owner,key,files:[...files.slice(0,-1),{...files.at(-1),size:files.at(-1).size+1}]})).response.status,400);
    assert.equal(phases.at(-1).statements,0);
-   const upload=phases.filter(p=>p.phase==='upload').slice(0,scenario.files),times=upload.map(p=>p.elapsedMs).sort((a,b)=>a-b);
+   const upload=phases.filter(p=>p.phase==='upload'&&p.status===200).slice(0,scenario.files),times=upload.map(p=>p.elapsedMs).sort((a,b)=>a-b);
    results.push({...scenario,init,complete,upload:{count:times.length,totalMs:times.reduce((a,b)=>a+b,0),medianMs:times[Math.floor(times.length/2)],p95Ms:times[Math.ceil(times.length*.95)-1],maxMs:times.at(-1),maxD1Statements:Math.max(...upload.map(p=>p.statements)),maxD1Calls:Math.max(...upload.map(p=>p.calls))},retry,totals:phases.reduce((a,p)=>({statements:a.statements+p.statements,calls:a.calls+p.calls,r2Writes:a.r2Writes+p.writes,r2Reads:a.r2Reads+p.reads}),{statements:0,calls:0,r2Writes:0,r2Reads:0}),boundaryChecks:'61 files, 32 MB + 1 byte and 4 MB + 1 byte rejected before DB; exhausted retained-storage quota rejects without R2 writes',phases});
   }finally{await mf.dispose();}
  }

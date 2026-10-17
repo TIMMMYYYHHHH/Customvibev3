@@ -2,7 +2,18 @@
 
 ## Current owner decision, 17 October 2026
 
-Tim chose to leave the availability investigation and stability follow-up Blocked and return later. Do not contact Cloudflare or resume diagnostics until he resumes this work. The report below remains unsent. Phone email acceptance stays on hold. Independent wording work may proceed.
+Tim explicitly resumed the availability investigation after temporary service errors blocked the approved CPU verification order. The earlier hold is superseded for this investigation. Continue only the same approved synthetic draft `62a8d010-96a3-4c1a-ab2a-bf9fef9f94aa`; no additional order is authorized. Other email testing, including phone acceptance, stays on hold. Provider contact is not yet authorized and the report remains unsent.
+
+## Fresh evidence, 17 October 2026
+
+The approved 60-file checkout attempt at 02:36:27 UTC and same-order retry at 02:37:21 UTC both stopped with a plain-text temporary-service response surfaced as a JSON parse error. A read-only check confirmed a single 31,522,260-byte reservation created 02:36:32 UTC, exactly 14-day expiry, 1/60 files ready, max tries 1, not finalised and no order sequence. Admin lookup confirmed unfinished artwork. The original tab and draft are retained.
+
+After Tim resumed investigation, one further same-order attempt at 02:40:01 UTC was captured in temporary live logs on security version `e7ce60e4-3f11-4bce-b0f2-8f2af2cd63cb`. Upload index 2 returned HTTP 200 (11 ms CPU, 1,227 ms wall time) at 02:40:10 UTC. Index 3 returned HTTP 503 with fixed diagnostic `security_artwork/database_internal` (12 ms CPU, 2,453 ms wall time) at 02:40:11 UTC. Execution outcome was `ok` because the exception was caught. These are endpoint-attributed samples, unlike the earlier dashboard percentile window. They do not establish dependable Free CPU headroom.
+
+Direct D1 dashboard SELECTs also intermittently returned internal errors without passing through application code. Provider references: `e_PVSMDp_ad50e61b29d1409f9f9927a129324d9a`, `e_PVSMDp_c5a083c9be884334af542511aa76d226`, `e_PVSMDp_0b4c74fcc55c413993515c030e052ec8`. Repeated metadata SELECTs and `SELECT 1 AS availability_probe` succeeded. Read-only API metadata: production database, 212,992 bytes, WEUR, replication disabled. This rules out the application response parser as the cause of those direct-console failures; it does not establish Cloudflare's internal root cause. No active D1 incident was listed on the public status page when checked. No migration, reset, write replay, auth bypass, paid feature or provider contact occurred.
+
+A narrow application correction returns safe JSON for caught service errors so the existing checkout displays a readable retry message and retains the same draft. Its regression failed against the previous plain-text response and passes after the change. This fixes error presentation, not D1 availability. Separately, the CPU follow-up uses workerd's native FixedLengthStream to enforce exact upload size without JavaScript chunk copying. All 192 tests pass; local workerd accepts maximum sizes and rejects short/oversized bodies without storage writes. Independent native-stream checks also verified cancellation and source-error cleanup. Hosted acceptance remains open.
+
 
 ## Evidence, 16 October 2026
 

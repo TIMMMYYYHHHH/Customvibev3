@@ -68,3 +68,11 @@ test('an upload that lost its lease cannot report success or delete retained art
  assert.equal((await upload(env,m)).status,503);assert.equal(env.objects.size,1);
  assert.equal(env.sql.prepare('SELECT ready FROM artwork_files WHERE request_id=?').get(m.id).ready,0);
 });
+
+test('temporary artwork database failures return safe JSON for the retained checkout draft',async()=>{
+ const env=artworkEnv(),m=await manifest();await call(env,'init',m);
+ env.DB={prepare:()=>{throw Error('D1_ERROR: internal error private-reference')}};
+ const response=await upload(env,m);assert.equal(response.status,503);
+ assert.match(response.headers.get('Content-Type'),/application\/json/);
+ const body=await response.json();assert.match(body.error,/retry/i);assert.doesNotMatch(body.error,/private-reference|D1_ERROR|SQL/i);assert.equal(env.objects.size,0);
+});
