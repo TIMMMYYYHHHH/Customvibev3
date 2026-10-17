@@ -93,11 +93,12 @@
 .storefront .result-count{font-size:12px;color:var(--muted);margin-bottom:20px}
 .storefront .catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:55px 35px}
 .storefront .catalog-grid article{min-width:0}
-.storefront .catalog-art{display:block;padding:0;width:100%;aspect-ratio:1;background:transparent}
+.storefront .catalog-art{position:relative;display:block;padding:0;width:100%;aspect-ratio:1;background:transparent}
 .storefront .catalog-art>img{width:100%;height:100%;object-fit:contain;transition:transform .2s}
 .storefront .catalog-art:hover{filter:none}
 .storefront .catalog-art:hover>img{transform:rotate(-2deg)}
-.storefront .catalog-art .puzzle-visual{margin:0;width:100%;transform:rotate(3deg) scale(.8)}
+/* Size square puzzles against the artwork height, including shallow cards. */
+.storefront .catalog-art .puzzle-visual{position:absolute;left:50%;top:50%;margin:0;width:auto;height:78%;max-width:78%;transform:translate(-50%,-50%) rotate(3deg)}
 .storefront .catalog-card-copy{padding:12px 10px 0}
 .storefront .catalog-card-copy .overline{color:var(--accent)}
 .storefront .catalog-card-copy h3{margin:12px 0 10px;font-size:29px}
@@ -398,6 +399,8 @@
 .storefront .collection-pack-face{display:block;width:100%;height:100%;overflow:hidden;border-radius:.5px}
 .storefront .product-dialog>.collection-pack-stage{padding:0}
 .storefront .puzzle-visual .magnet-preview-piece img{height:100%;border:0;box-shadow:none}
+/* Inset positioning keeps the puzzle margin from collapsing out of its link. */
+.storefront .product-art>.puzzle-visual{position:absolute;inset:9%;width:auto;margin:0}
 
 .storefront .collection-pack-preview.four{top:9%;left:9%;width:82%;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .storefront .collection-pack-preview.four>.magnet-preview-piece,.storefront .collection-pack-preview.single>.magnet-preview-piece{grid-column:auto}
