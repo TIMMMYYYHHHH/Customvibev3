@@ -11,3 +11,9 @@ Production assets: public/assets/business-games/. The two 1254px original game m
 Validation before publication: 264 tests pass; public, SSR and admin builds pass. Local desktop basket adds ten magnets for R400. Offline browser fixture tests/fixtures/game-print.html produced ten 1200×1200 JPEGs with two unique faces and an unpaid order; no network submissions or emails. Business page loads nine distinct assets. Both pages visually checked at 390px width. All four production QR compositions independently decode to the exact CustomVibe URL.
 
 Deploy the site, private catalogue and authenticated admin from this revision. Preserve stored catalogue copy, status and seasonal configuration. No customer records are migrated. Website/admin gates remain enabled, payments disabled. Physical print/readability/scan acceptance and the deferred general magnet-finish improvement remain separate.
+
+## Publication verified
+
+Published 18 October 2026 in commit 95ee5d8e347fe0cfe1beed61d25aca9c948caf9f. Public workflow https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39080392193 completed successfully. Matching admin Worker version 37b4dc9e-891a-4322-a69e-f53e1d5bfec5 and private catalogue Worker version fe32a7fe-190b-4bcb-9c5d-8a01d49d256c deployed successfully. Post-deploy checks verified existing destinations, authentication and gate protections.
+
+Live Business page loads all nine designs. Live game page and authenticated admin preview show five X and five O magnets with sharp square corners. Live basket adds the full ten-piece pack at R400. No live order or email was submitted. Screenshots are saved under output/business-game-release/live-business.jpg and live-game.jpg. Physical print acceptance remains open in Founders Hub.
