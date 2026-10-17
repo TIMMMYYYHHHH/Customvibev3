@@ -6,7 +6,11 @@ The owner also removed the inherited 30-entry cap. No fixed cap remains on magne
 
 Customer guidance in designer, basket, checkout and Help no longer presents an entry ceiling. File-free collection entries are not subject to a replacement item-count limit. Earlier 30/31 rejection evidence and the retained-30 policy in the history below are superseded.
 
-Tests cover 31 photo designs through the isolated full submission and saved-record flow, 60/61 photo-file boundaries, more than 30 file-free collection entries, and exact request-body/saved-record size boundaries. Artwork manifest and admin ZIP filename validation also accept design numbers beyond 99 when file-free entries precede artwork; path/name restrictions remain. Publication and live verification remain pending.
+Tests cover 31 photo designs through the isolated full submission and saved-record flow, 60/61 photo-file boundaries, more than 30 file-free collection entries, and exact request-body/saved-record size boundaries. Artwork manifest and admin ZIP filename validation also accept design numbers beyond 99 when file-free entries precede artwork; path/name restrictions remain.
+
+Published application `da7c5d5` through [protected Pages run 38992342973](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38992342973). All 188 tests, public/SSR/admin builds and pre/post protection checks passed. Private security Worker: `b8bf5e03-5cef-41d2-a1d2-495516dd5324`. Admin Worker: `bd9bda17-0957-4763-aa13-5225804fd292`. Existing D1/R2 bindings and private security routing were verified before/after; admin access guards passed before/after. Website password gate, separate admin authentication and disabled payments remain in place. No database migration or paid-service change occurred.
+
+Live signed-in verification accepted 31 synthetic photo designs in the studio, basket and checkout. The summary shows 31 entries, 31/60 artwork files and R1,240; Continue to checkout works and Place unpaid order is enabled after the normal form check. Expanded inline guidance explicitly states no fixed magnet or basket-entry cap while retaining file/size limits. Only synthetic images were read into browser memory; no customer details, order submission, artwork upload, email or production-record changes were made. Screenshot: `no-entry-cap-live.png` in the project workspace. Physical printing, maximum free-runtime load and blocked availability/email acceptance remain on their separate tasks; this release does not claim those checks passed.
 
 ## Previous magnet quantity revision, 17 October 2026
 
