@@ -1,5 +1,5 @@
 import {rename,rm,writeFile,mkdir,copyFile} from 'node:fs/promises';
-await rename('dist/admin/admin/index.html','dist/admin/index.html');await rm('dist/admin/admin',{recursive:true});for(const name of ['_routes.json','_redirects','_headers','sitemap.xml','content.json'])await rm('dist/admin/'+name,{force:true});await writeFile('dist/admin/robots.txt','User-agent: *\nDisallow: /\n');
+await rename('dist/admin/admin/index.html','dist/admin/index.html');await rename('dist/admin/admin/themes.html','dist/admin/themes.html');await rename('dist/admin/admin/preview.html','dist/admin/preview.html');await rm('dist/admin/admin',{recursive:true});for(const name of ['_routes.json','_redirects','_headers','sitemap.xml','content.json'])await rm('dist/admin/'+name,{force:true});await writeFile('dist/admin/robots.txt','User-agent: *\nDisallow: /\n');
 
 // The sign-in screen uses the same local brand fonts before authentication.
 await mkdir('dist/admin/admin-brand',{recursive:true});

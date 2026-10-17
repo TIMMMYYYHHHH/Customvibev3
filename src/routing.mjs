@@ -1,4 +1,5 @@
+import {previewPath} from './seasons/preview-routing.mjs';
 export const pagePath=page=>page==='home'?'/':'/'+page;
-export function currentPage(){const path=location.pathname.replace(/^\/|\/$/g,'');return path||'home'}
+export function currentPage(){const path=(typeof window!=='undefined'&&window.__CV_ADMIN_PREVIEW__?previewPath(location.href).split('#')[0]:location.pathname).replace(/^\/|\/$/g,'');return path||'home'}
 export function navigate(path){history.pushState(null,'',path);dispatchEvent(new PopStateEvent('popstate'))}
 export function installNavigation(){if(location.hash.startsWith('#/')){const [page,section]=location.hash.slice(2).split('/');history.replaceState(null,'',pagePath(['home','happy-chaos','colour-pop','keepsake-edit'].includes(page)?'home':page)+(section?'#'+section:''))}document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target||a.download)return;const url=new URL(a.href,location.href);if(url.origin!==location.origin||url.pathname.startsWith('/auth/')||/\.[a-z0-9]+$/i.test(url.pathname))return;e.preventDefault();navigate(url.pathname+url.search+url.hash)});}

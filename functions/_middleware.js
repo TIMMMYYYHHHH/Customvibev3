@@ -15,6 +15,7 @@ export async function onRequest(context){const {request,env}=context;try{const u
  if(target){url.pathname=target;return secure(Response.redirect(url.toString(),301),{privateResponse})}
 
  const catalogue=async()=>{if(!env.CATALOGUE)throw new Error('Missing binding');const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)throw new Error('Unavailable');return r.json()};
+ if(url.pathname==='/season.json'){const r=await env.CATALOGUE.fetch('https://catalogue.internal/season.json');if(!r.ok)throw Error('Seasonal settings unavailable');return secure(Response.json(await r.json(),{headers:{'Cache-Control':'no-store'}}),{privateResponse})}
  if(url.pathname==='/content.json')return secure(Response.json(await catalogue(),{headers:{'Cache-Control':'no-store'}}),{privateResponse});
  if(url.pathname==='/sitemap.xml')return secure(new Response(sitemap(await catalogue()),{headers:{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'no-store'}}),{privateResponse});
  // Native app routes and metadata use the live catalogue, including newly created products.

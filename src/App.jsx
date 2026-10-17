@@ -1,3 +1,4 @@
+import {SeasonProvider} from './seasons/runtime.jsx';
 import ProofReview from './ProofReview';
 import {isTemplateProduct,isSelectableCollection,selectedPrintManifest,selectionQuantities,productMagnetCount,collectionItemName,mergeCollectionItem} from './designs/products.mjs';
 import React,{useEffect,useLayoutEffect,useState,useRef,useReducer} from 'react';
@@ -27,7 +28,7 @@ import {canPurchase} from './content/model.mjs';
 import {currentPage,navigate,pagePath} from './routing.mjs';
 const routes=['proof','home','collections','studio','puzzle','basket','checkout','help',...Object.keys(policies)];
 
-export function App(props){return <SubmissionProvider><AppContent {...props}/></SubmissionProvider>}
+export function App(props){return <SeasonProvider><SubmissionProvider><AppContent {...props}/></SubmissionProvider></SeasonProvider>}
 function AppContent({initialPage}){
  const orderState=useSubmissionSnapshot('order'),orderLocked=orderState.pending;
  const {content}=useContent();const PACKS=Object.fromEntries(content.products.map(p=>[p.id,p]));
@@ -60,7 +61,7 @@ function AppContent({initialPage}){
  }
  useEffect(()=>{const update=()=>{setPage(currentPage());setRouteVersion(v=>v+1);};addEventListener('popstate',update);addEventListener('hashchange',update);return()=>{removeEventListener('popstate',update);removeEventListener('hashchange',update);clearTimeout(timer.current);}},[]);
  useLayoutEffect(()=>{
-  const section=location.hash.slice(1);
+  const section=(window.__CV_ADMIN_PREVIEW__?new URLSearchParams(location.search).get('page')?.split('#')[1]:location.hash.slice(1))||'';
   const frame=requestAnimationFrame(()=>{
    const target=section&&document.getElementById(section);
    if(target){
