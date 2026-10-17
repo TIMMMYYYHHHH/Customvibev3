@@ -1,5 +1,6 @@
+import {hasPrintContract,isTemplateProduct,upgradeCollections} from '../designs/products.mjs';
 export const defaultPricing={single:5000,six:25000,ten:40000};
-export const groups = ['All collections', 'Learning & play', 'Everyday favourites', 'Gifts & occasions', 'Your photos'];
+export const groups = ['All collections', 'Learning & play', 'Everyday favourites', 'Gifts & occasions', 'Your photos', 'Business & work', 'Home & handy'];
 const products = [
   {id:'alphabet', name:'The alphabet club', group:groups[1], image:'cutouts/alphabet-pack-glossy.webp', description:'Little letters. Big discoveries.', details:'An A–Z collection for spelling names, finding letters and playing with words.', tags:'abc letters preschool school'},
   {id:'counting', name:'Count on a little fun', group:groups[1], image:'cutouts/counting-pack-glossy.webp', description:'Make learning count, one square at a time.', details:'Numbers and matching dots for counting together. The collection runs from 1 to 10.', tags:'123 numbers dots preschool maths'},
@@ -13,8 +14,9 @@ const products = [
 
 
 export const defaultContent={version:1,revision:0,pricing:defaultPricing,images:{logo:'/assets/brand-icon.png',tray:'/assets/cutouts/hero-real-magnets-tray.webp',puzzle:'/assets/sample-coast.webp',hero0:'/assets/cutouts/05-sunglasses-square.webp',hero1:'/assets/cutouts/02-wedding-square.webp',hero2:'/assets/cutouts/03-beach-square.webp',hero3:'/assets/cutouts/04-pink-group-square.webp',hero4:'/assets/cutouts/01-restaurant-square.webp'},products:[...products.slice(0,2),products[6],...products.slice(2,6),products[7]].map(p=>({...p,name:p.id==='photos'?'Your photo magnets':p.name,image:p.image?'/assets/'+p.image:'',status:p.href?'available':'coming-soon',priceCents:null,count:p.id==='alphabet'?26:p.id==='counting'?10:p.href?1:4,featured:['alphabet','counting','puzzle'].includes(p.id),contents:p.id==='alphabet'?'26 uppercase letters, A–Z':p.id==='counting'?'10 number magnets, 1–10':p.href?'': 'Contents to be confirmed'}))};
+defaultContent.products=upgradeCollections(defaultContent.products);
 export const isPersonal=p=>['photos','puzzle'].includes(p.id);
-export const canPurchase=p=>!!p&&!isPersonal(p)&&p.status==='available'&&Number.isSafeInteger(p.priceCents)&&p.priceCents>0;
+export const canPurchase=p=>!!p&&!isPersonal(p)&&p.status==='available'&&(p.pricingMode==='per-magnet'?hasPrintContract(p):Number.isSafeInteger(p.priceCents)&&p.priceCents>0);
 export function validImage(src){return typeof src==='string'&&(src===''||/^\/assets\/[a-zA-Z0-9_./%-]+$/.test(src)&&!src.includes('..')||/^https:\/\/[^\s]+$/.test(src)||/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(src));}
 export function validateContent(c){
  const fail=m=>{throw new Error(m)};
@@ -30,8 +32,10 @@ export function validateContent(c){
   if(!p.name?.trim()||!groups.slice(1).includes(p.group))fail('Every product needs a name and a category.');
   if(!['available','coming-soon','hidden'].includes(p.status))fail('Choose an availability status.');
   if(!Number.isSafeInteger(p.count)||p.count<1||p.count>1000)fail('Magnet count must be a whole number from 1 to 1,000.');
-  if(!validImage(p.image)||(!p.image&&!isPersonal(p)))fail('Choose a valid product image.');
+  if(!validImage(p.image)||(!p.image&&!isPersonal(p)&&!hasPrintContract(p)))fail('Choose a valid product image.');
   if(p.priceCents!==null&&(!Number.isSafeInteger(p.priceCents)||p.priceCents<=0||p.priceCents>10000000))fail('Enter a positive product price or leave it blank.');
+  if(p.pricingMode!==undefined&&!['fixed','per-magnet'].includes(p.pricingMode))fail('Choose a supported pricing mode.');
+  if(p.pricingMode==='per-magnet'&&!hasPrintContract(p))fail('Collection count and print version must match its complete artwork.');
   if(!isPersonal(p)&&p.status==='available'&&!canPurchase(p))fail('An available collection needs a confirmed price.');
   if(isPersonal(p)&&p.status!=='available')fail('Photo magnets and puzzles must remain available.');
   if(p.href&&p.href!==({'photos':'/studio','puzzle':'/puzzle'}[p.id]))fail('Use the built-in product links.');

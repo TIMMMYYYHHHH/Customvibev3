@@ -29,7 +29,9 @@
       "priceCents": null,
       "count": 26,
       "featured": true,
-      "contents": "26 uppercase letters, A–Z"
+      "contents": "26 uppercase letters, A–Z",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
     },
     {
       "id": "counting",
@@ -43,7 +45,9 @@
       "priceCents": null,
       "count": 10,
       "featured": true,
-      "contents": "10 number magnets, 1–10"
+      "contents": "10 numbers with matching dots, 1–10",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
     },
     {
       "id": "photos",
@@ -71,7 +75,9 @@
       "priceCents": null,
       "count": 4,
       "featured": false,
-      "contents": "Contents to be confirmed"
+      "contents": "Apple, tree, sun and cat",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
     },
     {
       "id": "colours",
@@ -85,7 +91,9 @@
       "priceCents": null,
       "count": 4,
       "featured": false,
-      "contents": "Contents to be confirmed"
+      "contents": "Green, blue, pink and orange",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
     },
     {
       "id": "reminders",
@@ -99,7 +107,9 @@
       "priceCents": null,
       "count": 4,
       "featured": false,
-      "contents": "Contents to be confirmed"
+      "contents": "You’ve got this; One thing at a time; Good things ahead; Make room for joy",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
     },
     {
       "id": "thanks",
@@ -113,7 +123,9 @@
       "priceCents": null,
       "count": 4,
       "featured": false,
-      "contents": "Contents to be confirmed"
+      "contents": "Thank you; My favourite human; You are loved; Best day ever",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
     },
     {
       "id": "puzzle",
@@ -128,6 +140,70 @@
       "count": 1,
       "featured": true,
       "contents": ""
+    },
+    {
+      "description": "Your business, always handy.",
+      "details": "",
+      "tags": "",
+      "image": "",
+      "featured": false,
+      "priceCents": null,
+      "status": "coming-soon",
+      "id": "business",
+      "name": "Business magnets",
+      "group": "Business & work",
+      "count": 1,
+      "contents": "One personalised 7.5 cm square magnet",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
+    },
+    {
+      "description": "One little square. So much to share.",
+      "details": "",
+      "tags": "",
+      "image": "",
+      "featured": false,
+      "priceCents": null,
+      "status": "coming-soon",
+      "id": "qr",
+      "name": "Scan to connect",
+      "group": "Business & work",
+      "count": 1,
+      "contents": "One personalised 7.5 cm square magnet",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
+    },
+    {
+      "description": "A warm welcome, without spelling the password.",
+      "details": "",
+      "tags": "",
+      "image": "",
+      "featured": false,
+      "priceCents": null,
+      "status": "coming-soon",
+      "id": "wifi",
+      "name": "Wi-Fi made easy",
+      "group": "Home & handy",
+      "count": 1,
+      "contents": "One personalised 7.5 cm square magnet",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
+    },
+    {
+      "description": "The details you reach for, right where you need them.",
+      "details": "",
+      "tags": "",
+      "image": "",
+      "featured": false,
+      "priceCents": null,
+      "status": "coming-soon",
+      "id": "information",
+      "name": "Good to keep handy",
+      "group": "Home & handy",
+      "count": 1,
+      "contents": "One personalised 7.5 cm square magnet",
+      "pricingMode": "per-magnet",
+      "printVersion": 1
     }
   ]
 }

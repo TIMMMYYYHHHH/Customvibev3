@@ -1,3 +1,4 @@
+import {productMagnetCount,printManifest,isTemplateProduct} from './designs/products.mjs';
 import {defaultPricing,canPurchase} from './content/model.mjs';
 import {ARTWORK_LIMITS} from './artwork-policy.mjs';
 export const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
@@ -12,11 +13,13 @@ export const money=cents=>new Intl.NumberFormat('en-ZA',{style:'currency',curren
 export function summarize(items,content){
  const photoQty=items.filter(i=>i.kind==='photo').reduce((s,i)=>s+i.qty,0);
  const puzzleQty=items.filter(i=>i.kind==='puzzle').reduce((s,i)=>s+i.qty*(i.gridSize||3)**2,0);
- const pricedQty=photoQty+puzzleQty;
- const packs=items.filter(i=>!['photo','puzzle'].includes(i.kind));
+ const shared=items.filter(i=>content?.products.find(p=>p.id===i.kind)?.pricingMode==='per-magnet');
+ const collectionQty=shared.reduce((n,i)=>n+i.qty*productMagnetCount(content.products.find(p=>p.id===i.kind)),0);
+ const pricedQty=photoQty+puzzleQty+collectionQty;
+ const packs=items.filter(i=>!['photo','puzzle'].includes(i.kind)&&!shared.includes(i));
  const product=i=>content?.products.find(p=>p.id===i.kind);
  const packCents=packs.reduce((s,i)=>s+(canPurchase(product(i))?product(i).priceCents*i.qty:0),0);
- return {photoQty,puzzleQty,pricedQty,knownCents:photoPrice(pricedQty,content?.pricing)+packCents,unpriced:packs.some(i=>!canPurchase(product(i))),magnetQty:pricedQty+packs.reduce((s,i)=>s+i.qty*(product(i)?.count||i.count||({alphabet:26,counting:10}[i.kind]||1)),0)};
+ return {photoQty,puzzleQty,pricedQty,knownCents:photoPrice(pricedQty,content?.pricing)+packCents,unpriced:[...packs,...shared].some(i=>!canPurchase(product(i))),magnetQty:pricedQty+packs.reduce((s,i)=>s+i.qty*(product(i)?.count||i.count||({alphabet:26,counting:10}[i.kind]||1)),0)};
 }
 export function cropRect(w,h,ow,oh,zoom=1,x=.5,y=.5){
  if(![w,h,ow,oh].every(n=>Number.isFinite(n)&&n>0))throw new Error('Invalid image dimensions');
@@ -41,7 +44,7 @@ export function cropQuality(photo){
 
 export function orderCapacity(items,content){
  const magnets=summarize(items,content).magnetQty;
- const files=items.reduce((n,item)=>n+(item.kind==='photo'?1:item.kind==='puzzle'?(item.gridSize||3)**2+1:0),0);
+ const files=items.reduce((n,item)=>n+(item.kind==='photo'?1:item.kind==='puzzle'?(item.gridSize||3)**2+1:item.designMode==='assisted'?(item.reference?1:0):isTemplateProduct(content?.products.find(p=>p.id===item.kind))?1:printManifest(content?.products.find(p=>p.id===item.kind))?.designs.length||0),0);
  const issues=[];
  if(files>ARTWORK_LIMITS.files)issues.push(`These designs need ${files} artwork files. Keep up to ${ARTWORK_LIMITS.files}; use fewer puzzle designs or a smaller puzzle grid.`);
  return {magnets,files,entries:items.length,issues,allowed:issues.length===0};
