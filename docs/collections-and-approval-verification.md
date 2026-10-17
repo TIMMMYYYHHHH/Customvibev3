@@ -12,9 +12,19 @@
 - Revision upload reservations inherit original order expiry. Existing file/byte limits aggregate across originals and revisions. Cleanup removes proof records and sessions; storage cleanup preserves its existing quota-release guarantees.
 - Original preview repair is already live: commit 2035b09, deployment run 38997408349, independently reviewed. Live puzzle bounds 150×150 inside a 366×183 art area, with readable card copy.
 
-## Outstanding acceptance
+## Deployment and live verification
 
-Schema 0007 and private security/admin Workers deployed; website deployment 38999141808 succeeded at 07c362e. Catalogue service deployment and current production catalogue activation are in progress. Local 320/390px layouts, gate-to-review fragment preservation and explicit customer approval UI verified. Production read-only verification remains. The physical 7.5cm print readability and QR scan check is an owner acceptance step and keeps the Hub parent open. Provider availability issues remain separately tracked.
+Schema 0007 applied to the existing business D1 database. Security Worker version 644cf737-ffd4-4127-a294-2d08ea41741b, admin version a31cb5d3-d6e5-4aa1-ab6e-70fbcb6e5814 and catalogue version dadf826d-2ec8-4999-8079-08c6f6e50c04 deployed through the business-only helper. Pages runs 38999141808, 38999484028 and 38999749406 succeeded. The latest run on main carries the final card sizing correction.
+
+The signed-in admin merged and saved the latest catalogue, preserving existing owner content. All six packs and four practical collections are Available; the shop now shows 12 collections. Verified live: self-design preview and basket, assisted brief and Awaiting design state, six practical magnets at R250, all 26 alphabet faces at R1,040, and a mixed 32-magnet basket at R1,280. The temporary verification basket was cleared by leaving the memory-only session. No real orders or email were submitted.
+
+Live review without a private capability exposes no artwork and asks for the latest private email link. Local browser checks cover sign-in fragment preservation and explicit consent before approval; full service integration tests cover authorization and revision changes. Site/admin gates and disabled payments remain in place. Slow protected asset loading encountered during verification remains distinct from the previously tracked provider availability/CPU issue. Print fonts now load from bundled licensed bytes so independent font requests cannot break artwork generation. Card artwork fills its square frame and is sized relative to the art panel, verified in the local browser before release.
+
+The independent review identified six Important findings, all fixed and regression-tested: custom fixed-pack face metadata and filenames, immutable upload retry identity, unchanged-file reuse for large revisions, literal Wi-Fi spacing, normalized URL limits and capability preservation through sign-in. Unchanged files keep their existing private references; revisions do not bypass quotas or reset expiry.
+
+## Outstanding owner acceptance
+
+Physical 7.5cm print readability and QR scanning remain an owner acceptance step and keep the Hub parent open. Existing provider availability follow-ups remain separately tracked. Automated/local approval checks do not claim a real customer email was received or a production print was made.
 
 ## Deployment access
 
