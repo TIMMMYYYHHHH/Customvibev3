@@ -7,6 +7,20 @@ const secret=random(),salt=random();const password=random();
 const env={SITE_PASSWORD_HASH:await hashPassword(password,salt),SITE_PASSWORD_SALT:salt,SESSION_SECRET:secret};
 function services(){const count=new Map(),revoked=new Set();return {fetch:async(req,init)=>{const p=new URL(typeof req==='string'?req:req.url).pathname;const b=JSON.parse(init?.body||'{}');if(p==='/reserve'){const n=(count.get(b.key)||0)+1;count.set(b.key,n);return Response.json({allowed:n<=5})}if(p==='/revoke')revoked.add(b.jti);return Response.json({revoked:revoked.has(b.jti)})}}}
 function request(path='/',options={}){return new Request('https://customvibe.co.za'+path,{...options,headers:{'CF-Connecting-IP':'192.0.2.1',...options.headers}})}
+test('site entry keeps the password form closed until login, while failed login reopens it',async()=>{
+ const e={...env,AUTH:services()};
+ const first=(await gate(request(),e,'site')).response;
+ const html=await first.text();
+ assert.equal(first.status,401);
+ assert.match(html,/<dialog id="site-login"(?![^>]*\bopen\b)[^>]*>/);
+ assert.match(html,/href="\/auth\/login"/);
+ const direct=await (await gate(request('/auth/login'),e,'site')).response.text();
+ assert.match(direct,/<dialog id="site-login"[^>]*\bopen\b/);
+ const csrf=html.match(/name="csrf" value="([^"]+)"/)[1],cookie=first.headers.get('set-cookie').split(';')[0];
+ const failed=(await gate(request('/auth/login',{method:'POST',headers:{cookie,origin:'https://customvibe.co.za'},body:new URLSearchParams({csrf,password:'incorrect'})}),e,'site')).response;
+ assert.equal(failed.status,401);assert.equal(failed.headers.has('set-cookie'),false);
+ const failedHTML=await failed.text();assert.match(failedHTML,/<dialog id="site-login"[^>]*\bopen\b/);assert.match(failedHTML,/role="alert"/);
+});
 test('missing gate configuration fails closed for content and assets',async()=>{for(const path of ['/','/assets/a.js','/content.json','/sitemap.xml'])assert.equal((await gate(request(path),{},'site')).response.status,503)});
 test('robots remains public and disallows crawling while gated',async()=>{const r=(await gate(request('/robots.txt'),{},'site')).response;assert.equal(r.status,200);assert.match(await r.text(),/Disallow: \/\n/)});
 test('explicit false disables site gate but never admin auth',async()=>{assert.equal((await gate(request(),{SITE_GATE_ENABLED:'false'},'site')).response,null);assert.equal((await gate(request(),{SITE_GATE_ENABLED:'false'},'admin')).response.status,503)});
