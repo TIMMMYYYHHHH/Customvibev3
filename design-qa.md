@@ -1,3 +1,13 @@
+# Magnet rim and finger-boundary correction
+
+17 October 2026. The owner identified doubled rims and visible finger cutouts in the previous original-photo overlay. Byte-identical files alone did not validate the composite, and the preceding visual acceptance is superseded.
+
+Root cause: an affine transform aligned only three corners while placing a complete product rim above another rim already in the scene. Broad foreground patches also restored generated photo fragments beside the fingers. The new renderer inserts only original photograph content inside the existing scene rim. A four-corner homography drives a small native SVG mesh, preserving image quality on phones without foreignObject/3D rasterisation. A photo-visibility mask follows the actual finger silhouette; there is no second background image pasted above the product. Original source files remain unchanged, while the viewBox removes the source product frame and transparent padding.
+
+Visual inspection at 200% covered the marked index finger, thumb, beach top/bottom and wedding edges. The beach source crop retains the feet while removing its original frame. Phone composition inspected at 390x844. Regression checks protect byte-identical sources and exact projection of all four destination corners. Evidence: project output/coming-soon-implementation/faces-detail-desktop.jpg and faces-mobile-final.jpg. Release verification and live screenshots are recorded in Founders Hub.
+
+---
+
 # Exact original photo restoration
 
 17 October 2026. Owner rejected the regenerated photo content from the preceding revision. That approach is superseded.

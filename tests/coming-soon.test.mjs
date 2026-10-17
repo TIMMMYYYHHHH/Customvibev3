@@ -33,3 +33,15 @@ test('coming soon photos remain byte-identical to the original product files',as
   for(const size of ['desktop','mobile']) assert.ok(renderScene(size).includes('data-original-photo="'+name+'"'));
  }
 });
+
+test('photo projection aligns all four corners of every magnet face',async()=>{
+ const {scenes,projectiveMatrix,projectPoint}=await import('../server/coming-soon-scenes.mjs');
+ const corners=[[0,0],[1000,0],[1000,1000],[0,1000]];
+ for(const [scene,{placements}] of Object.entries(scenes))for(const [photo,quad] of placements){
+  const matrix=projectiveMatrix(quad);
+  corners.forEach((corner,index)=>{
+   const result=projectPoint(matrix,corner);
+   result.forEach((value,axis)=>assert.ok(Math.abs(value-quad[index][axis])<1e-7,`${scene}/${photo} corner ${index} must align`));
+  });
+ }
+});
