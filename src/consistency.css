@@ -380,3 +380,5 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
  .has-photo .studio-review-bar{grid-template-columns:minmax(0,1fr) auto}
  .shop-shell .has-photo .studio-review-bar>.button{padding-inline:10px;font-size:12px}
 }
+
+.policy-page section{scroll-margin-top:100px}.policy-page .policy-links{display:flex;flex-wrap:wrap;gap:8px 24px;list-style:none;padding:0;margin:18px 0 28px}.policy-page .policy-links a{display:inline-block;padding:8px 0;text-underline-offset:4px;overflow-wrap:anywhere}.policy-page section p+p{margin-top:16px}
