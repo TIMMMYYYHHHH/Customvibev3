@@ -61,7 +61,7 @@
 .shop-shell .help-hero h1{font-size:clamp(42px,5vw,66px);line-height:1.05}
 .help-topics{display:flex;gap:10px;flex-wrap:wrap;margin:25px 0 20px}
 .help-topics button{min-height:44px;padding:10px 20px;border-radius:30px;font-weight:650}
-.help-topics button[aria-pressed=true]{background:#eee2f7}
+.help-topics button[aria-pressed=true]{background:#26133d;color:#fff}
 .help-next{display:flex;align-items:center;justify-content:center;gap:24px;margin:38px 0 0;flex-wrap:wrap}
 .shop-shell .delivery-flow-page .checkout-grid{grid-template-columns:minmax(0,1fr) 350px;gap:40px}
 .shop-shell .delivery-heading h1{font-size:clamp(38px,4.2vw,56px);line-height:1.05}
@@ -192,7 +192,7 @@
 .purchase-progress{width:calc(100% - var(--cv-gutter)*2);max-width:var(--cv-page)}
 body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 .studio-mobile-count{display:none}
-@media(max-width:600px){.has-photo .studio-mobile-count{display:block;font-size:11px;margin-bottom:2px}.has-photo .studio-price strong{font-size:18px}.shop-shell .has-photo .studio-choice-row button[aria-pressed=true]{background:#faeaf0;border-color:#ae2e5b;color:#92234b}.has-photo .studio-price small{display:none}}
+@media(max-width:600px){.has-photo .studio-mobile-count{display:block;font-size:11px;margin-bottom:2px}.has-photo .studio-price strong{font-size:18px}.shop-shell .has-photo .studio-choice-row button[aria-pressed=true]{background:#26133d;border-color:transparent;color:#fff}.has-photo .studio-price small{display:none}}
 @media(max-width:360px){
  .header-inner{gap:5px;width:calc(100% - 24px)}
  .unified-header .site-wordmark{font-size:18px;gap:4px;letter-spacing:-.8px}
@@ -381,3 +381,16 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 }
 
 .policy-page section{scroll-margin-top:100px}.policy-page .policy-links{display:flex;flex-wrap:wrap;gap:8px 24px;list-style:none;padding:0;margin:18px 0 28px}.policy-page .policy-links a{display:inline-block;padding:8px 0;text-underline-offset:4px;overflow-wrap:anywhere}.policy-page section p+p{margin-top:16px}
+
+/* Owner-approved flat action treatment, shared by storefront and studio. */
+.shop-shell .button,.storefront .action,.storefront .thread-brand .action:not(.secondary):not(.outline-price),.storefront .thread-brand .shared-product-dialog .action,.shop-shell .delivery-summary>.button{box-shadow:none;border-color:transparent}
+.shop-shell .button.secondary,.storefront .action.secondary,.storefront .thread-brand .action.secondary{background:#eeeae6;color:#26133d;border-color:transparent;box-shadow:none}
+.shop-shell .button.secondary:hover:not(:disabled),.storefront .action.secondary:hover{background:#e2ddd8;color:#26133d}
+.shop-shell .studio-choice-row button{background:#eeeae6;border-color:transparent;color:#26133d;box-shadow:none}
+.shop-shell .studio-choice-row button[aria-pressed=true],.shop-shell .has-photo .studio-choice-row button[aria-pressed=true]{background:#26133d;color:#fff;border-color:transparent;box-shadow:none}
+.shop-shell .studio-choice-row button[aria-pressed=true] :is(strong,small){color:inherit}
+.storefront .collection-filters button,.help-topics button,.storefront .grid-switch button{background:#eeeae6;color:#26133d;border-color:transparent;box-shadow:none}
+.storefront .collection-filters button[aria-pressed=true],.help-topics button[aria-pressed=true],.storefront .grid-switch button[aria-pressed=true]{background:#26133d;color:#fff;border-color:transparent}
+
+.shop-shell .studio-add{background:#eeeae6;color:#26133d;border-color:transparent;box-shadow:none}
+.shop-shell .studio-add:hover{background:#e2ddd8}

@@ -48,3 +48,23 @@ body{margin:0;background:#faf8f4}.cv-admin{--ink:#35233f;--berry:#8c2754;--line:
  .cv-admin .admin-savebar>.text-button{justify-content:center;flex-wrap:wrap;gap:4px;padding:2px;min-width:0;font-size:12px;line-height:1.3;text-align:center}
 }
 @media(max-width:360px){.cv-admin .admin-image,.cv-admin .admin-image-grid .admin-image{grid-template-columns:1fr}.cv-admin .admin-image-preview{width:90px}}
+
+/* Owner-approved flat controls. Focus outlines remain explicit keyboard feedback. */
+.cv-admin .cv-btn,.cv-admin .button{border-color:transparent;box-shadow:none}
+.cv-admin .cv-btn.secondary,.cv-admin .button.secondary{background:#eeeae6;color:var(--ink);border-color:transparent;box-shadow:none}
+.cv-admin .cv-btn.quiet{background:transparent;border-color:transparent;color:var(--ink)}
+.cv-admin .cv-btn.secondary:not(:disabled):hover,.cv-admin .button.secondary:not(:disabled):hover{background:#e2ddd8;filter:none}
+.cv-admin .cv-admin-header nav a{border:0;box-shadow:none}
+.cv-admin .cv-admin-header nav a:hover{background:#eeeae6;color:var(--ink)}
+.cv-admin .cv-admin-header nav a[aria-current]{background:var(--ink);color:#fff;box-shadow:none}
+.cv-admin .admin-tabs button{background:#eeeae6;color:var(--ink);border-color:transparent;box-shadow:none}
+.cv-admin .admin-tabs button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:transparent}
+.cv-admin .admin-product-list>button.selected{background:var(--ink)!important;color:#fff;border-color:transparent!important;box-shadow:none}
+.cv-admin .admin-product-list>button.selected :is(strong,span,small){color:inherit}
+.cv-admin :is(.cv-card-email,.cv-card-move,.cv-stage-trigger){background:#eeeae6;color:var(--ink);border-color:transparent;box-shadow:none}
+.cv-admin :is(.cv-card-email,.cv-card-move):hover{background:#e2ddd8}
+.cv-admin .cv-stage-options li[aria-selected=true]{background:var(--ink);color:#fff}
+
+.cv-admin .admin-savebar{box-shadow:none}
+.cv-admin .cv-stage-options li.is-active{background:#eeeae6;outline:2px solid var(--ink);outline-offset:-2px}
+.cv-admin .cv-stage-options li.is-active[aria-selected=true]{background:var(--ink);color:#fff;outline-color:#fff}

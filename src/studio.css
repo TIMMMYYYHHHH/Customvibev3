@@ -42,13 +42,13 @@
 .studio-inspector legend{font-size:14px;font-weight:750;padding:0;margin:0 0 12px}
 .studio-choice-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .shop-shell .studio-choice-row button{border:1px solid #d7cfe1;border-radius:7px;padding:14px 10px;background:#fffdfa;min-width:0;display:flex;gap:9px;text-align:left;align-items:flex-start}
-.shop-shell .studio-choice-row button[aria-pressed=true]{border-color:#704269;background:#e9dff8;box-shadow:inset 0 0 0 1px #70426925}
+.shop-shell .studio-choice-row button[aria-pressed=true]{border-color:transparent;background:#26133d;color:#fff;box-shadow:none}
 .studio-choice-row svg{flex-shrink:0}
 .studio-choice-row strong{display:block;font-size:12px;line-height:1.35}
 .studio-choice-row small{display:block;font-size:10px;line-height:1.45;margin-top:5px}
 .studio-inspector .studio-grid-size{margin-top:22px;padding-top:20px;border-top:1px solid #26133d17}
 .studio-grid-size .studio-choice-row button{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px;height:110px}
-.shop-shell .studio-grid-size .studio-choice-row button[aria-pressed=true]{border-color:#ae2e5b}
+.shop-shell .studio-grid-size .studio-choice-row button[aria-pressed=true]{border-color:transparent}
 .studio-grid-size strong{font-size:15px}
 .studio-grid-size small{margin-top:0}
 .studio-copies{border-top:1px solid #26133d17;margin-top:22px;padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}

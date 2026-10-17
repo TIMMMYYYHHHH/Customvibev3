@@ -127,3 +127,8 @@
 @media(max-width:1180px){.cv-order-board .cv-board{grid-template-columns:repeat(2,minmax(0,1fr))}.cv-board-heading{align-items:start;flex-direction:column;gap:24px}.cv-order-board .cv-board-tools{width:100%;flex-wrap:nowrap}.cv-order-board .cv-board-tools>label{flex:1}.cv-order-board .cv-board-tools input{width:100%}.cv-order-board .cv-column h2{font-size:21px}}
 @media(min-width:761px){.cv-order-board .cv-board:has(>.cv-column:only-child){grid-template-columns:minmax(0,420px)}}
 @media(max-width:760px){.cv-order-board .cv-board{grid-template-columns:1fr;gap:32px}.cv-order-board .cv-board-tools{flex-wrap:wrap;gap:14px}.cv-order-board .cv-board-tools>label,.cv-order-board .cv-board-tools>.cv-stage-select{flex-basis:100%}.cv-board-heading{margin-top:0}.cv-board-meta{margin-bottom:22px}.cv-order-board .cv-column h2{font-size:22px}.cv-order-board .cv-order-card h3{font-size:26px}.cv-order-board .cv-order-open{padding:18px 18px 0}.cv-order-board .cv-column{min-height:0}}
+
+/* Keep the board's existing text navigation; flatten coloured control treatments. */
+.cv-admin:has(.cv-order-board) .cv-admin-header nav a[aria-current]{background:var(--ink);color:#fff;border-color:transparent}
+.cv-admin .cv-order-board :is(.cv-card-email,.cv-card-move){color:var(--ink)}
+.cv-admin .cv-order-board .cv-stage-trigger{background:#eeeae6;border-color:transparent;color:var(--ink);box-shadow:none}

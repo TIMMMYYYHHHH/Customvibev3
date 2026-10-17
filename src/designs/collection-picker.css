@@ -1,13 +1,13 @@
 .collection-choice{display:flex;gap:12px;margin:24px 0}
-.collection-picker .collection-choice>button{flex:1;text-align:left;border:1px solid #b9aebf;border-radius:12px;background:transparent;color:#29143d;padding:16px 20px;font:650 17px/1.3 'DM Sans Variable',sans-serif;cursor:pointer}
-.collection-picker .collection-choice>button[aria-pressed=true]{border:2px solid #29143d;padding:15px 19px;background:#eee7f5}
+.collection-picker .collection-choice>button{flex:1;text-align:left;border:1px solid transparent;border-radius:12px;background:#eeeae6;color:#29143d;padding:16px 20px;font:650 17px/1.3 'DM Sans Variable',sans-serif;cursor:pointer}
+.collection-picker .collection-choice>button[aria-pressed=true]{border:2px solid transparent;padding:15px 19px;background:#29143d;color:#fff}
 .collection-choice span{display:block;margin-top:5px;font-size:13px;font-weight:400}
 .collection-picker-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:32px;align-items:start}
 .collection-picker .collection-picker-art>p{font-size:14px;margin:0 0 16px;line-height:1.5}
 .collection-picker .design-gallery.all-designs{grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin:0;padding:0;max-height:none;overflow:visible}
 .collection-picker .design-gallery figcaption{font-size:12px;color:#6b5a76}
 .collection-picker .design-gallery .design-pick{width:100%;border:2px solid transparent;border-radius:6px;background:transparent;padding:6px;cursor:pointer;position:relative;color:#29143d}
-.collection-picker .design-pick[aria-pressed=true]{border-color:#ae2e5b;background:#f9edf1}
+.collection-picker .design-pick[aria-pressed=true]{border-color:transparent;background:#29143d;color:#fff}
 .collection-picker .design-pick-mark{position:absolute;bottom:0;right:0;background:#ae2e5b;color:white;border-radius:5px 0 3px 0;font:700 12px/20px sans-serif;width:20px;text-align:center}
 .collection-picker button:focus-visible,.collection-picker a:focus-visible{outline:3px solid #ae2e5b;outline-offset:3px}
 .collection-picker-summary{border-top:1px solid #d8cfdd;padding-top:20px}
@@ -42,3 +42,5 @@
 .collection-picker .design-quantity input::-webkit-inner-spin-button,.collection-picker .design-quantity input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .collection-picker .design-quantity:focus-within{outline:2px solid #ae2e5b;outline-offset:2px}
 @media(pointer:coarse){.collection-picker .design-quantity{grid-template-columns:44px minmax(0,1fr) 44px}}
+
+.collection-picker .design-pick[aria-pressed=true] figcaption{color:#fff}
