@@ -2,7 +2,7 @@
 
 ## Current owner decision, 17 October 2026
 
-Tim explicitly resumed the availability investigation after temporary service errors blocked the approved CPU verification order. The earlier hold is superseded for this investigation. Continue only the same approved synthetic draft `62a8d010-96a3-4c1a-ab2a-bf9fef9f94aa`; no additional order is authorized. Other email testing, including phone acceptance, stays on hold. Provider contact is not yet authorized and the report remains unsent.
+Tim explicitly resumed the availability investigation after temporary service errors blocked the approved CPU verification order. The earlier hold is superseded for this investigation. Continue only the same approved synthetic draft `62a8d010-96a3-4c1a-ab2a-bf9fef9f94aa`; no additional order is authorized. Other email testing, including phone acceptance, stays on hold. Tim subsequently chose to keep the prepared redacted report unsent. No provider or Community contact is authorized or has occurred. Availability stability and hosted CPU acceptance remain blocked by the unresolved D1 errors; the diagnostic evidence is retained without further speculative retries.
 
 ## Fresh evidence, 17 October 2026
 
@@ -70,7 +70,7 @@ The D1 dashboard's last-24-hour rounded totals were about 5k queries, 5k rows re
 
 ### Prepared public report, not sent
 
-Cloudflare's [support options](https://developers.cloudflare.com/support/contacting-cloudflare-support/) direct Free technical issues to Community or Discord; paid technical support is not being enabled. The following redacted Community report is ready for owner review. It omits account/database identifiers, hostnames, customer/session details, credentials and full request headers. Contacting the provider still needs explicit owner authorization.
+Cloudflare's [support options](https://developers.cloudflare.com/support/contacting-cloudflare-support/) direct Free technical issues to Community or Discord; paid technical support is not being enabled. The following redacted Community report is ready for owner review. It omits account/database identifiers, hostnames, customer/session details, credentials and full request headers. Tim reviewed the proposed contact and explicitly chose to keep this report unsent. Do not post or send it without a later explicit change of decision.
 
 **Title:** Intermittent D1 internal errors in Dashboard console and Worker binding (Free, WEUR)
 
