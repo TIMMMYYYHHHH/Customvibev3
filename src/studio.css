@@ -250,20 +250,18 @@
 .collection-magnet-preview{position:relative;width:100%;max-width:190px;aspect-ratio:1;margin:0 auto;isolation:isolate}
 
 .delivery-magnet-preview{position:relative;width:100%;aspect-ratio:1;isolation:isolate}
-.crop-quality,.order-capacity{margin:16px 0;padding:14px 16px;border:1px solid #d8d2c8;border-radius:10px;background:#fffdf8;color:#332c32;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+/* Guidance belongs to the surrounding flow, without a separate alert card. */
+.crop-quality,.order-capacity{margin:16px 0;color:var(--ink);font-size:13px;line-height:1.5;overflow-wrap:anywhere}
 .crop-quality strong,.order-capacity>strong{display:block;font-size:14px;line-height:1.4}
 .shop-shell .crop-quality p,.shop-shell .order-capacity p{margin:6px 0;font-size:13px;line-height:1.5}
 .crop-quality small{display:block;font-size:12px;line-height:1.5}
-.quality-good{background:#eef4ed;border-color:#b8cbb7}
-.quality-soft,.quality-low,.quality-unknown,.capacity-warning{background:#fff0d8;border-color:#c79850}
-.quality-low{border-left:4px solid #9a4a28}
-.capacity-warning{padding:8px 10px;margin-top:10px;border-left:3px solid #9a4a28;border-radius:4px}
+.capacity-warning{margin-top:10px;font-weight:600}
 .order-capacity summary{cursor:pointer;padding:10px 0;min-height:44px;text-decoration:underline;text-underline-offset:3px}
 .order-capacity a{color:#8f254b;text-decoration:underline;text-underline-offset:3px}
 .order-capacity summary:focus-visible,.order-capacity a:focus-visible{outline:3px solid var(--berry);outline-offset:3px}
 .one-studio>.order-capacity{margin:20px 0}
-.collection-card .crop-quality{padding:10px;margin:8px 0}
-@media(max-width:460px){.collection-card .crop-quality strong{font-size:13px}.shop-shell .collection-card .crop-quality p{font-size:12px}.order-capacity{padding:12px}}
+.collection-card .crop-quality{margin:8px 0}
+@media(max-width:460px){.collection-card .crop-quality strong{font-size:13px}.shop-shell .collection-card .crop-quality p{font-size:12px}}
 .shop-shell .checkout-thumbs{gap:16px;padding:4px 5px 10px 0}
 .shop-shell .checkout-thumbs .magnet-preview-piece img{border-radius:.5px}
 

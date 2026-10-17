@@ -42,3 +42,9 @@ Live signed-in checks confirmed the early upload/order guidance, source-based 40
 The crop-warning/order-limit subtask can be completed. The parent must remain In progress because physical printing and related acceptance remain open.
 
 Physical print checks, maximum free-runtime load testing, real email acceptance and admin availability remain on their existing separate tasks. No customer email, order submission, payment, stage change, database migration or Worker configuration change is part of this release.
+
+## Inline guidance correction, 17 October 2026
+
+Tim rejected the tinted warning cards and thick side stripes because they do not match the existing interface. Crop guidance and order limits now use plain inline text with the site's existing plum text and surrounding surface. The same shared styling covers the designer, basket, checkout and over-capacity notices. No crop thresholds, limits, validation or workflow behaviour changed.
+
+The preference is recorded in AGENTS.md and .better-web-ui.md. Local desktop and 393px phone checks verified the low-resolution warning, basket warning and checkout summary without extra card framing. Public build, SSR/prerender and whitespace checks passed. Live publication evidence follows after verification.
