@@ -9,5 +9,5 @@
 .artwork-find:disabled{opacity:.6;cursor:wait}
 .artwork-page a{color:#8c2754;text-underline-offset:4px}
 .artwork-page :focus-visible{outline:3px solid #8c2754;outline-offset:4px}
-.artwork-page [role=alert]{padding:16px;background:#fff0e9;border-left:4px solid #9b302b}
+.artwork-page [role=alert]{color:#8a2044;line-height:1.6;overflow-wrap:anywhere}
 .artwork-page li{padding:10px 0;border-bottom:1px solid #e4dbe7}

@@ -289,7 +289,7 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 .shop-shell .delivery-flow-page{width:calc(100% - var(--cv-gutter)*2);max-width:1280px;padding:28px 0 64px}
 .shop-shell .delivery-heading h1{margin:10px 0 14px;max-width:720px}
 .shop-shell .delivery-heading>div>p:last-child{font-size:16px;line-height:1.6;max-width:650px}
-.request-explainer{display:flex;align-items:flex-start;gap:12px;background:var(--mint);border:1px solid #47715525;border-radius:10px;padding:16px 18px;margin-top:20px;font-size:14px;line-height:1.6;max-width:680px}
+.request-explainer{display:block;margin-top:20px;font-size:14px;line-height:1.6;max-width:680px}
 .request-explainer strong{display:block;margin-bottom:3px}
 .request-explainer p{margin:0}
 .request-explainer svg{flex-shrink:0;margin-top:2px}
@@ -312,7 +312,7 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 .shop-shell .delivery-summary dl>div{line-height:1.5}
 .shop-shell .delivery-summary dd{max-width:58%;overflow-wrap:anywhere}
 .shop-shell .delivery-summary .total{flex-wrap:wrap}
-.shop-shell .delivery-summary .payment-coming-soon{margin:18px 0 6px;font-size:14px;line-height:1.6;border-radius:10px}
+.shop-shell .delivery-summary .payment-coming-soon{margin:18px 0 6px;font-size:14px;line-height:1.6}
 .shop-shell .delivery-summary>.button{min-height:50px;font-size:16px}
 .shop-shell .delivery-summary .delivery-next-note{font-size:13px;line-height:1.6;margin:18px 0 10px}
 .shop-shell .delivery-summary>.text-button{margin-top:4px;white-space:normal;text-align:left}
@@ -323,7 +323,7 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 .completion-details{width:100%;max-width:620px;margin:6px 0;padding:24px;text-align:left;background:#fffdf8;border:1px solid #26133d16;border-radius:12px}
 .shop-shell .completion-details p+p{margin-top:14px}
 .completion-details>p:first-child strong{display:block;font-size:18px;letter-spacing:.02em;color:var(--ink)}
-.confirmation-next{width:100%;max-width:620px;text-align:left;border-radius:12px;padding:22px 24px;background:var(--mint);font-size:15px;line-height:1.65}
+.confirmation-next{width:100%;max-width:620px;text-align:left;font-size:15px;line-height:1.65}
 .shop-shell .confirmation-next h2{font-size:25px;margin:0 0 12px}
 .confirmation-next ol{padding-left:22px;margin:0}
 .confirmation-next li+li{margin-top:10px}
@@ -344,14 +344,13 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
  .shop-shell .delivery-flow-page legend{font-size:23px}
  .shop-shell .delivery-flow-page .fields{grid-template-columns:minmax(0,1fr);gap:18px}
  .shop-shell .delivery-flow-page .order-consent{padding:12px;gap:10px}
- .request-explainer{padding:14px;font-size:14px}
+
  .shop-shell .delivery-summary{padding:24px 20px}
  .shop-shell .test-complete{padding:28px 20px;margin:24px auto 40px}
- .completion-details,.confirmation-next{padding:20px 16px}
+ .completion-details{padding:20px 16px}
  .confirmation-actions{flex-direction:column}
  .confirmation-actions>.button{flex:auto;max-width:none;width:100%}
 }
-.request-explainer{display:block}
 .confirmation-actions>.text-button{justify-content:center;min-height:48px}
 /* Tablet editing keeps the crop legible before putting tools alongside it. */
 @media(min-width:601px) and (max-width:1000px){
