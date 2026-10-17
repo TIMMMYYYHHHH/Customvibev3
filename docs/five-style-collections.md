@@ -59,3 +59,9 @@ Paired admin publication remains outstanding: verified bundle is /private/tmp/c3
 Planned follow-up: improve the reusable preview finish to match the physical magnet appearance elsewhere on the website. The owner explicitly deferred this after approving publication of the current layout. Reuse the existing Founders Hub subtask “Choose and apply a reusable magnet preview finish”, reopen it and set it Planned, retaining the earlier finish history. Board update remains unrecorded because task-opening controls did not respond in the signed-in frontend. Card/modal publication activities and remaining admin dependency also still need recording there.
 
 Practical collection ideation remains open. In addition to Business, Guests, Weddings & celebrations and Handy at home, discuss pets, babies, travel memories, teams/clubs, fundraising and personal gifts. These are possibilities, not approved new catalogue categories. No images generated or catalogue categories changed for this next phase.
+
+### Admin publication resolved
+
+The matching admin preview was included in the newer b79f04c release from customvibe-admin-consistency-release, whose successful deployment reported version a7b489c9-1e06-4341-b6c9-3a1ffa146e88. Verified that CollectionCard.jsx, CollectionPicker.jsx and their card, chooser and satin styles match this release checkout byte-for-byte. The newer deployment uploaded preview assets and retained server-side authentication. The earlier admin-publication dependency above is resolved; do not redeploy the older bundle over the newer wording-preview work. Founders Hub updates remain outstanding from the prior browser interaction failure.
+
+Next owner direction: focus on nine distinct business magnet ideas at the real 7.5 × 7.5 cm size. Prioritise one clear message, short copy and usable spacing. Other proposed categories remain ideas for later discussion, not approved catalogue changes.
