@@ -35,6 +35,10 @@ New uploads stop at the applicable capacity and retain successfully added photos
 
 ## Publication and remaining checks
 
-Protected Pages publication and read-only live verification pending at implementation commit. Keep the board subtask In progress until confirmed.
+Application commit: `10db996`. Protected [Pages run 38988835883](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38988835883) succeeded, including 174 tests, public/admin builds and before/after gate and configuration checks. The separate admin Worker publish step was skipped as intended.
+
+Live signed-in checks confirmed the early upload/order guidance, source-based 400px/135ppi photo warning, 3x3 puzzle 133px/45ppi warning, 9 magnets/10 artwork-file count and nonblocking basket warning. Phone display checked at 393px. Only a synthetic image was read into browser memory; no checkout submission, artwork upload or customer email occurred. Local 100/101, 30/31 and 60/61 boundary evidence is above. Physical print acceptance is not implied.
+
+The crop-warning/order-limit subtask can be completed. The parent must remain In progress because physical printing and related acceptance remain open.
 
 Physical print checks, maximum free-runtime load testing, real email acceptance and admin availability remain on their existing separate tasks. No customer email, order submission, payment, stage change, database migration or Worker configuration change is part of this release.
