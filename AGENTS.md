@@ -42,3 +42,5 @@ Owner artwork decision, 17 October 2026: all six ready-made collections are read
 Admin style system: use the shared AdminChrome and admin/workroom.css across Orders, Store content and Themes & seasons. Preserve page layouts and flat contrasting controls. The no-glow preference applies to badges, quantity labels and panels as well as buttons.
 
 Existing seasonal settings are authoritative after first installation. Deployments must preserve stored icons, removals, drafts, wording, progress and schedules, never reset them to clean defaults. Recommended occasion dates are advisory display only, never saved or enabled automatically.
+
+Collection presentation decision, 17 October 2026: homepage and Collections use the same CollectionCard layout. Marketing previews use Watercolour for alphabet and thank-yous, Gouache for counting, Layered paper for first words, Handmade clay for colours and Pencil & ink for reminders. Keep these preview choices separate from customer-selected basket, proof and print styles. Ready-made previews remain upright 3×3 grids, including on hover.

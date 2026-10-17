@@ -19,3 +19,13 @@ Display uses the approved sealed satin CSS surface with a subtle edge and shadow
 Publish the private catalogue, protected site and authenticated admin from the same revision. Deployment guards verify existing destinations and protection. The public launch, payment activation and physical printing are separate owner decisions.
 
 Release routing: the Pages automation credential cannot read the private catalogue Worker. The first release run stopped at that guard before website publication. Use the existing destination-only local helper for catalogue and admin publication, with bundles built from this release checkout. Keep the Pages workflow on its established restricted credential; do not broaden its access. The helper's shared checkout configuration is temporarily pointed at verified bundles/assets and restored byte-for-byte afterward, avoiding unrelated working-tree files.
+
+## Shared cards and flat controls, 17 October 2026
+
+The homepage and Collections page now render the same CollectionCard component, with matching preview panels, headings, descriptions, status labels and actions. Homepage featured products remain catalogue-managed. Puzzle cards lead to the existing 3×3/5×5 creator.
+
+Marketing preview styles: alphabet and thank-yous use Watercolour; counting uses Gouache; first words uses Layered paper; colours uses Handmade clay; reminders uses Pencil & ink. The mapping lives only in CollectionCard and cannot override basket or print style identity. Grids remain upright on hover.
+
+Remaining outlined pricing actions, studio zoom/rotation and selected photo controls, delivery choices and photo-example controls use the existing flat neutral/solid-selected contract. Keyboard focus is preserved. Magnet satin shading remains confined to the artwork preview.
+
+Validation: public/SSR/admin builds and all 254 tests pass after incorporating the latest admin consistency release. Browser checks confirm matching card typography, padding and aspect ratios; all six cards have nine images with the intended asset paths; homepage and Collections render at 390px. A Handmade clay apple selection reaches the local basket with that style intact. No order or email submitted. Deployment and live checks are recorded in Founders Hub.

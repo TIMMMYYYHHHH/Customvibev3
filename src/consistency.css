@@ -394,3 +394,23 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 
 .shop-shell .studio-add{background:#eeeae6;color:#26133d;border-color:transparent;box-shadow:none}
 .shop-shell .studio-add:hover{background:#e2ddd8}
+
+/* Complete the flat treatment on pricing, crop tools and delivery choices. */
+.storefront .thread-brand .chaos-price-grid .action.outline-price,
+.shop-shell .studio-zoom button,.shop-shell .studio-rotate button,
+.shop-shell .zoom-control button,.shop-shell .locker,.shop-shell .locker-official-link{
+ background:#eeeae6;color:#26133d;border-color:transparent;box-shadow:none;
+}
+.storefront .thread-brand .chaos-price-grid .action.outline-price:hover,
+.shop-shell .studio-zoom button:hover:not(:disabled),.shop-shell .studio-rotate button:hover:not(:disabled),
+.shop-shell .zoom-control button:hover:not(:disabled),.shop-shell .locker-official-link:hover{
+ background:#e2ddd8;color:#26133d;border-color:transparent;
+}
+.shop-shell .locker.selected{background:#26133d;color:#fff;border-color:transparent}
+.shop-shell .locker.selected :is(strong,small,span){color:inherit}
+.shop-shell .studio-thumbnails button[aria-pressed=true],
+.shop-shell .studio-library-grid button[aria-pressed=true],
+.shop-shell .photo-thumbs button.selected{background:#26133d;border-color:transparent;color:#fff;box-shadow:none}
+.shop-shell .stepper button:hover{background:#e2ddd8}
+.storefront .photo-options button{padding:3px;background:#eeeae6;border-color:transparent;box-shadow:none}
+.storefront .photo-options button[aria-pressed=true]{background:#26133d;border-color:transparent}

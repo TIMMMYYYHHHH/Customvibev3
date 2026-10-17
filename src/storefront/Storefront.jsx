@@ -5,7 +5,7 @@ import '../fonts.css';
 
 import {demoPhoto,renderPhoto} from '../artwork';
 import {MagnetPreview} from '../MagnetPreview';
-import CollectionPackPreview from './CollectionPackPreview';
+import CollectionCard from './CollectionCard';
 import './storefront.css';
 import ReferenceThread,{BrandDoodle} from './ReferenceThread';
 import Reviews from './Reviews';
@@ -13,7 +13,7 @@ import Contact from './Contact';
 import SmoothThread from './SmoothThread';
 import MobileThread from './MobileThread';
 import MagnetCollections from './MagnetCollections';
-import ProductDetails,{ProductStatus} from './ProductDetails';
+import ProductDetails from './ProductDetails';
 import {useContent} from '../content/ContentProvider';
 import {defaultContent} from '../content/model.mjs';
 import {money,photoPrice} from '../commerce.mjs';
@@ -38,9 +38,9 @@ function Tray(){const {content}=useContent();return <figure className="tray"><im
 function Puzzle({n=3}){const {content}=useContent();const [tiles,setTiles]=useState([]);useEffect(()=>{let alive=true;demoPhoto(content.images.puzzle).then(p=>renderPhoto(p,{puzzle:true,gridSize:n,size:160})).then(r=>{if(alive)setTiles(r.tiles)}).catch(()=>{});return()=>{alive=false}},[n,content.images.puzzle]);return <div className="puzzle-visual"><MagnetPreview urls={tiles} columns={n} label={`${n} by ${n} grid of ${n*n} square magnets forming one coastal picture`}/></div>}
 function Collections(){
  const {content}=useContent();const {onAddPack}=useContext(ShopContext);
- const [grid,setGrid]=useState(3),[pack,setPack]=useState(null);
+ const [pack,setPack]=useState(null);
  const featured=content.products.filter(p=>p.featured&&p.status!=='hidden');
- return <section className="collections content" id="collections"><div className="section-heading"><div><p className="overline">A LITTLE YOU. A LITTLE PLAY.</p><h2>Magnet collections</h2></div><p>Learning, little reminders, gifts and more.</p></div><div className="product-grid">{featured.map((item,i)=><article key={item.id}><div className="product-art-wrap"><ProductStatus product={item}/>{item.href?<a className="product-art" href={item.href} aria-label={'Create '+item.name}>{item.id==='puzzle'&&!item.image?<Puzzle n={grid}/>:<CollectionPackPreview kind={item.id}/>}</a>:<button className="product-art" onClick={()=>setPack(item.id)} aria-label={'Explore '+item.name}><CollectionPackPreview kind={item.id}/></button>}</div><div className="product-info"><span className="index">{String(i+1).padStart(2,'0')} / {item.group}</span><h3>{item.name}</h3><p>{item.description}</p>{item.id==='puzzle'&&<div className="grid-switch" aria-label="Preview puzzle size">{[3,5].map(n=><button key={n} aria-pressed={grid===n} onClick={()=>setGrid(n)}>{n} × {n}</button>)}<span>{grid*grid} square magnets</span></div>}{item.href?<a className="text-link" href={item.href}>{item.id==='puzzle'?'Make a puzzle':'Use your own photos'}</a>:<button className="text-link" onClick={()=>setPack(item.id)}>Explore collection</button>}</div></article>)}</div><div className="more-collections"><a className="action secondary" href="/collections">View more designs</a><p>First words, colours, thoughtful gifts and everyday favourites.</p></div>{pack&&<ProductDetails product={content.products.find(p=>p.id===pack)} onClose={()=>setPack(null)} onAddPack={onAddPack}/>}</section>;
+ return <section className="collections content" id="collections"><div className="section-heading"><div><p className="overline">A LITTLE YOU. A LITTLE PLAY.</p><h2>Magnet collections</h2></div><p>Learning, little reminders, gifts and more.</p></div><div className="catalog-grid collection-cards">{featured.map(item=><CollectionCard key={item.id} item={item} Puzzle={Puzzle} onExplore={item=>setPack(item.id)}/>)}</div><div className="more-collections"><a className="action secondary" href="/collections">View more designs</a><p>First words, colours, thoughtful gifts and everyday favourites.</p></div>{pack&&<ProductDetails product={content.products.find(p=>p.id===pack)} onClose={()=>setPack(null)} onAddPack={onAddPack}/>}</section>;
 }
 function HappyBundles(){const {content}=useContent();return <section className="chaos-pricing content" id="photo-pricing" aria-labelledby="chaos-pricing-title"><div className="section-heading"><h2 id="chaos-pricing-title">A few favourites.<br/>Or the whole story.</h2><p>A different photo on every magnet.<br/>One little collection that’s completely you.</p></div><div className="chaos-price-grid">{[[1,50,'Just one'],[6,250,'A little collection'],[10,400,'The whole story']].map(([n,price,name])=><article key={n}><p className="overline">{n} {n===1?'MAGNET':'MAGNETS'}</p><h3>{name}</h3><strong>{money(photoPrice(n,content.pricing))}</strong><BuilderLink className={n===6?'featured-price':'outline-price'}>Start creating</BuilderLink></article>)}</div><p className="price-delivery">Photo magnets and puzzle pieces share bundle pricing. Delivery is additional.</p></section>}
 function Questions(){return <section className="questions content" id="questions"><div><p className="overline">BEFORE YOU MAKE IT YOURS</p><h2>A few good questions.</h2><a className="text-link" href="/help">All questions & answers</a></div><FAQList featured/></section>}
