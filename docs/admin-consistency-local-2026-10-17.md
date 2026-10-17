@@ -29,7 +29,7 @@ Orders use fictional fixtures. Content and seasons use an in-memory database and
 - [x] Desktop and 390px phone-width checks, including full 12-month calendar; no horizontal overflow.
 - [x] Admin build and 21 existing UI, stage, security and seasonal tests passed.
 - [x] Owner visual review and explicit publication approval.
-- [ ] Production deployment and live verification.
+- [x] Production deployment and live verification.
 
 Screenshots: project output/admin-consistency-review/local-*.png. Founders Hub tracking stays in Fix admin centre view > Match admin styling to the website, In progress until acceptance. No changes have been pushed or deployed.
 
@@ -58,3 +58,13 @@ Calendar references checked: https://www.gov.za/about-sa/public-holidays and htt
 Release source starts at 2f77d7b, retaining the already published five-style artwork work and excluding other unapproved local changes. No seasonal database migrations or writes are part of this release.
 
 Pre-release verification: current-production release checkout passed public/SSR/admin builds and all 254 tests. Admin dry-run bundle succeeded. Existing CONTENT_DB binding, AUTH service, gate, manual sending flags and credential presence were checked before deployment. Mobile recommendations fit at 390px with seven visible occasions and no overflow.
+
+## Published and verified
+
+Implementation 32c8dbff765ef5ea99be647992f0161687d6cc8e is live. Protected public workflow https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39069815960 passed. Admin Worker version 133ca6e1-c03d-47e4-9801-9dafaaa06417 was published through the existing restricted helper using the isolated release bundle and assets. Every non-asset binding matched the pre-deploy record. No seasonal settings writes or migrations were performed.
+
+Authenticated live checks passed across Orders, Store content and Themes: matching 22px/24px header padding at the checked width, plum brand text and 8px selected navigation corners. Orders show transparent card borders and solid plum/white Unpaid badges. Seven uploaded icons match the prior observed bytes; three occasions remain removed. All seven retained occasions still show no dates, Schedule off, Theme not created and Not started. Christmas wording matches the owner's saved text. Original-site preview renders the current five-style collection catalogue.
+
+The original signed-in session expired before release verification; the owner signed in again. No claim of a complete database before/after backup is made. Preservation is supported by unchanged storage/auth bindings, no write path in deployment or suggestions, and the observed live UI/history.
+
+Evidence: output/admin-consistency-review/live-recommended-occasions.png, live-orders-flat.png and live-content-shared.png in the project workspace. Founders Hub tracks styling and recommended dates as separate deliverables; theme design approval remains open.
