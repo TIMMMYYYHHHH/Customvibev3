@@ -1,0 +1,33 @@
+/* Practical collection ideas use an artwork-led layout, separate from policy prose. */
+.shop-shell .section.idea-page{max-width:1120px;padding:32px 0 72px}
+.idea-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px;line-height:1.5;margin-bottom:28px;color:#6b5a76}
+.idea-breadcrumb a{display:inline-flex;align-items:center;min-height:44px;text-underline-offset:4px}
+.idea-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:clamp(32px,5vw,72px)}
+.idea-artwork{margin:0;min-width:0}
+.idea-artwork-stage{aspect-ratio:1;border-radius:24px;background:#eee7f5;display:grid;place-items:center;padding:clamp(30px,5vw,64px)}
+.idea-page-business .idea-artwork-stage{background:#e5f0e7}
+.idea-page-wifi .idea-artwork-stage{background:#f7e7db}
+.idea-page-information .idea-artwork-stage{background:#f2e9dd}
+.idea-artwork-stage .design-gallery:has(figure:only-child){width:100%;max-width:none;margin:0;padding:0;min-width:0}
+.idea-artwork-stage .design-gallery>p{font-size:14px;text-align:center}
+.idea-artwork>figcaption{font-size:13px;color:#6b5a76;text-align:center;margin-top:16px;line-height:1.5}
+.idea-copy{min-width:0;padding:8px 0}
+.shop-shell .idea-copy h1{font-size:clamp(38px,4.2vw,56px);line-height:1.04;margin:20px 0 18px;text-wrap:balance}
+.shop-shell .idea-copy .idea-lead{font-size:21px;line-height:1.4;margin-bottom:16px;max-width:29ch}
+.shop-shell .idea-copy .idea-possibilities{font-size:16px;line-height:1.65;max-width:45ch;color:#6b5a76}
+.idea-next{border-top:1px solid var(--line);padding-top:24px;margin-top:28px}
+.shop-shell .idea-next h2{font-size:25px;margin-bottom:10px}
+.shop-shell .idea-next p{font-size:15px;line-height:1.6;max-width:44ch}
+.idea-next .button{margin-top:24px}
+.idea-back{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;font-size:14px;text-underline-offset:4px}
+@media(max-width:700px){
+ .shop-shell .section.idea-page{padding:16px 0 40px}
+ .idea-breadcrumb{font-size:13px;margin-bottom:16px;gap:8px}
+ .idea-layout{grid-template-columns:1fr;gap:28px}
+ .idea-artwork{width:100%;max-width:420px;margin-inline:auto}
+ .idea-artwork-stage{padding:40px;border-radius:18px}
+ .idea-copy{padding:0}
+ .shop-shell .idea-copy h1{font-size:38px;margin:16px 0}
+ .shop-shell .idea-copy .idea-lead{font-size:20px}
+ .idea-next{margin-top:24px}
+}
