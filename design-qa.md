@@ -34,3 +34,9 @@ Only admin/Orders.jsx, admin/orders.css and the light-board fixture variant chan
 Source a24aaeb was pushed to main. The final admin release includes the concurrent completed f2f51f7 quantity changes, rebuilding both applications and repeating all tests before publishing. Worker version aa8adf29-b3ad-4dc1-94ca-f4911c901db9 supersedes the initial light release. The existing business account connection published to admin.customvibe.co.za. The final bundle uses index-DYx2YIO1.css and index-B82nGn0l.js.
 
 Founders Hub saved the owner direction decision in the existing styling subtask. The final release update and completion status could not be recorded because task actions stalled, including after a fresh tab and reload. The attempted reopening of the signed-in owner-review subtask could not be verified. Do not treat the earlier signed-in acceptance as acceptance of this new layout. Reconcile these existing tasks when the Hub responds again; avoid duplicate tasks.
+
+## Card palette revision, 17 October
+
+Owner requested option 2 colours on the existing option 5 light layout. Stage card fills are lavender #e6d7ed, peach #efd5b3, sage #d1dfd2 and blue #cedfe6, with matching borders, hover fills and stage dots. Open columns and the approved layout are retained. Solid fills remain shadow-free. Card secondary text is darkened for contrast.
+
+Admin build and existing admin UI checks passed. Local browser verification confirmed all four colours, transparent columns and no card shadows. Moving the synthetic Patrick order to Ready to ship changed its card to sage and displayed the existing no-email confirmation. Main, secondary and action text pass 4.5:1 contrast across every card and action hover fill. Evidence: output/admin-card-directions/05-light-option2-colours.png in the workspace. No production orders or emails were changed.

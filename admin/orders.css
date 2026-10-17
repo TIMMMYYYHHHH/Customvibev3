@@ -76,8 +76,13 @@
 .cv-previous-reference{font-size:12px;color:#75677c;overflow-wrap:anywhere}
 @media(max-width:600px){.cv-email-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:12px}.cv-email-dialog>header,.cv-email-envelope,.cv-email-plain,.cv-email-dialog>footer{padding:14px}.cv-email-dialog>header h2{font-size:23px}.cv-email-dialog>footer .cv-btn{flex:1}.cv-email-envelope dl{display:block}.cv-email-envelope dd{margin:4px 0 10px}}
 
-/* Selected direction 5, adapted to matte light surfaces. */
+/* Direction 5 layout in light mode, with direction 2 stage colours on cards. */
 .cv-order-board{--board-paper:#f5f2ee;--card-paper:#eae5df;--card-line:#d1c8d1;--board-muted:#706575}
+.cv-order-board .stage-new{--card-paper:#e6d7ed;--card-line:#cbb6d5;--card-hover:#dac6e4;--stage-dot:#9667a6}
+.cv-order-board .stage-in_progress{--card-paper:#efd5b3;--card-line:#d4b48c;--card-hover:#e6c79f;--stage-dot:#b87918}
+.cv-order-board .stage-ready_to_ship{--card-paper:#d1dfd2;--card-line:#adc5b0;--card-hover:#bfd2c1;--stage-dot:#408465}
+.cv-order-board .stage-shipped{--card-paper:#cedfe6;--card-line:#aac4d0;--card-hover:#bad2de;--stage-dot:#5c7b90}
+.cv-order-board .cv-order-card{--board-muted:#625168}
 .cv-admin:has(.cv-order-board){background:#f5f2ee}
 .cv-admin:has(.cv-order-board) .cv-admin-header{background:#f5f2ee;border-bottom:1px solid #d1c8d1}
 .cv-admin:has(.cv-order-board) .cv-admin-brand{color:var(--ink)!important}
@@ -97,10 +102,7 @@
 .cv-order-board .cv-board{gap:28px}
 .cv-order-board .cv-column{background:transparent;border:0;border-radius:0;padding:0;min-height:260px;transition:none}
 .cv-order-board .cv-column h2{margin:0 0 18px;font-size:22px;gap:12px;line-height:1.3}
-.cv-order-board .cv-column h2>span{width:12px;height:12px;background:#bd78a2}
-.cv-order-board .stage-in_progress h2>span{background:#c99a40}
-.cv-order-board .stage-ready_to_ship h2>span{background:#719578}
-.cv-order-board .stage-shipped h2>span{background:#8b799d}
+.cv-order-board .cv-column h2>span{width:12px;height:12px;background:var(--stage-dot)}
 .cv-order-board .cv-column h2 small{background:transparent;font:500 16px var(--body);padding:0;color:var(--board-muted)}
 .cv-order-board .cv-column-body{gap:18px}
 .cv-order-board .cv-column.is-drop-target{outline:2px dashed var(--berry);outline-offset:8px;box-shadow:none}
@@ -117,7 +119,7 @@
 .cv-admin .cv-order-board .cv-card-email{padding:8px;flex:1}
 .cv-admin .cv-order-board .cv-card-move{width:auto;padding:8px;gap:8px;flex:1.35;border-left:1px solid var(--card-line);border-radius:0}
 .cv-admin .cv-order-board .cv-card-move>span{border-left:1px solid var(--card-line);padding-left:10px;min-height:24px}
-.cv-admin .cv-order-board .cv-card-email:hover,.cv-admin .cv-order-board .cv-card-move:hover{background:#e0d8d2}
+.cv-admin .cv-order-board .cv-card-email:hover,.cv-admin .cv-order-board .cv-card-move:hover{background:var(--card-hover)}
 .cv-order-board .cv-card-move-controls{padding:8px 20px 20px;border-top:1px solid var(--card-line)}
 .cv-order-board .cv-card-move-controls .cv-stage-trigger{background:var(--board-paper)}
 .cv-order-board .cv-empty{background:transparent;border-color:var(--card-line);border-radius:8px;min-height:204px;font-size:16px;color:var(--board-muted);margin:0}
