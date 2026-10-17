@@ -1,5 +1,5 @@
-/* Selected finish 3. Presentation only; source artwork stays untouched. */
+/* Satin laminate and a shallow wrapped edge. Preview-only, never printed. */
 .satin-magnet{position:relative;isolation:isolate;border-radius:3px}
-.satin-magnet::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:3px;transform:translateY(3px);background:#92918b;box-shadow:1px 4px 5px #38352c35,0 12px 18px -9px #38352c55}
+.satin-magnet::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:3px;transform:translateY(4px);background:linear-gradient(180deg,#97968c,#74766d);box-shadow:0 2px 2px #302e2640,1px 6px 7px #302e262e,0 13px 17px -8px #302e2640}
 .satin-art{display:block;position:relative;width:100%;height:100%;border-radius:3px;overflow:hidden;background-repeat:no-repeat}
-.satin-art::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;border:0;box-shadow:inset 0 1px 0 #ffffff20,inset 0 -1px 1px #37332b30;background:linear-gradient(140deg,#ffffff0d,transparent 45%)}
+.satin-art::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;border:0;box-shadow:inset 0 -1px 1px #312e2630;background:linear-gradient(180deg,#ffffff55,transparent) top/100% 1.5% no-repeat,linear-gradient(90deg,#ffffff28,transparent) left/1.2% 100% no-repeat,linear-gradient(270deg,#302e2636,transparent) right/1.2% 100% no-repeat,linear-gradient(0deg,#302e2652,transparent) bottom/100% 1.8% no-repeat,linear-gradient(135deg,#ffffff17,transparent 38%,#ffffff04 68%,transparent)}

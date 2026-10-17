@@ -1,18 +1,27 @@
-/* Collection cards share one padded content/action area at every breakpoint. */
-.storefront .catalog-grid.collection-cards{gap:28px}
-.storefront .catalog-grid.collection-cards>article{display:flex;flex-direction:column;border:0;border-radius:0;overflow:visible;background:transparent}
-.storefront .catalog-grid.collection-cards>article>.product-status{top:14px;left:14px;background:#fffdf8ed;color:#291438;font-size:11px}
-.storefront .catalog-grid.collection-cards .catalog-art{aspect-ratio:1.15;border:0;border-radius:12px;overflow:hidden;background:#ede8df;max-width:none;margin:0}
-.storefront .collection-cards [data-collection=business] .catalog-art,.storefront .collection-cards [data-collection=words] .catalog-art{background:#e5eee6}
-.storefront .collection-cards [data-collection=qr] .catalog-art,.storefront .collection-cards [data-collection=thanks] .catalog-art{background:#eae2f1}
-.storefront .collection-cards [data-collection=wifi] .catalog-art,.storefront .collection-cards [data-collection=counting] .catalog-art{background:#f7e7dc}
-.storefront .collection-cards [data-collection=information] .catalog-art,.storefront .collection-cards [data-collection=reminders] .catalog-art{background:#eee9e0}
-.storefront .collection-cards .catalog-art>.design-gallery{height:76%;max-width:76%;gap:12px}
+/* C3: colour chapters. Shared by the homepage and full catalogue. */
+.storefront .catalog-grid.collection-cards{gap:20px}
+.storefront .catalog-grid.collection-cards>article{display:flex;flex-direction:column;border:0;border-radius:16px;overflow:hidden;background:#e8e4da;padding:28px 24px 20px;text-align:center}
+.storefront .collection-cards>article[data-collection=alphabet],.storefront .collection-cards>article[data-collection=business]{background:#ccebd8}
+.storefront .collection-cards>article[data-collection=counting],.storefront .collection-cards>article[data-collection=wifi]{background:#f8d7bf}
+.storefront .collection-cards>article[data-collection=words],.storefront .collection-cards>article[data-collection=qr]{background:#e0d0ee}
+.storefront .collection-cards>article[data-collection=colours],.storefront .collection-cards>article[data-collection=photos]{background:#d8e7ef}
+.storefront .collection-cards>article[data-collection=reminders],.storefront .collection-cards>article[data-collection=information]{background:#f0e4be}
+.storefront .collection-cards>article[data-collection=thanks],.storefront .collection-cards>article[data-collection=puzzle]{background:#f2d9de}
+.storefront .collection-cards .catalog-card-heading{min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px}
+.storefront .collection-cards .catalog-card-heading h3{font:650 clamp(26px,2.25vw,34px)/1.12 'Fredoka Variable',sans-serif;letter-spacing:-.025em;margin:0;color:#291438}
+.storefront .collection-cards .catalog-card-heading .product-status{position:static;background:none;color:#291438;border:0;border-radius:0;font-size:14px;font-weight:450;padding:0;min-height:22px;margin:0}
+.storefront .catalog-grid.collection-cards .catalog-art{aspect-ratio:1;border:0;border-radius:0;overflow:visible;background:transparent;max-width:none;margin:12px 0 0}
+.storefront .collection-cards .catalog-art>.design-gallery{position:static;transform:none;width:100%;height:auto;aspect-ratio:1;max-width:none;padding:6px;gap:12px}
+.storefront .collection-cards .catalog-art>.design-gallery:has(figure:only-child){padding:18px}
 .storefront .collection-cards .catalog-art .magnet-preview-piece{box-shadow:0 7px 10px #29143820,0 2px 2px #29143828}
-.storefront .collection-cards .catalog-card-copy{display:flex;flex:1;flex-direction:column;padding:20px 2px 8px}
-.storefront .collection-cards .catalog-card-copy h3{font-size:27px;line-height:1.15;margin:0 0 9px}
-.storefront .collection-cards .catalog-card-copy>p:not(.overline){font-size:15px;line-height:1.5;margin:0 0 16px;min-height:0;max-width:36ch}
-.storefront .collection-cards .catalog-card-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 18px;margin-top:auto;padding-top:10px;border-top:1px solid #29143825}
-.storefront .collection-cards .catalog-card-actions .text-link{padding:8px 0;margin:0;font-size:14px;min-height:44px}
-.storefront .collection-cards .catalog-card-actions .catalog-details{display:inline-flex;align-items:center;min-height:44px;font-size:13px;color:#65586c;text-decoration:underline;text-underline-offset:4px}
-@media(max-width:600px){.storefront .catalog-grid.collection-cards{gap:30px}.storefront .catalog-grid.collection-cards .catalog-art{aspect-ratio:1.15}.storefront .collection-cards .catalog-card-copy{padding:17px 2px 0}.storefront .collection-cards .catalog-card-copy h3{font-size:27px}}
+.storefront .collection-cards .catalog-card-copy{display:flex;flex:1;flex-direction:column;padding:24px 0 0}
+.storefront .collection-cards .catalog-card-copy>p{font-size:16px;line-height:1.55;margin:0 auto 20px;min-height:0;max-width:32ch}
+.storefront .collection-cards .catalog-card-actions{display:flex;flex-direction:column;gap:4px;margin-top:auto;border:0;padding:0}
+.storefront .collection-cards .catalog-explore{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;padding:14px 12px;border:0;border-radius:9px;background:#ae2e5b;color:#fff;font:650 16px/1.3 'DM Sans Variable',sans-serif;text-decoration:none;box-shadow:none}
+.storefront .collection-cards .catalog-explore:hover{background:#92254c;filter:none;transform:none}
+.storefront .collection-cards .catalog-details{display:inline-flex;align-items:center;align-self:center;min-height:44px;font-size:13px;color:#493b50;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:650px){.storefront .catalog-grid.collection-cards{gap:24px}.storefront .catalog-grid.collection-cards>article{padding:26px 22px 16px}.storefront .collection-cards .catalog-card-heading{min-height:0;margin-bottom:14px}.storefront .collection-cards .catalog-card-heading h3{font-size:32px}.storefront .collection-cards .catalog-card-copy{padding-top:22px}}
+
+/* Match the puzzle's nine physical pieces to the neighbouring 3×3 previews. */
+.storefront .collection-cards .catalog-art>.puzzle-visual{position:static;inset:auto;transform:none;width:100%;height:auto;max-width:none;aspect-ratio:1;margin:0;padding:6px}
+.storefront .collection-cards .puzzle-visual .magnet-preview-grid{position:relative;inset:auto;gap:12px;width:100%;height:100%}

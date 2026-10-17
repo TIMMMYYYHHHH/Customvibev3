@@ -35,3 +35,17 @@ Validation: public/SSR/admin builds and all 254 tests pass after incorporating t
 New collection dialogs and product pages start with the style displayed on their marketing card. The shared mapping now lives in artwork.mjs. All five choices remain available. Editing an existing basket item keeps its saved style, including the legacy Watercolour fallback. Regression coverage checks all six initial styles and all five existing-item styles; local browser checks verify every card opens with the matching radio option selected.
 
 Card and larger desktop-modal redesigns are image concepts pending owner selection. They are not implemented as part of this behaviour correction.
+
+## C3 and M1 local layout review
+
+The owner selected C3 Colour chapters and M1 Sidebar and gallery. The local build now applies coloured full-card panels to the shared home/catalogue cards and a larger desktop chooser with styles left, the three-column gallery in the centre and shopping summary right. Existing exact magnet artwork, preview-matched styles, individual quantities, basket edit identity and shared pricing remain. Phone shopping mode choices precede the gallery. Evidence and verification are in `design-qa.md` and `output/c3-m1-review/`. Review at http://127.0.0.1:5191/collections. This revision is unpublished, awaiting owner visual approval.
+
+### Local appearance refinements, 18 October 2026
+
+Following owner review, increased the reusable satin preview's wrapped-edge shading and shallow depth, removed the shopping-mode circle indicators, and sized the puzzle's 3×3 pieces to match the adjacent collection previews. Printable source artwork remains unchanged. Public build and browser interaction/layout checks pass; updated evidence is recorded in design-qa.md. Still unpublished pending owner review.
+
+## Publication approval and follow-ups, 18 October 2026
+
+The owner approved publishing the current C3/M1 update, including clean shopping-mode buttons and equal-sized puzzle previews. The preview finish still does not meet the desired physical-magnet appearance. Improving it to match the other website magnets is explicitly deferred, and must be tracked as planned work. Do not describe the current finish as visually accepted.
+
+Next discussion: replace practical collection clip-art previews with one coherent generated art direction and upright 3×3 grids of nine varied examples. Business contact, QR and Wi-Fi ideas may be consolidated into clearer use-based categories; wedding favours are a possible additional category. Categories and examples are not yet agreed. Existing practical products remain inspiration leading to the studio, without introducing a new ordering flow.

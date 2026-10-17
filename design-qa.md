@@ -1,94 +1,47 @@
-# Magnet rim and finger-boundary correction
+# C3 cards and M1 collection chooser local review
 
-17 October 2026. The owner identified doubled rims and visible finger cutouts in the previous original-photo overlay. Byte-identical files alone did not validate the composite, and the preceding visual acceptance is superseded.
+final result: passed
 
-Root cause: an affine transform aligned only three corners while placing a complete product rim above another rim already in the scene. Broad foreground patches also restored generated photo fragments beside the fingers. The new renderer inserts only original photograph content inside the existing scene rim. A four-corner homography drives a small native SVG mesh, preserving image quality on phones without foreignObject/3D rasterisation. A photo-visibility mask follows the actual finger silhouette; there is no second background image pasted above the product. Original source files remain unchanged, while the viewBox removes the source product frame and transparent padding.
+## Source and implementation
+- Source visual truth: `output/collection-concepts/C3.png` and `output/collection-concepts/M1.png`, selected explicitly by the owner.
+- Actual artwork reused from `public/assets/magnet-artwork/`. No generated replacement artwork or print-file changes.
+- Implementation: http://127.0.0.1:5191/collections and homepage `/#collections`.
+- Evidence: `output/c3-m1-review/cards-desktop.png`, `modal-desktop.png`, `home.png`, `phone-card.png`, `phone-modal.png`.
+- Reference and desktop evidence are 1536 × 1024 pixels. Desktop evidence uses a same-origin 1536 × 1024 CSS-pixel iframe and a full-page browser capture, with no image rescaling. Native desktop also checked at 1280 × 720. Phone is a 390 × 844 CSS-pixel iframe; capture includes surrounding neutral harness canvas. Density is 1.
+- State: Learning & play cards, alphabet full-set modal in Watercolour. Existing site header, filters, catalogue order, real artwork, short approved product descriptions and Details navigation are intentionally preserved instead of copying mock-only content.
 
-Visual inspection at 200% covered the marked index finger, thumb, beach top/bottom and wedding edges. The beach source crop retains the feet while removing its original frame. Phone composition inspected at 390x844. Regression checks protect byte-identical sources and exact projection of all four destination corners. Evidence: project output/coming-soon-implementation/faces-detail-desktop.jpg and faces-mobile-final.jpg. Release verification and live screenshots are recorded in Founders Hub.
+## Comparison history and fixes
+1. Initial desktop browser comparison found inherited global heading/body styles overriding the compact M1 summary typography (P2), making the purchase controls and information unnecessarily tall. Scoped selectors now restore summary typography; final screenshots show the corrected state.
+2. Initial larger desktop view had oversized gallery magnets and could not show the first nine together (P2). Gallery width now caps at 660px, the rail/summary proportions match M1 more closely, and redundant full-set captions are hidden. The original image alt text remains. All 26 designs are available by scrolling the centre gallery.
+3. Initial card actions left-aligned Details (P2). Centered the secondary link and shortened excess header space. Final desktop and phone cards show the aligned actions.
+4. Phone flow would have placed shopping mode choices after the long gallery (P2). Responsive layout now places those choices above the artwork. Phone screenshot and interactions confirm that change.
+5. Final source/implementation images were opened together for the full card and modal comparison. Focused controls, typography, quantities and card imagery were also inspected in native desktop/phone screenshots. No actionable P0/P1/P2 findings remain.
 
----
+## Required fidelity surfaces
+- Typography: existing Fredoka headings and DM Sans UI retained. Headings above coloured previews match C3; M1's style rail and compact summary are readable. Wide desktop uses larger controls, phone text wraps without clipping.
+- Spacing/layout: same C3 component on home and Collections. Upright three-column previews, full-card colour, consistent padding, solid primary action. M1 uses a larger dialog, left styles, centre artwork and right summary. Each desktop column can scroll on short screens. Phone stacks naturally and keeps shopping choices before artwork.
+- Colour/tokens: mint, peach and lilac primary collection panels with complementary colours on other collections. Solid plum selected controls, neutral secondary controls, solid berry purchase actions; no coloured glow or inset control shadows.
+- Asset quality: exact existing artwork and satin preview finish retained. Source print artwork is unchanged. Images fill square viewports without generated substitutes or white outlines.
+- Copy: actual collection names/descriptions, real full-set counts, pricing and 7.5 × 7.5 cm size. Mock-only longer descriptions were not introduced. Existing five full style names remain visible.
 
-# Exact original photo restoration
+## Interaction verification
+- All six collections open in their advertised style: alphabet/thanks Watercolour, counting Gouache, words Layered paper, colours Handmade clay, reminders Pencil & ink.
+- Alphabet full set displays 26 designs; numbers 10; other collections 9.
+- Selecting A twice and C once, then switching to Handmade clay, preserves both quantities. Basket displays three magnets at R150, correct style and labels. Editing retains that style and quantities.
+- Phone individual selection and quantity increment remain selected after switching to Pencil & ink.
+- All five style controls remain available; full-set/individual toggles, dialog close, card navigation and Details links remain functional.
+- Homepage uses the same C3 component, including the puzzle card. Native desktop has no horizontal overflow.
+- Browser console: no errors observed during the tested local flows.
+- All 255 existing automated tests pass. Public client, SSR/prerender and admin build pass. Whitespace check passes.
+- No live deployments, checkout submissions, customer emails or production data writes performed.
 
-17 October 2026. Owner rejected the regenerated photo content from the preceding revision. That approach is superseded.
+## Remaining owner review
+The selected direction is implemented and verified locally. Owner approval of actual-artwork appearance is still required before publication. The mock is a layout direction, not a replacement for existing catalogue imagery or copy.
 
-The four original product cutouts are copied byte-for-byte to the explicitly public coming-soon assets. Both responsive scenes render those files in independent SVG image layers, aligned to the existing physical magnet planes. Original photo content is not regenerated, recoloured or retouched. SVG viewBoxes trim transparent product padding; affine transforms scale and angle the photos for the scene. Foreground finger clips preserve the visible grip and existing scene contact shadows. The background remains generated scenery.
-
-A regression test compares all four served source buffers against the originals and checks that both scenes reference each product. All 18 focused authentication and presentation tests pass. Browser checks at 320x568, 390x844, 768x1024, 1280x720 and 1920x1080 confirm correct responsive scene selection and no horizontal overflow; widescreen desktop still fits without scrolling. Desktop and mobile screenshots were compared with the original photographs. Evidence: project output/coming-soon-implementation/originals-desktop-local.jpg, originals-mobile-local.jpg and originals-measurements.json.
-
-This changes only presentation assets and rendering. Website/admin protection, payments and customer workflows remain unchanged. Full deployment checks repeat builds, test suite and protection verification.
-
----
-
-# Responsive composition correction
-
-17 October 2026. Local implementation and browser checks passed.
-
-The owner reported that the three loose magnets looked pasted on, with the desktop scene shrunk on mobile and a large blank area below the footer. This revision supersedes the separate overlay approach below. Both scenes now integrate all four magnets with consistent perspective, lighting, physical thickness and contact shadows. The desktop uses a 1920 x 1080 composition; phones and portrait tablets use a closer 1024 x 1280 composition. These are image-generated renditions using the supplied product photographs, not pixel-identical original photos. Source assets and exact prompts are in project output/coming-soon-assets/worktable-cohesive-{desktop,mobile}.png and worktable-cohesive-prompts.txt. Production WebP versions are scene-desktop-v3.webp and scene-mobile-v3.webp.
-
-The mobile layout grows the artwork between editable copy and the footer, with dynamic viewport height and safe-area padding. Short phones, landscape phones and tablets can scroll naturally. No fixed desktop canvas is scaled down. Desktop retains a viewport-height composition. Seven named presentation files are public; retired overlays are removed. Authentication, customer workflows and disabled payments are unchanged.
-
-Browser viewport checks: 320 x 568, 390 x 844, 430 x 932, 768 x 1024, 1024 x 1366, 844 x 390, 1280 x 720 and 1920 x 1080. No horizontal overflow. Footer directly follows artwork without a blank tail. All four magnets remain visible in the phone composition. Wide 16:9 screens fit without vertical scrolling. Small-phone Log in opens the password dialog and focuses Password. All 235 tests and storefront/SSR build passed. These are desktop-browser viewport simulations, not physical-device checks. Evidence: project output/coming-soon-implementation/responsive-*.jpg and responsive-measurements.json.
-
----
-
-# Coming soon hand grip and 16:9 correction
-
-Final result: passed. 17 October 2026.
-
-Addressed the owner-reported pasted grip, scrolling and rounded corners. The hand-held magnet is now part of a realistic photographic grip with foreground finger overlap. Three original product overlays have square corners. Measured no page overflow at 1920 x 1080, 1280 x 720 and 390 x 844; natural mobile document flow remains available. See docs/coming-soon/design-qa.md for provenance and verification. Earlier visual acceptance below is superseded by these corrections.
-
----
-
-# Coming soon worktable design QA, 17 October 2026
-
-Final result: passed.
-
-The owner-attached worktable reference supersedes the mistaken fridge selection. Compared the source and implemented screenshot at 1536 x 1024, login closed. Centred headline, lilac label, tabletop composition, hands, ribbon, tissue and footer match; original product photos and the actual brand logo intentionally replace generated imagery. Mobile verified at 390px and 320px with no horizontal overflow. All assets load; password dialog opens, focuses correctly, closes and restores focus; no console warnings or errors. No unresolved P0/P1/P2 issues.
-
-See docs/coming-soon/design-qa.md for current implementation, evidence paths, asset-generation prompt and preserved superseded history. Previous unrelated admin QA follows unchanged.
-
----
-
-# Admin board light-mode design QA
-
-Date: 17 October 2026
-Status: Passed for implementation and local browser verification.
-Owner decision: Direction 5, with light mode retained.
-
-## Design
-
-Open stage columns, matte warm-grey cards on a lighter page, thin borders, restrained plum text and berry actions. No card shadows, glow or gradients. Email update and Move order share a compact horizontal action row. Existing Fredoka and DM Sans fonts remain in use.
-
-Reference and captured evidence are in the workspace output/admin-card-directions directory: 05-light-mode.png, 05-light-comparison.png, 05-light-card-comparison.png, 05-light-phone.png and 05-light-implemented.png.
-
-The real implementation intentionally retains the private-store notice, unpaid counts, refresh action, accessible field labels and manual email guidance. These move the board lower than the generated reference. Text uses the actual brand fonts rather than the generated approximation. No unresolved P0, P1 or P2 visual issues were identified.
-
-## Verification
-
-- Final isolated release snapshot a24aaeb includes the completed f2f51f7 per-letter quantity and studio notes changes. Concurrent uncommitted work is excluded.
-- Site build, SSR build and 26-page prerender passed.
-- Final complete isolated test suite: 232 passed, zero failed.
-- Admin build and prepare-admin passed.
-- Desktop at 1600px: four open columns, solid card fill, computed box-shadow none, no horizontal overflow.
-- Phone layouts at 390px and 320px: one column, no horizontal overflow, expanded Move order controls fit.
-- Search for Joe returns one card; unmatched search returns empty columns.
-- Stage filter In progress returns the matching column.
-- Move order changes a synthetic order stage; Email update reaches the existing manual preview controls. No messages sent or production records changed.
-- No browser warnings or errors in the local preview.
-
-## Release boundary
-
-Only admin/Orders.jsx, admin/orders.css and the light-board fixture variant change application behavior or previews. Authentication, payment state, artwork retention, sending logic and backend workflows are unchanged. Live authenticated visual acceptance remains distinct from this local verification.
-
-## Publication
-
-Source a24aaeb was pushed to main. The final admin release includes the concurrent completed f2f51f7 quantity changes, rebuilding both applications and repeating all tests before publishing. Worker version aa8adf29-b3ad-4dc1-94ca-f4911c901db9 supersedes the initial light release. The existing business account connection published to admin.customvibe.co.za. The final bundle uses index-DYx2YIO1.css and index-B82nGn0l.js.
-
-Founders Hub saved the owner direction decision in the existing styling subtask. The final release update and completion status could not be recorded because task actions stalled, including after a fresh tab and reload. The attempted reopening of the signed-in owner-review subtask could not be verified. Do not treat the earlier signed-in acceptance as acceptance of this new layout. Reconcile these existing tasks when the Hub responds again; avoid duplicate tasks.
-
-## Card palette revision, 17 October
-
-Owner requested option 2 colours on the existing option 5 light layout. Stage card fills are lavender #e6d7ed, peach #efd5b3, sage #d1dfd2 and blue #cedfe6, with matching borders, hover fills and stage dots. Open columns and the approved layout are retained. Solid fills remain shadow-free. Card secondary text is darkened for contrast.
-
-Admin build and existing admin UI checks passed. Local browser verification confirmed all four colours, transparent columns and no card shadows. Moving the synthetic Patrick order to Ready to ship changed its card to sage and displayed the existing no-email confirmation. Main, secondary and action text pass 4.5:1 contrast across every card and action hover fill. Evidence: output/admin-card-directions/05-light-option2-colours.png in the workspace. No production orders or emails were changed.
+## Owner feedback refinements, 18 October 2026
+- Strengthened the preview-only satin edge, shallow base and directional surface shading. No white perimeter outline and no changes to printable artwork.
+- Removed the circular shopping-mode indicators; full-set and individual controls use clean text with solid selected fill.
+- Matched the puzzle preview padding and gaps to the neighbouring 3×3 artwork grids. At a 985px viewport each piece measures 112.3125px square in all three cards; the 1536px screenshot confirms matching preview extents.
+- Verified full-set switching, individual A selection and preservation when changing to Handmade clay. Circle pseudo-elements are absent.
+- Public build and whitespace check pass for these CSS refinements. The 255-test result above belongs to the preceding implementation, not a new run.
+- Updated evidence: output/c3-m1-review/refined-cards.png and refined-modal.png. These refinements remain local and await owner appearance review.
