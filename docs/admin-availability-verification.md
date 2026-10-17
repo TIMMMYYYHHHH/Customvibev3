@@ -61,3 +61,29 @@ Business account `4f57d4e924674cb87b33d4c884745cf6`; D1 `customvibe-security`, d
 Queries include `SELECT exp FROM revoked WHERE id=? AND exp>?` and `SELECT * FROM artwork_requests WHERE id=?`. Parameters contain private identifiers and are deliberately omitted. Each retry uses a new prepared statement. Known schema, quota and overload errors are excluded from retry; this event was classified as an internal D1 error. The deployed security Worker version is listed above. No migration, DB reset, permission change or paid feature was introduced. Authentication remains fail-closed, and writes are not retried.
 
 Please investigate the database's internal errors at these times and advise on a durable remedy within the existing Free resources. The application logs intentionally retain fixed error categories rather than full error text or customer/session data; no precise Cloudflare-internal cause has been established.
+
+## Follow-up deployment and final captured failure
+
+Commit `376795e` deployed the native bounded reader and safe JSON errors at 02:45:18 UTC. Security version `38cdf928-a60d-449d-916f-b8815840ffe9` was verified at 100% traffic; public Worker/preview URLs remain disabled. The same draft was retried at 02:46:07 UTC. Upload index 0 failed at 02:46:08.713 UTC with HTTP 503, `security_artwork/database_internal`, 2 ms CPU and 2,332 ms wall time. The browser now displays the safe retry message, retains the same draft and offers Retry same order. The error-presentation acceptance passed. This failed readiness lookup did not exercise the native reader, so its 2 ms CPU is not evidence of successful upload CPU headroom. No new order number or successful email sending was observed. Temporary live diagnostics were paused after capture.
+
+The D1 dashboard's last-24-hour rounded totals were about 5k queries, 5k rows read and 2k rows written. The usage chart reported 193 kB current storage; the read-only database metadata API reported 212,992 bytes. These are different reported observations, not a precise storage comparison. The unchanged project resource use remains small. No paid upgrade or persistent logging was enabled.
+
+### Prepared public report, not sent
+
+Cloudflare's [support options](https://developers.cloudflare.com/support/contacting-cloudflare-support/) direct Free technical issues to Community or Discord; paid technical support is not being enabled. The following redacted Community report is ready for owner review. It omits account/database identifiers, hostnames, customer/session details, credentials and full request headers. Contacting the provider still needs explicit owner authorization.
+
+**Title:** Intermittent D1 internal errors in Dashboard console and Worker binding (Free, WEUR)
+
+A small production D1 database on Workers Free intermittently returns internal errors through both the Cloudflare Dashboard SQL console and the Worker binding. Repeating the same read later can succeed. Database metadata reports production, WEUR, 212,992 bytes and read replication disabled. The dashboard's last-24-hour totals are approximately 5k queries, 5k rows read and 2k rows written.
+
+The problem was observed on 16 October 2026 around 21:49 and 21:52 UTC and again on 17 October around 02:35-02:46 UTC. A direct-console example is `SELECT id,amount FROM artwork_usage ORDER BY id;`. Console errors include:
+
+- `internal error; reference = e_PVSMDp_ad50e61b29d1409f9f9927a129324d9a`
+- `internal error; reference = e_PVSMDp_c5a083c9be884334af542511aa76d226`
+- `internal error; reference = e_PVSMDp_0b4c74fcc55c413993515c030e052ec8`
+
+A later `SELECT 1 AS availability_probe;` succeeded, as did a repeated indexed record lookup. No data reset, migration or configuration change occurred between failures and successes. Application traces also catch D1 internal errors and return HTTP 503: 17 October 02:40:11 UTC (2,453 ms wall, 12 ms CPU) and 02:46:08 UTC (2,332 ms wall, 2 ms CPU). The second failure is well below the Worker CPU allowance. The public status page showed no active D1 incident when checked.
+
+Authentication stays fail-closed. Existing explicit read-only recovery is bounded; writes and email sends are not automatically replayed. The affected application remains password protected. The dashboard-console failures reproduce outside our application request handler.
+
+Can Cloudflare investigate the internal-error references and advise on a durable remedy within the existing Free resources? We can provide the database ID privately to Cloudflare staff through an appropriate authenticated channel. No credentials or customer data will be shared.
