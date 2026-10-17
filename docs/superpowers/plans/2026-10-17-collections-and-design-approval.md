@@ -65,7 +65,7 @@
 
 ### Task 4: Immutable proof revisions and approval rules
 
-**Files:** Create `security/proofs.mjs`, `security/migrations/0007_order_proofs.sql` (use actual existing migration directory and next available sequence if changed), `tests/order-proofs.test.mjs`; modify `security/index.mjs`, `security/orders.mjs`, `security/artwork.mjs`, `server/order-record.mjs`.
+**Files:** Create `security/proofs.mjs`, `migrations/security/0007_order_proofs.sql`, `tests/order-proofs.test.mjs`; modify `security/index.mjs`, `security/orders.mjs`, `security/artwork.mjs`, `server/order-record.mjs`.
 
 **Interfaces:** Internal proof actions `prepare`, `publish`, `detail`, `approve`, `changes`, `revoke` operate on `{orderId,expectedVersion,revision,digest}`. Store immutable revision manifests mapping stable item IDs, filenames and quantities; current state stores current/approved revisions and digest, capability hash, expiry and events. `approvalRequired` is pinned on new snapshots; existing legacy snapshots remain compatible. `canProduce(order,proof,now)` requires current unexpired approved digest and revision.
 
