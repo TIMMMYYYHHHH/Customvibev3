@@ -1,6 +1,6 @@
 # Collections and customer approval verification
 
-17 October 2026. Feature implementation remains local pending independent review and deployment.
+17 October 2026. Feature implementation and one independent review/fix pass complete. All 218 automated checks and public/SSR/admin builds pass.
 
 - Complete version 1 print definitions: A–Z (26), 1–10 with dots (10), first words (4), colours (4), reminders (4), thank-yous (4).
 - Business, QR, Wi-Fi and information templates render locally to 1200-square baseline JPEGs. Browser fixture validates all 56 pack/sample outputs and decodes the two exported sample QR codes exactly. Original/reference files and unsent designs stay in memory.
@@ -14,4 +14,8 @@
 
 ## Outstanding acceptance
 
-Full final test/build pass, independent review and any fixes; schema/Worker/Pages deployment; merge current production catalogue; local mobile and gate-to-review journey verification; production read-only verification. The physical 7.5cm print readability and QR scan check is an owner acceptance step and keeps the Hub parent open. Provider availability issues remain separately tracked.
+Schema 0007 and private security/admin Workers deployed; website deployment 38999141808 succeeded at 07c362e. Catalogue service deployment and current production catalogue activation are in progress. Local 320/390px layouts, gate-to-review fragment preservation and explicit customer approval UI verified. Production read-only verification remains. The physical 7.5cm print readability and QR scan check is an owner acceptance step and keeps the Hub parent open. Provider availability issues remain separately tracked.
+
+## Deployment access
+
+The Pages CI credential cannot update the existing catalogue Worker (run 38999170683 stopped safely before that deployment). Use the existing business-only temporary artwork-access helper for private Worker deployments; it now accepts the named catalogue configuration. Credentials remain in memory. The website and separate admin gates remain enabled, payments disabled, and no real emails or test orders were sent.

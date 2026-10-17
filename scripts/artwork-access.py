@@ -35,11 +35,12 @@ def handle(data):
     allowed = [
         ['deploy', '--config', 'wrangler.security.jsonc'],
         ['deploy', '--config', 'wrangler.admin.jsonc'],
+        ['deploy', '--config', 'wrangler.catalogue.jsonc'],
         ['d1', 'migrations', 'apply', 'customvibe-security', '--config', 'wrangler.security.jsonc', '--remote'],
         ['d1', 'migrations', 'list', 'customvibe-security', '--config', 'wrangler.security.jsonc', '--remote'],
     ]
     if data.get('op') != 'wrangler' or args not in allowed: raise ValueError('Operation is not allowed')
-    for config in ['wrangler.security.jsonc', 'wrangler.admin.jsonc']:
+    for config in ['wrangler.security.jsonc', 'wrangler.admin.jsonc', 'wrangler.catalogue.jsonc']:
         if json.loads((ROOT/config).read_text()).get('account_id') != ACCOUNT: raise ValueError('Configuration account mismatch')
     env = {**os.environ, 'PATH': str(NODE.parent)+':'+os.environ.get('PATH', ''), 'CLOUDFLARE_ACCOUNT_ID': ACCOUNT, 'CLOUDFLARE_API_TOKEN': TOKEN, 'WRANGLER_SEND_METRICS': 'false', 'CI': 'true'}
     for key in ['CLOUDFLARE_API_KEY', 'CLOUDFLARE_EMAIL', 'CLOUDFLARE_PROFILE']: env.pop(key, None)
