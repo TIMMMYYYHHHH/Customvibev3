@@ -4,7 +4,7 @@ import {onRequest} from '../functions/_middleware.js';
 import {gate} from '../server/auth.mjs';
 
 test('only explicit coming soon presentation assets can be served without a site session',async()=>{
- for(const path of ['/coming-soon/styles.css','/coming-soon/login.js','/coming-soon/worktable-held-v2.webp','/coming-soon/logo.png','/coming-soon/fredoka.woff2','/coming-soon/dm-sans.woff2','/coming-soon/together.webp','/coming-soon/beach.webp','/coming-soon/wedding.webp']){
+ for(const path of ['/coming-soon/styles.css','/coming-soon/login.js','/coming-soon/scene-desktop-v3.webp','/coming-soon/scene-mobile-v3.webp','/coming-soon/logo.png','/coming-soon/fredoka.woff2','/coming-soon/dm-sans.woff2']){
   let served=0;
   const response=await onRequest({request:new Request('https://customvibe.co.za'+path),env:{},next:async()=>{served++;return new Response('public presentation asset')}});
   assert.equal(response.status,200,path);assert.equal(served,1);assert.equal(response.headers.has('set-cookie'),false);

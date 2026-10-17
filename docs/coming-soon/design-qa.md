@@ -1,3 +1,15 @@
+# Responsive composition correction
+
+17 October 2026. Local implementation and browser checks passed.
+
+The owner reported that the three loose magnets looked pasted on, with the desktop scene shrunk on mobile and a large blank area below the footer. This revision supersedes the separate overlay approach below. Both scenes now integrate all four magnets with consistent perspective, lighting, physical thickness and contact shadows. The desktop uses a 1920 x 1080 composition; phones and portrait tablets use a closer 1024 x 1280 composition. These are image-generated renditions using the supplied product photographs, not pixel-identical original photos. Source assets and exact prompts are in project output/coming-soon-assets/worktable-cohesive-{desktop,mobile}.png and worktable-cohesive-prompts.txt. Production WebP versions are scene-desktop-v3.webp and scene-mobile-v3.webp.
+
+The mobile layout grows the artwork between editable copy and the footer, with dynamic viewport height and safe-area padding. Short phones, landscape phones and tablets can scroll naturally. No fixed desktop canvas is scaled down. Desktop retains a viewport-height composition. Seven named presentation files are public; retired overlays are removed. Authentication, customer workflows and disabled payments are unchanged.
+
+Browser viewport checks: 320 x 568, 390 x 844, 430 x 932, 768 x 1024, 1024 x 1366, 844 x 390, 1280 x 720 and 1920 x 1080. No horizontal overflow. Footer directly follows artwork without a blank tail. All four magnets remain visible in the phone composition. Wide 16:9 screens fit without vertical scrolling. Small-phone Log in opens the password dialog and focuses Password. All 235 tests and storefront/SSR build passed. These are desktop-browser viewport simulations, not physical-device checks. Evidence: project output/coming-soon-implementation/responsive-*.jpg and responsive-measurements.json.
+
+---
+
 # Hand grip, square corners and viewport-fit correction
 
 17 October 2026. Final result: passed locally.
