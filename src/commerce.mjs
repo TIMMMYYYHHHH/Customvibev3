@@ -1,5 +1,5 @@
 import {defaultPricing,canPurchase} from './content/model.mjs';
-import {ARTWORK_LIMITS,ORDER_LIMITS} from './artwork-policy.mjs';
+import {ARTWORK_LIMITS} from './artwork-policy.mjs';
 export const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
 export function photoPrice(qty,pricing=defaultPricing){
   if(!Number.isInteger(qty)||qty<0) throw new Error('Choose a whole number of magnets.');
@@ -43,7 +43,6 @@ export function orderCapacity(items,content){
  const magnets=summarize(items,content).magnetQty;
  const files=items.reduce((n,item)=>n+(item.kind==='photo'?1:item.kind==='puzzle'?(item.gridSize||3)**2+1:0),0);
  const issues=[];
- if(items.length>ORDER_LIMITS.entries)issues.push(`Keep up to ${ORDER_LIMITS.entries} designs or collection entries per order.`);
  if(files>ARTWORK_LIMITS.files)issues.push(`These designs need ${files} artwork files. Keep up to ${ARTWORK_LIMITS.files}; use fewer puzzle designs or a smaller puzzle grid.`);
  return {magnets,files,entries:items.length,issues,allowed:issues.length===0};
 }

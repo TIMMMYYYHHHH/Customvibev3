@@ -1,6 +1,14 @@
 # Crop quality and order limits
 
-## Current quantity policy, 17 October 2026
+## Current entry policy, 17 October 2026
+
+The owner also removed the inherited 30-entry cap. No fixed cap remains on magnet quantities or basket entries. Retained protections: 60 artwork files, 4 MB/file, 32 MB total artwork, 150,000-byte private-order request bodies, 40,000-character serialized saved-order records, existing storage/service quotas, positive safe-integer quantities and 14-day retention. The request body is still bounded before JSON parsing. Saved-order size is also checked before artwork reservation/upload, while the private order service independently retains its own size guard.
+
+Customer guidance in designer, basket, checkout and Help no longer presents an entry ceiling. File-free collection entries are not subject to a replacement item-count limit. Earlier 30/31 rejection evidence and the retained-30 policy in the history below are superseded.
+
+Tests cover 31 photo designs through the isolated full submission and saved-record flow, 60/61 photo-file boundaries, more than 30 file-free collection entries, and exact request-body/saved-record size boundaries. Artwork manifest and admin ZIP filename validation also accept design numbers beyond 99 when file-free entries precede artwork; path/name restrictions remain. Publication and live verification remain pending.
+
+## Previous magnet quantity revision, 17 October 2026
 
 The owner removed the inherited 100-magnet cap. Orders above 100 are permitted for photo copies, puzzles and collection packs. Quantities must be positive safe integers, and totals must remain safely representable. The 30-entry, 60-file, 4 MB/file and 32 MB/request limits, storage quotas and 14-day retention remain unchanged. Copies reuse each design's files. Designer, basket, checkout, Help, server validation and the private saved-order service use this policy. Earlier 100/101 boundary evidence below is historical and superseded by this decision.
 

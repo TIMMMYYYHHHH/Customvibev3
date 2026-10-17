@@ -12,7 +12,7 @@ export async function boundedBytes(request,max){
 export async function artworkDigest(bytes){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');}
 function manifest(files){
  if(!Array.isArray(files)||files.length>limits.files)throw Error('Invalid manifest');let bytes=0;
- const clean=files.map(f=>{if(!f||!Number.isSafeInteger(f.size)||f.size<20||f.size>limits.fileBytes||!artworkHash(f.sha256)||typeof f.proof!=='boolean'||!/^design-\d{2}-(?:photo|proof|row-[1-5]-col-[1-5])\.jpg$/.test(f.name))throw Error('Invalid file');bytes+=f.size;return {size:f.size,sha256:f.sha256,proof:f.proof,name:f.name}});
+ const clean=files.map(f=>{if(!f||!Number.isSafeInteger(f.size)||f.size<20||f.size>limits.fileBytes||!artworkHash(f.sha256)||typeof f.proof!=='boolean'||!/^design-\d{2,}-(?:photo|proof|row-[1-5]-col-[1-5])\.jpg$/.test(f.name))throw Error('Invalid file');bytes+=f.size;return {size:f.size,sha256:f.sha256,proof:f.proof,name:f.name}});
  if(bytes>limits.requestBytes)throw Error('Too much artwork');return {json:JSON.stringify(clean),bytes,files:clean};
 }
 async function operation(env){

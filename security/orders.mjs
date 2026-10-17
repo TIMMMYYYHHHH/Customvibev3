@@ -1,13 +1,13 @@
 import {readSelect} from './read.mjs';
 import {requestReference} from '../src/request-reference.mjs';
-import {artworkId,artworkHash,ARTWORK_LIMITS} from '../src/artwork-policy.mjs';
+import {artworkId,artworkHash,ARTWORK_LIMITS,ORDER_LIMITS} from '../src/artwork-policy.mjs';
 export const ORDER_STATUSES=['new','in_progress','ready_to_ship','shipped'];
 const now=()=>Math.floor(Date.now()/1000);
 const fail=(status,error)=>Response.json({error},{status});
 const reference=row=>'CV-'+String(row.seq).padStart(6,'0');
 const previousReference=row=>{const snapshot=JSON.parse(row.snapshot);return snapshot.referenceVersion===2?undefined:snapshot.reference||'CV-'+row.id;};
 const view=row=>({id:row.id,reference:reference(row),...(previousReference(row)?{previousReference:previousReference(row)}:{}),status:row.status,version:row.version,created:row.created,expires:row.expires,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent,snapshot:JSON.parse(row.snapshot)});
-function validSnapshot(s){return s&&typeof s.contact?.name==='string'&&s.contact.name.length<=100&&typeof s.contact.email==='string'&&/^[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+$/.test(s.contact.email)&&s.contact.email.length<=254&&typeof s.contact.phone==='string'&&s.contact.phone.length<=30&&typeof s.locker?.name==='string'&&s.locker.name.length<=140&&typeof s.locker.area==='string'&&s.locker.area.length<=140&&s.paymentStatus==='unpaid'&&Number.isSafeInteger(s.magnetQty)&&s.magnetQty>0&&Number.isSafeInteger(s.subtotalCents)&&s.subtotalCents>0&&Array.isArray(s.items)&&s.items.length>0&&s.items.length<=30&&s.items.every(i=>typeof i.kind==='string'&&typeof i.name==='string'&&i.name.length<=200&&Number.isSafeInteger(i.qty)&&i.qty>0&&Array.isArray(i.files)&&i.files.length<=26);}
+function validSnapshot(s){return s&&typeof s.contact?.name==='string'&&s.contact.name.length<=100&&typeof s.contact.email==='string'&&/^[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+$/.test(s.contact.email)&&s.contact.email.length<=254&&typeof s.contact.phone==='string'&&s.contact.phone.length<=30&&typeof s.locker?.name==='string'&&s.locker.name.length<=140&&typeof s.locker.area==='string'&&s.locker.area.length<=140&&s.paymentStatus==='unpaid'&&Number.isSafeInteger(s.magnetQty)&&s.magnetQty>0&&Number.isSafeInteger(s.subtotalCents)&&s.subtotalCents>0&&Array.isArray(s.items)&&s.items.length>0&&s.items.every(i=>typeof i.kind==='string'&&typeof i.name==='string'&&i.name.length<=200&&Number.isSafeInteger(i.qty)&&i.qty>0&&Array.isArray(i.files)&&i.files.length<=26);}
 export async function orderService(request,env){
  const b=await request.json(),path=new URL(request.url).pathname.slice('/orders/'.length),time=now();
  if(!env.DB||!b||typeof b!=='object')return fail(400,'Invalid request.');
@@ -19,7 +19,7 @@ export async function orderService(request,env){
  if(!artworkId(b.id))return fail(400,'Invalid reference.');
  let row=await (path==='detail'?readSelect(env.DB,'SELECT * FROM orders WHERE id=?',[b.id]):env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first());
  if(path==='create'){
-  if(!artworkHash(b.fingerprint)||!validSnapshot(b.snapshot)||(b.snapshot.referenceVersion!==undefined&&(b.snapshot.referenceVersion!==2||b.snapshot.reference!==undefined))||JSON.stringify(b.snapshot).length>40000||(b.snapshot.reference!==undefined&&b.snapshot.reference!==requestReference({id:b.id,referenceVersion:1})))return fail(400,'Invalid order.');
+  if(!artworkHash(b.fingerprint)||!validSnapshot(b.snapshot)||(b.snapshot.referenceVersion!==undefined&&(b.snapshot.referenceVersion!==2||b.snapshot.reference!==undefined))||JSON.stringify(b.snapshot).length>ORDER_LIMITS.recordCharacters||(b.snapshot.reference!==undefined&&b.snapshot.reference!==requestReference({id:b.id,referenceVersion:1})))return fail(400,'Invalid order.');
   if(row)return row.expires<=time?fail(410,'Order expired.'):row.fingerprint!==b.fingerprint||row.snapshot!==JSON.stringify(b.snapshot)?fail(409,'Order changed.'):Response.json({ok:true,reference:reference(row)});
   let expires=time+ARTWORK_LIMITS.retentionSeconds;
   if(b.privateArtwork){const a=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(b.id).first();if(!a?.finalized||a.expires<=time)return fail(409,'Complete artwork first.');const files=b.snapshot.items.flatMap(i=>i.files),manifest=JSON.parse(a.manifest);if(files.length!==manifest.length||files.some((f,n)=>f.index!==n||f.name!==manifest[n].name||f.size!==manifest[n].size||f.proof!==manifest[n].proof))return fail(409,'Artwork does not match order.');expires=Math.min(expires,a.expires);}

@@ -36,3 +36,11 @@ test('order records preserve quantities above 100 without weakening numeric vali
  const detail=await(await call(env,'detail',{id:b.id})).json();assert.equal(detail.snapshot.magnetQty,1000);assert.equal(detail.snapshot.items[0].qty,1000);
  for(const qty of [0,-1,1.5,Number.MAX_SAFE_INTEGER+1]){const bad=record();bad.snapshot.items[0].qty=qty;assert.equal((await call(env,'create',bad)).status,400);}
 });
+
+test('saved orders accept over 30 entries but retain the exact record-size boundary',async()=>{
+ const env=artworkEnv(),b=record();b.snapshot.items=Array.from({length:60},()=>structuredClone(b.snapshot.items[0]));b.snapshot.magnetQty=120;b.snapshot.subtotalCents=480000;
+ b.snapshot.padding='';b.snapshot.padding='x'.repeat(40000-JSON.stringify(b.snapshot).length);
+ assert.equal(JSON.stringify(b.snapshot).length,40000);assert.equal((await call(env,'create',b)).status,200);
+ const detail=await(await call(env,'detail',{id:b.id})).json();assert.equal(detail.snapshot.items.length,60);
+ const oversized=structuredClone(b);oversized.id=crypto.randomUUID();oversized.snapshot.padding+='x';assert.equal((await call(env,'create',oversized)).status,400);
+});

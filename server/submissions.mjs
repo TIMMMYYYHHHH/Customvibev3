@@ -1,5 +1,6 @@
 import {requestReference} from '../src/request-reference.mjs';
 import {orderRecord} from './order-record.mjs';
+import {ORDER_LIMITS} from '../src/artwork-policy.mjs';
 import {boundedBody,cookie,sameOrigin,constantEqual,random,signToken,verifyToken} from './auth.mjs';
 import {MAX_BODY,validateContact,validateOrder,orderEmails,artworkManifest,fingerprintPayload} from './submission-model.mjs';
 import {privateUpload,initArtwork,verifyArtworkGrant,completeArtwork} from './artwork-api.mjs';
@@ -30,7 +31,7 @@ export async function submissions(request,env,network=fetch){
   const privateArtwork=kind==='order'&&env.ARTWORK_STORAGE_ENABLED==='true';
   if(url.pathname==='/api/artwork/upload')return privateArtwork?privateUpload(request,env,session):fail(503,'Private uploads are not enabled.');
   if(url.pathname==='/api/artwork/init'&&!privateArtwork)return fail(503,'Private uploads are not enabled.');
-  let body;try{body=JSON.parse(await boundedBody(request,url.pathname==='/api/contact'?15000:privateArtwork?150000:MAX_BODY))}catch{return fail(400,'The request is invalid or too large. Check the artwork limits and try again.');}
+  let body;try{body=JSON.parse(await boundedBody(request,url.pathname==='/api/contact'?15000:privateArtwork?ORDER_LIMITS.requestBytes:MAX_BODY))}catch{return fail(400,'The request is invalid or too large. Check the artwork limits and try again.');}
   const finishing=privateArtwork&&url.pathname==='/api/order-request';
   if(!body||typeof body!=='object'||body.website||(!finishing&&(typeof body.turnstile!=='string'||body.turnstile.length>2048)))return fail(400,'Please complete the security check.');
   const ip=request.headers.get('CF-Connecting-IP');if(!ip)return fail(503,'Sending is temporarily unavailable. Please keep your draft.');
@@ -42,7 +43,8 @@ export async function submissions(request,env,network=fetch){
   let submission;try{
    if(kind==='contact')submission=validateContact(body.payload);
    else{const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)throw new Error('Unavailable');submission=validateOrder(body.payload,await r.json(),privateArtwork);}
-  }catch{return fail(400,'Check your details, products and artwork. Check the design and artwork file limits.');}
+   if(kind==='order'&&env.ORDER_RECORDS_ENABLED==='true'&&JSON.stringify(orderRecord(submission,privateArtwork)).length>ORDER_LIMITS.recordCharacters)throw new Error('Order details too large');
+  }catch{return fail(400,'Check your details, products and artwork. Check the artwork and order-detail size limits.');}
   if(privateArtwork){
    if(url.pathname==='/api/artwork/init')return initArtwork(env,session,submission,ip,body.resume);
    const grant=await verifyArtworkGrant(body.grant,env,session,submission);if(!grant)return fail(403,'Refresh the security check and retry this same order.');

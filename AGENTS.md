@@ -15,4 +15,4 @@ Payment-provider direction, 17 October 2026: the owner selected Yoco as the gate
 
 Public form verification: use Turnstile interaction-only appearance with automatic execution. Keep token validation, hostname/action checks, CSRF and expiry/error handling intact; do not hide an interactive challenge with custom CSS or weaken verification to change its appearance.
 
-Order capacity policy: no fixed magnet quantity cap. Retain 30 design or collection entries, 60 artwork files, 4 MB per file, 32 MB per request, existing storage/service quotas and safe-integer validation. Copies reuse each design’s artwork files. Do not restore an arbitrary magnet cap.
+Order capacity policy: no fixed magnet quantity or entry cap. Retain 60 artwork files, 4 MB per file, 32 MB per request, 150,000-byte private-order request bodies, 40,000-character saved-order records, existing storage/service quotas and safe-integer validation. Copies reuse each design’s artwork files. Do not restore arbitrary magnet or entry caps.

@@ -40,7 +40,7 @@ test('server accepts more than 100 magnets while retaining accurate prices and s
  const raw=input();raw.items=[{kind:'alphabet',qty:101,files:[]}];
  const order=validateOrder(raw,catalogue,true);assert.equal(order.magnetQty,2626);assert.equal(order.subtotalCents,1010000);
 });
-test('private orders retain file, total-byte and entry limits without a magnet cap',()=>{
+test('private orders retain file and total-byte limits without magnet or entry caps',()=>{
  const file=size=>({size,sha256:'a'.repeat(64)});
  const raw=input();raw.items=[{kind:'photo',qty:1000,files:[file(4000000)]}];
  assert.equal(validateOrder(raw,defaultContent,true).magnetQty,1000);
@@ -51,12 +51,18 @@ test('private orders retain file, total-byte and entry limits without a magnet c
  raw.items=Array.from({length:6},()=>({kind:'puzzle',gridSize:3,qty:10,files:Array.from({length:10},()=>file(20))}));
  assert.equal(validateOrder(raw,defaultContent,true).magnetQty,540);
  raw.items.push({kind:'photo',qty:1,files:[file(20)]});assert.throws(()=>validateOrder(raw,defaultContent,true));
- raw.items=Array.from({length:30},()=>({kind:'photo',qty:1000,files:[file(20)]}));
- assert.equal(validateOrder(raw,defaultContent,true).magnetQty,30000);
+ raw.items=Array.from({length:60},()=>({kind:'photo',qty:1000,files:[file(20)]}));
+ assert.equal(validateOrder(raw,defaultContent,true).magnetQty,60000);
  raw.items.push(raw.items[0]);assert.throws(()=>validateOrder(raw,defaultContent,true));
 });
 test('orders still reject malformed or numerically unsafe quantities and totals',()=>{
  for(const qty of [0,-1,1.5,'101',NaN,Infinity,Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER+1]){
   const raw=input();raw.items[0].qty=qty;assert.throws(()=>validateOrder(raw,defaultContent));
  }
+});
+
+test('server accepts over 30 file-free collection entries',()=>{
+ const catalogue=structuredClone(defaultContent),pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;
+ const raw=input();raw.items=Array.from({length:75},()=>({kind:'alphabet',qty:1,files:[]}));
+ const order=validateOrder(raw,catalogue,true);assert.equal(order.items.length,75);assert.equal(order.subtotalCents,750000);
 });

@@ -76,3 +76,36 @@ test('pre-dashboard artwork grants and recovery tokens survive added price snaps
  const recovery=await verifyToken(first.resume,env.SESSION_SECRET,'artwork-resume');const oldResume=await signToken({...recovery,hash:oldHash},env.SESSION_SECRET);
  const fresh={...session,jti:random(),csrf:random()};assert.equal((await initArtwork(env,fresh,order,'192.0.2.1',oldResume)).status,200);
 });
+
+test('31 photo designs complete the private order flow and retain all saved entries',async()=>{
+ const env=setup();env.ORDER_RECORDS_ENABLED='true';const c=await form(env),data=payload();data.referenceVersion=2;
+ data.items=Array.from({length:31},()=>({kind:'photo',qty:1,files:[{size:tile.length,sha256:tileHash}]}));
+ const mails=[],network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});mails.push(JSON.parse(init.body));return Response.json({id:'accepted'});};
+ const initial=await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network);assert.equal(initial.status,200);const {grant}=await initial.json();
+ for(let i=0;i<31;i++)assert.equal((await submissions(post('/api/artwork/upload',c,tile,{'Content-Type':'image/jpeg','X-Artwork-Grant':grant,'X-Artwork-Index':String(i)}),env,network)).status,200);
+ assert.equal((await submissions(post('/api/order-request',c,{payload:data,grant}),env,network)).status,200);
+ const stored=await(await env.AUTH.fetch('https://internal/orders/detail',{method:'POST',body:JSON.stringify({id:data.id})})).json();assert.equal(stored.snapshot.items.length,31);assert.equal(stored.snapshot.magnetQty,31);assert.equal(mails.length,2);assert.equal(env.objects.size,31);
+});
+test('private order requests retain the exact 150000-byte body limit before provider or storage work',async()=>{
+ const env=setup(),c=await form(env),raw=JSON.stringify({payload:payload(),turnstile:'test'});let calls=0;
+ const network=async()=>{calls++;return Response.json({success:true,hostname:'customvibe.co.za',action:'order'})};
+ const body=raw.padEnd(150000,' ');assert.equal((await submissions(post('/api/artwork/init',c,body),env,network)).status,200);assert.equal(calls,1);
+ assert.equal((await submissions(post('/api/artwork/init',c,body+' '),env,network)).status,400);assert.equal(calls,1);
+});
+test('oversized saved order details reject before reserving artwork or sending mail',async()=>{
+ const env=setup();env.ORDER_RECORDS_ENABLED='true';const c=await form(env),data=payload(),catalogue=structuredClone(defaultContent);
+ const pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;pack.name='A'.repeat(200);env.CATALOGUE={fetch:async()=>Response.json(catalogue)};
+ data.items=Array.from({length:150},()=>({kind:'alphabet',qty:1,files:[]}));data.items.push({kind:'photo',qty:1,files:[{size:tile.length,sha256:tileHash}]});
+ let storageCalls=0;const auth=env.AUTH;env.AUTH={fetch:async(...args)=>{storageCalls++;return auth.fetch(...args)}};
+ const network=async url=>{assert.ok(url.includes('siteverify'));return Response.json({success:true,hostname:'customvibe.co.za',action:'order'})};
+ assert.equal((await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network)).status,400);assert.equal(storageCalls,0);assert.equal(env.objects.size,0);
+});
+
+test('artwork after 100 file-free entries keeps its matching design number',async()=>{
+ const env=setup();env.ORDER_RECORDS_ENABLED='true';const c=await form(env),data=payload(),catalogue=structuredClone(defaultContent);
+ const pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;env.CATALOGUE={fetch:async()=>Response.json(catalogue)};
+ data.items=Array.from({length:100},()=>({kind:'alphabet',qty:1,files:[]}));data.items.push({kind:'photo',qty:1,files:[{size:tile.length,sha256:tileHash}]});
+ const network=async()=>Response.json({success:true,hostname:'customvibe.co.za',action:'order'});
+ const initial=await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network);assert.equal(initial.status,200);
+ const row=env.sql.prepare('SELECT manifest FROM artwork_requests WHERE id=?').get(data.id);assert.equal(JSON.parse(row.manifest)[0].name,'design-101-photo.jpg');
+});
