@@ -2,9 +2,13 @@
 
 ## Current quantity policy, 17 October 2026
 
-The owner removed the inherited 100-magnet cap. Orders above 100 are permitted for photo copies, puzzles and collection packs. Quantities must be positive safe integers, and totals must remain safely representable. The 30-entry, 60-file, 4 MB/file and 32 MB/request limits, storage quotas and 14-day retention remain unchanged. Copies reuse each design's files. Designer, basket, checkout, Help and server validation use this policy. Earlier 100/101 boundary evidence below is historical and superseded by this decision.
+The owner removed the inherited 100-magnet cap. Orders above 100 are permitted for photo copies, puzzles and collection packs. Quantities must be positive safe integers, and totals must remain safely representable. The 30-entry, 60-file, 4 MB/file and 32 MB/request limits, storage quotas and 14-day retention remain unchanged. Copies reuse each design's files. Designer, basket, checkout, Help, server validation and the private saved-order service use this policy. Earlier 100/101 boundary evidence below is historical and superseded by this decision.
 
-Regression coverage accepts 101 and 1,000 photo copies, 125 puzzle magnets with 26 files, and 101 alphabet packs; it still rejects 31 entries, 61 files, files above 4 MB and totals above 32 MB. Production and live verification will be recorded after checks complete.
+Regression coverage accepts 101 and 1,000 photo copies, 125 puzzle magnets with 26 files, and 101 alphabet packs; it still rejects 31 entries, 61 files, files above 4 MB and totals above 32 MB. All 180 tests and public/SSR/admin builds passed. Saved-order regression coverage verifies 1,000 copies survive persistence; invalid and unsafe quantities still reject.
+
+Published application `a26c742` through [protected Pages run 38991672022](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38991672022): tests, builds and pre/post protection checks passed. The separate private security Worker is `ea204cce-988b-4ff2-bb43-33c1fd098c84`. Existing D1/R2 bindings were verified before and after; public routes, workers.dev and preview URLs remain disabled. No database migration, paid service, storage setting or admin deployment was needed.
+
+Live signed-in browser verification: the designer no longer shows a 100-magnet ceiling; five 5x5 puzzle copies increase the basket to 125 magnets, 26 artwork files and R5,000. Continue to checkout works, and Place unpaid order is enabled after the normal form check. Expanded guidance explains copies reuse files, no fixed quantity cap, 4 MB/file and 32 MB/request. Only the existing synthetic 400px test image was read into browser memory. No customer details, order submission, artwork upload, email or production-record changes were made. The physical print, maximum free-runtime and blocked availability/email acceptance tasks remain separate. Screenshot: `no-magnet-cap-live.png` in the project workspace.
 
 
 17 October 2026. Board: Artwork & email > Protect print quality for larger orders > Add crop-resolution warnings and clear order limits.
