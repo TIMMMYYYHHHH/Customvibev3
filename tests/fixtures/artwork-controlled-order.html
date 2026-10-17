@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Controlled order fixture</title><h1>Synthetic controlled order fixture</h1><p>Local preparation only. No live submission.</p><button id="prepare">Prepare synthetic file</button><pre id="result"></pre><a id="download" hidden download="synthetic-runtime.png">Download synthetic source</a><script type="module">
+import {makePhoto,renderPhoto,loadImage} from '../../src/artwork.js';
+import {preparePrivateArtwork} from '../../src/order-artwork.mjs';
+import {defaultContent} from '../../src/content/model.mjs';
+if(!['localhost','127.0.0.1'].includes(location.hostname))throw Error('Local only');
+document.querySelector('#prepare').onclick=async()=>{
+ const canvas=document.createElement('canvas');canvas.width=canvas.height=1200;const ctx=canvas.getContext('2d');let low=0,high=1,best;
+ for(let step=0;step<12;step++){
+  const fraction=(low+high)/2,pixels=ctx.createImageData(1200,1200);let seed=123456;
+  for(let i=0;i<pixels.data.length;i+=4){const y=Math.floor(i/4/1200);for(let c=0;c<3;c++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;pixels.data[i+c]=y<1200*fraction?seed>>>24:220;}pixels.data[i+3]=255;}
+  ctx.putImageData(pixels,0,0);const blob=await new Promise(r=>canvas.toBlob(r,'image/png')),src=URL.createObjectURL(blob);await loadImage(src);const photo=makePhoto(src,'Synthetic runtime',1200,1200);const prepared=await preparePrivateArtwork([{kind:'photo',qty:1,sourceId:photo.id}], [photo],renderPhoto,defaultContent);const bytes=prepared.uploads[0].length;
+  document.querySelector('#result').textContent=JSON.stringify({step,fraction,bytes,total60:bytes*60});
+  if(bytes<=530000){best={src,bytes,fraction,sourceBytes:blob.size};low=fraction;}else high=fraction;
+ }
+ const a=document.querySelector('#download');a.href=best.src;a.hidden=false;document.querySelector('#result').textContent=JSON.stringify({...best,src:undefined,total60:best.bytes*60},null,2);
+};
+</script></html>

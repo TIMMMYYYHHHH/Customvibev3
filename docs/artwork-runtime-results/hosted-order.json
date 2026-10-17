@@ -1,0 +1,87 @@
+{
+  "measuredDate": "2026-10-17",
+  "orderReference": "CV-000006",
+  "submitClickedUtc": "2026-10-17T02:15:44.400Z",
+  "artworkReservedUtc": "2026-10-17T02:15:48Z",
+  "orderStoredUtc": "2026-10-17T02:18:10Z",
+  "successObservedUtc": "2026-10-17T02:18:24.714Z",
+  "expiresUtc": "2026-10-31T02:15:48Z",
+  "files": 60,
+  "bytes": 31522260,
+  "allFilesReady": true,
+  "maxUploadAttempts": 1,
+  "artworkFinalized": true,
+  "payment": "unpaid",
+  "status": "new",
+  "ownerEmailAccepted": true,
+  "receiptEmailAccepted": true,
+  "inboxDeliveryVerified": false,
+  "download": {
+    "bytes": 525371,
+    "sha256": "5c9da2c3a92bbf730f76add7ba14a4d56b6397782d0f7a64bf406b9d9b3e2515",
+    "matchesManifest": true
+  },
+  "metrics": {
+    "scope": "All security Worker invocations in 04:15-04:19 SAST; time-correlated, not request-attributed",
+    "invocations": 139,
+    "uncaughtExceptions": 1,
+    "exceededCpu": 0,
+    "exceededMemory": 0,
+    "cpuChartLegendMs": {
+      "p50": 1.24,
+      "p90": 10.36,
+      "p99": 16.79,
+      "p999": 16.79
+    },
+    "highestMinuteP99CpuMs": 21.438,
+    "memoryChartLegendMB": {
+      "p50": 5.6,
+      "p90": 8.44,
+      "p99": 10.22,
+      "p999": 10.22
+    },
+    "charts": [
+      {
+        "metric": "Invocations",
+        "accessibleChartText": "This is a chart. It consists of 2 series count. The 0 series is a Bar chart representing b8bf5e03.The data is as follows: 1792203300000, 20, 20, NaN, 1792203360000, 53, 53, NaN, 1792203420000, 53, 53, NaN, 1792203480000, 13, 13, NaN, 1792203540000, 0, 0, NaN. The 1 series is a Line chart.The data is as follows: ."
+      },
+      {
+        "metric": "Invocations",
+        "accessibleChartText": "This is a chart. It consists of 2 series count. The 0 series is a Bar chart representing b8bf5e03.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 1, 1, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 1 series is a Line chart.The data is as follows: ."
+      },
+      {
+        "metric": "Errors by invocation status",
+        "accessibleChartText": "This is a chart. It consists of 6 series count. The 0 series is a Bar chart representing Exceeded Memory.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 0, 0, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 1 series is a Bar chart representing Exceeded CPU Time Limits.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 0, 0, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 2 series is a Bar chart representing Internal.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 0, 0, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 3 series is a Bar chart representing Load Shed.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 0, 0, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 4 series is a Bar chart representing Uncaught Exception.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 1, 1, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 5 series is a Line chart.The data is as follows: ."
+      },
+      {
+        "metric": "Errors by invocation status",
+        "accessibleChartText": "This is a chart. It consists of 3 series count. The 0 series is a Bar chart representing Cancelled.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 0, 0, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 1 series is a Bar chart representing Response stream disconnected.The data is as follows: 1792203300000, 0, 0, NaN, 1792203360000, 0, 0, NaN, 1792203420000, 0, 0, NaN, 1792203480000, 0, 0, NaN, 1792203540000, 0, 0, NaN. The 2 series is a Line chart.The data is as follows: ."
+      },
+      {
+        "metric": "CPU Time",
+        "accessibleChartText": "This is a chart. It consists of 9 series count. The 0 series is a Line chart representing P50.The data is as follows: 1792203300000, 0.824, 1792203360000, 1.038, 1792203420000, 1.288, 1792203480000, 1.815. The 1 series is a Line chart representing P50.The data is as follows: 1792203480000, 1.815, 1792203540000, 0. The 2 series is a Line chart representing P90.The data is as follows: 1792203300000, 11.48, 1792203360000, 10.603, 1792203420000, 10.094, 1792203480000, 9.279. The 3 series is a Line chart representing P90.The data is as follows: 1792203480000, 9.279, 1792203540000, 0. The 4 series is a Line chart representing P99.The data is as follows: 1792203300000, 21.438, 1792203360000, 15.196, 1792203420000, 20.303, 1792203480000, 10.208. The 5 series is a Line chart representing P99.The data is as follows: 1792203480000, 10.208, 1792203540000, 0. The 6 series is a Line chart representing P999.The data is as follows: 1792203300000, 21.438, 1792203360000, 15.196, 1792203420000, 20.303, 1792203480000, 10.208. The 7 series is a Line chart representing P999.The data is as follows: 1792203480000, 10.208, 1792203540000, 0. The 8 series is a Line chart.The data is as follows: ."
+      },
+      {
+        "metric": "Wall Time",
+        "accessibleChartText": "This is a chart. It consists of 9 series count. The 0 series is a Line chart representing P50.The data is as follows: 1792203300000, 158.682, 1792203360000, 154.197, 1792203420000, 155.361, 1792203480000, 346.118. The 1 series is a Line chart representing P50.The data is as follows: 1792203480000, 346.118, 1792203540000, 0. The 2 series is a Line chart representing P90.The data is as follows: 1792203300000, 1767.38, 1792203360000, 2438.797, 1792203420000, 2811.774, 1792203480000, 1814.032. The 3 series is a Line chart representing P90.The data is as follows: 1792203480000, 1814.032, 1792203540000, 0. The 4 series is a Line chart representing P99.The data is as follows: 1792203300000, 2358.826, 1792203360000, 2871.052, 1792203420000, 2862.461, 1792203480000, 1842.992. The 5 series is a Line chart representing P99.The data is as follows: 1792203480000, 1842.992, 1792203540000, 0. The 6 series is a Line chart representing P999.The data is as follows: 1792203300000, 2358.826, 1792203360000, 2871.052, 1792203420000, 2862.461, 1792203480000, 1842.992. The 7 series is a Line chart representing P999.The data is as follows: 1792203480000, 1842.992, 1792203540000, 0. The 8 series is a Line chart.The data is as follows: ."
+      },
+      {
+        "metric": "Memory usage",
+        "accessibleChartText": "This is a chart. It consists of 9 series count. The 0 series is a Line chart representing P50.The data is as follows: 1792203300000, 1343488, 1792203360000, 7897420, 1792203420000, 9212236, 1792203480000, 3954870. The 1 series is a Line chart representing P50.The data is as follows: 1792203480000, 3954870, 1792203540000, 0. The 2 series is a Line chart representing P90.The data is as follows: 1792203300000, 6869356, 1792203360000, 10821213, 1792203420000, 11869789, 1792203480000, 4217014. The 3 series is a Line chart representing P90.The data is as follows: 1792203480000, 4217014, 1792203540000, 0. The 4 series is a Line chart representing P99.The data is as follows: 1792203300000, 7931335, 1792203360000, 11869821, 1792203420000, 12918365, 1792203480000, 8163660. The 5 series is a Line chart representing P99.The data is as follows: 1792203480000, 8163660, 1792203540000, 0. The 6 series is a Line chart representing P999.The data is as follows: 1792203300000, 7931335, 1792203360000, 11869821, 1792203420000, 12918365, 1792203480000, 8163660. The 7 series is a Line chart representing P999.The data is as follows: 1792203480000, 8163660, 1792203540000, 0. The 8 series is a Line chart.The data is as follows: ."
+      },
+      {
+        "metric": "Request duration",
+        "accessibleChartText": "This is a chart. It consists of 9 series count. The 0 series is a Line chart representing P50.The data is as follows: 1792203300000, 158.596, 1792203360000, 154.127, 1792203420000, 155.308, 1792203480000, 346.054. The 1 series is a Line chart representing P50.The data is as follows: 1792203480000, 346.054, 1792203540000, 0. The 2 series is a Line chart representing P90.The data is as follows: 1792203300000, 1767.308, 1792203360000, 2438.713, 1792203420000, 2811.699, 1792203480000, 1813.959. The 3 series is a Line chart representing P90.The data is as follows: 1792203480000, 1813.959, 1792203540000, 0. The 4 series is a Line chart representing P99.The data is as follows: 1792203300000, 2358.734, 1792203360000, 2870.989, 1792203420000, 2862.402, 1792203480000, 1842.912. The 5 series is a Line chart representing P99.The data is as follows: 1792203480000, 1842.912, 1792203540000, 0. The 6 series is a Line chart representing P999.The data is as follows: 1792203300000, 2358.734, 1792203360000, 2870.989, 1792203420000, 2862.402, 1792203480000, 1842.912. The 7 series is a Line chart representing P999.The data is as follows: 1792203480000, 1842.912, 1792203540000, 0. The 8 series is a Line chart.The data is as follows: ."
+      }
+    ]
+  },
+  "quotaAfter": {
+    "dailyBytes": 31522260,
+    "monthlyBytes": 57845587,
+    "retainedBytes": 57845587,
+    "dailyRequests": 1,
+    "monthlyRequests": 11,
+    "monthlyOperations": 644
+  },
+  "acceptance": "Functional test passed; nominal Free CPU headroom not established. No second order approved or submitted."
+}
