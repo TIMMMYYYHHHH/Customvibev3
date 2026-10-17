@@ -14,9 +14,9 @@ The real implementation intentionally retains the private-store notice, unpaid c
 
 ## Verification
 
-- Isolated release snapshot based on a833a7c plus these three changed files, excluding concurrent unfinished work.
+- Final isolated release snapshot a24aaeb includes the completed f2f51f7 per-letter quantity and studio notes changes. Concurrent uncommitted work is excluded.
 - Site build, SSR build and 26-page prerender passed.
-- Complete isolated test suite: 226 passed, zero failed.
+- Final complete isolated test suite: 232 passed, zero failed.
 - Admin build and prepare-admin passed.
 - Desktop at 1600px: four open columns, solid card fill, computed box-shadow none, no horizontal overflow.
 - Phone layouts at 390px and 320px: one column, no horizontal overflow, expanded Move order controls fit.
@@ -28,3 +28,9 @@ The real implementation intentionally retains the private-store notice, unpaid c
 ## Release boundary
 
 Only admin/Orders.jsx, admin/orders.css and the light-board fixture variant change application behavior or previews. Authentication, payment state, artwork retention, sending logic and backend workflows are unchanged. Live authenticated visual acceptance remains distinct from this local verification.
+
+## Publication
+
+Source a24aaeb was pushed to main. The final admin release includes the concurrent completed f2f51f7 quantity changes, rebuilding both applications and repeating all tests before publishing. Worker version aa8adf29-b3ad-4dc1-94ca-f4911c901db9 supersedes the initial light release. The existing business account connection published to admin.customvibe.co.za. The final bundle uses index-DYx2YIO1.css and index-B82nGn0l.js.
+
+Founders Hub saved the owner direction decision in the existing styling subtask. The final release update and completion status could not be recorded because task actions stalled, including after a fresh tab and reload. The attempted reopening of the signed-in owner-review subtask could not be verified. Do not treat the earlier signed-in acceptance as acceptance of this new layout. Reconcile these existing tasks when the Hub responds again; avoid duplicate tasks.
