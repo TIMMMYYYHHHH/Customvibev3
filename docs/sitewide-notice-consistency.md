@@ -36,6 +36,6 @@ Application dcc5734 published through [protected Pages run 38990638802](https://
 
 Live 393px customer checks verified the designer's best-rate text, basket and checkout, including inline unpaid/payment guidance, crop warnings and order limits. Only a synthetic photo was loaded into browser memory. No order or email was submitted.
 
-The admin session had expired at the live artwork check, and the separate sign-in screen appeared as expected. Signed-in visual verification remains pending owner sign-in; local admin error/success/recovery rendering and deployed protection are verified. This is distinct from the separate, owner-paused admin availability investigation.
+The admin session initially expired and the separate sign-in screen appeared as expected. Tim restored sign-in. Live 393px checks then verified the inline invalid-artwork-ID error and Store content session guidance, with no content saves, customer changes or emails. The invalid ID is rejected locally before any artwork lookup. This visual check is complete and is distinct from the separate, owner-paused admin availability investigation.
 
 This work does not establish physical print acceptance, phone email acceptance, resolved admin availability, public launch approval or live payment approval. Those remain in their existing tasks.
