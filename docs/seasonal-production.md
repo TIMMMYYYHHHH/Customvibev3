@@ -22,3 +22,12 @@ Activation requires installed artwork and Ready to use, plus an enabled valid sc
 - Build and test an exact tracked-source export to exclude unrelated local coming-soon and artwork work.
 - Preserve website password gate, separate admin authentication, disabled payments and existing email/retention rules.
 - Deploy catalogue, site and admin from the verified revision, then verify clean live defaults and preview. Record release evidence below and in Founders Hub.
+
+## Release evidence, 17 October 2026
+Implementation 82e7c6e; canonical asset-path correction 44a6c02. Public release workflow https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39067277348 completed successfully. Catalogue version 79e01057-1cc8-477c-9f50-0217649af0d4. Admin version 53c3e9f0-81a6-4ce4-a3cc-0b1f039a311c. Security Worker unchanged.
+
+All 246 tests passed in the clean tracked-source export; 12 affected routing/security/storage checks passed again after the route correction. Public, SSR and admin builds passed. Independent review findings were addressed: calendar visitor preview carries its selected date and icon copy describes shared saving. Production asset URLs use canonical paths so Cloudflare HTML normalization does not redirect in a loop.
+
+Live admin initial settings saved successfully and survived reload. All ten occasions were verified Not started, Schedule Off, Theme Not created, with no dates or active controls. Original website displayed in both draft and selected-date preview. Preview rendered current production catalogue availability (distinct from local fallback), mobile preview measured 375px with no overflow, and contact sending was disabled. Local admin phone-width fixture also measured 375px without overflow. Existing website/admin deployment protection guards passed after publishing. No customer records or emails were changed.
+
+Screenshots are in project output/seasonal-production/: live-occasions.png, live-shared-preview.png and local-mobile-admin.png. The rollout task is maintained under Review seasonal themes and admin controls in Founders Hub. Actual occasion design approval and installation remain separate pending work.

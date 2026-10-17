@@ -7,7 +7,7 @@ Spec: workspace christmas-preview/docs/ADMIN-THEMES-CONCEPT.md and owner approva
 - [x] Add clean production state, strict storage validation, conflict-safe authenticated API and server-owned audit history. Test missing data, invalid input, stale writes, missing artwork, dates and simulation isolation.
 - [x] Port approved compact controls/calendar/editor, replacing browser storage with confirmed server persistence. Keep date simulation ephemeral. No sample artwork or schedules. Test save failures and empty dates.
 - [x] Add authenticated same-code storefront preview, live catalogue reads, isolated routing, preview-only side-effect blocking and same-origin framing restricted to preview routes. Add empty theme renderer registry and runtime extension points.
-- [ ] Build/test exact committed source, check desktop/mobile and persistence, review diff, deploy protected services and verify live defaults and preview. Record verification in Founders Hub.
+- [x] Build/test exact committed source, check desktop/mobile and persistence, review diff, deploy protected services and verify live defaults and preview. Record verification in Founders Hub.
 
 Constraints: no production customer writes during testing; no emails; gate, admin sign-in and payments unchanged. Preserve unrelated uncommitted work. No seasonal design installed by this rollout. All dates Africa/Johannesburg. No em dashes or diagonal arrows.
 
