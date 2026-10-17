@@ -1,5 +1,7 @@
 # Magnet collections and customer design approval
 
+> Superseded in part by the later owner decision on 17 October: practical collections are inspiration for the existing studio, with optional order notes. Separate template and Design it for me forms are removed. Proof approval and ready-made packs remain. See docs/collections-and-approval-verification.md for current scope and evidence.
+
 Design for owner review, 17 October 2026. Implementation of the new flows follows review of this document. The separately authorised existing-preview bugfix can proceed independently.
 
 ## Outcome and agreed decisions

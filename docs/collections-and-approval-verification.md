@@ -1,5 +1,15 @@
 # Collections and customer approval verification
 
+## Current owner decision: inspiration and studio notes
+
+17 October 2026, later correction. Business/work, QR, Wi-Fi and information collections now provide ideas and lead to the existing studio. Separate template personalisation and Design it for me forms are removed. Old design links redirect to the studio. Earlier descriptions below are historical and superseded for these entry paths; legacy server contracts remain compatible with existing records.
+
+Optional whole-order notes (1,000 characters) are editable in the studio and checkout, held in browser memory before submission, validated server-side and retained privately with the order. Notes appear in admin, existing order emails and print instructions, never in magnet artwork. Proof approval, ready-made learning/gift packs, quantity pricing, manual status emails and original 14-day expiry remain unchanged.
+
+Verification: 221 tests pass; public, SSR, prerender and admin builds pass. Browser fixture confirms a note survives studio > basket > checkout and an edited checkout note returns to the studio. No real order or email submitted. Independent review found one wording issue: filenames are not retained, so guidance now asks customers to describe the relevant image. No other important or critical findings. Security Worker deployed as 0f15ebb7-68ff-4d84-82f2-5bf047519655; admin deployed as b4395421-adfc-42fe-aab1-5f3407e94c54. Pages release and live verification are tracked in Founders Hub.
+
+## Historical implementation evidence
+
 17 October 2026. Feature implementation and one independent review/fix pass complete. All 218 automated checks and public/SSR/admin builds pass.
 
 - Complete version 1 print definitions: A–Z (26), 1–10 with dots (10), first words (4), colours (4), reminders (4), thank-yous (4).

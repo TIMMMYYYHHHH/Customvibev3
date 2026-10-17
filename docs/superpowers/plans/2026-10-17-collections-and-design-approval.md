@@ -1,5 +1,7 @@
 # Collections and Design Approval Implementation Plan
 
+> Superseded in part by the later owner decision on 17 October: practical collections are inspiration for the existing studio, with optional order notes. Separate template and Design it for me forms are removed. Proof approval and ready-made packs remain. See docs/collections-and-approval-verification.md for current scope and evidence.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Fulfil all existing collections and the four new practical collections through self-service templates or assisted design, with approval of final artwork before printing.
