@@ -47,7 +47,9 @@ W3Forms is not Web3Forms. Its policy currently retains submissions while the acc
 - 167 automated tests passed, including existing authentication, CSRF, form validation and retention checks.
 - Local map iframe counts: 0 before Show, 1 after Show, 0 after Hide. Provider attribution remained visible when loaded. Manual fields remained available. No form submitted.
 - Local privacy anchors resolve, move below the fixed header and have no horizontal overflow at 1280px and 390px. Provider links verified against their published policy pages.
-- Publication and live verification recorded below after deployment.
+- Published application `1838279` through protected business Pages run [38986605402](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38986605402). Public/admin builds, all 167 tests and before/after protection checks passed. Admin Worker publication was not requested.
+- Signed-in live `/privacy` serves the new bundle `main-C_zcMUo0.js`. Topic anchors, provider/privacy email links, cookie lifetimes, automatic verification and map/measurement disclosures verified in the live DOM. Cookie section scrolls below the fixed header; no horizontal overflow at the live 600px view. Screenshot: `/tmp/customvibe-privacy-live.png` (local review evidence).
+- W3Forms service correction and owner privacy task saved in Founders Hub. Existing launch parent remains open; no real order or email was sent.
 
 ## Remaining launch requirements
 
