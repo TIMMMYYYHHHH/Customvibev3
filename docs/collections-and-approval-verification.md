@@ -29,3 +29,11 @@ Physical 7.5cm print readability and QR scanning remain an owner acceptance step
 ## Deployment access
 
 The Pages CI credential cannot update the existing catalogue Worker (run 38999170683 stopped safely before that deployment). Use the existing business-only temporary artwork-access helper for private Worker deployments; it now accepts the named catalogue configuration. Credentials remain in memory. The website and separate admin gates remain enabled, payments disabled, and no real emails or test orders were sent.
+
+## Visual revision after owner feedback, 17 October
+
+The owner rejected the initial sparse designs and card layout. The revision gives business, QR, Wi-Fi and information magnets distinct illustrated compositions and replaces plain gift/reminder wording with bouquets, rainbows, hearts and sunshine. These illustrations are part of the actual 1200px JPEG exports, not decorative preview overlays. Sample details are explicitly identified in the editor. Existing uploaded/approved artwork remains immutable; no order, price, approval or retention contract changed.
+
+Collection cards use larger artwork, complementary backgrounds and one padded copy/action area. Detached bottom-edge product links and unnecessary card borders are removed. Phone layouts inspected at 320px and 390px. Original letter/number learning content remains easy to recognise.
+
+Verification: 218 automated tests pass; public and SSR builds pass; the browser export fixture validates 66 baseline JPEGs, decodes 10 QR examples across all colour choices, and verifies both optional business/information logos appear in the rendered output. Independent review identified an information-logo omission; fixed and covered by the export fixture. Physical print/scan acceptance remains open. This section records local verification; the deployment result is recorded in Founders Hub once verified.
