@@ -1,4 +1,5 @@
 import {defaultPricing,canPurchase} from './content/model.mjs';
+import {ARTWORK_LIMITS,ORDER_LIMITS} from './artwork-policy.mjs';
 export const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
 export function photoPrice(qty,pricing=defaultPricing){
   if(!Number.isInteger(qty)||qty<0) throw new Error('Choose a whole number of magnets.');
@@ -26,6 +27,26 @@ export function puzzleRects(r,gridSize=3){
  if(![3,5].includes(gridSize))throw new Error('Choose a 3 × 3 or 5 × 5 grid.');
  if(Math.abs(r.sw-r.sh)>0.001)throw new Error('Puzzle crops must be square.');
  return Array.from({length:gridSize*gridSize},(_,i)=>({sx:r.sx+(i%gridSize)*r.sw/gridSize,sy:r.sy+Math.floor(i/gridSize)*r.sh/gridSize,sw:r.sw/gridSize,sh:r.sh/gridSize}));
+}
+
+// Assess original pixels before canvas resampling. Every tile prints at 7.5 cm.
+export function cropQuality(photo){
+ if(!photo||![photo.w,photo.h].every(n=>Number.isFinite(n)&&n>0))return {level:'unknown',pixels:null,ppi:null};
+ const rotated=(photo.rotation||0)%180!==0;
+ const crop=cropRect(rotated?photo.h:photo.w,rotated?photo.w:photo.h,1,1,photo.zoom,photo.x,photo.y);
+ const grid=photo.format==='puzzle'?(photo.gridSize||3):1;
+ const pixels=Math.min(crop.sw,crop.sh)/grid,ppi=pixels/(7.5/2.54);
+ return {level:ppi<150?'low':ppi<300?'soft':'good',pixels:Math.floor(pixels),ppi:Math.floor(ppi)};
+}
+
+export function orderCapacity(items,content){
+ const magnets=summarize(items,content).magnetQty;
+ const files=items.reduce((n,item)=>n+(item.kind==='photo'?1:item.kind==='puzzle'?(item.gridSize||3)**2+1:0),0);
+ const issues=[];
+ if(magnets>ORDER_LIMITS.magnets)issues.push(`Remove ${magnets-ORDER_LIMITS.magnets} ${magnets-ORDER_LIMITS.magnets===1?'magnet':'magnets'} or reduce copies to stay within ${ORDER_LIMITS.magnets} magnets per order.`);
+ if(items.length>ORDER_LIMITS.entries)issues.push(`Keep up to ${ORDER_LIMITS.entries} designs or collection entries per order.`);
+ if(files>ARTWORK_LIMITS.files)issues.push(`These designs need ${files} artwork files. Keep up to ${ARTWORK_LIMITS.files}; use fewer puzzle designs or a smaller puzzle grid.`);
+ return {magnets,files,entries:items.length,issues,allowed:issues.length===0};
 }
 
 // Personalised magnets share bundle pricing, including every square puzzle piece.

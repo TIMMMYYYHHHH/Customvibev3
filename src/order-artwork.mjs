@@ -1,4 +1,5 @@
 import {ARTWORK_LIMITS as limits} from './artwork-policy.mjs';
+import {orderCapacity} from './commerce.mjs';
 // Build only in memory. Only the customer's chosen crop is sent, with no original metadata.
 function printJpeg(data){
  const binary=atob(data),parts=[binary.slice(0,2)];let at=2;
@@ -8,7 +9,8 @@ function printJpeg(data){
  }
  throw new Error('A design could not be prepared.');
 }
-export async function prepareOrderItems(basket,photos,render,privateArtwork=false){
+export async function prepareOrderItems(basket,photos,render,privateArtwork=false,content){
+ const capacity=orderCapacity(basket,content);if(!capacity.allowed)throw new Error(capacity.issues.join(' '));
  const items=[],uploads=[];let length=0,count=0;
  for(const item of basket){
   const files=[];
@@ -23,4 +25,4 @@ export async function prepareOrderItems(basket,photos,render,privateArtwork=fals
  return privateArtwork?{items,uploads}:items;
 }
 
-export const preparePrivateArtwork=(basket,photos,render)=>prepareOrderItems(basket,photos,render,true);
+export const preparePrivateArtwork=(basket,photos,render,content)=>prepareOrderItems(basket,photos,render,true,content);

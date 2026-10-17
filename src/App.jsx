@@ -83,7 +83,7 @@ function AppContent({initialPage}){
 
  {storefront&&<Storefront page={page} onAddPack={addPack} basketCount={sum.magnetQty}/>}
  {!orderLocked&&['studio','puzzle'].includes(page)&&<Editor {...{studio,dispatchStudio,photos,setPhotos,basket,setBasket,go,notify}}/>}
- {(!collectionBusy||basket.length>0)&&!collectionError&&!orderLocked&&page==='basket'&&<CollectionReview basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
+ {(!collectionBusy||basket.length>0)&&!collectionError&&!orderLocked&&page==='basket'&&<CollectionReview photos={photos} basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
  {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout photos={photos} basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft} onStartNew={startNewRequest}/>}
  {page==='help'&&<HelpPage/>}
  {page==='contact'&&<ContactPage/>}
