@@ -31,5 +31,5 @@ export default {async fetch(request,env){let phase='admin_request';try{const url
  if(url.pathname.startsWith('/api/')||url.pathname.startsWith('/internal/')||url.pathname.includes('..')||/\.(?:map|sql|log|bak)$/.test(url.pathname))return reply(new Response('Not found',{status:404}));
  if(!['GET','HEAD'].includes(request.method))return reply(new Response('Method not allowed',{status:405}));
  phase='admin_assets';
- const target={'/themes':'/themes.html','/preview':'/preview.html','/artwork':'/','/orders':'/','/content':'/'}[url.pathname];return reply(await env.ASSETS.fetch(target?new Request(url.origin+target,request):request));
+ const target={'/artwork':'/','/orders':'/','/content':'/'}[url.pathname];return reply(await env.ASSETS.fetch(target?new Request(url.origin+target,request):request));
  }catch(error){reportUnavailable(phase,error);return secure(unavailable(),{admin:true})}}};
