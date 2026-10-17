@@ -1,3 +1,17 @@
+# Hand grip, square corners and viewport-fit correction
+
+17 October 2026. Final result: passed locally.
+
+The owner identified three defects after the worktable release: every finger behind the held magnet, a fixed 3:2 canvas causing desktop scrolling, and 6% CSS corner clipping. Those supersede the previous visual acceptance below.
+
+The scene is now a 1920 x 1080 image with the supplied sunglasses magnet composited into a physical grip. Left fingertip/thumb and right thumb overlap its edges with contact shadows. The held image is an image-generated rendition, not pixel-identical product photography. The other three magnets remain original cutout images with border-radius: 0. The desktop hero uses viewport height, with typography scaled to available height; phone layouts retain normal document flow and accessible content.
+
+Built-in image generation edited the existing tabletop scene with the original sunglasses product as a supporting image: preserve the couple/photo, place a thin sharp-cornered square magnet in a natural grip with visible finger overlap, keep ribbon/tissue/heart and blank upper/right areas, output a 16:9 photo with no UI or text. Source and full prompt: project output/coming-soon-assets/worktable-held-v2.png and worktable-held-v2-prompt.txt. Production: public/coming-soon/worktable-held-v2.webp.
+
+Measured document and viewport sizes match at 1920 x 1080 and 1280 x 720, with no horizontal or vertical overflow. The three overlay wrappers all compute to 0px radius. At 390 x 844 the page also fits without horizontal overflow. Images load and the password dialog still opens and closes. Storefront build and 17 focused authentication/presentation tests pass. Screenshot evidence: project output/coming-soon-implementation/grip-1920.jpg and grip-1280.jpg. Deployment workflow repeats the full suite and protection checks.
+
+---
+
 # Coming soon worktable correction
 
 Date: 17 October 2026

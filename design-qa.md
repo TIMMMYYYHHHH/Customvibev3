@@ -1,3 +1,11 @@
+# Coming soon hand grip and 16:9 correction
+
+Final result: passed. 17 October 2026.
+
+Addressed the owner-reported pasted grip, scrolling and rounded corners. The hand-held magnet is now part of a realistic photographic grip with foreground finger overlap. Three original product overlays have square corners. Measured no page overflow at 1920 x 1080, 1280 x 720 and 390 x 844; natural mobile document flow remains available. See docs/coming-soon/design-qa.md for provenance and verification. Earlier visual acceptance below is superseded by these corrections.
+
+---
+
 # Coming soon worktable design QA, 17 October 2026
 
 Final result: passed.
