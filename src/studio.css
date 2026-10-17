@@ -268,3 +268,12 @@
 .shop-shell .one-studio .studio-library>.studio-upload-guidance{display:block;flex-basis:100%;font-size:12px;line-height:1.5;margin:6px 0 12px;color:#594761}
 
 .order-capacity{scroll-margin-top:90px}.studio-upload-guidance a{color:#8f254b;text-decoration:underline;text-underline-offset:3px}.studio-upload-guidance a:focus-visible{outline:3px solid var(--berry);outline-offset:3px}
+.studio-inspector .studio-notes{border-top:1px solid #26133d25;padding-top:16px;margin-top:20px}
+.studio-notes summary{cursor:pointer;font-size:14px;font-weight:700;min-height:44px;align-content:center}
+.studio-notes summary span{font-size:12px;font-weight:400;margin-left:8px;color:#665371}
+.studio-notes summary:focus-visible{outline:3px solid #ae2e5b;outline-offset:3px}
+.studio-notes .order-notes{margin:8px 0 0;max-width:none}
+.shop-shell .studio-notes .order-notes label{font-size:14px;margin-bottom:8px}
+.shop-shell .studio-notes .order-notes p{font-size:13px;line-height:1.5;margin:0 0 12px}
+.studio-notes .order-notes textarea{font-size:14px;min-height:112px;padding:12px}
+.studio-notes .order-notes small{font-size:11px}

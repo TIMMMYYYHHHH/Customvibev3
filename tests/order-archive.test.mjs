@@ -11,3 +11,10 @@ test('archive supports later design numbers while rejecting unsafe filenames',as
  const names=JSON.parse(execFileSync('python3',['-c','import io,sys,zipfile,json;z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()));print(json.dumps(z.namelist()))'],{input:Buffer.from(data)}));assert.ok(names.includes('design-101-photo.jpg'));
  for(const name of ['../design-101-photo.jpg','design-101/../../photo.jpg','design-101-photo.html']){large.snapshot.items[0].files[0].name=name;await assert.rejects(downloadOrderArchive(large,async()=>{throw Error('Must not fetch unsafe path')}),/Invalid artwork list/);}
 });
+
+test('approved archive prints each letter using its final proof quantity',async()=>{
+ const letters={reference:'CV-000003',snapshot:{approvalRequired:true,magnetQty:6,items:[]},proof:{revision:2,status:'approved',digest:'abc',items:[{kind:'alphabet',name:'Alphabet · A × 2, B',qty:2,files:[{index:0,name:'design-01-alphabet-1.jpg',size:3,copies:4},{index:1,name:'design-01-alphabet-2.jpg',size:3,copies:2}]}]}};
+ const zip=await downloadOrderArchive(letters,async()=>new Response(new Uint8Array([1,2,3]),{headers:{'Content-Type':'image/jpeg'}}));
+ const instructions=execFileSync('python3',['-c','import io,sys,zipfile;print(zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())).read("print-instructions.txt").decode())'],{input:Buffer.from(zip)}).toString();
+ assert.match(instructions,/design-01-alphabet-1.jpg - Print 4 copies/);assert.match(instructions,/design-01-alphabet-2.jpg - Print 2 copies/);
+});

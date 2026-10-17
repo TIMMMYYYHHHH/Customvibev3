@@ -33,7 +33,7 @@ export function validateOrder(x,catalogue,privateArtwork=false){
   const expected=item.kind==='photo'?1:item.kind==='puzzle'?gridSize**2+1:contract.designMode==='assisted'?(contract.hasReference?1:0):isTemplateProduct(product)?1:selectedPrintManifest(product,contract.designIds)?.designs.length||0;
   if(!Array.isArray(item.files)||item.files.length!==expected)invalid();
   const files=item.files.map((f,i)=>{fileCount++;if(privateArtwork){if(!plain(f)||!Number.isSafeInteger(f.size)||f.size<20||f.size>limits.fileBytes||!artworkHash(f.sha256))invalid();totalBytes+=f.size;if(totalBytes>limits.requestBytes||fileCount>limits.files)invalid();return {size:f.size,sha256:f.sha256}}totalBytes+=typeof f==='string'?f.length:0;if(totalBytes>2000000||fileCount>60)invalid();return jpeg(f,item.kind==='puzzle'&&i===0)});
-  return {...contract,kind:item.kind,name:collectionItemName(product,contract),qty:item.qty,faceCount:item.kind==='puzzle'?gridSize**2:productMagnetCount(product,contract),...(gridSize?{gridSize}:{}),files};
+  return {...contract,kind:item.kind,name:collectionItemName(product,contract),qty:item.qty,faceCount:item.kind==='puzzle'?gridSize**2:contract.designIds?contract.designIds.length:productMagnetCount(product,contract),...(gridSize?{gridSize}:{}),files};
  });
  const sum=summarize(items,catalogue);if(sum.unpriced||!Number.isSafeInteger(sum.magnetQty)||!Number.isSafeInteger(sum.knownCents)||sum.knownCents<=0)invalid();
  // Allocate the shared personalised bundle total proportionally, rounding cumulative cents.

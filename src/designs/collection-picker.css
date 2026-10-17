@@ -34,3 +34,11 @@
  .storefront .shared-product-dialog.collection-select-dialog[open]{padding:56px 18px 22px}
  .shop-shell .section.collection-select-page{padding:16px 0 40px}
 }
+.collection-picker .design-gallery:has(.design-quantity){grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:20px 12px}
+.collection-picker .design-quantity{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;border:1px solid #b9aebf;border-radius:8px;overflow:hidden;background:#fffdf8}
+.collection-picker .design-quantity button{border:0;background:transparent;color:#29143d;font:500 22px/1 sans-serif;min-width:0;min-height:44px;padding:0;cursor:pointer}
+.collection-picker .design-quantity button:disabled{opacity:.3;cursor:default}
+.collection-picker .design-quantity input{appearance:textfield;min-width:0;width:100%;box-sizing:border-box;text-align:center;padding:8px 0;border:0;border-radius:0;background:transparent;color:#29143d;font:650 16px/1.4 'DM Sans Variable',sans-serif}
+.collection-picker .design-quantity input::-webkit-inner-spin-button,.collection-picker .design-quantity input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.collection-picker .design-quantity:focus-within{outline:2px solid #ae2e5b;outline-offset:2px}
+@media(pointer:coarse){.collection-picker .design-quantity{grid-template-columns:44px minmax(0,1fr) 44px}}

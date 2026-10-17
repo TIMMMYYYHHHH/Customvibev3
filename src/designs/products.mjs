@@ -2,7 +2,7 @@ import {collectionDesigns,packIds} from './catalogue.mjs';
 export const practicalIds=['business','qr','wifi','information'];
 export const isTemplateProduct=p=>!!p&&practicalIds.includes(p.id);
 export const isSelectableCollection=p=>!!p&&['alphabet','counting'].includes(p.id)&&!!printManifest(p);
-export const productMagnetCount=(p,item)=>item?.designIds!==undefined?selectedPrintManifest(p,item.designIds).designs.length:isTemplateProduct(p)?1:p?.count||1;
+export const productMagnetCount=(p,item)=>item?.designIds!==undefined?selectionQuantities(p,item.designIds,item.designQuantities).reduce((n,q)=>n+q,0):isTemplateProduct(p)?1:p?.count||1;
 export function printManifest(p){
  if(!p||p.pricingMode!=='per-magnet'||p.printVersion!==1)return null;
  const designs=collectionDesigns(p.id);
@@ -21,10 +21,20 @@ export function selectedPrintManifest(product,designIds){
  if(designs.some(d=>!d))throw Error('Choose valid letters or numbers.');
  return {...manifest,designs};
 }
-export function selectionLabel(product,designIds){return designIds===undefined?'':selectedPrintManifest(product,designIds).designs.map(d=>d.values.title??d.values.number).join(', ');}
-export function collectionItemName(product,item){const label=selectionLabel(product,item?.designIds);return product.name+(label?' · '+label:'');}
+export function selectionQuantities(product,designIds,quantities){
+ const manifest=selectedPrintManifest(product,designIds);
+ if(quantities===undefined)return manifest.designs.map(()=>1);
+ if(designIds===undefined||!Array.isArray(quantities)||quantities.length!==manifest.designs.length||quantities.some(q=>!Number.isSafeInteger(q)||q<1)||!Number.isSafeInteger(quantities.reduce((n,q)=>n+q,0)))throw Error('Choose a valid quantity for every letter or number.');
+ return quantities;
+}
+export function selectionLabel(product,designIds,quantities){
+ if(designIds===undefined)return '';
+ const counts=selectionQuantities(product,designIds,quantities);
+ return selectedPrintManifest(product,designIds).designs.map((d,i)=>(d.values.title??d.values.number)+(counts[i]>1?` × ${counts[i]}`:'')).join(', ');
+}
+export function collectionItemName(product,item){const label=selectionLabel(product,item?.designIds,item?.designQuantities);return product.name+(label?' · '+label:'');}
 export function mergeCollectionItem(basket,incoming,editingId){
- const same=i=>i.kind===incoming.kind&&JSON.stringify(i.designIds)===JSON.stringify(incoming.designIds);
+ const same=i=>i.kind===incoming.kind&&JSON.stringify(i.designIds)===JSON.stringify(incoming.designIds)&&JSON.stringify(i.designQuantities||i.designIds?.map(()=>1))===JSON.stringify(incoming.designQuantities||incoming.designIds?.map(()=>1));
  const remaining=basket.filter(i=>i.id!==editingId),matches=remaining.filter(same);
  if(!matches.length)return editingId?basket.map(i=>i.id===editingId?incoming:i):[...basket,incoming];
  const qty=incoming.qty+matches.reduce((total,i)=>total+i.qty,0);

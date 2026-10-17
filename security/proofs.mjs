@@ -14,7 +14,7 @@ function mapFiles(snapshot,requestId,files,selection,reusable=[]){
   const f=reusable[n];if(!f||choice?.requestId!==f.requestId||choice?.index!==f.index)throw Error('Only unchanged artwork from this design position can be reused.');return f;
  });
  if(used.size!==files.length)throw Error('Every uploaded file must belong to the final design.');
- let at=0;return snapshot.items.map((item,n)=>({id:item.id||`item-${n+1}`,name:item.name,kind:item.kind,qty:item.qty,...(item.gridSize?{gridSize:item.gridSize}:{}),files:expected.filter(e=>e.itemId===(item.id||`item-${n+1}`)).map(()=>resolved[at++])}));
+ let at=0;return snapshot.items.map((item,n)=>({id:item.id||`item-${n+1}`,name:item.name,kind:item.kind,qty:item.qty,...(item.gridSize?{gridSize:item.gridSize}:{}),files:expected.filter(e=>e.itemId===(item.id||`item-${n+1}`)).map(row=>({...resolved[at++],copies:row.copies}))}));
 }
 async function session(env,id){if(!artworkHash(id))return null;return env.DB.prepare('SELECT s.*,p.digest,p.status,o.expires AS order_expires FROM proof_sessions s JOIN proof_state p ON p.order_id=s.order_id AND p.revision=s.revision AND p.token_hash=s.token_hash JOIN orders o ON o.id=s.order_id WHERE s.id=? AND s.expires>? AND o.expires>?').bind(id,now(),now()).first();}
 export async function proofService(request,env){
@@ -28,7 +28,7 @@ export async function proofService(request,env){
  if(['read','download','approve','changes'].includes(action)){
   const s=await session(env,b.sessionId);if(!s)return fail(403,'This review session is invalid or expired. Reopen your latest review link.');
   const revision=await env.DB.prepare('SELECT manifest FROM proof_revisions WHERE order_id=? AND revision=?').bind(s.order_id,s.revision).first();const items=JSON.parse(revision.manifest);
-  if(action==='read'){await env.DB.prepare('UPDATE proof_sessions SET viewed_digest=? WHERE id=?').bind(s.digest,b.sessionId).run();return Response.json({revision:s.revision,digest:s.digest,status:s.status,expires:s.order_expires,items:items.map(i=>({name:i.name,qty:i.qty,kind:i.kind,gridSize:i.gridSize,files:i.files.map(f=>({slot:items.flatMap(i=>i.files).findIndex(x=>x===f),proof:f.proof,name:f.name}))}))});}
+  if(action==='read'){await env.DB.prepare('UPDATE proof_sessions SET viewed_digest=? WHERE id=?').bind(s.digest,b.sessionId).run();return Response.json({revision:s.revision,digest:s.digest,status:s.status,expires:s.order_expires,items:items.map(i=>({name:i.name,qty:i.qty,kind:i.kind,gridSize:i.gridSize,files:i.files.map(f=>({slot:items.flatMap(i=>i.files).findIndex(x=>x===f),proof:f.proof,name:f.name,copies:f.copies??i.qty}))}))});}
   if(action==='download'){const files=items.flatMap(i=>i.files),f=Number.isSafeInteger(b.slot)&&files[b.slot];if(!f)return fail(404,'Image not found.');return callArtwork(env,'download',{id:f.requestId,index:f.index});}
   if(b.revision!==s.revision||b.digest!==s.digest||s.viewed_digest!==s.digest)return fail(409,'Open and review the current design before responding.');
   if(action==='approve'&&s.status==='approved')return Response.json({ok:true});

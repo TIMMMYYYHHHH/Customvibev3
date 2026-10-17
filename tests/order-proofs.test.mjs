@@ -24,3 +24,28 @@ test('file-free custom fixed pack can receive all final faces for approval',asyn
  const {env,id}=await setupProof();const snapshot=JSON.parse(env.sql.prepare('SELECT snapshot FROM orders WHERE id=?').get(id).snapshot);snapshot.items=[{id:'item-1',kind:'custom-pack',name:'Custom',qty:1,faceCount:4,files:[]}];env.sql.prepare('UPDATE orders SET snapshot=? WHERE id=?').run(JSON.stringify(snapshot),id);
  const m=await manifest(),files=Array.from({length:4},(_,i)=>({...m.files[0],name:`design-01-face-${i+1}.jpg`})),args={id,version:0,requestId:m.id,owner:m.owner,files};assert.equal((await call(env,'proofs/prepare',args)).status,200);env.sql.prepare('UPDATE artwork_requests SET finalized=1 WHERE id=?').run(m.id);assert.equal((await call(env,'proofs/publish',args)).status,200);assert.equal((await(await call(env,'proofs/detail',{id})).json()).items[0].files.length,4);
 });
+
+test('per-face quantities survive seeded and replacement proofs without multiplying file slots',async()=>{
+ const {env,id}=await setupProof(),m=await manifest();
+ const originals=Array.from({length:2},(_,i)=>({...m.files[0],name:`design-01-alphabet-${i+1}.jpg`}));
+ env.sql.prepare('UPDATE artwork_requests SET manifest=? WHERE id=?').run(JSON.stringify(originals),id);
+ const snapshot=JSON.parse(env.sql.prepare('SELECT snapshot FROM orders WHERE id=?').get(id).snapshot);
+ snapshot.items=[{id:'item-1',kind:'alphabet',name:'Alphabet · A × 2, B',qty:3,faceCount:2,designIds:['alphabet-1','alphabet-2'],designQuantities:[2,1],files:originals.map((f,index)=>({...f,index}))}];snapshot.magnetQty=9;
+ env.sql.prepare('UPDATE orders SET snapshot=? WHERE id=?').run(JSON.stringify(snapshot),id);
+ assert.equal((await call(env,'proofs/seed',{id,version:0})).status,200);
+ let detail=await(await call(env,'proofs/detail',{id})).json();assert.deepEqual(detail.items[0].files.map(f=>f.copies),[6,3]);
+ await call(env,'proofs/issue',{id,version:1,tokenHash:'b'.repeat(64)});await call(env,'proofs/exchange',{tokenHash:'b'.repeat(64),sessionId:'c'.repeat(64)});
+ const review=await(await call(env,'proofs/read',{sessionId:'c'.repeat(64)})).json();assert.deepEqual(review.items[0].files.map(f=>f.copies),[6,3]);
+ const files=[{...m.files[0],name:originals[0].name}],args={id,version:2,requestId:m.id,owner:m.owner,files,selection:[{upload:0},{requestId:id,index:1}]};
+ assert.equal((await call(env,'proofs/prepare',args)).status,200);env.sql.prepare('UPDATE artwork_requests SET finalized=1 WHERE id=?').run(m.id);assert.equal((await call(env,'proofs/publish',args)).status,200);
+ detail=await(await call(env,'proofs/detail',{id})).json();assert.deepEqual(detail.items[0].files.map(f=>f.copies),[6,3]);assert.equal(detail.items[0].files.length,2);
+});
+
+test('all alphabet quantities fit the saved-order name contract',async()=>{
+ const {env}=await setupProof();
+ const {defaultContent}=await import('../src/content/model.mjs'),{validateOrder}=await import('../server/submission-model.mjs'),{orderRecord}=await import('../server/order-record.mjs');
+ const content=structuredClone(defaultContent);content.products.forEach(p=>p.status='available');
+ const id=crypto.randomUUID(),item={id:crypto.randomUUID(),kind:'alphabet',qty:1,printVersion:1,designIds:Array.from({length:26},(_,i)=>`alphabet-${i+1}`),designQuantities:[10,...Array(25).fill(2)],files:Array(26).fill({size:2000,sha256:'a'.repeat(64)})};
+ const order=validateOrder({id,createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'test@example.com',phone:'0123456789'},locker:{name:'Locker',area:'Durban'},consent:true,items:[item]},content,true),snapshot=orderRecord(order,false);
+ assert.ok(snapshot.items[0].name.length>200);assert.equal((await call(env,'orders/create',{id,fingerprint:'b'.repeat(64),snapshot,privateArtwork:false})).status,200);
+});

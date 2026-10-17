@@ -35,3 +35,24 @@ test('editing into an existing selection merges copies and later adds exactly on
  const added=mergeCollectionItem(edited,{...a,id:'c'});assert.equal(added.length,1);assert.equal(added[0].qty,3);
  const full={...a,id:'full'};delete full.designIds;assert.equal(mergeCollectionItem(added,full).length,2);
 });
+
+test('different quantities per letter price all copies but upload each face only once',()=>{
+ const item={...chosen,designQuantities:[2,1,3]};
+ const order=validateOrder(payload([item]),content,true),record=orderRecord(order,true);
+ assert.equal(order.magnetQty,12);assert.equal(order.subtotalCents,48000);
+ assert.equal(order.items[0].faceCount,3);assert.equal(orderCapacity([item],content).files,3);
+ assert.deepEqual(record.items[0].designQuantities,[2,1,3]);
+ assert.match(record.items[0].name,/A × 2, C, Z × 3/);
+ assert.deepEqual(proofRows(record).map(r=>r.copies),[4,2,6]);
+});
+test('per-letter quantities reject malformed, mismatched and unsafe counts',()=>{
+ for(const designQuantities of [[],[2],[0,1,1],[-1,1,1],[1.5,1,1],['2',1,1],null,{},[Number.MAX_SAFE_INTEGER,1,1]])assert.throws(()=>validateOrder(payload([{...chosen,designQuantities}]),content,true));
+ assert.throws(()=>validateOrder(payload([{...chosen,designIds:undefined,designQuantities:[2],files:Array(26).fill(file)}]),content,true));
+});
+test('selections with different per-letter quantities stay distinct when adding or editing',async()=>{
+ const {mergeCollectionItem}=await import('../src/designs/products.mjs');
+ const a={...chosen,qty:1,designQuantities:[2,1,1]},b={...chosen,id:'b',qty:1,designQuantities:[1,2,1]};
+ assert.equal(mergeCollectionItem([a],b).length,2);
+ const merged=mergeCollectionItem([a,b],{...b,designQuantities:[2,1,1]},'b');
+ assert.equal(merged.length,1);assert.equal(merged[0].qty,2);
+});

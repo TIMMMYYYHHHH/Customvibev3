@@ -6,6 +6,6 @@ test('practical collections are inspiration and retired designer links lead to t
  const content=structuredClone(defaultContent);content.products.forEach(p=>p.status='available');
  for(const kind of ['business','qr','wifi','information']){
   const idea=renderDocument(template,'/products/'+kind,content,'testnonce');assert.equal(idea.status,200);assert.match(idea.html,/Inspiration/);assert.match(idea.html,/Open the studio/);assert.doesNotMatch(idea.html,/Choose your design option|Design it for me/);
-  const retired=renderDocument(template,'/design/'+kind,content,'testnonce');assert.equal(retired.status,200);assert.match(retired.html,/Notes or instructions for us/);assert.doesNotMatch(retired.html,/Design it for me|Business and contact details/);
+  const retired=renderDocument(template,'/design/'+kind,content,'testnonce');assert.equal(retired.status,200);assert.match(retired.html,/Notes for our team/);assert.doesNotMatch(retired.html,/Design it for me|Business and contact details/);
  }
 });

@@ -1,5 +1,5 @@
 import ProofReview from './ProofReview';
-import {isTemplateProduct,isSelectableCollection,selectedPrintManifest,collectionItemName,mergeCollectionItem} from './designs/products.mjs';
+import {isTemplateProduct,isSelectableCollection,selectedPrintManifest,selectionQuantities,productMagnetCount,collectionItemName,mergeCollectionItem} from './designs/products.mjs';
 import React,{useEffect,useLayoutEffect,useState,useRef,useReducer} from 'react';
 import {Bag,Plus,Minus,X,Check,Trash,ArrowLeft} from '@phosphor-icons/react';
 import './fonts.css';
@@ -75,12 +75,14 @@ function AppContent({initialPage}){
  function notify(message){setToast(message);clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),4500);}
  function changeQuantity(item,delta){setBasket(b=>b.map(x=>x.id===item.id?{...x,qty:x.qty+delta}:x));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.map(p=>p.id===(item.sourceId||item.id)?{...p,qty:item.qty+delta}:p));}
  function removeItem(item){setBasket(b=>b.filter(x=>x.id!==item.id));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.filter(p=>p.id!==(item.sourceId||item.id))); }
- function addPack(kind,chosenIds){
+ function addPack(kind,chosenIds,chosenQuantities){
   if(orderLocked){notify('Your current order is saved. Return to checkout to view its status.');return;}
   const pack=PACKS[kind];if(!canPurchase(pack)){notify('This collection is not available yet.');return;}
   if(isTemplateProduct(pack)){go('studio');return;}
-  const manifest=selectedPrintManifest(pack,chosenIds),designIds=chosenIds&&chosenIds.length!==pack.count?manifest.designs.map(d=>d.id):undefined;
-  const selection={...(designIds?{designIds}:{}),count:designIds?.length||pack.count};
+  const manifest=selectedPrintManifest(pack,chosenIds),quantities=manifest?selectionQuantities(pack,chosenIds,chosenQuantities):[];
+  const designIds=chosenIds&&(chosenIds.length!==pack.count||quantities.some(q=>q!==1))?manifest.designs.map(d=>d.id):undefined;
+  const selection={...(designIds?{designIds,...(quantities.some(q=>q!==1)?{designQuantities:quantities}:{})}:{})};
+  selection.count=productMagnetCount(pack,selection);
   const editing=editingPack?.kind===kind?editingPack:null;
   const incoming={id:editing?.id||crypto.randomUUID(),kind,name:collectionItemName(pack,selection),qty:editing?.qty||1,preview:pack.image,printVersion:pack.printVersion,...selection};
   setBasket(b=>mergeCollectionItem(b,incoming,editing?.id));
