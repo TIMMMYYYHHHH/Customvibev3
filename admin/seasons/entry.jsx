@@ -1,0 +1,10 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {flushSync} from 'react-dom';
+import '../../src/fonts.css';
+import './admin.css';
+import {AdminChrome} from '../AdminShell.jsx';
+import {logout} from '../logout.mjs';
+import '../workroom.css';
+flushSync(()=>createRoot(document.getElementById('admin-chrome')).render(<AdminChrome section="themes" logout={logout} connectionStatus/>));
+await import('./admin.mjs');

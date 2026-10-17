@@ -1,0 +1,73 @@
+/* Shared admin presentation. Keep page-specific layouts in their own stylesheets. */
+.cv-admin.admin-workroom{--ink:#35233f;--berry:#8c2754;--line:#ded7de;--paper:#fffdf8;--workroom-bg:#f5f2ee;--control-bg:#eeeae6;--control-hover:#e2ddd8;--control-radius:8px;--display:'Fredoka Variable',sans-serif;--body:'DM Sans Variable',sans-serif;background:var(--workroom-bg);font:15px/1.5 var(--body);color:var(--ink);font-synthesis:none}
+.admin-workroom .cv-admin-header{padding:22px 40px;gap:40px;background:var(--workroom-bg);border-bottom:1px solid var(--line)}
+.admin-workroom .cv-admin-brand{font:700 31px/1 var(--display);letter-spacing:-.8px;color:var(--ink)!important}
+.admin-workroom .cv-admin-brand span{font:600 9px/1 var(--body);letter-spacing:2.2px;margin-top:8px}
+.admin-workroom .cv-admin-header nav a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;font:600 15px/1.5 var(--body);border:0;border-radius:var(--control-radius);box-shadow:none;background:transparent}
+.admin-workroom .cv-admin-header nav a:hover{background:var(--control-bg);color:var(--ink)}
+.admin-workroom .cv-admin-header nav a[aria-current]{background:var(--ink);color:#fff}
+.admin-workroom .cv-test-strip{padding:9px 40px;gap:10px;background:#e8f1eb;font:400 12px/1.5 var(--body);min-height:36px;flex-wrap:wrap}
+.admin-workroom .cv-test-strip .cv-store-policy{margin-left:auto}
+.admin-workroom #connection-status{margin:0;padding-left:12px;border-left:1px solid #b9c9be}
+.admin-workroom :is(.cv-orders,.section.admin-page,.workspace,.artwork-page){width:100%;max-width:1600px;margin:0 auto;padding:32px 40px 64px}
+.admin-workroom :is(.cv-board-heading,.admin-heading,.page-heading){margin:0 0 24px;gap:24px;align-items:flex-start}
+.cv-admin.admin-workroom #admin-main h1{font:700 clamp(32px,3.5vw,46px)/1.12 var(--display);letter-spacing:-.025em;margin:0 0 12px}
+.admin-workroom :is(.cv-board-heading,.admin-heading,.page-heading) p{font:400 15px/1.5 var(--body);color:#6e6075;margin:0;max-width:none}
+.admin-workroom :is(h2,h3){font-family:var(--display)}
+.admin-workroom :is(.cv-btn,.button){min-height:44px;padding:10px 16px;border:0;border-radius:var(--control-radius);font:600 14px/1.5 var(--body);box-shadow:none}
+.admin-workroom :is(.cv-btn,.button):hover{box-shadow:none}
+.admin-workroom :is(.cv-btn.secondary,.button.secondary),.admin-workroom.cv-seasons .button{background:var(--control-bg);color:var(--ink)}
+.admin-workroom :is(.cv-btn.secondary,.button.secondary):not(:disabled):hover,.admin-workroom.cv-seasons .button:not(:disabled):hover{background:var(--control-hover);filter:none}
+.admin-workroom :is(.cv-btn.quiet,.text-button){background:transparent;color:var(--ink)}
+.admin-workroom.cv-seasons .button.primary{background:var(--berry);color:#fff}
+.admin-workroom.cv-seasons .button.primary:not(:disabled):hover{background:#732045}
+.admin-workroom.cv-seasons .button.danger{background:var(--ink);color:#fff}
+.admin-workroom :is(.admin-tabs,.page-tabs){display:flex;flex-wrap:wrap;gap:8px}
+.admin-workroom :is(.admin-tabs,.page-tabs) button{min-height:44px;padding:10px 16px;border:0;border-radius:var(--control-radius);background:var(--control-bg);font:600 14px/1.5 var(--body);color:var(--ink);box-shadow:none}
+.admin-workroom :is(.admin-tabs,.page-tabs) button:hover{background:var(--control-hover)}
+.admin-workroom :is(.admin-tabs button[aria-pressed=true],.page-tabs button[aria-current]){background:var(--ink);color:#fff}
+.admin-workroom :is(.cv-stage-trigger,.demo-select-trigger){min-height:44px;padding:10px 16px;gap:24px;border:0;border-radius:var(--control-radius);background:var(--control-bg);color:var(--ink);font:400 14px/1.5 var(--body);box-shadow:none}
+.admin-workroom :is(.cv-stage-options,.demo-select-options){border:1px solid var(--line);border-radius:var(--control-radius);background:#fffdf8;box-shadow:none;font:400 14px/1.5 var(--body)}
+.admin-workroom :is(.cv-stage-options,.demo-select-options) li{font-size:14px}
+.admin-workroom .demo-select-options li[aria-selected=true]{background:var(--ink);color:white}
+.admin-workroom :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea){border:1px solid #b8a9b9;border-radius:var(--control-radius);background:var(--paper);font:400 15px/1.4 var(--body);min-height:44px;padding:10px 14px}
+.admin-workroom :focus-visible{outline:3px solid var(--berry);outline-offset:3px}
+.admin-workroom :is(.admin-product-form,.admin-savebar){box-shadow:none}
+.admin-workroom .admin-savebar{background:var(--workroom-bg)}
+.admin-workroom.cv-seasons p{margin-bottom:0}
+.admin-workroom.cv-seasons .occasion-symbol.button{background:transparent;padding:3px}
+.admin-workroom.cv-seasons .icon-option.button{font-size:25px;padding:7px}
+.admin-workroom.cv-seasons .button.small{font-size:13px;padding:8px 12px}
+.admin-workroom.cv-seasons .tabs button{font-family:var(--body)}
+@media(max-width:1100px){.admin-workroom .cv-admin-header{gap:24px;padding-inline:24px}.admin-workroom .cv-test-strip{padding-inline:24px}.admin-workroom :is(.cv-orders,.section.admin-page,.workspace,.artwork-page){padding:30px 24px 56px}}
+@media(max-width:760px){
+ .admin-workroom .cv-admin-header{padding:18px 20px;gap:16px;flex-wrap:wrap}
+ .admin-workroom .cv-admin-brand{font-size:29px}
+ .admin-workroom .cv-admin-header>.cv-btn{margin-left:auto}
+ .admin-workroom .cv-admin-header nav{order:3;flex-basis:100%;gap:6px}
+ .admin-workroom .cv-admin-header nav a{flex:1;font-size:13px;padding:10px 8px;white-space:nowrap}
+ .admin-workroom .cv-test-strip{padding:10px 20px;gap:6px}
+ .admin-workroom .cv-test-strip .cv-store-policy{width:100%;margin:0}
+ .admin-workroom #connection-status{width:auto;padding:0;border:0}
+ .admin-workroom :is(.cv-orders,.section.admin-page,.workspace,.artwork-page){padding:28px 20px 48px}
+ .admin-workroom :is(.cv-board-heading,.admin-heading,.page-heading){align-items:start;gap:20px}
+ .admin-workroom :is(.admin-tabs,.page-tabs) button{padding:10px 12px;font-size:13px}
+}
+
+.cv-admin.admin-workroom .admin-save-state{background:transparent;padding:0;border:0;border-radius:0;font:400 12px/1.5 var(--body);color:#6e6075}
+
+/* Flat order surfaces: stage colour is a fill, never a matching outlined treatment. */
+.admin-workroom .cv-order-board{--card-line:#35233f1a}
+.admin-workroom .cv-order-board .cv-column{--card-line:#35233f1a}
+.admin-workroom .cv-order-board .cv-order-card footer span{color:var(--ink)}
+.admin-workroom .cv-order-board .cv-order-card footer{color:var(--ink)}
+.cv-admin.admin-workroom .cv-order-board :is(.cv-card-email,.cv-card-move):hover{background:#ffffff55}
+.admin-workroom .cv-print-qty{background:var(--control-bg);color:var(--ink);border:0;box-shadow:none}
+.admin-workroom .cv-file.is-proof,.admin-workroom .cv-file img{background:var(--control-bg)}
+.admin-workroom .cv-detail :is(.cv-file a,.cv-update-history){color:var(--ink)}
+.admin-workroom :is(.cv-btn,.button):disabled{background:var(--control-bg);color:#726973;opacity:1;box-shadow:none}
+
+.admin-workroom .occasion-recommendation{display:flex;flex-wrap:wrap;gap:2px 8px;margin:8px 0 0;font:400 12px/1.5 var(--body);color:#6e6075}
+.admin-workroom .occasion-recommendation strong{color:var(--ink);font-weight:600}
+.admin-workroom .occasion-recommendation span:last-child{flex-basis:100%}
+.admin-workroom #schedule-panel .occasion-recommendation{display:grid;gap:5px;margin:16px 0 24px;font-size:13px}
