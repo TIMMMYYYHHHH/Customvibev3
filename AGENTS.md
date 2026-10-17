@@ -10,3 +10,5 @@ Production checkout rule: only server-verified successful payment completes an o
 Brand spelling: use exactly CustomVibe in all current visible copy, wordmarks, email branding, sign-in screens, metadata and social artwork. Lowercase domain/email addresses and technical resource identifiers stay unchanged. Email headings and signoff must remain live text so forced dark mode cannot expose light image rectangles. Never claim Gmail phone rendering verified from a browser simulation.
 
 Payment-provider direction, 17 October 2026: the owner selected Yoco as the gateway to test. Account information and test-access readiness are tracked in Founders Hub under Required business information. This choice does not enable live payments or approve paid services; existing payment and email safeguards remain in force.
+
+Public form verification: use Turnstile interaction-only appearance with automatic execution. Keep token validation, hostname/action checks, CSRF and expiry/error handling intact; do not hide an interactive challenge with custom CSS or weaken verification to change its appearance.
