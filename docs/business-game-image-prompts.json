@@ -1,0 +1,17 @@
+[
+  {
+    "id": "game-sharp",
+    "prompt": "Edit this product concept. Change ONLY the outer corners of all ten square magnets to precise SHARP 90 degree square corners, like cut square photo magnets, with no radius whatsoever. Preserve five coral X magnets and five mint O magnets, arrangement, text, colours, symbols, dark thin backing and subtle satin finish. No board. No added objects. All front faces are flat squares with sharp corner intersections. Preserve the full set only wording and 7.5 x 7.5cm each.",
+    "generated": "Generated images are saved to /Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06 as /Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-2e45c307-2c01-4f35-afb9-511f34d000c0.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "game-x-master",
+    "prompt": "Using this approved concept as reference, create ONE individual print master of the coral X magnet face. Square 1:1 image. Artwork fills the entire canvas edge to edge. Coral red solid background with subtle paper texture; large perfectly centred warm cream X with the same chunky proportions and diagonal geometry as the reference. This is the FLAT PRINTED FACE only, not a product photograph. Exact square sharp 90 degree outer corners with no radius, no margin, no border, no white rim, no bevel, no shadow, no backing, no shine and no text. Preserve approved colours. Output one X design, not a grid or presentation.",
+    "generated": "Generated images are saved to /Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06 as /Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-d42decaa-5174-458a-a9f0-fcb37d462dd0.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "game-o-master",
+    "prompt": "Using this approved concept as reference, create ONE individual print master of the mint O magnet face. Square 1:1 image. Artwork fills entire canvas edge to edge. Soft mint green solid background with subtle paper texture; large perfectly centred dark plum circular O ring with same chunky proportions as reference. This is the FLAT PRINTED FACE only, not a product photograph. Exact square sharp 90 degree outer corners with no radius, no margin, no border, no white rim, no bevel, no shadow, no backing, no shine and no text. Preserve approved colours. Output one O design, not a grid or presentation.",
+    "generated": "Generated images are saved to /Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06 as /Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-a421beaf-f188-483f-9450-e70e1e9b34b5.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  }
+]

@@ -1,8 +1,9 @@
 import {validArtworkStyle} from './artwork.mjs';
 import {validateTemplate} from './templates.mjs';
-import {isTemplateProduct,printManifest,selectionQuantities} from './products.mjs';
+import {isTemplateProduct,isGameProduct,printManifest,selectionQuantities} from './products.mjs';
 const uuid=/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/;
 export function designContract(item,product){
+ if(isGameProduct(product)&&(item.style!==undefined||item.designIds!==undefined||item.designQuantities!==undefined))throw new Error('Noughts & crosses is available as a full set only.');
  if(item.style!==undefined&&(!validArtworkStyle(item.style)||!printManifest(product)))throw new Error('Choose a valid artwork style.');
  if(item.designIds!==undefined||item.designQuantities!==undefined)selectionQuantities(product,item.designIds,item.designQuantities);
  if(!isTemplateProduct(product)&&product.pricingMode!=='per-magnet')return {};

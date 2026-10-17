@@ -210,6 +210,22 @@
       "contents": "One personalised 7.5 cm square magnet",
       "pricingMode": "per-magnet",
       "printVersion": 1
+    },
+    {
+      "id": "noughts-crosses",
+      "name": "Noughts & crosses",
+      "group": "Learning & play",
+      "description": "Your next move, on the fridge.",
+      "details": "Five coral X magnets and five mint O magnets. Play together on a magnetic surface. No board included.",
+      "contents": "Full set only · 5 X magnets + 5 O magnets · 7.5 × 7.5 cm each",
+      "count": 10,
+      "status": "available",
+      "priceCents": null,
+      "pricingMode": "per-magnet",
+      "printVersion": 1,
+      "image": "",
+      "featured": false,
+      "tags": "game noughts crosses tic tac toe family play"
     }
   ]
 }

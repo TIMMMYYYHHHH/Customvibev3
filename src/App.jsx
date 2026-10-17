@@ -1,6 +1,6 @@
 import {SeasonProvider} from './seasons/runtime.jsx';
 import ProofReview from './ProofReview';
-import {isTemplateProduct,isSelectableCollection,selectedPrintManifest,selectionQuantities,productMagnetCount,collectionItemName,mergeCollectionItem} from './designs/products.mjs';
+import {isTemplateProduct,isGameProduct,isSelectableCollection,selectedPrintManifest,selectionQuantities,productMagnetCount,collectionItemName,mergeCollectionItem} from './designs/products.mjs';
 import React,{useEffect,useLayoutEffect,useState,useRef,useReducer} from 'react';
 import {Bag,Plus,Minus,X,Check,Trash,ArrowLeft} from '@phosphor-icons/react';
 import './fonts.css';
@@ -82,7 +82,7 @@ function AppContent({initialPage}){
   if(isTemplateProduct(pack)){go('studio');return;}
   const manifest=selectedPrintManifest(pack,chosenIds),quantities=manifest?selectionQuantities(pack,chosenIds,chosenQuantities):[];
   const designIds=chosenIds&&(chosenIds.length!==pack.count||quantities.some(q=>q!==1))?manifest.designs.map(d=>d.id):undefined;
-  const selection={style,...(designIds?{designIds,...(quantities.some(q=>q!==1)?{designQuantities:quantities}:{})}:{})};
+  const selection={...(!isGameProduct(pack)?{style}:{}),...(designIds?{designIds,...(quantities.some(q=>q!==1)?{designQuantities:quantities}:{})}:{})};
   selection.count=productMagnetCount(pack,selection);
   const editing=editingPack?.kind===kind?editingPack:null;
   const incoming={id:editing?.id||crypto.randomUUID(),kind,name:collectionItemName(pack,selection),qty:editing?.qty||1,preview:pack.image,printVersion:pack.printVersion,...selection};
