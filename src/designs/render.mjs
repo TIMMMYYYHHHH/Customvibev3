@@ -1,7 +1,7 @@
 import {printJpeg} from './jpeg.mjs';
 import {colours,validateTemplate,templateIds,qrPayload,qrMatrix} from './templates.mjs';
 const ink='#291438';
-export function fitLines(ctx,text,{width,height,maxSize=100,minSize=38,family='"DM Sans Variable", sans-serif',weight=600,literal=false}){
+export function fitLines(ctx,text,{width,height,maxSize=100,minSize=38,family='"CustomVibe Print Body", sans-serif',weight=600,literal=false}){
  for(let size=maxSize;size>=minSize;size-=2){
   ctx.font=`${weight} ${size}px ${family}`;const lines=[];
   for(const paragraph of text.split('\n')){
@@ -13,7 +13,7 @@ export function fitLines(ctx,text,{width,height,maxSize=100,minSize=38,family='"
  throw new Error('This wording does not fit clearly. Shorten it or add spaces, then try again.');
 }
 function text(ctx,value,x,y,width,height,maxSize=100,minSize=38,heading=false,literal=false){
- const {lines,size}=fitLines(ctx,value,{width,height,maxSize,minSize,family:heading?'"Fredoka Variable", sans-serif':'"DM Sans Variable", sans-serif',weight:heading?600:500,literal});
+ const {lines,size}=fitLines(ctx,value,{width,height,maxSize,minSize,family:heading?'"CustomVibe Print Heading", sans-serif':'"CustomVibe Print Body", sans-serif',weight:heading?600:500,literal});
  ctx.fillStyle=ink;ctx.textAlign='center';ctx.textBaseline='middle';lines.forEach((line,i)=>ctx.fillText(line,x,y+(i-(lines.length-1)/2)*size*1.25));
 }
 function picture(ctx,name){
@@ -26,7 +26,7 @@ function picture(ctx,name){
 }
 export async function renderDesign(design,{size=1200,logo}={}){
  if(design.version!==1)throw new Error('This design version is not available.');
- await Promise.all([document.fonts.load('600 100px "Fredoka Variable"'),document.fonts.load('500 60px "DM Sans Variable"')]);
+ const {loadArtworkFonts}=await import('./fonts.mjs');await loadArtworkFonts();
  const canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;const ctx=canvas.getContext('2d');ctx.scale(size/1200,size/1200);
  const {template}=design,v=templateIds.includes(template)?validateTemplate(template,design.values):design.values;
  ctx.fillStyle=colours[v.colour]||colours.cream;ctx.fillRect(0,0,1200,1200);

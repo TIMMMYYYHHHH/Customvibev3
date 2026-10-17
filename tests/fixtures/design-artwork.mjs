@@ -1,5 +1,4 @@
-import '@fontsource-variable/dm-sans';
-import '@fontsource-variable/fredoka';
+// No page font CSS: print artwork must load its own bundled font bytes.
 import jsQR from 'jsqr';
 import {collectionDesigns,packIds} from '../../src/designs/catalogue.mjs';
 import {renderDesign} from '../../src/designs/render.mjs';
