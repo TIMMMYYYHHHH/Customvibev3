@@ -16,9 +16,9 @@ const packs={
  thanks:{image:'collections/little-thank-yous.webp',label:'Four thank-you and gift magnet concepts',faces:[[100,122,485,460],[670,122,485,460],[100,670,485,458],[670,670,485,458]]},
  photos:{image:'cutouts/05-sunglasses-square.webp',label:'Photo magnet of a couple wearing sunglasses',faces:[[126,119,1001]]}
 };
-export default function CollectionPackPreview({kind}){
+export default function CollectionPackPreview({kind,designIds}){
  const {content}=useContent();const item=content.products.find(p=>p.id===kind);
- if(hasPrintContract(item))return <DesignGallery kind={kind}/>;
+ if(hasPrintContract(item))return <DesignGallery kind={kind} designIds={designIds}/>;
  const original=defaultContent.products.find(p=>p.id===kind);
  if(kind==='puzzle')return <div className="collection-pack-stage"><img loading="lazy" src={content.images.puzzle} alt="Coastal photo for a square magnet puzzle"/></div>;
  if(!packs[kind]||item?.image!==original?.image)return <div className="collection-pack-stage custom-pack-image"><img loading="lazy" src={item?.image} alt={item?.name||'Magnet collection'}/></div>;

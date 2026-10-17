@@ -1,6 +1,6 @@
 import {validateOrderNotes} from '../src/order-notes.mjs';
 import {designContract} from '../src/designs/state.mjs';
-import {printManifest,isTemplateProduct,productMagnetCount} from '../src/designs/products.mjs';
+import {selectedPrintManifest,isTemplateProduct,productMagnetCount,collectionItemName} from '../src/designs/products.mjs';
 import {requestReference} from '../src/request-reference.mjs';
 import {ARTWORK_LIMITS as limits,artworkHash} from '../src/artwork-policy.mjs';
 import {validateJpeg as jpeg} from './jpeg.mjs';
@@ -30,16 +30,16 @@ export function validateOrder(x,catalogue,privateArtwork=false){
   if(!product||product.status!=='available'||(!personal&&!canPurchase(product)))invalid();
   const gridSize=item.kind==='puzzle'?item.gridSize:undefined;if(item.kind==='puzzle'&&![3,5].includes(gridSize))invalid();
   const contract=designContract(item,product);if(contract.id){if(ids.has(contract.id))invalid();ids.add(contract.id);}
-  const expected=item.kind==='photo'?1:item.kind==='puzzle'?gridSize**2+1:contract.designMode==='assisted'?(contract.hasReference?1:0):isTemplateProduct(product)?1:printManifest(product)?.designs.length||0;
+  const expected=item.kind==='photo'?1:item.kind==='puzzle'?gridSize**2+1:contract.designMode==='assisted'?(contract.hasReference?1:0):isTemplateProduct(product)?1:selectedPrintManifest(product,contract.designIds)?.designs.length||0;
   if(!Array.isArray(item.files)||item.files.length!==expected)invalid();
   const files=item.files.map((f,i)=>{fileCount++;if(privateArtwork){if(!plain(f)||!Number.isSafeInteger(f.size)||f.size<20||f.size>limits.fileBytes||!artworkHash(f.sha256))invalid();totalBytes+=f.size;if(totalBytes>limits.requestBytes||fileCount>limits.files)invalid();return {size:f.size,sha256:f.sha256}}totalBytes+=typeof f==='string'?f.length:0;if(totalBytes>2000000||fileCount>60)invalid();return jpeg(f,item.kind==='puzzle'&&i===0)});
-  return {...contract,kind:item.kind,name:product.name,qty:item.qty,faceCount:item.kind==='puzzle'?gridSize**2:productMagnetCount(product),...(gridSize?{gridSize}:{}),files};
+  return {...contract,kind:item.kind,name:collectionItemName(product,contract),qty:item.qty,faceCount:item.kind==='puzzle'?gridSize**2:productMagnetCount(product,contract),...(gridSize?{gridSize}:{}),files};
  });
  const sum=summarize(items,catalogue);if(sum.unpriced||!Number.isSafeInteger(sum.magnetQty)||!Number.isSafeInteger(sum.knownCents)||sum.knownCents<=0)invalid();
  // Allocate the shared personalised bundle total proportionally, rounding cumulative cents.
  // This preserves the submitted line prices without changing the overall bundle price.
  let pieces=0,allocated=0;const personalTotal=photoPrice(sum.pricedQty,catalogue.pricing);
- for(const item of items){if(['photo','puzzle'].includes(item.kind)||catalogue.products.find(p=>p.id===item.kind)?.pricingMode==='per-magnet'){pieces+=item.qty*(item.kind==='puzzle'?item.gridSize**2:item.kind==='photo'?1:productMagnetCount(catalogue.products.find(p=>p.id===item.kind)));const total=Math.round(personalTotal*pieces/sum.pricedQty);item.lineCents=total-allocated;allocated=total;}else item.lineCents=catalogue.products.find(p=>p.id===item.kind).priceCents*item.qty;}
+ for(const item of items){if(['photo','puzzle'].includes(item.kind)||catalogue.products.find(p=>p.id===item.kind)?.pricingMode==='per-magnet'){pieces+=item.qty*(item.kind==='puzzle'?item.gridSize**2:item.kind==='photo'?1:productMagnetCount(catalogue.products.find(p=>p.id===item.kind),item));const total=Math.round(personalTotal*pieces/sum.pricedQty);item.lineCents=total-allocated;allocated=total;}else item.lineCents=catalogue.products.find(p=>p.id===item.kind).priceCents*item.qty;}
  return {...base,contact,locker,items,magnetQty:sum.magnetQty,subtotalCents:sum.knownCents,deliveryCents:null,paymentStatus:'unpaid',consent:true};
 }
 export function orderEmails(order,privateArtwork=false,assignedReference){

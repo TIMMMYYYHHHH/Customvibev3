@@ -1,4 +1,4 @@
-import {productMagnetCount,printManifest,isTemplateProduct} from './designs/products.mjs';
+import {productMagnetCount,selectedPrintManifest,isTemplateProduct} from './designs/products.mjs';
 import {defaultPricing,canPurchase} from './content/model.mjs';
 import {ARTWORK_LIMITS} from './artwork-policy.mjs';
 export const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
@@ -14,7 +14,7 @@ export function summarize(items,content){
  const photoQty=items.filter(i=>i.kind==='photo').reduce((s,i)=>s+i.qty,0);
  const puzzleQty=items.filter(i=>i.kind==='puzzle').reduce((s,i)=>s+i.qty*(i.gridSize||3)**2,0);
  const shared=items.filter(i=>content?.products.find(p=>p.id===i.kind)?.pricingMode==='per-magnet');
- const collectionQty=shared.reduce((n,i)=>n+i.qty*productMagnetCount(content.products.find(p=>p.id===i.kind)),0);
+ const collectionQty=shared.reduce((n,i)=>n+i.qty*productMagnetCount(content.products.find(p=>p.id===i.kind),i),0);
  const pricedQty=photoQty+puzzleQty+collectionQty;
  const packs=items.filter(i=>!['photo','puzzle'].includes(i.kind)&&!shared.includes(i));
  const product=i=>content?.products.find(p=>p.id===i.kind);
@@ -44,7 +44,7 @@ export function cropQuality(photo){
 
 export function orderCapacity(items,content){
  const magnets=summarize(items,content).magnetQty;
- const files=items.reduce((n,item)=>n+(item.kind==='photo'?1:item.kind==='puzzle'?(item.gridSize||3)**2+1:item.designMode==='assisted'?(item.reference?1:0):isTemplateProduct(content?.products.find(p=>p.id===item.kind))?1:printManifest(content?.products.find(p=>p.id===item.kind))?.designs.length||0),0);
+ const files=items.reduce((n,item)=>n+(item.kind==='photo'?1:item.kind==='puzzle'?(item.gridSize||3)**2+1:item.designMode==='assisted'?(item.reference?1:0):isTemplateProduct(content?.products.find(p=>p.id===item.kind))?1:selectedPrintManifest(content?.products.find(p=>p.id===item.kind),item.designIds)?.designs.length||0),0);
  const issues=[];
  if(files>ARTWORK_LIMITS.files)issues.push(`These designs need ${files} artwork files. Keep up to ${ARTWORK_LIMITS.files}; use fewer puzzle designs or a smaller puzzle grid.`);
  return {magnets,files,entries:items.length,issues,allowed:issues.length===0};
