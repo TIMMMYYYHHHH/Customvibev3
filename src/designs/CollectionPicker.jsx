@@ -2,13 +2,13 @@ import React,{useState} from 'react';
 import {useContent} from '../content/ContentProvider';
 import {money,photoPrice} from '../commerce.mjs';
 import {printManifest,selectionLabel} from './products.mjs';
-import {artworkStyles,artworkStyleName,defaultArtworkStyle} from './artwork.mjs';
+import {artworkStyles,artworkStyleName,initialArtworkStyle} from './artwork.mjs';
 import {ArtworkFace} from './ArtworkGallery';
 import DesignGallery from './DesignGallery';
 import './collection-picker.css';
 export default function CollectionPicker({product,onAdd,initialItem}){
  const {content}=useContent(),designs=printManifest(product).designs;
- const [style,setStyle]=useState(initialItem?.style||defaultArtworkStyle);
+ const [style,setStyle]=useState(()=>initialArtworkStyle(product.id,initialItem));
  const [mode,setMode]=useState(initialItem?.designIds?'choose':'all');
  const [selected,setSelected]=useState(()=>Object.fromEntries((initialItem?.designIds||[]).map((id,i)=>[id,initialItem.designQuantities?.[i]??1])));
  const [error,setError]=useState('');

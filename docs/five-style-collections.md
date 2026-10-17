@@ -29,3 +29,9 @@ Marketing preview styles: alphabet and thank-yous use Watercolour; counting uses
 Remaining outlined pricing actions, studio zoom/rotation and selected photo controls, delivery choices and photo-example controls use the existing flat neutral/solid-selected contract. Keyboard focus is preserved. Magnet satin shading remains confined to the artwork preview.
 
 Validation: public/SSR/admin builds and all 254 tests pass after incorporating the latest admin consistency release. Browser checks confirm matching card typography, padding and aspect ratios; all six cards have nine images with the intended asset paths; homepage and Collections render at 390px. A Handmade clay apple selection reaches the local basket with that style intact. No order or email submitted. Deployment and live checks are recorded in Founders Hub.
+
+## Preview-matched opening style
+
+New collection dialogs and product pages start with the style displayed on their marketing card. The shared mapping now lives in artwork.mjs. All five choices remain available. Editing an existing basket item keeps its saved style, including the legacy Watercolour fallback. Regression coverage checks all six initial styles and all five existing-item styles; local browser checks verify every card opens with the matching radio option selected.
+
+Card and larger desktop-modal redesigns are image concepts pending owner selection. They are not implemented as part of this behaviour correction.

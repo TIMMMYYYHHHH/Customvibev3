@@ -1,16 +1,14 @@
 import React from 'react';
+import {collectionPreviewStyle} from '../designs/artwork.mjs';
 import {isTemplateProduct} from '../designs/products.mjs';
 import CollectionPackPreview from './CollectionPackPreview';
 import {ProductStatus} from './ProductDetails';
 import './collection-cards.css';
 
-// Marketing previews only. Basket and print artwork retain the customer's style.
-const previewStyles={alphabet:'watercolour',counting:'gouache',words:'paper',colours:'clay',reminders:'pencil',thanks:'watercolour'};
-
 export default function CollectionCard({item,Puzzle,onExplore}) {
   const template=isTemplateProduct(item);
   const href=item.href||(template?'/studio':null);
-  const preview=item.id==='puzzle'&&!item.image?<Puzzle/>:<CollectionPackPreview kind={item.id} style={previewStyles[item.id]}/>;
+  const preview=item.id==='puzzle'&&!item.image?<Puzzle/>:<CollectionPackPreview kind={item.id} style={collectionPreviewStyle(item.id)}/>;
   return <article data-collection={item.id}>
     <ProductStatus product={item}/>
     {href?<a className="catalog-art" href={href} aria-label={(template?'Open studio for ':'Create ')+item.name}>{preview}</a>:<button className="catalog-art" onClick={()=>onExplore(item)} aria-label={'Explore '+item.name}>{preview}</button>}
