@@ -18,7 +18,39 @@ def api(path, method='GET', body=None):
         with urllib.request.urlopen(req, timeout=60) as response:
             return json.load(response)
     except urllib.error.HTTPError as error:
-        return {'success': False, 'status': error.code}
+        try:
+            errors = json.load(error).get('errors', [])
+            codes = [item['code'] for item in errors if isinstance(item, dict) and type(item.get('code')) is int]
+        except (ValueError, AttributeError, TypeError):
+            codes = []
+        return {'success': False, 'status': error.code, 'codes': codes}
+    except (urllib.error.URLError, TimeoutError):
+        return {'success': False, 'network_error': True}
+
+def check_access(request=api):
+    """Read only the fixed business account and existing admin; never print API payloads."""
+    account = request('accounts/' + ACCOUNT)
+    worker = request('accounts/' + ACCOUNT + '/workers/scripts/customvibe-admin/settings')
+    def label(result):
+        if result.get('success'): return 'OK'
+        if result.get('network_error'): return 'network connection failed'
+        status = result.get('status')
+        codes = [str(code) for code in result.get('codes', []) if type(code) is int]
+        return ('HTTP ' + str(status) if type(status) is int else 'request rejected') + ('; Cloudflare code ' + ', '.join(codes) if codes else '')
+    lines = ['Business account check: ' + label(account), 'Existing admin check: ' + label(worker)]
+    if account.get('success') and account.get('result', {}).get('id') != ACCOUNT:
+        return False, lines + ['Account identity did not match. No changes made.']
+    if not account.get('success') or not worker.get('success'):
+        if any(r.get('network_error') for r in (account, worker)):
+            detail = 'Could not reach Cloudflare. Check the connection and try again.'
+        elif any(r.get('status') == 401 for r in (account, worker)):
+            detail = 'Cloudflare did not accept this token for the requested access. Check the token is current and copied in full, including any expiry or client-IP restrictions.'
+        elif any(r.get('status') in (403, 404) for r in (account, worker)):
+            detail = 'This token cannot access the required business account or existing admin. Check its existing account scope and permissions; do not add broader permissions just to retry.'
+        else:
+            detail = 'Cloudflare rejected verification. Share only the check lines above with Codex.'
+        return False, lines + [detail, 'No changes made. You may share these check lines, never the token.']
+    return True, lines
 
 def sanitize(value):
     if isinstance(value, list): return [sanitize(item) for item in value]
@@ -60,8 +92,11 @@ if __name__ == '__main__':
     print('This opens temporary local access for the approved database and Worker deployments.')
     TOKEN = getpass.getpass('Business Cloudflare API token (hidden): ').strip()
     if not re.fullmatch(r'[A-Za-z0-9_-]{20,256}', TOKEN): raise SystemExit('Token format not recognized.')
-    result = api('accounts/' + ACCOUNT)
-    if not result.get('success') or result.get('result', {}).get('id') != ACCOUNT: raise SystemExit('Business account verification failed. No changes made.')
+    ready, checks = check_access()
+    for line in checks: print(line)
+    if not ready:
+        TOKEN = ''
+        raise SystemExit(1)
     os.umask(0o077)
     with socketserver.UnixStreamServer(str(SOCKET), Handler) as server:
         SOCKET.chmod(0o600)
