@@ -76,13 +76,13 @@ function AppContent({initialPage}){
  function notify(message){setToast(message);clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),4500);}
  function changeQuantity(item,delta){setBasket(b=>b.map(x=>x.id===item.id?{...x,qty:x.qty+delta}:x));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.map(p=>p.id===(item.sourceId||item.id)?{...p,qty:item.qty+delta}:p));}
  function removeItem(item){setBasket(b=>b.filter(x=>x.id!==item.id));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.filter(p=>p.id!==(item.sourceId||item.id))); }
- function addPack(kind,chosenIds,chosenQuantities){
+ function addPack(kind,chosenIds,chosenQuantities,style='watercolour'){
   if(orderLocked){notify('Your current order is saved. Return to checkout to view its status.');return;}
   const pack=PACKS[kind];if(!canPurchase(pack)){notify('This collection is not available yet.');return;}
   if(isTemplateProduct(pack)){go('studio');return;}
   const manifest=selectedPrintManifest(pack,chosenIds),quantities=manifest?selectionQuantities(pack,chosenIds,chosenQuantities):[];
   const designIds=chosenIds&&(chosenIds.length!==pack.count||quantities.some(q=>q!==1))?manifest.designs.map(d=>d.id):undefined;
-  const selection={...(designIds?{designIds,...(quantities.some(q=>q!==1)?{designQuantities:quantities}:{})}:{})};
+  const selection={style,...(designIds?{designIds,...(quantities.some(q=>q!==1)?{designQuantities:quantities}:{})}:{})};
   selection.count=productMagnetCount(pack,selection);
   const editing=editingPack?.kind===kind?editingPack:null;
   const incoming={id:editing?.id||crypto.randomUUID(),kind,name:collectionItemName(pack,selection),qty:editing?.qty||1,preview:pack.image,printVersion:pack.printVersion,...selection};

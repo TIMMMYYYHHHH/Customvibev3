@@ -6,7 +6,7 @@ import {validateTemplate,qrPayload,qrMatrix} from '../src/designs/templates.mjs'
 test('complete print masters cover every advertised pack face',()=>{
  assert.deepEqual(collectionDesigns('alphabet').map(d=>d.values.title),[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']);
  assert.deepEqual(collectionDesigns('counting').map(d=>d.values.number),Array.from({length:10},(_,i)=>i+1));
- for(const kind of ['words','colours','reminders','thanks'])assert.equal(collectionDesigns(kind).length,4);
+ for(const kind of ['words','colours','reminders','thanks'])assert.equal(collectionDesigns(kind).length,9);
  assert.equal(new Set(collectionDesigns('alphabet').map(d=>d.id)).size,26);
  assert.ok(collectionDesigns('alphabet').every(d=>d.version===1));
 });

@@ -1,3 +1,4 @@
+import {artworkUrl} from './artwork.mjs';
 import {composePractical,composeGift} from './compositions.mjs';
 import {printJpeg} from './jpeg.mjs';
 import {colours,validateTemplate,templateIds} from './templates.mjs';
@@ -27,6 +28,12 @@ function picture(ctx,name){
 }
 export async function renderDesign(design,{size=1200,logo}={}){
  if(design.version!==1)throw new Error('This design version is not available.');
+ if(design.style){
+  const image=new Image();image.src=artworkUrl(design.id,design.style);await image.decode();
+  const canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);ctx.imageSmoothingQuality='high';ctx.drawImage(image,0,0,size,size);
+  const url='data:image/jpeg;base64,'+printJpeg(canvas.toDataURL('image/jpeg',.94).split(',')[1]);const bytes=Uint8Array.from(atob(url.split(',')[1]),c=>c.charCodeAt(0));
+  const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');return {url,sha256};
+ }
  const {loadArtworkFonts}=await import('./fonts.mjs');await loadArtworkFonts();
  const canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;const ctx=canvas.getContext('2d');ctx.scale(size/1200,size/1200);
  const {template}=design,v=templateIds.includes(template)?validateTemplate(template,design.values):design.values;

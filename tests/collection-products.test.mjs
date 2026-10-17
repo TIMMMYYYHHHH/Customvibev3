@@ -4,10 +4,10 @@ import {summarize,orderCapacity} from '../src/commerce.mjs';
 import {printManifest,collectionProducts} from '../src/designs/products.mjs';
 const content=structuredClone(defaultContent);content.products=content.products.filter(p=>!collectionProducts.some(c=>c.id===p.id)).concat(collectionProducts.map(p=>({...p,status:'available'})));
 test('pack contents participate in shared quantity discounts, including copies and mixed baskets',()=>{
- assert.equal(summarize([{kind:'alphabet',qty:1},{kind:'words',qty:1}],content).knownCents,120000);
+ assert.equal(summarize([{kind:'alphabet',qty:1},{kind:'words',qty:1}],content).knownCents,140000);
  assert.equal(summarize([{kind:'alphabet',qty:2}],content).knownCents,208000);
- assert.equal(summarize([{kind:'words',qty:1},{kind:'business',qty:2}],content).knownCents,25000);
- assert.equal(summarize([{kind:'words',qty:1}],content).knownCents,20000);
+ assert.equal(summarize([{kind:'words',qty:1},{kind:'business',qty:2}],content).knownCents,44000);
+ assert.equal(summarize([{kind:'words',qty:1}],content).knownCents,37500);
  assert.equal(summarize([{kind:'wifi',qty:1},{kind:'puzzle',qty:1,gridSize:3}],content).knownCents,40000);
 });
 test('available built-in packs require matching complete versioned print manifests',()=>{
@@ -16,6 +16,6 @@ test('available built-in packs require matching complete versioned print manifes
  assert.equal(canPurchase({...alphabet,printVersion:2}),false);
 });
 test('pack files count against upload capacity, while copies reuse exact artwork',()=>{
- assert.equal(orderCapacity([{kind:'alphabet',qty:2},{kind:'words',qty:1}],content).files,30);
+ assert.equal(orderCapacity([{kind:'alphabet',qty:2},{kind:'words',qty:1}],content).files,35);
  assert.equal(orderCapacity([{kind:'alphabet',qty:1},{kind:'alphabet',qty:1},{kind:'counting',qty:1}],content).allowed,false);
 });

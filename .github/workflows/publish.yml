@@ -35,14 +35,22 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
+      - name: Publish matching private catalogue Worker
+        run: |
+          node scripts/check-catalogue-deployment.mjs
+          npx --no-install wrangler deploy --config wrangler.catalogue.jsonc
+          node scripts/check-catalogue-deployment.mjs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
+          WRANGLER_SEND_METRICS: 'false'
       - name: Publish to protected Pages project
         run: npx --no-install wrangler pages deploy dist/client --project-name customvibe-business --branch main
         env:
           CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
           WRANGLER_SEND_METRICS: 'false'
-      - name: Publish existing business admin Worker when requested
-        if: github.event_name == 'workflow_dispatch' && inputs.publish_admin
+      - name: Publish matching business admin Worker
         run: |
           node scripts/check-admin-deployment.mjs
           npx --no-install wrangler deploy --config wrangler.admin.jsonc

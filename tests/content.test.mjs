@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {defaultContent,validateContent,canPurchase} from '../src/content/model.mjs';
 import {photoPrice,summarize,nextPhotoTier} from '../src/commerce.mjs';
-const copy=()=>{const c=structuredClone(defaultContent);c.products.forEach(p=>{if(p.id==='alphabet')p.pricingMode='fixed'});return c;};
+const copy=()=>{const c=structuredClone(defaultContent);c.products.forEach(p=>{if(p.id==='alphabet'){p.pricingMode='fixed';p.status='coming-soon'}});return c;};
 test('legacy fixed-price packs need a real price and count; coming soon never purchasable',()=>{
  const c=copy();assert.equal(validateContent(c),c);
  const p=c.products[0];assert.equal(canPurchase(p),false);p.status='available';assert.throws(()=>validateContent(c),/price/i);

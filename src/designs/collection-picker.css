@@ -44,3 +44,28 @@
 @media(pointer:coarse){.collection-picker .design-quantity{grid-template-columns:44px minmax(0,1fr) 44px}}
 
 .collection-picker .design-pick[aria-pressed=true] figcaption{color:#fff}
+
+.artwork-gallery .satin-magnet{display:block;aspect-ratio:1;width:100%;transform:none}
+.artwork-gallery .satin-art img{width:100%;height:100%;object-fit:cover}
+.collection-picker .design-gallery.all-designs,.collection-picker .design-gallery:has(.design-quantity){grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 14px}
+.collection-picker .design-gallery.all-designs:has(figure:only-child){max-width:none}
+.collection-picker .design-gallery .design-pick{padding:8px;background:#eeeae6;border:0;border-radius:6px}
+.collection-picker .design-gallery .design-pick[aria-pressed=true]{background:#29143d;color:#fff}
+.artwork-select-label{display:block;padding-top:12px;font-size:12px}
+.artwork-styles{border:0;padding:0;margin:28px 0;min-width:0}
+.artwork-styles legend{font:550 28px/1.2 'Fredoka Variable',sans-serif}
+.artwork-styles>p{font-size:14px;margin:8px 0 20px}
+.artwork-style-options{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.artwork-style-options label{position:relative;cursor:pointer;min-width:0}
+.artwork-style-options input{position:absolute;opacity:0;width:1px;height:1px}
+.artwork-style-card{display:flex;flex-direction:column;height:100%;padding:12px;box-sizing:border-box;background:#eeeae6;color:#29143d;border-radius:10px;gap:14px}
+.artwork-style-card .satin-magnet{display:block;aspect-ratio:1;width:100%}
+.artwork-style-card img{display:block;width:100%;height:100%;object-fit:cover}
+.artwork-style-card strong{font-size:14px;line-height:1.3;flex:1}
+.artwork-style-card small{font-size:12px}
+.artwork-style-options input:checked+.artwork-style-card{background:#29143d;color:white}
+.artwork-style-options input:focus-visible+.artwork-style-card{outline:3px solid #ae2e5b;outline-offset:3px}
+.artwork-style-options label:hover .artwork-style-card{filter:brightness(.96)}
+.collection-picker .collection-style-name{font-size:14px;font-weight:600;margin-bottom:12px}
+@media(max-width:650px){.artwork-style-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.artwork-style-card{display:grid;grid-template-columns:54px 1fr;gap:7px 12px}.artwork-style-card .satin-magnet{grid-row:span 2}.artwork-style-card strong{font-size:13px}.artwork-style-card small{font-size:11px}.collection-picker .design-gallery.all-designs,.collection-picker .design-gallery:has(.design-quantity){gap:18px 8px}.collection-picker .design-quantity{grid-template-columns:28px minmax(0,1fr) 28px}.collection-picker .design-gallery .design-pick{padding:5px}}
+.collection-picker .artwork-style-card small,.collection-picker .artwork-style-card strong{color:inherit}
