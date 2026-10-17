@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local artwork preparation measurements</title>
+<style>body{font:16px system-ui;max-width:1000px;margin:32px auto;padding:0 24px;color:#26133d;background:#fffdf8}button{padding:12px 18px;font:inherit}pre{white-space:pre-wrap;overflow-wrap:anywhere}td,th{text-align:left;padding:10px;border-bottom:1px solid #ddd}table{border-collapse:collapse;width:100%}</style>
+<h1>Local artwork preparation measurements</h1><p>Actual browser renderer and preparation code. Local synthetic data only. No order submission, uploads or email. Timings are browser wall time, not Cloudflare CPU.</p>
+<button id="run">Run bounded measurements</button><p id="status" role="status">Ready</p><pre id="result" aria-label="Measurement results"></pre>
+<script type="module">
+import {loadImage,makePhoto,renderPhoto,releasePhotos} from '../../src/artwork.js';
+import {preparePrivateArtwork} from '../../src/order-artwork.mjs';
+import {validateOrder} from '../../server/submission-model.mjs';
+import {defaultContent} from '../../src/content/model.mjs';
+const local=['localhost','127.0.0.1','[::1]'].includes(location.hostname);if(!local)throw Error('Local-only fixture');
+document.querySelector('#run').onclick=async()=>{
+ const button=document.querySelector('#run'),status=document.querySelector('#status'),result=document.querySelector('#result');button.disabled=true;
+ const rows=[];let patternUrl;
+ try{
+  const canvas=document.createElement('canvas');canvas.width=1800;canvas.height=1800;
+  const ctx=canvas.getContext('2d'),pixels=ctx.createImageData(1800,1800);let seed=123456;
+  for(let i=0;i<pixels.data.length;i+=4){for(let c=0;c<3;c++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;pixels.data[i+c]=seed>>>24;}pixels.data[i+3]=255;}
+  ctx.putImageData(pixels,0,0);patternUrl=URL.createObjectURL(await new Promise(resolve=>canvas.toBlob(resolve,'image/png')));canvas.width=canvas.height=0;
+  for(const scenario of [
+   {name:'60 photo designs, shared sample source',grids:Array(60).fill(1)},
+   {name:'Six 3x3 puzzles, 60 files',grids:Array(6).fill(3)},
+   {name:'Two 5x5 puzzles and eight photos, 60 files',grids:[5,5,...Array(8).fill(1)]},
+   {name:'60 high-detail synthetic photos',grids:Array(60).fill(1),noise:true},
+   {name:'61 photos, reject before rendering',grids:Array(61).fill(1)}]){
+   status.textContent='Measuring '+scenario.name;await new Promise(resolve=>setTimeout(resolve,0));
+   const src=scenario.noise?patternUrl:'/assets/sample-coast.webp',img=await loadImage(src);
+   const photos=scenario.grids.map((grid,i)=>({...makePhoto(src,'Synthetic '+(i+1),img.naturalWidth,img.naturalHeight),x:.45+(i%3)*.05}));
+   const previewStart=performance.now();const basket=[];
+   for(let i=0;i<photos.length;i++){const gridSize=scenario.grids[i],puzzle=gridSize>1;const preview=puzzle?await renderPhoto(photos[i],{puzzle,gridSize}):null;basket.push({kind:puzzle?'puzzle':'photo',qty:1,sourceId:photos[i].id,gridSize,preview:preview?.url});}
+   const previewMs=performance.now()-previewStart,start=performance.now();let renderCalls=0;
+   try{
+    const prepared=await preparePrivateArtwork(basket,photos,(...args)=>{renderCalls++;return renderPhoto(...args)},defaultContent);
+    validateOrder({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Local benchmark',email:'benchmark@example.com',phone:'0821234567'},locker:{name:'Synthetic',area:'Local'},consent:true,items:prepared.items},defaultContent,true);
+    rows.push({name:scenario.name,outcome:'accepted',previewMs,prepareMs:performance.now()-start,renderCalls,files:prepared.uploads.length,bytes:prepared.uploads.reduce((n,b)=>n+b.length,0),largestFileBytes:Math.max(...prepared.uploads.map(b=>b.length))});
+   }catch(error){rows.push({name:scenario.name,outcome:'rejected',previewMs,prepareMs:performance.now()-start,renderCalls,message:error.message});}
+   result.textContent=JSON.stringify({browser:navigator.userAgent,measuredAt:new Date().toISOString(),rows},null,2);
+  }
+  status.textContent='Measurements complete. No network submissions.';
+ }catch(error){status.textContent='Measurement failed: '+error.message;}finally{if(patternUrl)releasePhotos([{src:patternUrl}]);button.disabled=false;}
+};
+</script></html>

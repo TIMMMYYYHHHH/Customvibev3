@@ -1,0 +1,52 @@
+{
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+  "measuredAt": "2026-10-17T02:06:18.517Z",
+  "rows": [
+    {
+      "name": "60 photo designs, shared sample source",
+      "outcome": "accepted",
+      "previewMs": 0,
+      "prepareMs": 2063.89999999851,
+      "renderCalls": 60,
+      "files": 60,
+      "bytes": 22056000,
+      "largestFileBytes": 373914
+    },
+    {
+      "name": "Six 3x3 puzzles, 60 files",
+      "outcome": "accepted",
+      "previewMs": 287.30000000074506,
+      "prepareMs": 2025.4000000022352,
+      "renderCalls": 6,
+      "files": 60,
+      "bytes": 12974086,
+      "largestFileBytes": 502066
+    },
+    {
+      "name": "Two 5x5 puzzles and eight photos, 60 files",
+      "outcome": "accepted",
+      "previewMs": 305.5999999977648,
+      "prepareMs": 2144.10000000149,
+      "renderCalls": 10,
+      "files": 60,
+      "bytes": 11804836,
+      "largestFileBytes": 1045809
+    },
+    {
+      "name": "60 high-detail synthetic photos",
+      "outcome": "rejected",
+      "previewMs": 0,
+      "prepareMs": 2116.300000000745,
+      "renderCalls": 30,
+      "message": "This order exceeds the artwork limit: 4 MB per file, 32 MB in total and 60 files. Keep your designs and contact us for help."
+    },
+    {
+      "name": "61 photos, reject before rendering",
+      "outcome": "rejected",
+      "previewMs": 0,
+      "prepareMs": 0.3999999985098839,
+      "renderCalls": 0,
+      "message": "These designs need 61 artwork files. Keep up to 60; use fewer puzzle designs or a smaller puzzle grid."
+    }
+  ]
+}
