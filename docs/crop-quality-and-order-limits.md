@@ -47,4 +47,6 @@ Physical print checks, maximum free-runtime load testing, real email acceptance 
 
 Tim rejected the tinted warning cards and thick side stripes because they do not match the existing interface. Crop guidance and order limits now use plain inline text with the site's existing plum text and surrounding surface. The same shared styling covers the designer, basket, checkout and over-capacity notices. No crop thresholds, limits, validation or workflow behaviour changed.
 
-The preference is recorded in AGENTS.md and .better-web-ui.md. Local desktop and 393px phone checks verified the low-resolution warning, basket warning and checkout summary without extra card framing. Public build, SSR/prerender and whitespace checks passed. Live publication evidence follows after verification.
+The preference is recorded in AGENTS.md and .better-web-ui.md. Local desktop and 393px phone checks verified the low-resolution warning, basket warning and checkout summary without extra card framing. Public build, SSR/prerender and whitespace checks passed.
+
+Application 794f8fd published successfully through [protected run 38989870359](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/38989870359), including tests, public/admin builds and before/after protection checks. The live 393px designer was checked with the synthetic 400px image: the 135ppi warning uses inline text, without a coloured box or border. No submission or customer email occurred. Physical print acceptance remains separate and open.
