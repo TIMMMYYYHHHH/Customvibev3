@@ -7,7 +7,7 @@ import {contentStore} from '../scripts/content-store.mjs';
 test('saved content survives a new store instance and stale saves cannot overwrite it',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'cv-content-'));
  try{const path=join(dir,'content.json'),store=contentStore(path);const first=await store.read();first.products[0].name='Alphabet test';const saved=await store.save(first);assert.equal(saved.revision,1);assert.equal((await contentStore(path).read()).products[0].name,'Alphabet test');await assert.rejects(store.save(first),/another tab/);
- const valid=structuredClone(saved),invalid=structuredClone(saved);invalid.products[0].status='available';await assert.rejects(store.save(invalid),/price/i);assert.deepEqual(await store.read(),valid);
+ const valid=structuredClone(saved),invalid=structuredClone(saved);invalid.products[0].pricingMode='fixed';invalid.products[0].status='available';await assert.rejects(store.save(invalid),/price/i);assert.deepEqual(await store.read(),valid);
  }finally{await rm(dir,{recursive:true,force:true})}
 });
 

@@ -36,7 +36,7 @@ test('server accepts more than 100 magnets while retaining accurate prices and s
   const raw=input();raw.items[0].qty=qty;
   const order=validateOrder(raw,defaultContent);assert.equal(order.magnetQty,qty);assert.equal(order.subtotalCents,qty*4000);assert.equal(order.items[0].files.length,1);
  }
- const catalogue=structuredClone(defaultContent),pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;
+ const catalogue=structuredClone(defaultContent),pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.pricingMode='fixed';pack.priceCents=10000;
  const raw=input();raw.items=[{kind:'alphabet',qty:101,files:[]}];
  const order=validateOrder(raw,catalogue,true);assert.equal(order.magnetQty,2626);assert.equal(order.subtotalCents,1010000);
 });
@@ -62,7 +62,7 @@ test('orders still reject malformed or numerically unsafe quantities and totals'
 });
 
 test('server accepts over 30 file-free collection entries',()=>{
- const catalogue=structuredClone(defaultContent),pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;
+ const catalogue=structuredClone(defaultContent),pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.pricingMode='fixed';pack.priceCents=10000;
  const raw=input();raw.items=Array.from({length:75},()=>({kind:'alphabet',qty:1,files:[]}));
  const order=validateOrder(raw,catalogue,true);assert.equal(order.items.length,75);assert.equal(order.subtotalCents,750000);
 });

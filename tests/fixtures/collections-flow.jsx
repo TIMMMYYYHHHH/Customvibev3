@@ -1,0 +1,5 @@
+import React from 'react';import {createRoot} from 'react-dom/client';import {App} from '../../src/App';import {ContentProvider} from '../../src/content/ContentProvider';import {defaultContent} from '../../src/content/model.mjs';import {installNavigation} from '../../src/routing.mjs';
+import '../../src/shop-base.css';import '../../src/shop.css';import '../../src/studio.css';import '../../src/consistency.css';import '../../src/mobile.css';
+if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw Error('Local only');const content=structuredClone(defaultContent);content.products.forEach(p=>p.status='available');
+window.fetch=async input=>{const u=new URL(typeof input==='string'?input:input.url,location.origin);if(u.origin===location.origin&&u.pathname==='/content.json')return Response.json(content);if(u.origin===location.origin&&u.pathname==='/api/forms')return Response.json({available:false});throw Error('Local fixture blocks all submissions');};
+installNavigation();createRoot(document.getElementById('root')).render(<ContentProvider initialContent={content}><App initialPage="collections"/></ContentProvider>);

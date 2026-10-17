@@ -94,7 +94,7 @@ test('private order requests retain the exact 150000-byte body limit before prov
 });
 test('oversized saved order details reject before reserving artwork or sending mail',async()=>{
  const env=setup();env.ORDER_RECORDS_ENABLED='true';const c=await form(env),data=payload(),catalogue=structuredClone(defaultContent);
- const pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;pack.name='A'.repeat(200);env.CATALOGUE={fetch:async()=>Response.json(catalogue)};
+ const pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.pricingMode='fixed';pack.priceCents=10000;pack.name='A'.repeat(200);env.CATALOGUE={fetch:async()=>Response.json(catalogue)};
  data.items=Array.from({length:150},()=>({kind:'alphabet',qty:1,files:[]}));data.items.push({kind:'photo',qty:1,files:[{size:tile.length,sha256:tileHash}]});
  let storageCalls=0;const auth=env.AUTH;env.AUTH={fetch:async(...args)=>{storageCalls++;return auth.fetch(...args)}};
  const network=async url=>{assert.ok(url.includes('siteverify'));return Response.json({success:true,hostname:'customvibe.co.za',action:'order'})};
@@ -103,7 +103,7 @@ test('oversized saved order details reject before reserving artwork or sending m
 
 test('artwork after 100 file-free entries keeps its matching design number',async()=>{
  const env=setup();env.ORDER_RECORDS_ENABLED='true';const c=await form(env),data=payload(),catalogue=structuredClone(defaultContent);
- const pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.priceCents=10000;env.CATALOGUE={fetch:async()=>Response.json(catalogue)};
+ const pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.pricingMode='fixed';pack.priceCents=10000;env.CATALOGUE={fetch:async()=>Response.json(catalogue)};
  data.items=Array.from({length:100},()=>({kind:'alphabet',qty:1,files:[]}));data.items.push({kind:'photo',qty:1,files:[{size:tile.length,sha256:tileHash}]});
  const network=async()=>Response.json({success:true,hostname:'customvibe.co.za',action:'order'});
  const initial=await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network);assert.equal(initial.status,200);

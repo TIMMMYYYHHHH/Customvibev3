@@ -1,10 +1,11 @@
+import {proofService} from './proofs.mjs';
 import {readSelect} from './read.mjs';
 import {reportUnavailable} from '../server/availability.mjs';
 import {orderService,cleanOrders} from './orders.mjs';
 import {artworkService,cleanArtwork} from './artwork.mjs';
 import {submissionState} from './submissions.mjs';
 // Service binding only. No workers.dev address, preview URL or public route.
-export default {async fetch(request,env){let phase='security_request';try{if(request.method!=='POST')return new Response(null,{status:405});if(new URL(request.url).pathname.startsWith('/orders/')){phase='security_orders';return await orderService(request,env);}if(new URL(request.url).pathname.startsWith('/artwork/')){phase='security_artwork';return await artworkService(request,env);}if(new URL(request.url).pathname.startsWith('/submissions/'))return await submissionState(request,env);const {scope,key,jti,exp}=await request.json();if(!['site','admin'].includes(scope))return new Response(null,{status:400});const path=new URL(request.url).pathname;phase=path==='/status'?'security_status':path==='/reserve'?'security_reserve':path==='/revoke'?'security_revoke':'security_request';const now=Math.floor(Date.now()/1000);const kv=scope==='admin'?env.ADMIN_LOCKOUT:env.SITE_LOCKOUT;if(!env.DB||!kv)return new Response(null,{status:503});
+export default {async fetch(request,env){let phase='security_request';try{if(request.method!=='POST')return new Response(null,{status:405});if(new URL(request.url).pathname.startsWith('/proofs/')){phase='security_proofs';return await proofService(request,env);}if(new URL(request.url).pathname.startsWith('/orders/')){phase='security_orders';return await orderService(request,env);}if(new URL(request.url).pathname.startsWith('/artwork/')){phase='security_artwork';return await artworkService(request,env);}if(new URL(request.url).pathname.startsWith('/submissions/'))return await submissionState(request,env);const {scope,key,jti,exp}=await request.json();if(!['site','admin'].includes(scope))return new Response(null,{status:400});const path=new URL(request.url).pathname;phase=path==='/status'?'security_status':path==='/reserve'?'security_reserve':path==='/revoke'?'security_revoke':'security_request';const now=Math.floor(Date.now()/1000);const kv=scope==='admin'?env.ADMIN_LOCKOUT:env.SITE_LOCKOUT;if(!env.DB||!kv)return new Response(null,{status:503});
  if(path==='/reserve'){
   if(!/^[a-f0-9]{64}$/.test(key))return new Response(null,{status:400});const id=scope+':'+key;
   if(await kv.get(id))return Response.json({allowed:false});

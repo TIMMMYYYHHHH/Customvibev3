@@ -8,6 +8,10 @@ on:
         description: Also publish the existing business admin Worker
         type: boolean
         default: false
+      publish_catalogue:
+        description: Also publish the existing business catalogue Worker
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -35,6 +39,15 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
+      - name: Publish existing business catalogue Worker when requested
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_catalogue
+        run: |
+          node --input-type=module -e "import fs from 'node:fs';const c=JSON.parse(fs.readFileSync('wrangler.catalogue.jsonc'));if(c.account_id!=='4f57d4e924674cb87b33d4c884745cf6'||c.name!=='customvibe-catalogue'||c.workers_dev!==false||c.preview_urls!==false)throw Error('Unexpected catalogue destination');"
+          npx --no-install wrangler deploy --config wrangler.catalogue.jsonc
+        env:
+          CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
+          WRANGLER_SEND_METRICS: 'false'
       - name: Publish to protected Pages project
         run: npx --no-install wrangler pages deploy dist/client --project-name customvibe-business --branch main
         env:

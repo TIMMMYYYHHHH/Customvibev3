@@ -3,7 +3,7 @@ export const practicalIds=['business','qr','wifi','information'];
 export const isTemplateProduct=p=>!!p&&practicalIds.includes(p.id);
 export const productMagnetCount=p=>isTemplateProduct(p)?1:p?.count||1;
 export function printManifest(p){
- if(!p||p.printVersion!==1)return null;
+ if(!p||p.pricingMode!=='per-magnet'||p.printVersion!==1)return null;
  const designs=collectionDesigns(p.id);
  return designs.length&&designs.length===p.count?{version:1,designs}:null;
 }

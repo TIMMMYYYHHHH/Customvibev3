@@ -1,3 +1,5 @@
+import DesignGallery from '../designs/DesignGallery';
+import {hasPrintContract} from '../designs/products.mjs';
 import React from 'react';
 import {useContent} from '../content/ContentProvider';
 import {defaultContent} from '../content/model.mjs';
@@ -16,6 +18,7 @@ const packs={
 };
 export default function CollectionPackPreview({kind}){
  const {content}=useContent();const item=content.products.find(p=>p.id===kind);
+ if(hasPrintContract(item))return <DesignGallery kind={kind}/>;
  const original=defaultContent.products.find(p=>p.id===kind);
  if(kind==='puzzle')return <div className="collection-pack-stage"><img loading="lazy" src={content.images.puzzle} alt="Coastal photo for a square magnet puzzle"/></div>;
  if(!packs[kind]||item?.image!==original?.image)return <div className="collection-pack-stage custom-pack-image"><img loading="lazy" src={item?.image} alt={item?.name||'Magnet collection'}/></div>;

@@ -84,6 +84,7 @@ test('sequential orders use one server number across mail, confirmation, retries
 });
 test('existing long references become searchable aliases without rewriting snapshots or history',async()=>{
  const env=artworkEnv(),order=validateOrder(input(),defaultContent),snapshot=orderRecord(order,false),body={id:order.id,fingerprint:'b'.repeat(64),snapshot};
+ delete snapshot.approvalRequired; // Historical record created before proof approval was introduced.
  await call(env,'create',body);await call(env,'status',{id:order.id,status:'in_progress',version:0});await call(env,'claim-update',{id:order.id,version:1});await call(env,'mark-update',{id:order.id,version:1,state:'accepted'});
  const before=env.sql.prepare('SELECT * FROM orders').get(),detail=await(await call(env,'detail',{id:order.id})).json();
  assert.equal(detail.reference,'CV-000001');assert.equal(detail.previousReference,snapshot.reference);assert.equal(detail.status,'in_progress');assert.equal(detail.updates[0].state,'accepted');

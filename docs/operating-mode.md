@@ -53,3 +53,11 @@ Owner decision, 17 October 2026: use server-assigned sequential order numbers su
 ## Provider readiness, 17 October 2026
 
 Tim selected Yoco as the payment gateway to test. Founders Hub tracks account details and test-access preparation in Required business information, alongside the existing Google Business requirements and PUDO locker account setup. Live payment collection remains disabled and separately approved. PUDO account setup and live locker data are waiting for Tim to gather the registration details; no account or live data connection was completed. The independently prepared checkout layout now includes an optional OpenStreetMap area map, the official courier finder link and manual locker preference entry. A local-only sample preview demonstrates future search and selection. See docs/locker-map-readiness.md; live API integration remains blocked.
+
+## Collections and proof approval, owner approved 17 October 2026
+
+All six ready-made collections have versioned complete print definitions. Business, QR, Wi-Fi and information products support templates and assisted design, with simple design included. Every built-in magnet participates in existing quantity pricing. Customer approval is required for each exact current revision before new orders enter production or later stages. Historical snapshots retain their previous workflow. Approval does not imply payment, printing or dispatch.
+
+Customer review is a narrowly scoped exception to admin-only artwork access. Random fragment capabilities are stored hashed and exchanged for short-lived HttpOnly sessions with CSRF. Private downloads reveal only the current proof set. Revised files and proof records inherit original expiry and aggregate within existing per-order quotas. Review invitations are sent only through manual Preview update and Send update. Publish and stage changes send nothing.
+
+Deployment for this feature: additive security migration 0007, security and catalogue Workers, admin Worker, then Pages; merge latest catalogue revision through authenticated management. Preserve the site gate, separate admin sign-in and disabled payments. Feature verification is recorded in collections-and-approval-verification.md.
