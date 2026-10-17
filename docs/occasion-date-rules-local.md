@@ -14,7 +14,7 @@ Owner decision, 17 October 2026: replace advisory recommended dates with actual 
 - [x] Preserve existing readiness, manual activation, authentication and CSRF protections.
 - [x] Final local desktop/mobile, calendar and persistence checks.
 - [x] Owner review and deployment approval.
-- [ ] Publish and verify the live controls and populated dates, preserving latest settings.
+- [x] Publish and verify the live controls and populated dates, preserving latest settings.
 
 ## Current scope
 
@@ -54,3 +54,13 @@ Screenshots: `output/occasion-date-rules/desktop-controls.png`, `mobile-controls
 ## Approved release
 
 Publishing from the latest production source, preserving newer collection-card and flat-control changes. Populate only empty live date fields through the authenticated admin after deployment, never by replaying the local fixture. Keep all schedules off and preserve wording, icons, removals, progress, appearance and repeat choices. Birthday remains unset unless the owner has supplied its anniversary. Live verification and release identifiers will be recorded below.
+
+## Published and verified, 17 October 2026
+
+Release `53d3beeda3730bc0a092208078ce8973ac1b35cc` includes the latest production collection/card changes from `a9ee002`. All 260 tests and public, SSR/prerender and admin builds pass. Protected Pages workflow succeeded: https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39072542752. Admin Worker version: `bf8c852d-590a-4d94-b218-bfa2302ac6b2`. Every non-asset admin binding matched its sanitized pre-release snapshot.
+
+The six known occasion windows were saved through the authenticated live admin with each schedule off. Before each save, the editor showed Current settings and empty dates, with no saved draft to overwrite. Existing one-time repeat choices were preserved. No local fixture was imported. Christmas remains 1 to 27 December 2026; Halloween 17 October to 1 November 2026; Valentine’s Day 1 to 15 February 2027; Easter 14 to 30 March 2027; Mother’s Day 25 April to 10 May 2027; Father’s Day 6 to 21 June 2027. Moving occasions use Follow the occasion; fixed occasions retain fixed dates. Birthday remains blank.
+
+After reloading, all seven uploaded icon sources match their pre-release DOM values, all progress values remain Not started, all schedules show Off, and all themes show Not created. Christmas wording matches byte-for-byte in the editor. Removed occasions remain removed. The 2027 live calendar shows Easter and Father’s Day on their calculated windows, marked Schedule Off / Theme Not created, with nothing scheduled to go live. No occasion theme was installed, no customer record changed and no email was sent. Password gate, separate admin authentication and disabled payments remain intact.
+
+Live evidence: project output/occasion-date-rules/live-date-editor.png. Founders Hub date-rule subtask is complete; the seasonal parent remains In progress because actual theme design approval and installation are separate outstanding work.
