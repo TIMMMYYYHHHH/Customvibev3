@@ -49,3 +49,13 @@ Following owner review, increased the reusable satin preview's wrapped-edge shad
 The owner approved publishing the current C3/M1 update, including clean shopping-mode buttons and equal-sized puzzle previews. The preview finish still does not meet the desired physical-magnet appearance. Improving it to match the other website magnets is explicitly deferred, and must be tracked as planned work. Do not describe the current finish as visually accepted.
 
 Next discussion: replace practical collection clip-art previews with one coherent generated art direction and upright 3×3 grids of nine varied examples. Business contact, QR and Wi-Fi ideas may be consolidated into clearer use-based categories; wedding favours are a possible additional category. Categories and examples are not yet agreed. Existing practical products remain inspiration leading to the studio, without introducing a new ordering flow.
+
+### Release verification
+
+Customer site revision 73f24f3 was published successfully by https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39075608413. Fresh public/SSR/admin builds and all 260 tests pass after preserving the latest occasion-date release. Deployment destination and post-publication protection checks pass. Reloaded live homepage shows C3 headings before the preview grids. Live click-based modal checks could not be completed because browser actions on both the storefront and Founders Hub were not activating their controls; do not claim those checks passed.
+
+Paired admin publication remains outstanding: verified bundle is /private/tmp/c3-m1-admin-bundle/worker.js with this checkout's dist/admin assets. The destination-only helper socket is unavailable; the owner has been asked to reopen the existing helper privately. No credentials were requested in chat.
+
+Planned follow-up: improve the reusable preview finish to match the physical magnet appearance elsewhere on the website. The owner explicitly deferred this after approving publication of the current layout. Reuse the existing Founders Hub subtask “Choose and apply a reusable magnet preview finish”, reopen it and set it Planned, retaining the earlier finish history. Board update remains unrecorded because task-opening controls did not respond in the signed-in frontend. Card/modal publication activities and remaining admin dependency also still need recording there.
+
+Practical collection ideation remains open. In addition to Business, Guests, Weddings & celebrations and Handy at home, discuss pets, babies, travel memories, teams/clubs, fundraising and personal gifts. These are possibilities, not approved new catalogue categories. No images generated or catalogue categories changed for this next phase.
