@@ -20,3 +20,22 @@ test('admin sign-in exposes only fixed brand assets without issuing login cookie
  assert.match(html, /rel="icon"[^>]*href="\/favicon.png"/);
  assert.match(html, /href="\/admin-brand\/fonts.css"/);
 });
+
+test('search finds retained orders beyond the first page and paginates matching results only',async()=>{
+ const {env,cookie}=await setup(),time=Math.floor(Date.now()/1000);
+ const add=(n,name,status='new',expired=false,legacy)=>env.sql.prepare('INSERT INTO orders(id,fingerprint,snapshot,status,created,expires) VALUES (?,?,?,?,?,?)').run(`11111111-1111-4111-8111-${String(n).padStart(12,'0')}`,'a'.repeat(64),JSON.stringify({contact:{name,email:'private@example.com'},magnetQty:1,referenceVersion:legacy?1:2,...(legacy?{reference:legacy}:{})}),status,time,expired?time-1:time+1000);
+ add(1,'Older target','shipped',false,'CV-OLD-REFERENCE');
+ for(let n=2;n<=112;n++)add(n,n%2?'Matching customer':'Other customer');
+ add(113,'Older target expired','shipped',true);
+ const get=async query=>{const r=await admin.fetch(new Request('https://admin.customvibe.co.za/api/orders?'+query,{headers:{cookie}}),env);assert.equal(r.status,200);return r.json()};
+ const baseline=await get('');assert.equal(baseline.orders.length,50);assert.ok(!baseline.orders.some(o=>o.reference==='CV-000001'));
+ for(const q of ['OLDER TARGET','cv-000001','old-reference']){const result=await get('q='+encodeURIComponent(q));assert.deepEqual(result.orders.map(o=>o.reference),['CV-000001']);assert.equal(result.next,null);assert.equal(result.orders[0].snapshot.contact.email,undefined)}
+ const first=await get('q=matching');assert.equal(first.orders.length,50);assert.equal(first.next,13);
+ const last=await get('q=matching&before='+first.next);assert.deepEqual(last.orders.map(o=>o.reference),['CV-000011','CV-000009','CV-000007','CV-000005','CV-000003']);assert.equal(last.next,null);
+ assert.deepEqual((await get('q=customer&stage=shipped')).orders,[]);
+ assert.deepEqual((await get('stage=shipped')).orders.map(o=>o.reference),['CV-000001']);
+ for(const q of ["%' OR 1=1 --",'_','not found'])assert.deepEqual((await get('q='+encodeURIComponent(q))).orders,[]);
+ assert.equal((await get('q=%20%20')).orders.length,50);
+ for(const query of ['q='+ 'x'.repeat(161),'stage=invalid'])assert.equal((await admin.fetch(new Request('https://admin.customvibe.co.za/api/orders?'+query,{headers:{cookie}}),env)).status,400);
+ assert.equal((await admin.fetch(new Request('https://admin.customvibe.co.za/api/orders?q=target'),env)).status,401);
+});

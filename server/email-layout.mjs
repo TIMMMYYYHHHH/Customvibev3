@@ -6,11 +6,11 @@ export const row=(label,value)=>`<tr><th class="email-muted email-rule" scope="r
 export const details=rows=>`<table style="width:100%;border-collapse:collapse;font-size:16px;table-layout:fixed">${rows}</table>`;
 export const signoff='From our tribe to yours.';
 export const unpaid='Payment status: Unpaid. No payment has been taken through the website.';
-const kinds=new Set(['ack','owner','new','in_progress','ready_to_ship','shipped']);
+const kinds=new Set(['ack','owner','new','in_progress','ready_to_ship','shipped','fulfilled']);
 // Only decorative artwork is rasterised. Text must adapt with the surrounding email in Gmail.
 export function emailLayout({subject,preheader,heading,kind,label,reference,body,footer}){
  if(!kinds.has(kind))throw Error('Unknown email design');
- const ending={ack:'with us.',owner:'order.',new:'order.',in_progress:'in progress.',ready_to_ship:'ready to ship.',shipped:'been dispatched.'}[kind];
+ const ending={ack:'with us.',owner:'order.',new:'order.',in_progress:'in progress.',ready_to_ship:'ready to ship.',shipped:'been dispatched.',fulfilled:'choosing us.'}[kind];
  const title=heading.endsWith(ending)?escapeHTML(heading.slice(0,-ending.length))+`<span class="email-accent" style="display:block;color:#a53d63">${escapeHTML(ending)}</span>`:escapeHTML(heading);
  const html=`<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${escapeHTML(subject)}</title><style>
 :root{color-scheme:light dark;supported-color-schemes:light dark}body{margin:0}table{mso-table-lspace:0;mso-table-rspace:0}img{border:0;outline:none}a{color:#9a3156}

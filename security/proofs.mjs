@@ -1,3 +1,4 @@
+import {artworkExpiry} from '../server/order-retention.mjs';
 import {proofRows,reusableProofFiles} from '../src/proof-manifest.mjs';
 import {artworkId,artworkHash,ARTWORK_LIMITS} from '../src/artwork-policy.mjs';
 import {artworkDigest,artworkService} from './artwork.mjs';
@@ -16,12 +17,12 @@ function mapFiles(snapshot,requestId,files,selection,reusable=[]){
  if(used.size!==files.length)throw Error('Every uploaded file must belong to the final design.');
  let at=0;return snapshot.items.map((item,n)=>({id:item.id||`item-${n+1}`,name:item.name,kind:item.kind,qty:item.qty,...(item.values?.handyTemplate?{values:item.values}:{}),...(item.gridSize?{gridSize:item.gridSize}:{}),files:expected.filter(e=>e.itemId===(item.id||`item-${n+1}`)).map(row=>({...resolved[at++],copies:row.copies}))}));
 }
-async function session(env,id){if(!artworkHash(id))return null;return env.DB.prepare('SELECT s.*,p.digest,p.status,o.expires AS order_expires FROM proof_sessions s JOIN proof_state p ON p.order_id=s.order_id AND p.revision=s.revision AND p.token_hash=s.token_hash JOIN orders o ON o.id=s.order_id WHERE s.id=? AND s.expires>? AND o.expires>?').bind(id,now(),now()).first();}
+async function session(env,id){if(!artworkHash(id))return null;return env.DB.prepare('SELECT s.*,p.digest,p.status,COALESCE(o.artwork_expires,o.expires) AS order_expires FROM proof_sessions s JOIN proof_state p ON p.order_id=s.order_id AND p.revision=s.revision AND p.token_hash=s.token_hash JOIN orders o ON o.id=s.order_id WHERE s.id=? AND s.expires>? AND MIN(o.expires,COALESCE(o.artwork_expires,o.expires))>?').bind(id,now(),now()).first();}
 export async function proofService(request,env){
  const b=await request.json(),action=new URL(request.url).pathname.slice('/proofs/'.length),time=now();
  if(action==='exchange'){
   if(!artworkHash(b.tokenHash)||!artworkHash(b.sessionId))return fail(403,'This review link is invalid or expired.');
-  const p=await env.DB.prepare('SELECT p.*,o.expires FROM proof_state p JOIN orders o ON o.id=p.order_id WHERE p.token_hash=? AND o.expires>?').bind(b.tokenHash,time).first();if(!p)return fail(403,'This review link is invalid or expired.');
+  const p=await env.DB.prepare('SELECT p.*,COALESCE(o.artwork_expires,o.expires) AS expires FROM proof_state p JOIN orders o ON o.id=p.order_id WHERE p.token_hash=? AND MIN(o.expires,COALESCE(o.artwork_expires,o.expires))>?').bind(b.tokenHash,time).first();if(!p)return fail(403,'This review link is invalid or expired.');
   const allowance=await env.DB.prepare('INSERT INTO attempts(id,count,until) VALUES (?,1,?) ON CONFLICT(id) DO UPDATE SET count=CASE WHEN until<=? THEN 1 ELSE count+1 END,until=CASE WHEN until<=? THEN excluded.until ELSE until END RETURNING count').bind('proof-session:'+b.tokenHash,time+900,time,time).first();if(allowance.count>20)return fail(429,'Please wait 15 minutes before opening another review session.');
   const expires=Math.min(p.expires,time+1800);await env.DB.prepare('INSERT INTO proof_sessions(id,order_id,revision,token_hash,expires) SELECT ?,order_id,revision,token_hash,? FROM proof_state WHERE order_id=? AND token_hash=? ON CONFLICT DO NOTHING').bind(b.sessionId,expires,p.order_id,b.tokenHash).run();return Response.json({id:p.order_id,revision:p.revision,expires});
  }
@@ -36,12 +37,13 @@ export async function proofService(request,env){
   if(action==='changes'&&(typeof b.message!=='string'||!b.message.trim()||b.message.length>2000||/[\x00-\x08\x0b-\x1f\x7f]/.test(b.message)))return fail(400,'Describe the changes in up to 2,000 characters.');
   const status=action==='approve'?'approved':'changes_requested';
   // The session, digest and current revision are checked again in the transaction.
-  const changed=await env.DB.batch([env.DB.prepare("UPDATE proof_state SET status=?,approved_at=? WHERE order_id=? AND revision=? AND digest=? AND status='awaiting_approval' AND token_hash=? AND EXISTS(SELECT 1 FROM orders WHERE id=? AND expires>?) RETURNING revision").bind(status,action==='approve'?time:null,s.order_id,s.revision,s.digest,s.token_hash,s.order_id,time),env.DB.prepare("INSERT INTO proof_events(order_id,revision,kind,created,message) SELECT order_id,revision,?,?,? FROM proof_state WHERE order_id=? AND status=? AND approved_at IS ? AND changes()>0").bind(action,time,action==='changes'?b.message.trim():'',s.order_id,status,action==='approve'?time:null),env.DB.prepare('UPDATE orders SET version=version+1 WHERE id=? AND changes()>0').bind(s.order_id)]);
+  const changed=await env.DB.batch([env.DB.prepare("UPDATE proof_state SET status=?,approved_at=? WHERE order_id=? AND revision=? AND digest=? AND status='awaiting_approval' AND token_hash=? AND EXISTS(SELECT 1 FROM orders WHERE id=? AND COALESCE(artwork_expires,expires)>?) RETURNING revision").bind(status,action==='approve'?time:null,s.order_id,s.revision,s.digest,s.token_hash,s.order_id,time),env.DB.prepare("INSERT INTO proof_events(order_id,revision,kind,created,message) SELECT order_id,revision,?,?,? FROM proof_state WHERE order_id=? AND status=? AND approved_at IS ? AND changes()>0").bind(action,time,action==='changes'?b.message.trim():'',s.order_id,status,action==='approve'?time:null),env.DB.prepare('UPDATE orders SET version=version+1 WHERE id=? AND changes()>0').bind(s.order_id)]);
   return changed[0].results.length?Response.json({ok:true}):fail(409,'The design changed. Reopen your latest review link.');
  }
  if(!artworkId(b.id))return fail(400,'Invalid order.');
  const order=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND expires>?').bind(b.id,time).first();if(!order)return fail(410,'Order unavailable or expired.');const snapshot=JSON.parse(order.snapshot);
  if(action==='detail')return Response.json(await proofDetail(env,b.id));
+ if(artworkExpiry(order)<=time)return fail(410,'Artwork has expired.');
  if(!snapshot.approvalRequired)return fail(409,'This historical order uses the original workflow.');
  // An immutable publish identity makes a lost success response safe to retry.
  if(action==='publish'&&artworkId(b.requestId)&&b.requestId!==b.id){const prior=await env.DB.prepare('SELECT revision,digest FROM proof_revisions WHERE order_id=? AND publish_id=?').bind(b.id,b.requestId).first();if(prior)return Response.json({ok:true,...prior});}
@@ -55,12 +57,12 @@ export async function proofService(request,env){
  if(action==='seed'||action==='publish'){
   if((action==='seed'||b.requestId===b.id)&&snapshot.items.some(i=>i.designMode==='assisted'||!i.files.length))return fail(409,'Finish every design before publishing a proof.');
   const requestId=action==='seed'?b.id:b.requestId;if(!artworkId(requestId))return fail(400,'Invalid artwork.');
-  const a=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=? AND finalized=1 AND expires>?').bind(requestId,time).first();if(!a||(requestId!==b.id&&a.parent_order!==b.id)||a.expires>order.expires)return fail(409,'Complete this order’s artwork upload first.');
+  const a=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=? AND finalized=1 AND expires>?').bind(requestId,time).first();if(!a||(requestId!==b.id&&a.parent_order!==b.id)||a.expires>artworkExpiry(order))return fail(409,'Complete this order’s artwork upload first.');
   let items;try{items=mapFiles(snapshot,requestId,JSON.parse(a.manifest),action==='seed'?undefined:b.selection,reusableProofFiles({id:b.id,snapshot,proof:await proofDetail(env,b.id)}))}catch(e){return fail(400,e.message)}
   const manifest=JSON.stringify(items),digest=await artworkDigest(new TextEncoder().encode(manifest)),current=await proofDetail(env,b.id),revision=current.revision+1;
   if(action==='seed'&&current.revision)return fail(409,'A proof already exists.');
   const updated=await env.DB.batch([
-   env.DB.prepare("UPDATE orders SET version=version+1,status='new' WHERE id=? AND version=? AND expires>? AND status<>'shipped' RETURNING version").bind(b.id,b.version,time),
+   env.DB.prepare("UPDATE orders SET version=version+1,status='new' WHERE id=? AND version=? AND expires>? AND status NOT IN ('shipped','fulfilled') RETURNING version").bind(b.id,b.version,time),
    env.DB.prepare('INSERT INTO proof_revisions(order_id,revision,digest,manifest,created,publish_id) SELECT ?,?,?,?,?,? WHERE changes()>0').bind(b.id,revision,digest,manifest,time,action==='publish'&&requestId!==b.id?requestId:null),
    env.DB.prepare("INSERT INTO proof_state(order_id,revision,digest,status) SELECT ?,?,?,'awaiting_approval' WHERE changes()>0 ON CONFLICT(order_id) DO UPDATE SET revision=excluded.revision,digest=excluded.digest,status=excluded.status,token_hash=NULL,approved_at=NULL").bind(b.id,revision,digest),
    env.DB.prepare("INSERT INTO proof_events(order_id,revision,kind,created) SELECT ?,?,'published',? WHERE changes()>0").bind(b.id,revision,time)
@@ -72,4 +74,6 @@ export async function proofService(request,env){
  }
  return fail(404,'Not found.');
 }
-export async function cleanProofs(env){const time=now();await env.DB.batch(['proof_sessions','proof_events','proof_state','proof_revisions'].map(t=>env.DB.prepare(`DELETE FROM ${t} WHERE order_id IN(SELECT id FROM orders WHERE expires<=?)`).bind(time)));await env.DB.prepare('DELETE FROM proof_sessions WHERE expires<=?').bind(time).run();}
+export async function cleanProofs(env){const time=now();
+ await env.DB.batch(['proof_sessions','proof_events','proof_revisions'].map(t=>env.DB.prepare(`DELETE FROM ${t} WHERE order_id IN(SELECT id FROM orders WHERE COALESCE(artwork_expires,expires)<=?)`).bind(time)));
+ await env.DB.prepare('UPDATE proof_state SET token_hash=NULL WHERE order_id IN(SELECT id FROM orders WHERE COALESCE(artwork_expires,expires)<=?)').bind(time).run();await env.DB.batch(['proof_sessions','proof_events','proof_state','proof_revisions'].map(t=>env.DB.prepare(`DELETE FROM ${t} WHERE order_id IN(SELECT id FROM orders WHERE expires<=?)`).bind(time)));await env.DB.prepare('DELETE FROM proof_sessions WHERE expires<=?').bind(time).run();}

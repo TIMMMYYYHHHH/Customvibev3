@@ -1,0 +1,1 @@
+for(const [id,value] of [['expire-review-session','expire'],['restore-review-session','restore']])document.getElementById(id).onclick=async()=>{const r=await fetch('/__review/session',{method:'POST',body:value});document.getElementById('review-session-result').textContent=r.ok?'Local session '+(value==='expire'?'expired':'restored'):'Local control failed'};

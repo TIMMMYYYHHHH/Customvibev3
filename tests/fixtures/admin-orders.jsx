@@ -6,17 +6,32 @@ if(scenario==='light-board'){
  const examples=[['CV-000006','Sample order',60,'new','2026-10-17'],['CV-000005','Patrick',3,'new','2026-10-17'],['CV-000001','Timmy',11,'in_progress','2026-10-16'],['CV-000004','Joe',3,'shipped','2026-10-17']];
  orders.splice(4);orders.forEach((order,i)=>{const [reference,name,quantity,status,date]=examples[i];order.reference=reference;order.snapshot.contact.name=name;order.snapshot.magnetQty=quantity;order.status=status;order.created=Date.parse(date+'T08:00:00+02:00')/1000;});
 }
+if(scenario==='replacement-proof'){
+ const o=orders[0];o.snapshot.approvalRequired=true;o.snapshot.contact.name='Replacement proof review';
+ o.proof={revision:2,status:'approved',digest:'local-sample',events:[],items:o.snapshot.items.map((item,n)=>({...item,files:item.files.map((file,j)=>({...file,requestId:n===0?'22222222-2222-4222-8222-222222222222':o.id,index:n===0?7:file.index,copies:item.qty*(item.designQuantities?.[j]??1)}))}))};
+}
 window.fetch=async(path,opts={})=>{
  const url=new URL(path,location.origin);
  if(url.pathname.startsWith('/api/'))console.info('Fixture request:',opts.method||'GET',url.pathname);
  if(url.pathname==='/content.json')return unifiedReview?realFetch(path,opts):Response.json(defaultContent);
  if(url.pathname==='/api/session')return unifiedReview?realFetch(path,opts):Response.json({csrf:'sample'});
- if(url.pathname==='/api/orders')return Response.json({orders,next:null});
+ if(scenario==='fulfilled'&&url.pathname.startsWith('/api/orders')){if(url.pathname.endsWith('/preview')){const r=await realFetch(url.pathname.replace('/api/orders','/__review/fulfilled-orders').replace('/preview',''));return Response.json(orderUpdateEmail(await r.json()))}if(url.pathname.endsWith('/send'))return Response.json({error:'Local preview: sending is disabled.'},{status:503});return realFetch(url.pathname.replace('/api/orders','/__review/fulfilled-orders')+url.search,opts)}
+ if(url.pathname==='/api/orders')return scenario==='search-all'?realFetch('/__review/search-orders'+url.search):Response.json({orders,next:null});
  if(/^\/api\/artwork\/[a-f0-9-]{36}$/.test(url.pathname))return Response.json({id:orders[0].id,expires:orders[0].expires,files:orders[0].snapshot.items.flatMap(item=>item.files)});
  if(url.pathname.startsWith('/api/artwork/'))return realFetch('/tests/fixtures/print-tile.jpg');
  if(url.pathname.startsWith('/api/orders/')){
+  if(unifiedReview){const session=await realFetch('/api/session');if(!session.ok)return session;}
+
   const id=url.pathname.split('/')[3],order=orders.find(o=>o.id===id);
   if(!order)return Response.json({error:'Request not found.'},{status:404});
+  if(url.pathname.includes('/proof/')){
+   const body=JSON.parse(opts.body||'{}');if(body.version!==order.version)return Response.json({error:'Order changed. Review current version.'},{status:409});
+   const action=url.pathname.split('/').at(-1);
+   if(action==='prepare')return Response.json({ok:true});
+   if(action==='publish'||action==='seed'){order.proof={...order.proof,revision:(order.proof?.revision||0)+1,status:'awaiting_approval',items:order.proof?.items||order.snapshot.items};order.status='new';order.version++;return Response.json({ok:true});}
+   if(action==='revoke'){order.version++;return Response.json({ok:true});}
+   return Response.json({error:'Unsupported local proof operation'},{status:400});
+  }
   if(url.pathname.endsWith('/preview'))return Response.json(orderUpdateEmail(order));
   if(url.pathname.endsWith('/send'))return Response.json({error:'Local preview: sending is disabled.'},{status:503});
   if(url.pathname.endsWith('/status')){
@@ -35,6 +50,6 @@ window.fetch=async(path,opts={})=>{
  return realFetch(path,opts);
 };
 // Keep navigation within this synthetic fixture; no production mutation or email.
-const fixture='/tests/fixtures/admin-orders.html';document.addEventListener('click',e=>{if(unifiedReview)return;const a=e.target.closest('a');if(!a)return;const u=new URL(a.href);if(u.origin===location.origin&&['/orders','/content'].includes(u.pathname)){e.preventDefault();location.href=fixture+(u.pathname==='/content'?'?view=content':u.search+u.hash)}});
+const fixture='/tests/fixtures/admin-orders.html';document.addEventListener('click',e=>{if(scenario==='fulfilled'){const a=e.target.closest('a');if(a){const u=new URL(a.href);if(u.origin===location.origin&&u.pathname==='/orders'){e.preventDefault();u.searchParams.set('scenario','fulfilled');location.href=u.href;return}}}if(unifiedReview)return;const a=e.target.closest('a');if(!a)return;const u=new URL(a.href);if(u.origin===location.origin&&['/orders','/content'].includes(u.pathname)){e.preventDefault();location.href=fixture+(u.pathname==='/content'?'?view=content':u.search+u.hash)}});
 const view=new URLSearchParams(location.search).get('view'),content=location.pathname==='/content'||view==='content',artwork=view==='artwork';
 createRoot(document.getElementById('root')).render(<>{!unifiedReview&&<p style={{margin:0,padding:'6px 20px',background:'#35233f',color:'white',font:'12px system-ui'}}>LOCAL PREVIEW · Synthetic orders · No email sending</p>}<AdminShell section={content?'content':artwork?'artwork':'orders'} logout={()=>alert('Local preview only. There is no live session to sign out of.')}>{content?<ContentProvider onSave={unifiedReview?saveAdminContent:async d=>d}><Admin/></ContentProvider>:artwork?<Artwork/>:<Orders/>}</AdminShell></>);
