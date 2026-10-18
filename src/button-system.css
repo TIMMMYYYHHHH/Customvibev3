@@ -1,15 +1,6 @@
 /* P1 Soft sticker + S1 Fresh mint, approved 18 October 2026.
    Canonical customer control roles: docs/design/button-system.md. */
-:root {
-  --cv-action: #ae2e5b;
-  --cv-action-hover: #92234b;
-  --cv-secondary: #9ddcc4;
-  --cv-secondary-hover: #83ccb1;
-  --cv-selected: #291438;
-  --cv-disabled: #e7e2dd;
-  --cv-disabled-text: #776e7a;
-  --cv-radius: 14px;
-}
+@import './button-tokens.css';
 .shop-shell .button.button,.storefront .action.action,.unified-header .site-create,
 .shop-shell .studio-add {
   border-radius:var(--cv-radius);border-color:transparent;box-shadow:none;

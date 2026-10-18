@@ -1,4 +1,5 @@
 @import '../src/designs/handy-details.css';
+@import '../src/button-tokens.css';
 /* Shared admin presentation. Keep page-specific layouts in their own stylesheets. */
 .cv-admin.admin-workroom{--ink:#35233f;--berry:#8c2754;--line:#ded7de;--paper:#fffdf8;--workroom-bg:#f5f2ee;--control-bg:#eeeae6;--control-hover:#e2ddd8;--control-radius:8px;--display:'Fredoka Variable',sans-serif;--body:'DM Sans Variable',sans-serif;background:var(--workroom-bg);font:15px/1.5 var(--body);color:var(--ink);font-synthesis:none}
 .admin-workroom .cv-admin-header{padding:22px 40px;gap:40px;background:var(--workroom-bg);border-bottom:1px solid var(--line)}
@@ -86,3 +87,41 @@
 .cv-proof-confirm::backdrop{background:rgb(20 15 25 / .45)}
 .cv-proof-confirm h2{margin-top:0}.cv-proof-confirm p{line-height:1.65}
 .cv-confirm-actions{display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+
+/* P1 / Fresh mint admin extension. Do not recolour content panels or stage badges. */
+.cv-admin.admin-workroom :is(.cv-btn,.button) {
+ border:0;border-radius:var(--cv-radius);box-shadow:none;
+ font-family:var(--display);font-weight:650;
+ background:var(--cv-action);color:#fff;
+}
+.cv-admin.admin-workroom :is(.cv-btn,.button):hover:not(:disabled) {
+ background:var(--cv-action-hover);filter:none;box-shadow:none;
+}
+.cv-admin.admin-workroom :is(.cv-btn.secondary,.button.secondary),
+.cv-admin.admin-workroom.cv-seasons .button:not(.primary):not(.danger):not(.occasion-symbol):not(:disabled),
+.cv-admin.admin-workroom :is(.admin-tabs button,.page-tabs button,.segmented button,.tabs button,.cv-order-view .cv-btn,.cv-stage-trigger,.demo-select-trigger) {
+ background:var(--cv-secondary);color:var(--cv-selected);border:0;box-shadow:none;border-radius:var(--cv-radius);
+}
+.cv-admin.admin-workroom :is(.cv-btn.secondary,.button.secondary):hover:not(:disabled),
+.cv-admin.admin-workroom.cv-seasons .button:not(.primary):not(.danger):not(.occasion-symbol):not(:disabled):hover:not(:disabled),
+.cv-admin.admin-workroom :is(.admin-tabs button,.page-tabs button,.segmented button,.tabs button,.cv-order-view .cv-btn,.cv-stage-trigger,.demo-select-trigger):hover:not(:disabled) {
+ background:var(--cv-secondary-hover);filter:none;
+}
+.cv-admin.admin-workroom :is(.admin-tabs button,.page-tabs button,.segmented button,.tabs button,.cv-order-view .cv-btn,.icon-option.button):is([aria-pressed=true],[aria-selected=true],[aria-current]):not(:disabled),
+.cv-admin.admin-workroom .cv-admin-header nav a[aria-current] {
+ background:var(--cv-selected);color:#fff;
+}
+.cv-admin.admin-workroom .tabs {height:auto;min-height:59px;align-items:center;gap:6px;padding-block:7px;flex-wrap:wrap}
+.cv-admin.admin-workroom .tabs button {min-height:44px;padding:8px 12px}
+.cv-admin.admin-workroom .segmented button {min-height:44px;padding:8px 12px}
+.cv-admin.admin-workroom .cv-admin-header nav a {border-radius:var(--cv-radius)}
+.cv-admin.admin-workroom :is(.cv-btn.quiet,.text-button,.occasion-symbol.button) {background:transparent;color:var(--ink)}
+.cv-admin.admin-workroom :is(.cv-btn.quiet,.text-button,.occasion-symbol.button):hover:not(:disabled) {background:var(--control-bg);color:var(--ink)}
+.cv-admin.admin-workroom :is(.cv-btn.danger,.button.danger) {background:var(--cv-selected);color:#fff}
+.cv-admin.admin-workroom :is(.cv-btn.danger,.button.danger):hover:not(:disabled) {background:#42264f;color:#fff}
+.cv-admin.admin-workroom :is(.cv-btn,.button,.admin-tabs button,.page-tabs button,.segmented button,.tabs button,.cv-stage-trigger,.demo-select-trigger):disabled {
+ background:var(--cv-disabled);color:var(--cv-disabled-text);opacity:1;box-shadow:none;cursor:not-allowed;
+}
+.cv-admin.admin-workroom :is(.cv-btn,.button,.admin-tabs button,.page-tabs button,.segmented button,.tabs button,.cv-stage-trigger,.demo-select-trigger):focus-visible {
+ outline:3px solid var(--cv-selected);outline-offset:3px;
+}

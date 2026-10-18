@@ -1,0 +1,11 @@
+/* Shared approved P1 / Fresh mint palette. Layout rules remain surface-scoped. */
+:root {
+  --cv-action: #ae2e5b;
+  --cv-action-hover: #92234b;
+  --cv-secondary: #9ddcc4;
+  --cv-secondary-hover: #83ccb1;
+  --cv-selected: #291438;
+  --cv-disabled: #e7e2dd;
+  --cv-disabled-text: #776e7a;
+  --cv-radius: 14px;
+}
