@@ -1,10 +1,15 @@
-import React,{createContext,useContext,useEffect,useState} from 'react';
+import React,{createContext,useContext,useEffect,useLayoutEffect,useState} from 'react';
 import {resolveAt,nowSAST,millis,occasion} from './model.mjs';
 import {INSTALLED_THEMES} from './registry.mjs';
 import {iconDefinition} from './occasion-summary.mjs';
 import './visitor.css';
-// Each approved occasion registers its own components here; no exploration designs are installed.
-export const THEME_COMPONENTS=Object.freeze({});
+import {ChristmasHero,ChristmasDecorations} from './christmas/Christmas.jsx';
+import {ChristmasControlIcon} from './christmas/ChristmasControlIcon.jsx';
+import {flushSync} from 'react-dom';
+import {fadeChristmasChange} from './christmas/transition.mjs';
+import './christmas/transition.css';
+// Occasion components remain dormant until an authorized preview or eligible public campaign.
+export const THEME_COMPONENTS=Object.freeze({christmas:{Hero:ChristmasHero,Decorations:ChristmasDecorations,ControlIcon:ChristmasControlIcon}});
 const Context=createContext({campaign:null,visible:false});
 const preferenceKey='cv-season-preferences-v1';
 export function SeasonProvider({children}){
@@ -19,15 +24,21 @@ export function SeasonProvider({children}){
  },[preview]);
  const raw=appearance.campaign,campaign=raw&&Object.hasOwn(INSTALLED_THEMES,raw.occasion)&&Object.hasOwn(THEME_COMPONENTS,raw.occasion)?raw:null;
  const key=campaign?.key||campaign?.id,visible=!!campaign&&!preferences.alwaysOriginal&&!preferences.disabled?.[key];
- const save=next=>{setPreferences(next);if(!preview)try{localStorage.setItem(preferenceKey,JSON.stringify(next))}catch{}};
+ const save=next=>{
+  const commit=()=>{setPreferences(next);if(!preview)try{localStorage.setItem(preferenceKey,JSON.stringify(next))}catch{}};
+  const nextVisible=!!campaign&&!next.alwaysOriginal&&!next.disabled?.[key];
+  if(campaign?.occasion==='christmas'&&nextVisible!==visible){
+   fadeChristmasChange(()=>flushSync(commit),{motion:!!campaign.motion&&!reduced&&!preferences.motionOff&&!next.motionOff});
+  }else commit();
+ };
  // A draft may preview copy on the shared original without installing or enabling a theme.
  const copy=visible?campaign.copy:preview&&appearance.previewMode==='draft'&&!campaign?raw?.copy:null;
- const value={campaign,copy,definition:appearance.definition,visible,preferences,save,key,motion:visible&&campaign.motion&&!reduced&&!preferences.motionOff};
- useEffect(()=>{if(!visible)return;document.documentElement.dataset.season=campaign.occasion;document.documentElement.dataset.seasonMotion=String(value.motion);return()=>{delete document.documentElement.dataset.season;delete document.documentElement.dataset.seasonMotion}},[visible,campaign?.occasion,value.motion]);
+ const value={campaign,copy,definition:appearance.definition,visible,preferences,save,key,motionAllowed:!!campaign?.motion&&!reduced&&!preferences.motionOff,motion:visible&&campaign.motion&&!reduced&&!preferences.motionOff};
+ useLayoutEffect(()=>{if(!visible)return;document.documentElement.dataset.season=campaign.occasion;document.documentElement.dataset.seasonMotion=String(value.motion);return()=>{delete document.documentElement.dataset.season;delete document.documentElement.dataset.seasonMotion}},[visible,campaign?.occasion,value.motion]);
  const Decoration=visible?THEME_COMPONENTS[campaign.occasion]?.Decorations:null;
  return <Context.Provider value={value}>{children}{Decoration&&campaign.decorations&&<Decoration season={value}/>}</Context.Provider>;
 }
 export const useSeason=()=>useContext(Context);
 export function SeasonText({field,children}){const {copy}=useSeason(),text=copy?.[field];return typeof text==='string'&&text.trim()?text.split('\n').map((line,i)=><React.Fragment key={i}>{i>0&&<br/>}{line}</React.Fragment>):children}
 export function SeasonSlot({name,children}){const season=useSeason(),Component=season.visible?THEME_COMPONENTS[season.campaign.occasion]?.[name]:null;return Component?<Component season={season} original={children}/>:children}
-export function SeasonControl(){const s=useSeason(),[open,setOpen]=useState(false);if(!s.campaign)return null;const o=s.definition,icon=iconDefinition({customOccasions:[o],occasionSettings:{[o.id]:o}},o.id);return <div className="season-control"><button className="season-toggle" aria-pressed={s.visible} onClick={()=>s.save({...s.preferences,alwaysOriginal:false,disabled:{...s.preferences.disabled,[s.key]:s.visible}})}>{icon.image?<img src={icon.image} alt=""/>:<span aria-hidden="true">{icon.symbol}</span>}{o.name} {s.visible?'on':'off'}</button><button className="season-settings" aria-label="Seasonal display preferences" aria-expanded={open} onClick={()=>setOpen(!open)}>Settings</button>{open&&<div className="season-options" onKeyDown={e=>{if(e.key==='Escape')setOpen(false)}}><label><input type="checkbox" checked={!!s.preferences.alwaysOriginal} onChange={e=>s.save({...s.preferences,alwaysOriginal:e.target.checked})}/>Always use the original look</label><label><input type="checkbox" checked={!!s.preferences.motionOff} onChange={e=>s.save({...s.preferences,motionOff:e.target.checked})}/>Pause seasonal motion</label><button onClick={()=>setOpen(false)}>Done</button></div>}</div>}
+export function SeasonControl(){const s=useSeason(),[open,setOpen]=useState(false);if(!s.campaign)return null;const o=s.definition,icon=iconDefinition({customOccasions:[o],occasionSettings:{[o.id]:o}},o.id),ControlIcon=THEME_COMPONENTS[s.campaign.occasion]?.ControlIcon;return <div className="season-control"><button className={`season-toggle${s.campaign.occasion==='christmas'?' cv-christmas-slider':''}`} aria-label={s.campaign.occasion==='christmas'?'Christmas theme':undefined} role={s.campaign.occasion==='christmas'?'switch':undefined} aria-checked={s.campaign.occasion==='christmas'?s.visible:undefined} aria-pressed={s.campaign.occasion==='christmas'?undefined:s.visible} onClick={()=>s.save({...s.preferences,alwaysOriginal:false,disabled:{...s.preferences.disabled,[s.key]:s.visible}})}>{ControlIcon?<ControlIcon season={s}/>:icon.image?<img src={icon.image} alt=""/>:<span aria-hidden="true">{icon.symbol}</span>}{s.campaign.occasion!=='christmas'&&<>{o.name} {s.visible?'on':'off'}</>}</button>{s.campaign.occasion!=='christmas'&&<button className="season-settings" aria-label="Seasonal display preferences" aria-expanded={open} onClick={()=>setOpen(!open)}>Settings</button>}{s.campaign.occasion!=='christmas'&&open&&<div className="season-options" onKeyDown={e=>{if(e.key==='Escape')setOpen(false)}}><label><input type="checkbox" checked={!!s.preferences.alwaysOriginal} onChange={e=>s.save({...s.preferences,alwaysOriginal:e.target.checked})}/>Always use the original look</label><label><input type="checkbox" checked={!!s.preferences.motionOff} onChange={e=>s.save({...s.preferences,motionOff:e.target.checked})}/>Pause seasonal motion</label><button onClick={()=>setOpen(false)}>Done</button></div>}</div>}

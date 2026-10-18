@@ -1,0 +1,26 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-18",
+  "reference": "output/christmas-santa-redesign/2026-10-18/06-refined-tree-and-peeking-santa.png",
+  "assets": [
+    {
+      "path": "night-backdrop.png",
+      "prompt": "Use case: stylized-concept. Generate a production website background raster asset matching the attached reference's charming tactile miniature Christmas world, rich plum midnight snow setting. NOT a website screenshot. Wide landscape 1536x1024. Background base deep plum #24112e, nearly uniform subtly textured spacious center taking 75 percent of width and unobstructed for live text and photos. Very dim soft snow-covered miniature fir branches frame only the extreme left and right edges, subtly lit by a few warm golden bokeh points. Few tiny scattered soft snow specks. Materials fluffy cream snow, soft crafted tree needles, cozy studio depth of field. Keep edge foliage restrained and dark enough not to compete with hero. No central tree, no Santa, no figures, no presents, no lantern, no ground snowbank, no buildings, no text, no UI, no logo, no border. Reference supplies style and palette only; omit all its content.",
+      "transparent": false,
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "path": "snow-divider.png",
+      "prompt": "Use case: stylized-concept. Generate a transparent PNG asset for a website section divider, matching only the fluffy crafted cream snow material of the reference. A single continuous low gently irregular snowbank strip extending edge to edge across a very wide horizontal image, about 1536 pixels wide and 200 pixels high. Thick soft cream white granular fluffy snow, charming tactile miniature winter diorama style, gentle lavender shadow underneath, tiny glistening crystals with restrained warm soft highlights. The top edge undulates mildly, lower edge softly irregular. Real transparent background above and below the snow, preserve alpha. Snow fills the middle horizontal band, touches left and right edges seamlessly. No trees, no characters, no Santa, no props, no sky, no text, no UI, no border. It is a reusable foreground snow lip, not a scene or screenshot. Wide panorama aspect, do not render a rectangular white background.",
+      "transparent": true,
+      "dimensions": [
+        2172,
+        724
+      ],
+      "notes": "Generated panoramic canvas includes transparent padding above and below. Retain alpha; crop with CSS/object positioning if needed."
+    }
+  ]
+}

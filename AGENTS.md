@@ -63,3 +63,5 @@ Admin recovery decision, 18 October 2026: confirm consequential proof preparatio
 Owner decision, 18 October 2026: add Fulfilled for delivered or collected, latest three completions plus older history, and option 2 grouped-by-stage Table alongside Board. Customer thank-you updates remain manual, with one fulfilled update attempt per order even after reopening. Google review CTA stays absent until a real verified business review URL is configured. Never invent a link.
 
 Handy publication approval, 18 October 2026: the owner approved publishing the reviewed studio integration while retaining all newer admin changes. Physical print readability remains a separate owner check.
+
+Christmas installation decision, 18 October 2026: the owner authorised publishing the Santa World theme to the existing Christmas occasion while inactive. This supersedes local-only deployment restrictions for this build. Preserve all saved seasonal records, wording, dates, repetition and schedule-off state. Do not mark Ready to use or activate without separate explicit approval. Continue refinements through the authenticated draft preview.

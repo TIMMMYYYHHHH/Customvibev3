@@ -1,0 +1,125 @@
+/* Christmas only. Shared content and customer controls remain the source of truth. */
+html[data-season="christmas"]{--cv-action:#b92353;--cv-action-hover:#9c1d46;background:#24112e}
+html[data-season="christmas"] body{background:#24112e}
+html[data-season="christmas"] .unified-header{background:#24112e;color:#fff9e9;border-color:#e8c8f12b}
+html[data-season="christmas"] .unified-header :is(.site-wordmark,.site-basket,.site-menu,nav a){color:#fff9e9}
+html[data-season="christmas"] .unified-header .site-create{background:#b92353;color:white;border:0;box-shadow:none}
+html[data-season="christmas"] .storefront,
+html[data-season="christmas"] .storefront .concept.thread-brand{--ink:#fff9e9;--surface:#24112e;--accent:#e4b2f1;background:#24112e;color:#fff9e9}
+html[data-season="christmas"] .storefront .thread-brand .thread-flow{padding-top:0;background:linear-gradient(to bottom,transparent 35vw,#24112e 66vw),url('/assets/seasons/christmas/santa-world/night-backdrop.webp') center top/100% auto no-repeat}
+html[data-season="christmas"] .storefront .thread-brand :is(.smooth-thread,.lower-thread,.mobile-thread,.reference-thread,.reference-thread-mobile,.thread-heart,.thread-accent){display:none}
+html[data-season="christmas"] .storefront .thread-brand .chapter-hero{width:100%;max-width:none;overflow:visible;z-index:2}
+html[data-season="christmas"] .storefront .cv-christmas-hero{position:relative;isolation:isolate;display:grid;grid-template-columns:43% 57%;align-items:center;max-width:1800px;margin:0 auto;min-height:620px}
+html[data-season="christmas"] .storefront .cv-christmas-copy{position:relative;z-index:2;min-width:0;padding:60px 0 110px clamp(24px,6vw,100px);text-align:left}
+html[data-season="christmas"] .storefront .cv-christmas-copy .overline{font-size:12px;letter-spacing:.17em;color:#fff9e9;font-weight:600}
+html[data-season="christmas"] .storefront .cv-christmas-copy h1{font:650 clamp(42px,4.7vw,76px)/1.05 'Fredoka Variable',sans-serif;letter-spacing:-.025em;margin:22px 0 26px;color:#fff9e9;overflow-wrap:anywhere}
+html[data-season="christmas"] .storefront .cv-christmas-copy :is(em,.cv-christmas-emphasis){color:#e3b0f1;font-style:normal}
+html[data-season="christmas"] .storefront .cv-christmas-copy>p:not(.overline){font-size:clamp(18px,1.75vw,27px);line-height:1.45;margin-bottom:30px}
+html[data-season="christmas"] .storefront .cv-christmas-copy>.action{font:650 clamp(19px,1.7vw,25px)/1.2 'Fredoka Variable',sans-serif;padding:17px 28px;min-height:58px;transform:none;box-shadow:none;background:#b92353;color:#fff9e9;border:0;border-radius:8px}
+html[data-season="christmas"] .storefront .cv-christmas-copy>small{display:block;font-size:14px;margin-top:18px;color:#e3d2e8}
+html[data-season="christmas"] .cv-christmas-tree{position:relative;width:100%;aspect-ratio:1;align-self:end;z-index:1}
+html[data-season="christmas"] .cv-christmas-tree-scene{display:block;width:100%;height:100%;object-fit:contain;mask-image:linear-gradient(to right,transparent,#000 9%,#000 96%,transparent);pointer-events:none}
+html[data-season="christmas"] .cv-christmas-photo{position:absolute;width:19%;filter:drop-shadow(0 4px 5px #120b1766)}
+html[data-season="christmas"] .cv-christmas-photo .magnet-face{width:100%;aspect-ratio:1}
+html[data-season="christmas"] .cv-christmas-photo>span{display:none}
+html[data-season="christmas"] .cv-christmas-photo-0{left:34%;top:24%;transform:rotate(9deg);width:17%}
+html[data-season="christmas"] .cv-christmas-photo-1{left:23%;top:43%;transform:rotate(-6deg)}
+html[data-season="christmas"] .cv-christmas-photo-2{left:48%;top:45%;transform:rotate(6deg)}
+html[data-season="christmas"] .cv-christmas-photo-3{left:20%;top:66%;transform:rotate(7deg)}
+html[data-season="christmas"] .cv-christmas-photo-4{left:46%;top:69%;transform:rotate(-7deg)}
+/* Raster snow and cameos decorate existing sections without duplicating their content. */
+html[data-season="christmas"] .cv-christmas-hero::after,
+html[data-season="christmas"] .storefront .chapter-story::before,
+html[data-season="christmas"] .storefront .chapter-story::after{content:"";position:absolute;left:0;right:0;height:170px;background:url('/assets/seasons/christmas/santa-world/snow-divider.webp') center/100% auto no-repeat;pointer-events:none;z-index:3}
+html[data-season="christmas"] .cv-christmas-hero::after{bottom:-70px}
+html[data-season="christmas"] .storefront .chapter-collections{position:relative;overflow:visible;z-index:3;padding:0 0 55px}
+html[data-season="christmas"] .storefront .chapter-collections::before{content:"";position:absolute;left:4%;top:-130px;width:340px;aspect-ratio:1.5;background:url('/assets/seasons/christmas/santa-world/peek-snow.webp') center/contain no-repeat;z-index:4;pointer-events:none}
+html[data-season="christmas"] .storefront .thread-brand .collections{padding-top:64px;padding-bottom:35px;width:min(1320px,90%)}
+html[data-season="christmas"] .storefront .thread-brand .collections .section-heading{text-align:center;margin-bottom:32px}
+html[data-season="christmas"] .storefront .thread-brand .collections .section-heading h2{max-width:none}
+html[data-season="christmas"] .storefront .thread-brand .collections .section-heading>p{color:#f5eaf6}
+html[data-season="christmas"] .storefront .thread-brand :is(.story-copy,.section-heading,.make-it,.reviews,.questions,.contact-intro){color:#fff9e9}
+html[data-season="christmas"] .storefront .thread-brand :is(.photo-scribble,.story-scribble,.contact-scribble,.price-delivery){color:#e3b0f1}
+html[data-season="christmas"] .storefront .thread-brand :is(.chaos-price-grid article,.contact-form,.collection-card,.product-dialog,.reviews-empty,.review,.collection-empty){--ink:#26133d;--surface:#fffdf8;color:#26133d}
+html[data-season="christmas"] .storefront .thread-brand .action{box-shadow:none}
+html[data-season="christmas"] .storefront .chapter-story{background:#fff9ee;isolation:isolate}
+html[data-season="christmas"] .storefront .chapter-story::before{top:-85px}
+html[data-season="christmas"] .storefront .chapter-story::after{bottom:-85px}
+html[data-season="christmas"] .storefront .thread-brand .chapter-story .story{width:min(1200px,86%);grid-template-columns:40% 51%;gap:9%;padding:120px 0 85px;align-items:center}
+html[data-season="christmas"] .storefront .thread-brand .chapter-story .story-image{position:relative;max-width:370px;width:100%;padding:0;margin:0;grid-template-columns:1fr;isolation:isolate}
+html[data-season="christmas"] .storefront .chapter-story .story-image::before{content:"";position:absolute;right:-115px;top:-70px;width:220px;aspect-ratio:.75;background:url('/assets/seasons/christmas/santa-world/peek-side.webp') center/contain no-repeat;pointer-events:none;z-index:0}
+html[data-season="christmas"] .storefront .thread-brand .chapter-story .story-photo{transform:rotate(-4deg);grid-row:1;z-index:1}
+html[data-season="christmas"] .storefront .chapter-story .photo-options{position:relative;z-index:2;grid-row:2;margin-top:26px}
+html[data-season="christmas"] .storefront .chapter-story :is(.story-scribble,.photo-accent){display:none}
+html[data-season="christmas"] .storefront .thread-brand .chapter-story :is(.story-copy,.photo-scribble){color:#26133d}
+html[data-season="christmas"] .storefront .thread-brand .chapter-story .story-copy>p{max-width:550px}
+html[data-season="christmas"] .storefront .chapter-story .action{background:#b92353;color:#fff9e9;border:0}
+html[data-season="christmas"] .storefront .chapter-making{position:relative;padding-top:100px;padding-bottom:20px}
+html[data-season="christmas"] .storefront .chapter-making::before{content:"";position:absolute;right:4%;top:-20px;width:250px;aspect-ratio:1.5;background:url('/assets/seasons/christmas/santa-world/peek-snow.webp') center/contain no-repeat;pointer-events:none;z-index:4}
+html[data-season="christmas"] .storefront .thread-brand .make-it{display:block;width:min(1250px,88%);padding:35px 0 70px;min-height:0}
+html[data-season="christmas"] .storefront .thread-brand .make-it>.tray{display:none}
+html[data-season="christmas"] .storefront .thread-brand .make-it>div{max-width:none;margin:0}
+html[data-season="christmas"] .storefront .thread-brand .make-it>div>h2{max-width:70%}
+html[data-season="christmas"] .storefront .thread-brand .make-it>div>p:not(.overline){max-width:700px}
+html[data-season="christmas"] .storefront .thread-brand .making-steps{margin:32px 0;max-width:none}
+html[data-season="christmas"] .storefront .thread-brand .making-steps :is(strong,small){color:#fff9e9}
+html[data-season="christmas"] .storefront .thread-brand .questions details{color:#26133d;border-color:#eee0f23d}
+html[data-season="christmas"] .storefront .thread-brand .reviews-intro>.overline,
+html[data-season="christmas"] .storefront .thread-brand .contact-intro :is(.overline,em,a,h1>span,h2>span){color:#e3b0f1}
+html[data-season="christmas"] .storefront .collection-page :is(.catalog-status,.result-count){color:#d9c8e1}
+html[data-season="christmas"] .storefront .collection-search input::placeholder{color:#d9c8e1;opacity:1}
+html[data-season="christmas"] .storefront .collection-filters [aria-pressed="true"]{background:#b92353;color:white}
+html[data-season="christmas"] .unified-footer{background:#1b0d23;color:#fff9e9;border-color:#e6baf330}
+html[data-season="christmas"] .unified-footer :is(a,h2,p,span){color:inherit}
+html[data-season="christmas"] .unified-footer .footer-hand{color:#e3b0f1}
+html[data-season="christmas"] .storefront .catalog-grid.collection-cards>article{--ink:#26133d;background:#fff9ee;color:#26133d}
+html[data-season="christmas"] .storefront .collection-cards .catalog-card-copy>p{color:#493b50}
+/* Shopping workspaces retain clear warm surfaces and the same controls. */
+html[data-season="christmas"] .shop-shell{background:#fcf6fa;--cv-action:#b92353;--cv-action-hover:#9c1d46}
+html[data-season="christmas"] .shop-shell .button{box-shadow:none}
+html[data-season="christmas"] .cv-christmas-snow{position:fixed;inset:70px 0 0;pointer-events:none;z-index:4;overflow:hidden;contain:strict}
+html[data-season="christmas"] .cv-christmas-snow span{position:absolute;color:#eee1f2;opacity:.65;line-height:1;animation:cv-christmas-fall 20s linear infinite;animation-play-state:paused}
+html[data-season="christmas"][data-season-motion="true"] .cv-christmas-snow span{animation-play-state:running}
+html[data-season="christmas"] .cv-christmas-motion{position:fixed;right:20px;bottom:18px;z-index:50;border:1px solid #cba3d7;background:#24112e;color:#fff9e9;border-radius:6px;min-height:44px;padding:10px 16px;font:500 13px 'DM Sans Variable',sans-serif;cursor:pointer}
+html[data-season="christmas"] :is(a,button,input,select,summary):focus-visible{outline:3px solid #be74d5;outline-offset:4px}
+@keyframes cv-christmas-fall{from{transform:translate3d(0,-100vh,0)}to{transform:translate3d(25px,100vh,0)}}
+@media(min-width:1181px){html[data-season="christmas"] .unified-header .header-inner{gap:15px}html[data-season="christmas"] .unified-header nav{gap:16px}}
+@media(max-width:1000px) and (min-width:761px){
+ html[data-season="christmas"] .storefront .cv-christmas-hero{min-height:550px;grid-template-columns:44% 56%}
+ html[data-season="christmas"] .storefront .cv-christmas-copy{padding-left:30px}
+ html[data-season="christmas"] .storefront .cv-christmas-copy h1{font-size:43px}
+ html[data-season="christmas"] .storefront .chapter-collections::before{width:220px;top:-100px}
+}
+@media(max-width:760px){
+ html[data-season="christmas"] .storefront .cv-christmas-hero{display:flex;flex-direction:column;min-height:0}
+ html[data-season="christmas"] .storefront .cv-christmas-copy{width:100%;padding:38px 24px 10px}
+ html[data-season="christmas"] .storefront .cv-christmas-copy h1{font-size:clamp(39px,8.4vw,60px);margin:18px 0 22px}
+ html[data-season="christmas"] .storefront .cv-christmas-copy .overline{font-size:10px}
+ html[data-season="christmas"] .storefront .cv-christmas-copy>p:not(.overline){font-size:19px;margin-bottom:24px}
+ html[data-season="christmas"] .storefront .cv-christmas-copy>.action{font-size:21px;padding:14px 24px}
+ html[data-season="christmas"] .storefront .cv-christmas-copy>small{font-size:12px;margin-top:15px}
+ html[data-season="christmas"] .cv-christmas-tree{width:min(100%,600px);align-self:center;margin-top:16px}
+ html[data-season="christmas"] .cv-christmas-hero::after{height:100px;bottom:-35px;background-size:auto 190px}
+ html[data-season="christmas"] .storefront .chapter-collections::before{left:3%;top:-55px;width:170px}
+ html[data-season="christmas"] .storefront .thread-brand .collections{padding-top:70px}
+ html[data-season="christmas"] .storefront .thread-brand .collections .section-heading{margin-bottom:26px}
+ html[data-season="christmas"] .storefront .thread-brand .collections .section-heading>p{font-size:17px}
+ html[data-season="christmas"] .storefront .thread-brand .chapter-story .story{grid-template-columns:1fr;gap:38px;padding:80px 0;width:calc(100% - 48px)}
+ html[data-season="christmas"] .storefront .thread-brand .chapter-story .story-image{width:75%;max-width:290px;margin:0 auto 0 0}
+ html[data-season="christmas"] .storefront .chapter-story .story-image::before{right:-75px;top:-55px;width:145px}
+ html[data-season="christmas"] .storefront .chapter-story .story-copy h2{font-size:39px}
+ html[data-season="christmas"] .storefront .chapter-story::before{top:-70px}
+ html[data-season="christmas"] .storefront .chapter-story::after{bottom:-70px}
+ html[data-season="christmas"] .storefront .chapter-story::before,html[data-season="christmas"] .storefront .chapter-story::after{height:140px;background-size:auto 240px}
+ html[data-season="christmas"] .storefront .chapter-making{padding-top:100px}
+ html[data-season="christmas"] .storefront .chapter-making::before{width:180px;top:0;right:2%}
+ html[data-season="christmas"] .storefront .thread-brand .make-it{padding-top:40px;padding-bottom:40px}
+ html[data-season="christmas"] .storefront .thread-brand .make-it>div>h2{max-width:none}
+ html[data-season="christmas"] .cv-christmas-motion{right:12px;bottom:12px}
+}
+@media(prefers-reduced-motion:reduce){html[data-season="christmas"] .cv-christmas-snow span{animation:none}html[data-season="christmas"] .cv-christmas-motion{display:none}}
+
+@media(min-width:1001px){
+ html[data-season="christmas"] .storefront .thread-brand .chapter-story .story-image{grid-column:1;grid-row:1}
+ html[data-season="christmas"] .storefront .thread-brand .chapter-story .story-copy{grid-column:2;grid-row:1}
+}

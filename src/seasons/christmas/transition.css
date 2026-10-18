@@ -1,0 +1,13 @@
+/* Only present during an explicit Christmas appearance change. */
+html[data-christmas-transition]::view-transition-group(root){animation-duration:900ms}
+html[data-christmas-transition]::view-transition-old(root){animation:cv-christmas-page-out 900ms ease-in-out both;mix-blend-mode:normal}
+html[data-christmas-transition]::view-transition-new(root){animation:cv-christmas-page-in 900ms ease-in-out both;mix-blend-mode:normal}
+html[data-christmas-transition] .season-control:has(.cv-christmas-slider){view-transition-name:cv-christmas-control}
+html[data-christmas-transition]::view-transition-group(cv-christmas-control){animation:none;z-index:1}
+html[data-christmas-transition]::view-transition-old(cv-christmas-control){display:none}
+html[data-christmas-transition]::view-transition-new(cv-christmas-control){animation:none;mix-blend-mode:normal}
+@keyframes cv-christmas-page-out{from{opacity:1}to{opacity:0}}
+@keyframes cv-christmas-page-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){
+ html[data-christmas-transition]::view-transition-group(*),html[data-christmas-transition]::view-transition-old(*),html[data-christmas-transition]::view-transition-new(*){animation:none!important}
+}

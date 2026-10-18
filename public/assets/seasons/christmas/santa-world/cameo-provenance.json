@@ -1,0 +1,27 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-18",
+  "referenceImages": [
+    "output/christmas-santa-redesign/2026-10-18/06-refined-tree-and-peeking-santa.png",
+    "public/assets/seasons/christmas/santa-peekaboo-poses.png"
+  ],
+  "assets": [
+    {
+      "filename": "peek-snow.png",
+      "width": 1536,
+      "height": 1024,
+      "transparent": true,
+      "source": "/Users/timothymorton/.codex/generated_images/01a14dd3-8e1a-78a0-898a-771b651c92df/exec-8acdcb5a-9a42-48b6-a0a3-8e50e509c215.png",
+      "prompt": "Use case: stylized-concept. Create one production website decorative transparent PNG cutout. Reference image 1 is the approved website art style and peekaboo composition; reference image 2 is exact Santa character identity. Match this exact soft plush Santa: deep cranberry velvet knitted hat, fluffy ivory fleece brim and pompom, peach round nose, cream finely textured sculpted moustache/beard, smiling curved closed eyes. He peeks happily over a low irregular snowbank, with both red plush mitten hands gripping the snow, like the little cameo below the hero in reference 1. Only his hat, face, two mittens and low fluffy cream snowbank visible, no body below. Landscape composition 3:2; character centered with ample transparent margins. Snowbank narrow and low, irregular soft edges, spans approximately 80 percent of image width, Santa approximately 60 percent image width. Genuine alpha transparency everywhere around the cutout. NO background, trees, scenery, text, UI, shadows cast on a backdrop, extra characters, or photos. Warm soft studio light; lovable tactile high-quality miniature. Keep the same character silhouette, hat/beard material and facial proportions as reference 2."
+    },
+    {
+      "filename": "peek-side.png",
+      "width": 1086,
+      "height": 1448,
+      "transparent": true,
+      "source": "/Users/timothymorton/.codex/generated_images/01a14dd3-8e1a-78a0-898a-771b651c92df/exec-67b295e7-e8b6-4c0f-85c1-3868ce9cd275.png",
+      "prompt": "Use case: stylized-concept. Create one production website decorative cutout PNG with true transparent background. Reference 1 is approved website look; reference 2 is EXACT Santa character identity. Match the plush cranberry felt Santa hat, ivory fleece trim and pompom, peach round nose, sculpted textured cream beard and moustache. A playful Santa peeking around an INVISIBLE vertical edge on the LEFT of the composition: face is on the right of this imagined edge, looking left toward where a photo will later be placed. One mitten near upper left above face, another near lower left below face, as though gripping the photo's right edge. Head tilted slightly left, one happy curved closed eye and one open glossy black eye, cheeky gentle smile. No photo, no frame, no actual vertical object, no snow, no trees, no scenery. Isolated character head with red mittens, no full body. Leave generous fully transparent space around character, all shapes completely inside canvas. Clean cutout edge without any glow, halo, mist or shadow beyond character silhouette. Soft warm dimensional studio light on character itself, same lovely tactile soft toy quality and facial proportions as image 2. Portrait 3:4, no text, no UI."
+    }
+  ],
+  "verification": "Visually inspected both generated outputs, read PNG alpha channels. Snow preview shows hidden RGB haze but tested exterior pixels have alpha=0; preserved original alpha without edits. Source originals retained."
+}
