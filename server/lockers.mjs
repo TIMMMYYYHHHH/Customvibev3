@@ -40,7 +40,7 @@ export function createLockerSource({network=fetch,cache,now=Date.now,diagnostic=
     const cached=await store?.match(cacheKey);
     if(cached){const value=await cached.json();if(value.failed&&value.retryAt>now()){retryAt=value.retryAt;cachedFailure=true;throw unavailable();}if(Array.isArray(value.locations)&&Number.isFinite(value.updatedAt)&&now()>=value.updatedAt&&now()-value.updatedAt<MAX_AGE){memory=value;return value;}}
     stage='network';
-    const response=await network(ENDPOINT,{method:'GET',headers:{Authorization:'Bearer '+env.TCG_LOCKER_API_KEY,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(12000)});
+    const response=await network(ENDPOINT,{method:'GET',headers:{Authorization:'Bearer '+env.TCG_LOCKER_API_KEY,Accept:'application/json'},redirect:'manual',signal:AbortSignal.timeout(12000)});
     upstreamStatus=response.status;stage='upstream-status';
     if(!response.ok)throw unavailable();
     stage='read-body';const body=await boundedBody(response,MAX_BYTES);

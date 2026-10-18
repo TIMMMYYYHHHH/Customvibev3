@@ -19,13 +19,13 @@ test('provider data exposes only valid locker locations, never kiosks or arbitra
 });
 test('locker source uses a fixed GET endpoint, server bearer key, bounded cache and concurrent request coalescing',async()=>{
  const settings=env(),store=cache();let count=0;
- const source=createLockerSource({cache:store,network:async(url,options)=>{count++;assert.equal(url,'https://api-pudo.co.za/api/v1/lockers-data');assert.equal(options.method,'GET');assert.equal(options.redirect,'error');assert.equal(options.headers.Authorization,'Bearer '+settings.TCG_LOCKER_API_KEY);return Response.json([row()]);}});
+ const source=createLockerSource({cache:store,network:async(url,options)=>{count++;assert.equal(url,'https://api-pudo.co.za/api/v1/lockers-data');assert.equal(options.method,'GET');assert.equal(options.redirect,'manual');assert.equal(options.headers.Authorization,'Bearer '+settings.TCG_LOCKER_API_KEY);return Response.json([row()]);}});
  const results=await Promise.all([source(settings),source(settings),source(settings)]);assert.equal(count,1);assert.equal(results[0].locations[0].id,'CG123');
  await source(settings);assert.equal(count,1);
  const another=createLockerSource({cache:store,network:async()=>{throw Error('Cache must be reused')}});assert.equal((await another(settings)).locations.length,1);
 });
 test('failed and oversized upstream responses are not returned or cached as locker data',async()=>{
- for(const response of [new Response('secret upstream detail',{status:500}),Response.json({error:'private error'}),new Response('x'.repeat(8000001)),Response.json([])]){
+ for(const response of [new Response('secret upstream detail',{status:500}),new Response(null,{status:302,headers:{Location:'https://untrusted.example/'}}),Response.json({error:'private error'}),new Response('x'.repeat(8000001)),Response.json([])]){
   const source=createLockerSource({cache:cache(),network:async()=>response});await assert.rejects(()=>source(env()),/Locker lookup unavailable/);
  }
 });
