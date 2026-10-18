@@ -91,3 +91,16 @@ Owner requested three bounded presentation corrections: integrate the collection
 Evidence: project output/christmas-live/santa-snowbank-local.jpg and santa-snowbank-mobile.jpg.
 
 Live evidence: output/christmas-live/admin-neutral-calendar-live.jpg and santa-snowbank-live.jpg in the project workspace. The refreshed live editor also confirms the prior year-copy removal, closing its pending session-dependent visual check. Founders Hub review activity records implementation, local checks, publication and live verification separately; final owner design acceptance remains open.
+
+## 18 October: collection setup spacing and second snowbank cameo
+
+Owner annotated cramped Store content setup copy, the floating Santa above Pick. Crop. Stick., and asked what the date-preview controls do.
+
+- [x] Put the collection-preparation action and explanation on separate lines, with 14px internal spacing, readable line length, and separation from catalogue tabs. Link the explanation accessibly to the button. Preserve the action and all content values.
+- [x] Move the making-section Santa into the main snowbank and blend its lower patch. Christmas-only selectors; same artwork and responsive sizes. Checked desktop and 390px mobile.
+- [x] Site/SSR/prerender and admin builds pass, with 22 focused seasonal/date/motion tests. Local content review uses disposable in-memory data without production services.
+- [ ] Publish and verify both changes in authenticated live admin. Keep Christmas inactive.
+
+Date-preview code verified: the local simulated clock changes displayed status calculations; occasion shortcuts jump one hour after the preferred campaign start. This draft still shows draft appearance/wording, while selected-date preview resolves eligible approved themes. No schedule or activation is changed by these preview controls; reload restores today's clock. The feature remains in place because the owner asked for an explanation, not removal.
+
+Live pre-change observation: Christmas OFF, schedule unchecked, recurrence currently Every year. Preserve the current recurrence, which supersedes older one-time observations in this log. No seasonal or catalogue records were written. Local evidence: output/christmas-live/content-spacing-local.jpg, santa-making-local.jpg and santa-making-mobile.jpg in the project workspace. Founders Hub existing review subtask records the refinement; final owner design acceptance remains open.

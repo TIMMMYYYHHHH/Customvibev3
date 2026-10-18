@@ -55,7 +55,7 @@ html[data-season="christmas"] .storefront .thread-brand .chapter-story :is(.stor
 html[data-season="christmas"] .storefront .thread-brand .chapter-story .story-copy>p{max-width:550px}
 html[data-season="christmas"] .storefront .chapter-story .action{background:#b92353;color:#fff9e9;border:0}
 html[data-season="christmas"] .storefront .chapter-making{position:relative;padding-top:100px;padding-bottom:20px}
-html[data-season="christmas"] .storefront .chapter-making::before{content:"";position:absolute;right:4%;top:-20px;width:250px;aspect-ratio:1.5;background:url('/assets/seasons/christmas/santa-world/peek-snow.webp') center/contain no-repeat;pointer-events:none;z-index:4}
+html[data-season="christmas"] .storefront .chapter-making::before{content:"";position:absolute;right:4%;top:-115px;width:250px;aspect-ratio:1.5;background:url('/assets/seasons/christmas/santa-world/peek-snow.webp') center/contain no-repeat;mask-image:linear-gradient(to bottom,#000 67%,transparent 87%);pointer-events:none;z-index:4}
 html[data-season="christmas"] .storefront .thread-brand .make-it{display:block;width:min(1250px,88%);padding:35px 0 70px;min-height:0}
 html[data-season="christmas"] .storefront .thread-brand .make-it>.tray{display:none}
 html[data-season="christmas"] .storefront .thread-brand .make-it>div{max-width:none;margin:0}
@@ -112,7 +112,7 @@ html[data-season="christmas"] :is(a,button,input,select,summary):focus-visible{o
  html[data-season="christmas"] .storefront .chapter-story::after{bottom:-70px}
  html[data-season="christmas"] .storefront .chapter-story::before,html[data-season="christmas"] .storefront .chapter-story::after{height:140px;background-size:auto 240px}
  html[data-season="christmas"] .storefront .chapter-making{padding-top:100px}
- html[data-season="christmas"] .storefront .chapter-making::before{width:180px;top:0;right:2%}
+ html[data-season="christmas"] .storefront .chapter-making::before{width:180px;top:-75px;right:2%}
  html[data-season="christmas"] .storefront .thread-brand .make-it{padding-top:40px;padding-bottom:40px}
  html[data-season="christmas"] .storefront .thread-brand .make-it>div>h2{max-width:none}
  html[data-season="christmas"] .cv-christmas-motion{right:12px;bottom:12px}

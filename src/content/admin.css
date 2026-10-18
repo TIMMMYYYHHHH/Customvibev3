@@ -52,3 +52,6 @@
 .admin-save-state{padding:7px 12px;background:#eee6f1;border-radius:20px;color:#584263}
 .admin-savebar{box-shadow:0 -10px 22px #faf8f4}
 @media(max-width:760px){.admin-catalogue{gap:22px}.admin-form-grid{grid-template-columns:1fr}.admin-page .cv-stage-select{margin-bottom:16px}.admin-product-form{padding:20px}}
+
+.admin-collection-setup{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin:24px 0 28px}
+.admin-collection-setup>p{margin:0;max-width:72ch;line-height:1.6}
