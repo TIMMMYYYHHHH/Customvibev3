@@ -1,0 +1,5 @@
+export function proofConfirmation(action,order){
+ const revision=order.proof?.revision||0,approved=order.proof?.status==='approved';
+ if(action==='revoke')return {title:'Revoke review links?',label:'Revoke links',body:`For ${order.reference}, existing review links and open customer review sessions for revision ${revision} will stop working. The artwork and its ${approved?'recorded approval remain unchanged. Fresh approval is not required unless you publish a replacement revision.':'current approval status remain unchanged.'} No email is sent.`};
+ return {title:revision?'Publish a replacement proof?':'Prepare the first proof?',label:revision?'Publish replacement':'Prepare proof',body:`For ${order.reference}, this creates revision ${revision+1}. ${revision?'Previous review links and customer review sessions will stop working. Existing approval is cleared. ':''}The order returns to New order and needs customer approval of this revision before printing. No email is sent. Use Preview update and Send update separately to send the review link. The original artwork expiry date stays the same.`};
+}

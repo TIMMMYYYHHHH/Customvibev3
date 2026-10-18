@@ -1,0 +1,9 @@
+import React,{useEffect,useState,useSyncExternalStore} from 'react';
+import {sessionRecovery} from './session-recovery.mjs';
+export default function SessionRecovery(){
+ const session=useSyncExternalStore(sessionRecovery.subscribe,sessionRecovery.getSnapshot,sessionRecovery.getSnapshot),[checking,setChecking]=useState(false);
+ useEffect(()=>{let lastCheck=Date.now();sessionRecovery.check();const focus=()=>{if(document.visibilityState==='visible'&&Date.now()-lastCheck>15000){lastCheck=Date.now();sessionRecovery.check()}};const timer=setInterval(()=>sessionRecovery.tick(),10000);window.addEventListener('focus',focus);document.addEventListener('visibilitychange',focus);return()=>{clearInterval(timer);window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',focus)}},[]);
+ if(session.status==='active')return null;
+ const messages={expiring:'Your sign-in expires in less than a minute.',expired:'Your admin session has expired.',unavailable:'Your sign-in could not be checked. Check your connection and try again.',restored:'You are signed in again. Your edits are still here. Retry the action when you are ready.'};
+ return <section className="cv-session-recovery" aria-label="Admin session recovery" role="status"><strong>{messages[session.status]}</strong>{session.status!=='restored'&&<><p>Keep this tab open. Sign in in a new tab, then return here. Unsaved wording and selected artwork stay in this tab; nothing is saved or sent automatically.</p><a className="cv-btn quiet" href="/auth/login" target="_blank" rel="noopener">Sign in in a new tab</a> <button className="cv-btn quiet" type="button" disabled={checking} onClick={async()=>{setChecking(true);if(await sessionRecovery.check())window.dispatchEvent(new Event('cv-admin-session-restored'));setChecking(false)}}>{checking?'Checking…':'Check sign-in'}</button></>}</section>;
+}

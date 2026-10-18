@@ -19,8 +19,18 @@ window.fetch=async(path,opts={})=>{
  if(/^\/api\/artwork\/[a-f0-9-]{36}$/.test(url.pathname))return Response.json({id:orders[0].id,expires:orders[0].expires,files:orders[0].snapshot.items.flatMap(item=>item.files)});
  if(url.pathname.startsWith('/api/artwork/'))return realFetch('/tests/fixtures/print-tile.jpg');
  if(url.pathname.startsWith('/api/orders/')){
+  if(unifiedReview){const session=await realFetch('/api/session');if(!session.ok)return session;}
+
   const id=url.pathname.split('/')[3],order=orders.find(o=>o.id===id);
   if(!order)return Response.json({error:'Request not found.'},{status:404});
+  if(url.pathname.includes('/proof/')){
+   const body=JSON.parse(opts.body||'{}');if(body.version!==order.version)return Response.json({error:'Order changed. Review current version.'},{status:409});
+   const action=url.pathname.split('/').at(-1);
+   if(action==='prepare')return Response.json({ok:true});
+   if(action==='publish'||action==='seed'){order.proof={...order.proof,revision:(order.proof?.revision||0)+1,status:'awaiting_approval',items:order.proof?.items||order.snapshot.items};order.status='new';order.version++;return Response.json({ok:true});}
+   if(action==='revoke'){order.version++;return Response.json({ok:true});}
+   return Response.json({error:'Unsupported local proof operation'},{status:400});
+  }
   if(url.pathname.endsWith('/preview'))return Response.json(orderUpdateEmail(order));
   if(url.pathname.endsWith('/send'))return Response.json({error:'Local preview: sending is disabled.'},{status:503});
   if(url.pathname.endsWith('/status')){

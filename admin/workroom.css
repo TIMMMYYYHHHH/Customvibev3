@@ -77,3 +77,11 @@
 .calculated-dates h3 { margin: 0 0 8px; }
 .calculated-dates input[readonly] { background: #f0eeeb; color: #35233f; }
 @media (max-width: 420px) { .rule-grid { grid-template-columns: 1fr; } }
+
+/* Shared, flat recovery and confirmation surfaces. */
+.cv-session-recovery{padding:16px 24px;border-bottom:1px solid #ded8df;color:#35233f;background:#fffdf8;font-size:15px}
+.cv-session-recovery p{margin:8px 0 12px;max-width:78ch}
+.cv-proof-confirm{box-sizing:border-box;width:min(560px,calc(100% - 32px));max-height:calc(100svh - 32px);overflow:auto;border:1px solid #ded8df;border-radius:16px;background:#fffdf8;color:#35233f;padding:24px;font:inherit}
+.cv-proof-confirm::backdrop{background:rgb(20 15 25 / .45)}
+.cv-proof-confirm h2{margin-top:0}.cv-proof-confirm p{line-height:1.65}
+.cv-confirm-actions{display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}

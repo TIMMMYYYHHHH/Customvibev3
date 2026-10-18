@@ -34,9 +34,13 @@ const env={CONTENT_DB:db,ADMIN_PASSWORD_HASH:random(),ADMIN_PASSWORD_SALT:random
 
 const vite=await createServer({configFile:false,appType:'custom',server:{middlewareMode:true,host:"127.0.0.1",hmr:false},plugins:[(await import('@vitejs/plugin-react')).default()]});
 const banner='<div style="padding:6px 20px;background:#35233f;color:white;font:12px/1.5 system-ui">Local review · Sample orders · Changes stay on this computer · No emails</div>';
+let sessionExpired=false;
 http.createServer(async(req,res)=>{
  try{
   const path=new URL(req.url,'http://127.0.0.1').pathname;
+  if(path==='/__review/session'&&req.method==='POST'){const chunks=[];for await(const c of req)chunks.push(c);sessionExpired=Buffer.concat(chunks).toString()==='expire';res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({expired:sessionExpired}));return}
+  if(sessionExpired&&(path.startsWith('/api/')||path==='/content.json')){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'Local review session expired'}));return}
+
   if(/^\/api\/artwork\/(?:11111111-1111-4111-8111-00000000000[1-6]|22222222-2222-4222-8222-222222222222)\/(?:[0-9]|[1-5][0-9])$/.test(path)&&req.method==='GET'){
    res.writeHead(200,{'Content-Type':'image/jpeg','Cache-Control':'no-store'});res.end(await readFile('tests/fixtures/print-tile.jpg'));return;
   }
@@ -49,7 +53,7 @@ http.createServer(async(req,res)=>{
    res.writeHead(r.status,{'Content-Type':r.headers.get('Content-Type')||'application/json','Cache-Control':'no-store'});res.end(Buffer.from(await r.arrayBuffer()));return;
   }
   const pages={'/':'tests/fixtures/admin-orders.html','/orders':'tests/fixtures/admin-orders.html','/content':'tests/fixtures/admin-orders.html','/themes':'admin/themes.html','/preview':'admin/preview.html'};
-  if(pages[path]){let html=await readFile(pages[path],'utf8');if(path!=='/preview')html=html.replace('<body>','<body>'+banner);html=await vite.transformIndexHtml(req.url,html);res.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'});res.end(html);return}
+  if(pages[path]){let html=await readFile(pages[path],'utf8');if(path!=='/preview')html=html.replace('<body>','<body>'+banner+'<div id="review-session-controls"><button id="expire-review-session">Expire local session</button><button id="restore-review-session">Restore local sign-in</button><span id="review-session-result"></span></div><script type="module" src="/tests/fixtures/session-controls.mjs"></script>');html=await vite.transformIndexHtml(req.url,html);res.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'});res.end(html);return}
   vite.middlewares(req,res,()=>{res.writeHead(404);res.end('Not found')});
  }catch(e){res.statusCode=500;res.end(e.message)}
 }).listen(port,'127.0.0.1',()=>console.log(`Local admin review: http://127.0.0.1:${port}/orders`));

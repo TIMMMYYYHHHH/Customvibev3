@@ -1,3 +1,4 @@
+import {adminFetch} from './session-recovery.mjs';
 import OrderProof from './OrderProof';
 import EmailPreview from './EmailPreview';
 import React,{useState,useEffect,useRef} from 'react';
@@ -8,12 +9,12 @@ import {api} from './api.mjs';
 import {statusLabels} from '../server/order-update-email.mjs';
 import {downloadOrderArchive} from './order-archive.mjs';
 import {queueArtworkPreview} from './preview-queue.mjs';
-const date=t=>new Date(t*1000).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'});
+import {adminDate as date} from './time.mjs';
 function ArtworkPreview({url,alt}){
  const [src,setSrc]=useState(''),[error,setError]=useState(''),[attempt,setAttempt]=useState(0);
  useEffect(()=>{let active=true,objectUrl;const controller=new AbortController();setError('');setSrc('');
   queueArtworkPreview(async()=>{
-   const r=await fetch(url,{cache:'no-store',signal:controller.signal});
+   const r=await adminFetch(url,{cache:'no-store',signal:controller.signal});
    if(!r.ok)throw Error(r.status===401?'Sign in again to view this artwork.':r.status===410?'This artwork has expired.':r.status===429?'The download allowance is temporarily full.':'This preview could not load. Try again shortly.');
    if(!r.headers.get('content-type')?.startsWith('image/jpeg'))throw Error('This preview could not load. Try again shortly.');
    return r.blob();
@@ -32,7 +33,7 @@ export default function OrderDetail({order:initialOrder,onChange}){
  const stageLocked=['saving','error','conflict'].includes(moveState?.state);
  const root='/api/orders/'+order.id,expired=order.expires*1000<=Date.now();
  async function act(fn){if(busy||stageLocked)return;setBusy(true);setError('');setMessage('');try{await fn()}catch(e){setError(e.message)}finally{setBusy(false)}}
- async function archive(){const current=await api(root);const bytes=await downloadOrderArchive(current,(index,file)=>fetch(`/api/artwork/${file.requestId||order.id}/${index}`,{cache:'no-store'}));if((await api(root)).version!==current.version)throw Error('The order changed during download. Review the current revision and try again.');const url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));const a=document.createElement('a');a.href=url;a.download=order.reference+'-artwork.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);setMessage('Your artwork archive is ready. Print quantities are in the instructions file.');}
+ async function archive(){const current=await api(root);const bytes=await downloadOrderArchive(current,(index,file)=>adminFetch(`/api/artwork/${file.requestId||order.id}/${index}`,{cache:'no-store'}));if((await api(root)).version!==current.version)throw Error('The order changed during download. Review the current revision and try again.');const url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));const a=document.createElement('a');a.href=url;a.download=order.reference+'-artwork.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);setMessage('Your artwork archive is ready. Print quantities are in the instructions file.');}
  const attempted=order.updates.some(u=>u.version===order.version);
  const currentProof=order.snapshot.approvalRequired&&order.proof?.revision?order.proof:null;
  const artworkItems=currentProof?currentProof.items:order.snapshot.items;
