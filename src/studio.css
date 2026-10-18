@@ -71,8 +71,8 @@
 .studio-review-bar strong{display:block;font-size:16px}
 .studio-review-bar small{display:block;font-size:11px;margin-top:4px}
 .studio-price{padding:0 24px;border-left:1px solid #26133d22}
-.shop-shell .one-studio .button{background:#ae2e5b;border-color:#ae2e5b;color:white;box-shadow:none;font-family:'DM Sans Variable',sans-serif;font-size:15px;font-weight:750;letter-spacing:0;min-width:230px;border-radius:7px;min-height:54px}
-.shop-shell .one-studio .button:hover{background:#92234b;border-color:#92234b}
+.shop-shell .one-studio .button{font-size:17px;min-width:230px;min-height:54px}
+
 .studio-bundle{max-width:600px;margin:14px auto 0}
 .studio-photo-step{max-width:1040px;margin:35px auto}
 .studio-photo-intro{text-align:center;margin-bottom:24px}

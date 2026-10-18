@@ -8,5 +8,6 @@ import './shop.css';
 import './studio.css';
 import './consistency.css';
 import './mobile.css';
+import './button-system.css';
 installNavigation();
 createRoot(document.getElementById('root')).render(<React.StrictMode><ContentProvider initialContent={document.getElementById('site-content')?JSON.parse(document.getElementById('site-content').textContent):undefined}><App/></ContentProvider></React.StrictMode>);

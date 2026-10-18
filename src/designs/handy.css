@@ -24,8 +24,8 @@
 .handy-view-basket{margin:32px 0;min-height:44px}
 .handy-studio button:focus-visible,.handy-studio input:focus-visible,.studio-sections a:focus-visible{outline:2px solid #2c173c;outline-offset:4px;box-shadow:none}
 .studio-sections{display:flex;gap:8px;flex-wrap:wrap;max-width:1240px;margin:16px auto 0;padding:0 24px}
-.studio-sections a{min-height:44px;display:flex;align-items:center;padding:10px 18px;color:#2c173c;background:#eee9e7;border-radius:6px;font-weight:650;text-decoration:none}
-.studio-sections a[aria-current=page]{background:#2c173c;color:white}
+.studio-sections a{min-height:44px;display:flex;align-items:center;padding:10px 18px;color:#2c173c;background:var(--cv-secondary);border-radius:var(--cv-radius);font-weight:650;text-decoration:none}
+.studio-sections a[aria-current=page]{background:var(--cv-selected);color:white}
 @media(max-width:760px){.handy-workbench{grid-template-columns:1fr;gap:28px}.handy-live-preview{position:static;width:min(100%,470px);box-sizing:border-box;justify-self:center}.handy-chooser{gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}.handy-chooser>button{padding:10px}.handy-chooser>button>span:not(.magnet-preview-piece){font-size:16px}}
 @media(max-width:380px){.handy-chooser{gap:10px}.handy-chooser>button>span:not(.magnet-preview-piece){font-size:14px}}
 /* The shared photo overlay is absolute; this standalone editor needs its square in flow. */
@@ -33,3 +33,5 @@
 .storefront .collection-cards .catalog-art>.handy-gallery{padding:6px;gap:12px;box-sizing:border-box;aspect-ratio:1}
 
 .business-qr>legend{font-weight:700;font-size:22px;margin-bottom:18px}.handy-field select{width:100%;padding:12px;min-height:48px;border:1px solid #968b97;border-radius:6px;background:#fffdf7;color:#2c173c;font:inherit}.handy-chooser>button:hover{border-color:#2c173c;background:#f0ede8}
+
+.studio-sections a:hover:not([aria-current=page]){background:var(--cv-secondary-hover)}
