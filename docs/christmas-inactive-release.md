@@ -53,3 +53,17 @@ The owner explicitly requested replacing the saved test wording with the current
 - Button: Make your magnets
 
 Reloaded the admin and reopened Christmas to verify all four fields persisted. The overview shows Original CustomVibe and Nothing scheduled to go live; Christmas remains OFF. Motion and decorations remain enabled in the draft. No Apply changes, readiness, schedule, dates, repetition or activation changes. This supersedes preserving the test headline in the draft; applied campaign wording remains unchanged. Evidence: project output/christmas-live/wording-saved.jpg. Recorded on the existing Review local themes and approve final direction subtask in Founders Hub.
+
+
+## 18 October 2026: thumbnail and Santa grip correction
+
+Owner requested the broken live admin thumbnail be replaced with the current Christmas design and the story magnet cameo be made natural, with Christmas kept inactive.
+
+- [x] Capture the broken thumbnail before changes (`output/christmas-live/thumbnail-before.jpg` in the project workspace).
+- [x] Replace the missing `/admin-concept-christmas.png` reference with an installed-theme thumbnail. The bundled JPEG is an actual local Santa World homepage capture, not a new concept.
+- [x] Keep the existing Santa asset and original customer photograph. Place the cameo above the photo edge with both mittens visible, aligned to the magnet’s rotation. Scope placement to Christmas, with a smaller mobile size.
+- [x] Verify the story composition at desktop and 375px mobile, plus the admin thumbnail locally.
+- [x] All 301 tests, website/SSR/prerender and admin builds pass. The new regression check verifies every installed theme’s thumbnail exists.
+- [ ] Publish the focused correction and verify the authenticated live thumbnail, cameo and OFF status.
+
+No seasonal records are written by this code deployment. Readiness, schedule, dates, repetition, wording, visitor controls, motion, original storefront and other occasions retain their existing behaviour. Final design acceptance and activation remain separate owner decisions.

@@ -2,6 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {seedState,hasTheme,resolveAt,previewCampaign} from '../src/seasons/model.mjs';
 import {validateSeasonState} from '../server/seasons.mjs';
+import {INSTALLED_THEMES} from '../src/seasons/registry.mjs';
+import {stat} from 'node:fs/promises';
+
+test('installed themes provide a real bundled admin thumbnail',async()=>{
+ for(const theme of Object.values(INSTALLED_THEMES)){
+  assert.match(theme.thumbnail ?? '',/^\/assets\/seasons\//);
+  assert.ok((await stat(new URL('../public'+theme.thumbnail,import.meta.url))).size>0);
+ }
+});
 
 test('Christmas installation is isolated and cannot activate without readiness and a schedule',()=>{
  const s=seedState(),c=s.campaigns.find(c=>c.occasion==='christmas');
