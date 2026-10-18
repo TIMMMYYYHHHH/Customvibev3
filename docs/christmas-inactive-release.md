@@ -145,7 +145,9 @@ Owner supplied five annotated screenshots showing coarse snow, straight horizont
 - [x] Extend Christmas footer surface full width; keep its content centred and improve small footer text contrast.
 - [x] Check local 1920×1080, 1440×810 and 390px mobile review. Theme-on has no horizontal overflow; theme-off removes divider/background/footer theme styling. Existing theme-off mobile layout retained unchanged.
 - [x] Site/SSR/prerender and admin builds pass; 22 focused seasonal/date/transition/motion tests pass.
-- [ ] Owner visual review and production deployment approval.
-- [ ] Paired publication and live verification after approval.
+- [x] Owner visual review and production deployment approval.
+- [x] Paired publication and live verification after approval.
 
 All changes use Christmas-only selectors; shared content, original photos, slider behaviour, other occasions and scheduling are unchanged. No production settings, customer records or emails touched. Christmas remains inactive. Evidence in project output/christmas-live/: snow-hero-169-local.jpg, snow-collections-169-local.jpg, snow-story-169-local.jpg, snow-footer-169-local.jpg and snow-mobile-local.jpg. Prior approved production version remains available while this refinement is reviewed.
+
+Owner approved the softer snow and publication while keeping Christmas inactive. Published implementation 2ad0269 in merged release f6a92f3, preserving the newer customer button system and locker integration/diagnostics. Combined builds and 316 local tests passed; the subsequent locker diagnostic merge passed all 8 focused locker tests. Protected site workflow 39139470102 succeeded, including full tests and post-publication checks. Matching final admin Worker a0462f13-3782-4300-ad2a-06d5407e5fc8 passed its protection guard. Live authenticated full-screen draft renders snow-divider-soft-v2.webp, the complete snow silhouette and full-width scenery/footer. Original CustomVibe remains active with nothing scheduled; Christmas Schedule Off and progress In progress. No seasonal settings, customer records or email actions changed. Live evidence: project output/christmas-live/snow-improved-live.jpg. Final overall theme readiness and activation remain separate owner decisions.
