@@ -31,3 +31,16 @@ Owner authorised building on 18 October 2026 after other admin work completed. B
 ## Deployment sequence
 
 Apply migration 0008, publish security Worker, publish admin Worker, publish paired protected Pages revision. Preserve current bindings, gate, separate sign-in, manual send and disabled payments. Keep original local configs unchanged after temporary absolute-path staging. Never roll back to old runtime retention code after applying 0008 without a compatible forward fix.
+
+## Published and verified
+
+- Runtime revision: 0f37be16628161749d8043d1108b15abde84a27b.
+- Migration 0008 applied successfully to the existing business security database.
+- Security Worker: 4420547d-0d36-4f9e-b382-48e983e0c2f7.
+- Admin Worker: d2aa7755-ad84-42e9-ad98-e12fc9916d8c.
+- Paired Pages workflow succeeded: https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39105516890.
+- Live authenticated checks retained all seven original orders and original stage counts (New 5, In progress 1, Shipped 1). Table and Fulfilled are present. Existing order artwork expiry remained 30 October while its details now expire 16 April. No live stage changes, catalogue changes or real emails were used for verification.
+- Post-publication checks confirmed matching Pages revision, gates enabled, preview sending disabled, and unchanged Worker bindings. No browser console errors in the live order view.
+- Evidence: output/fulfilled-orders-release in the project workspace. Synthetic table, phone and email previews are separate from the private live screenshot.
+
+Founders Hub final retry: closed the stale parent draft, refreshed workspace and opened the retention subtask fresh. Saving its updated six-month description again produced Unconfirmed save. Neither the original comment nor task changes are claimed persisted. Exact reconciliation is saved at output/fulfilled-orders-release/founders-hub-updates.md in the workspace. Repository AGENTS.md is aligned; the project-mirror AGENTS.md is read-only and was not changed.

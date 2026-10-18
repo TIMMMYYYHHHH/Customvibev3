@@ -47,6 +47,6 @@ Interfaces: orderUpdateEmail(order,{googleReviewUrl}) uses validated optional li
 ### Task 4: Alignment and release verification
 Files: AGENTS.md, current customer retention copy, docs/operating-mode.md, release notes; existing Founders Hub records.
 - [ ] Align policy wording, migration/deployment instructions and service follow-ups.
-- [ ] Run full suite and paired public/admin builds; fresh review; resolve material issues.
-- [ ] Publish within approved scope only after verified readiness, preserving latest concurrent changes; verify guards and read-only live views.
+- [x] Run full suite and paired public/admin builds; fresh review; resolve material issues.
+- [x] Publish within approved scope only after verified readiness, preserving latest concurrent changes; verify guards and read-only live views.
 - [ ] Update existing Hub subtasks and verify saved statuses. Keep Google link blocked and real recipient/mobile email acceptance separate.
