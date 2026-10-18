@@ -86,6 +86,8 @@ Owner requested three bounded presentation corrections: integrate the collection
 - Both admin status-strip definitions now use flat neutral background/text, retaining the status and policy information. This shared admin change was explicitly requested.
 - The calendar sidebar preview button gains 16px top margin. Dates, preview behaviour and scheduling are unchanged.
 - Site/SSR/prerender and admin builds pass, as do 22 focused seasonal/date/transition/motion tests. No new behaviour tests added for these CSS-only refinements.
-- Live publication and authenticated verification to follow. Christmas must remain inactive; no seasonal settings or customer records are written.
+- Published `2218fa7`; site workflow `39130235792` succeeded. Admin version `949317d7-bade-4d2e-a44e-8bbcc8f202b7`. Post-publication admin protection checks passed. Authenticated live verification confirms the neutral strip, calendar button spacing and blended cameo. Christmas remains OFF with schedule Off and current In progress status. No seasonal settings or customer records were written.
 
 Evidence: project output/christmas-live/santa-snowbank-local.jpg and santa-snowbank-mobile.jpg.
+
+Live evidence: output/christmas-live/admin-neutral-calendar-live.jpg and santa-snowbank-live.jpg in the project workspace. The refreshed live editor also confirms the prior year-copy removal, closing its pending session-dependent visual check. Founders Hub review activity records implementation, local checks, publication and live verification separately; final owner design acceptance remains open.
