@@ -18,4 +18,6 @@ Owner approved implementation, testing and live publication on 18 October 2026. 
 
 ## Publication
 
-Pending release and authenticated smoke checks. Evidence is in output/admin-recovery-release in the project workspace. Founders Hub tracks three separate subtasks under Pass final website launch checks. The parent remains open for unrelated launch work.
+Published initial code 4ac16c1 with protected Pages workflow https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39102440574 and admin version cf7b6507-3749-40d9-a90b-4dc36b46bafb. Follow-up ensures automatic sign-in rechecks also refresh an initially failed page read, without replaying writes.
+
+Authenticated live checks: Orders, Store content and Themes loaded. First-proof confirmation opened with Cancel focused; cancellation restored focus and left the order Awaiting design. Live timestamps showed South African 24-hour time. The complete exported catalogue was identical before/after deployment; occasion view content matched except for the new recovery banner. The real session naturally reached its warning and expiry with the loaded page retained. Full reauthentication and failed-write retries were exercised locally, not by changing production data. Production protection and unchanged Worker bindings were reverified. Evidence is in output/admin-recovery-release in the project workspace. Founders Hub tracks three separate subtasks under Pass final website launch checks. The parent remains open for unrelated launch work.
