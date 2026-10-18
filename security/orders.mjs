@@ -14,7 +14,11 @@ export async function orderService(request,env){
  if(!env.DB||!b||typeof b!=='object')return fail(400,'Invalid request.');
  if(path==='list'){
   const before=b.before===undefined?Number.MAX_SAFE_INTEGER:Number(b.before);if(!Number.isSafeInteger(before)||before<1)return fail(400,'Invalid page.');
-  const rows=(await readSelect(env.DB,'SELECT * FROM orders WHERE expires>? AND seq<? ORDER BY seq DESC LIMIT 51',[time,before],'all')).results;
+  if(b.q!==undefined&&(typeof b.q!=='string'||b.q.length>160)||b.stage!==undefined&&b.stage!=='all'&&!ORDER_STATUSES.includes(b.stage))return fail(400,'Invalid search.');
+  const q=(b.q||'').trim(),where=['expires>?','seq<?'],args=[time,before];
+  if(q){where.push("instr(lower('CV-' || printf('%06d',seq) || ' ' || CASE WHEN json_extract(snapshot,'$.referenceVersion')=2 THEN '' ELSE coalesce(json_extract(snapshot,'$.reference'),'CV-' || id) END || ' ' || json_extract(snapshot,'$.contact.name')),lower(?))>0");args.push(q)}
+  if(b.stage&&b.stage!=='all'){where.push('status=?');args.push(b.stage)}
+  const rows=(await readSelect(env.DB,'SELECT * FROM orders WHERE '+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;
   return Response.json({orders:rows.slice(0,50).map(r=>{const v=view(r);return {...v,snapshot:{contact:{name:v.snapshot.contact.name},magnetQty:v.snapshot.magnetQty,paymentStatus:'unpaid'}}}),next:rows.length>50?rows[49].seq:null});
  }
  if(!artworkId(b.id))return fail(400,'Invalid reference.');

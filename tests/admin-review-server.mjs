@@ -1,5 +1,8 @@
 // Loopback-only verification server. In-memory database and synthetic auth, never production bindings.
 import http from 'node:http';import {createServer} from 'vite';import {readFile,writeFile} from 'node:fs/promises';import {resolve,extname} from 'node:path';import {DatabaseSync} from 'node:sqlite';import admin from '../admin/worker.mjs';import {random,signToken} from '../server/auth.mjs';
+import {artworkEnv} from './helpers/artwork.mjs';import {orderService} from '../security/orders.mjs';
+const searchEnv=artworkEnv(),searchTime=Math.floor(Date.now()/1000);
+for(let n=1;n<=113;n++)searchEnv.sql.prepare('INSERT INTO orders(id,fingerprint,snapshot,status,created,expires) VALUES (?,?,?,?,?,?)').run(`11111111-1111-4111-8111-${String(n).padStart(12,'0')}`,'a'.repeat(64),JSON.stringify({contact:{name:n===1?'Older target':n===113?'Older target expired':n%2?'Matching customer':'Other customer'},magnetQty:1,referenceVersion:n===1?1:2,...(n===1?{reference:'CV-OLD-REFERENCE'}:{})}),n===1||n===113?'shipped':'new',searchTime,n===113?searchTime-1:searchTime+7200);
 const port=Number(process.env.CV_ADMIN_REVIEW_PORT||5201);
 const sql=new DatabaseSync(':memory:');sql.exec('CREATE TABLE content (id INTEGER PRIMARY KEY, revision INTEGER, body TEXT)');const db={prepare(q){let args=[];return {bind(...v){args=v;return this},async first(){return sql.prepare(q).get(...args)||null},async run(){return {meta:sql.prepare(q).run(...args)}}}},async batch(rows){sql.exec('BEGIN');try{const out=[];for(const r of rows)out.push(await r.run());sql.exec('COMMIT');return out}catch(e){sql.exec('ROLLBACK');throw e}}};
 // Optional UI-observed owner choices are copied only into this disposable local database.
@@ -41,6 +44,7 @@ http.createServer(async(req,res)=>{
   if(path==='/__review/session'&&req.method==='POST'){const chunks=[];for await(const c of req)chunks.push(c);sessionExpired=Buffer.concat(chunks).toString()==='expire';res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({expired:sessionExpired}));return}
   if(sessionExpired&&(path.startsWith('/api/')||path==='/content.json')){res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'Local review session expired'}));return}
 
+  if(path==='/__review/search-orders'&&req.method==='GET'){const query=new URL(req.url,'http://127.0.0.1').searchParams;const result=sessionExpired?Response.json({error:'Local review session expired'},{status:401}):await orderService(new Request('https://local/orders/list',{method:'POST',body:JSON.stringify(Object.fromEntries(['q','stage','before'].filter(k=>query.has(k)).map(k=>[k,query.get(k)])))}),searchEnv);res.writeHead(result.status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(await result.text());return;}
   if(/^\/api\/artwork\/(?:11111111-1111-4111-8111-00000000000[1-6]|22222222-2222-4222-8222-222222222222)\/(?:[0-9]|[1-5][0-9])$/.test(path)&&req.method==='GET'){
    res.writeHead(200,{'Content-Type':'image/jpeg','Cache-Control':'no-store'});res.end(await readFile('tests/fixtures/print-tile.jpg'));return;
   }

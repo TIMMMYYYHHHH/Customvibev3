@@ -15,7 +15,7 @@ window.fetch=async(path,opts={})=>{
  if(url.pathname.startsWith('/api/'))console.info('Fixture request:',opts.method||'GET',url.pathname);
  if(url.pathname==='/content.json')return unifiedReview?realFetch(path,opts):Response.json(defaultContent);
  if(url.pathname==='/api/session')return unifiedReview?realFetch(path,opts):Response.json({csrf:'sample'});
- if(url.pathname==='/api/orders')return Response.json({orders,next:null});
+ if(url.pathname==='/api/orders')return scenario==='search-all'?realFetch('/__review/search-orders'+url.search):Response.json({orders,next:null});
  if(/^\/api\/artwork\/[a-f0-9-]{36}$/.test(url.pathname))return Response.json({id:orders[0].id,expires:orders[0].expires,files:orders[0].snapshot.items.flatMap(item=>item.files)});
  if(url.pathname.startsWith('/api/artwork/'))return realFetch('/tests/fixtures/print-tile.jpg');
  if(url.pathname.startsWith('/api/orders/')){
