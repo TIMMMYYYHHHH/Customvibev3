@@ -109,3 +109,21 @@ test('artwork after 100 file-free entries keeps its matching design number',asyn
  const initial=await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network);assert.equal(initial.status,200);
  const row=env.sql.prepare('SELECT manifest FROM artwork_requests WHERE id=?').get(data.id);assert.equal(JSON.parse(row.manifest)[0].name,'design-101-photo.jpg');
 });
+test('selected locker is validated once and signed recovery survives directory outages without duplicate orders',async()=>{
+ const env={...setup(),ORDER_RECORDS_ENABLED:'true',LOCKER_LOOKUP_ENABLED:'true',TCG_LOCKER_API_KEY:random()},c=await form(env),data=payload();data.locker={id:'CG123',name:'Example locker',area:'Durban North'};let lookups=0,sends=0;
+ assert.equal(c.lockerSearch,true);
+ const source=async()=>{lookups++;return {locations:[data.locker]}};
+ const offline=async()=>{throw Error('Directory is offline')};
+ const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});sends++;assert.match(JSON.parse(init.body).text,/CG123/);return Response.json({id:'accepted'})};
+ const invalid=await submissions(post('/api/artwork/init',c,{payload:{...data,locker:{...data.locker,id:'BAD'}},turnstile:'test'}),env,network,source);assert.equal(invalid.status,400);assert.equal(env.sql.prepare('SELECT count(*) AS n FROM artwork_requests').get().n,0);
+ const first=await(await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network,source)).json();assert.ok(first.grant);assert.equal(lookups,2);
+ const fresh=await form(env);
+ assert.equal((await submissions(post('/api/artwork/init',fresh,{payload:data,turnstile:'test',resume:'forged'}),env,network,offline)).status,403);
+ assert.equal((await submissions(post('/api/artwork/init',fresh,{payload:{...data,locker:{...data.locker,name:'Changed'}},turnstile:'test',resume:first.resume}),env,network,offline)).status,403);
+ const resumed=await submissions(post('/api/artwork/init',fresh,{payload:data,turnstile:'test',resume:first.resume}),env,network,offline);assert.equal(resumed.status,200);const {grant}=await resumed.json();
+ assert.equal((await submissions(post('/api/order-request',fresh,{payload:data,grant:'forged'}),env,network,offline)).status,403);
+ for(let i=0;i<10;i++)assert.equal((await submissions(post('/api/artwork/upload',fresh,tile,{'Content-Type':'image/jpeg','X-Artwork-Grant':grant,'X-Artwork-Index':String(i)}),env,network)).status,200);
+ assert.equal((await submissions(post('/api/order-request',fresh,{payload:{...data,locker:{...data.locker,area:'Changed'}},grant}),env,network,offline)).status,403);
+ for(let i=0;i<2;i++)assert.equal((await submissions(post('/api/order-request',fresh,{payload:data,grant}),env,network,offline)).status,200);
+ assert.equal(sends,2);const rows=env.sql.prepare('SELECT snapshot FROM orders').all();assert.equal(rows.length,1);assert.deepEqual(JSON.parse(rows[0].snapshot).locker,{...data.locker,provider:'tcg-locker'});
+});
