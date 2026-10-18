@@ -43,3 +43,15 @@
 
 /* Separate state labels share one compact treatment on cards and calendar items. */
 .occasion-labels{display:flex;flex-wrap:wrap;align-items:center;gap:5px 12px;margin:5px 0 3px;font-size:11px;line-height:1.45;color:#514655}.occasion-labels b{font-weight:600}.schedule-label{display:inline-block;background:#eae7e9;padding:3px 7px;border-radius:4px;white-space:nowrap}.schedule-label.active{background:#35233f;color:#fff}.theme-label{display:inline-block}.activation-detail{display:block;font-size:11px;line-height:1.45;color:#756677}.activation-detail.upcoming,.activation-detail.live{font-weight:600;color:#35233f}.event-list .occasion-labels{font-size:11px;margin:7px 0 4px;gap:4px 10px}.event-list .activation-detail{margin:3px 0 6px}.event-list .occasion-labels b{font-size:inherit}.event-list .theme-label{font-size:inherit}.occasion-summary h3{margin-bottom:3px}@media(max-width:760px){.occasion-labels{gap:4px 10px}.activation-detail{font-size:11px}}
+
+/* A private, full-window view of the current draft, with native modal focus handling. */
+html.preview-expanded{overflow:hidden}
+.fullscreen-preview{position:fixed;inset:0;margin:0;padding:0;width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;border:0;border-radius:0;background:#eeece9;color:#35233f}
+.fullscreen-preview[open]{display:flex;flex-direction:column}
+.fullscreen-toolbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid #ddd5dc;background:#f5f3ef}
+.fullscreen-toolbar>strong{margin-right:auto;font-size:14px}
+.fullscreen-toolbar button{min-height:44px}
+.fullscreen-canvas{display:flex;justify-content:center;flex:1;min-height:0;overflow:hidden}
+.fullscreen-canvas iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+.fullscreen-preview.mobile iframe{width:min(390px,100%)}
+@media(max-width:600px){.fullscreen-toolbar{gap:8px;padding:8px 12px}.fullscreen-toolbar>strong{flex-basis:100%}.fullscreen-toolbar>.button{margin-left:auto}.preview-tools .preview-controls{flex-wrap:wrap}}
