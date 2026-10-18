@@ -33,7 +33,7 @@ html[data-season="christmas"] .storefront .chapter-story::before,
 html[data-season="christmas"] .storefront .chapter-story::after{content:"";position:absolute;left:0;right:0;height:170px;background:url('/assets/seasons/christmas/santa-world/snow-divider.webp') center/100% auto no-repeat;pointer-events:none;z-index:3}
 html[data-season="christmas"] .cv-christmas-hero::after{bottom:-70px}
 html[data-season="christmas"] .storefront .chapter-collections{position:relative;overflow:visible;z-index:3;padding:0 0 55px}
-html[data-season="christmas"] .storefront .chapter-collections::before{content:"";position:absolute;left:4%;top:-130px;width:340px;aspect-ratio:1.5;background:url('/assets/seasons/christmas/santa-world/peek-snow.webp') center/contain no-repeat;z-index:4;pointer-events:none}
+html[data-season="christmas"] .storefront .chapter-collections::before{content:"";position:absolute;left:6%;top:-150px;width:300px;aspect-ratio:1.5;background:url('/assets/seasons/christmas/santa-world/peek-snow.webp') center/contain no-repeat;mask-image:linear-gradient(to bottom,#000 67%,transparent 87%);z-index:4;pointer-events:none}
 html[data-season="christmas"] .storefront .thread-brand .collections{padding-top:64px;padding-bottom:35px;width:min(1320px,90%)}
 html[data-season="christmas"] .storefront .thread-brand .collections .section-heading{text-align:center;margin-bottom:32px}
 html[data-season="christmas"] .storefront .thread-brand .collections .section-heading h2{max-width:none}
@@ -88,7 +88,7 @@ html[data-season="christmas"] :is(a,button,input,select,summary):focus-visible{o
  html[data-season="christmas"] .storefront .cv-christmas-hero{min-height:550px;grid-template-columns:44% 56%}
  html[data-season="christmas"] .storefront .cv-christmas-copy{padding-left:30px}
  html[data-season="christmas"] .storefront .cv-christmas-copy h1{font-size:43px}
- html[data-season="christmas"] .storefront .chapter-collections::before{width:220px;top:-100px}
+ html[data-season="christmas"] .storefront .chapter-collections::before{width:220px;top:-120px}
 }
 @media(max-width:760px){
  html[data-season="christmas"] .storefront .cv-christmas-hero{display:flex;flex-direction:column;min-height:0}
@@ -100,7 +100,7 @@ html[data-season="christmas"] :is(a,button,input,select,summary):focus-visible{o
  html[data-season="christmas"] .storefront .cv-christmas-copy>small{font-size:12px;margin-top:15px}
  html[data-season="christmas"] .cv-christmas-tree{width:min(100%,600px);align-self:center;margin-top:16px}
  html[data-season="christmas"] .cv-christmas-hero::after{height:100px;bottom:-35px;background-size:auto 190px}
- html[data-season="christmas"] .storefront .chapter-collections::before{left:3%;top:-55px;width:170px}
+ html[data-season="christmas"] .storefront .chapter-collections::before{left:4%;top:-75px;width:170px}
  html[data-season="christmas"] .storefront .thread-brand .collections{padding-top:70px}
  html[data-season="christmas"] .storefront .thread-brand .collections .section-heading{margin-bottom:26px}
  html[data-season="christmas"] .storefront .thread-brand .collections .section-heading>p{font-size:17px}

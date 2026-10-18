@@ -76,3 +76,16 @@ Live settings read after deployment: Christmas OFF, schedule Off, progress In pr
 ## 18 October: remove unused year-copy action
 
 Owner explicitly requested removing Copy to another year because they will never use it. Removed the editor action, its dialog and click handlers. Existing campaigns, the campaign selector, annual repeat rules, saved dates and activation controls remain intact. Shared dialog styles are retained because icon, occasion and activation dialogs use them. No seasonal records are deleted or changed. Admin build and all 16 focused seasonal checks passed. Published admin-only release `f90aa76`, Worker version `29b7dc3c-e721-47ef-b5bc-3739638f8b3a`; post-deployment protection checks passed. The local editor confirms removal. The existing live tab reports an expired session, and a fresh `/themes` page serves the sign-in form, so final authenticated visual verification awaits sign-in. No activation or seasonal-record writes were made. Decision and verification status saved to the existing Founders Hub review subtask.
+
+
+## 18 October: annotated visual refinements
+
+Owner requested three bounded presentation corrections: integrate the collections Santa into its snowbank, remove the green tinted admin status strip, and separate calendar explanatory text from its visitor-preview button.
+
+- Christmas-only cameo placement is smaller and higher; a lower-edge mask blends its separate patch into the main snowbank. Existing artwork, customer photos, content and slider are unchanged. Desktop and 390px mobile checked locally.
+- Both admin status-strip definitions now use flat neutral background/text, retaining the status and policy information. This shared admin change was explicitly requested.
+- The calendar sidebar preview button gains 16px top margin. Dates, preview behaviour and scheduling are unchanged.
+- Site/SSR/prerender and admin builds pass, as do 22 focused seasonal/date/transition/motion tests. No new behaviour tests added for these CSS-only refinements.
+- Live publication and authenticated verification to follow. Christmas must remain inactive; no seasonal settings or customer records are written.
+
+Evidence: project output/christmas-live/santa-snowbank-local.jpg and santa-snowbank-mobile.jpg.
