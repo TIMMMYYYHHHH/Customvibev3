@@ -1,6 +1,6 @@
-# Handy at home: local studio integration
+# Handy at home: studio integration and release
 
-18 October 2026. The owner approved the nine original designs with fixed headings and handwritten editable entries, then authorised proceeding with the existing-studio integration. This implementation is local, not deployed.
+18 October 2026. The owner approved the nine original designs with fixed headings and handwritten editable entries, then authorised proceeding with the existing-studio integration. The owner subsequently approved the reviewed local integration for publication, explicitly retaining newer admin updates.
 
 Review: http://127.0.0.1:5195/studio/handy
 Collections: http://127.0.0.1:5195/collections
@@ -27,8 +27,18 @@ Local print/admin verification: http://127.0.0.1:5195/tests/fixtures/handy-flow.
 - Downloaded and inspected local ZIP: nine JPEGs plus instructions with 75 × 75 mm size, template names, submitted wording, copy counts and unapproved-proof warning.
 - Independent review found stale edit sessions could overwrite newer quantities or resurrect removed lines. Fixed and covered by a regression test. Mobile inspection found the shared absolute photo-overlay layout needed a relative square in this editor; corrected and visually checked.
 
-## Remaining release and owner acceptance
+## Published release, 18 October 2026
 
-Local review is ready. Physical 7.5 cm print readability is still the owner's check. Publication needs the current live checkout reconciled with this feature branch, including newer admin/order-history work recorded in Founders Hub. Rebuild and publish matching customer/admin previews from that reconciled revision, and apply only the Handy catalogue fields to the latest authenticated live content. Never replace the live catalogue with this local file. Keep the site password gate and payments disabled. The deferred broader magnet-finish improvement remains separate.
+- Release revision: 8088d2c2a067d161a2bdbdc487968677c2593a02. Merged origin/main 7f03a1b, preserving Fulfilled history, grouped Table, six-month order details, 14-day artwork expiry, retained-order search, proof confirmations and sign-in recovery.
+- All 292 tests passed. Customer build, SSR/prerender and paired admin build passed. Vite retains its advisory bundle-size warning.
+- Nine-design browser fixture passed again against the merged admin: exact wording, 1200 px square JPEGs, 18 copies/nine files, matching print bytes and current-proof submitted details.
+- Protected Pages workflow succeeded: https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39108213661. Canonical deployment is https://048a09c1.customvibe-business.pages.dev and its commit matches this release.
+- Security Worker: fe85c932-2011-492d-beeb-ef1d67a9b7a5. Catalogue Worker: 8068e98c-9e2c-4097-9faf-759e45d3fd52. Admin Worker: d8767631-02d9-490d-a3dc-60a1ff355f24.
+- Every Worker binding matched before/after. Deployment used the existing scoped helper with temporary absolute release paths; original helper-checkout configs were restored byte for byte. No migration or data reset was needed.
+- Live studio: https://customvibe.co.za/studio/handy. Verified all nine previews load, Family week editing, exact basket wording, reopening saved values, and Pet care 08:30 preview. The collection card links to the new studio with Add your details.
+- Production remains password-gated; separate admin sign-in and disabled payments remain. Preview sending remains disabled. No real orders, emails, stage changes or customer-record mutations were used for release verification.
+- Evidence: output/handy-at-home/release, including live-studio.png and sanitised deployment/settings results.
 
-Final automated result: 272 tests passed, zero failures. Customer build, server rendering/prerender (26 pages) and paired admin build passed. Vite reports its advisory customer chunk-size warning above 500 KB; there is no build failure. The current checkout is intentionally not published over newer live admin changes.
+## Remaining acceptance
+
+Physical 7.5 cm print readability remains the owner's check. The broader magnet-finish improvement remains deferred. The admin browser is signed out, so authenticated post-publication order-view verification and the final Handy catalogue-copy refinement await the requested sign-in. The current live catalogue has been preserved in full, including its existing Handy title, hidden QR/Wi-Fi cards and all newer content. Do not replace it with local fallback data. Founders Hub keeps this task In progress for the outstanding print acceptance and explicitly distinguishes publication from the pending signed-in check.
