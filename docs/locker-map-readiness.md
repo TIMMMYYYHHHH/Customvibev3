@@ -4,7 +4,9 @@
 
 ## Current position, 18 October 2026
 
-The owner has completed courier account setup and authorised a dedicated CustomVibe API key, Cloudflare secret storage and live locker selection. The TCG Locker portal was inspected while signed in and its API Keys list was empty. Local integration is now implemented, with tests and visual checks recorded in [locker-integration.md](locker-integration.md). The dedicated CustomVibe key is now created and stored as an encrypted production-only Cloudflare secret. Authenticated production access returned 2,138 valid online lockers. Deployment/live checkout and free-tier CPU verification are pending. Provider API fees and refresh quotas were not stated in the reviewed portal/docs; no paid service was accepted. This replaces the account-registration dependency below.
+The dedicated CustomVibe key is encrypted in business Cloudflare production only. Live search, selection and the optional OSM pin are deployed and verified, release `e1c298e`; all 319 tests and protected deployment checks passed. The live directory listed 2,031 online lockers during checkout verification. Name/town/code and summary updates, keyboard selection, manual fallback and empty results passed. No order, email, payment or shipment was created. Full evidence and security details: [locker-integration.md](locker-integration.md).
+
+No paid service was enabled. Remaining launch checks are provider API fee/refresh terms and cold-refresh CPU headroom. Cached reads measured 3 ms CPU after optimization; the successful cold refresh used 221 ms, above the nominal free allowance. These limits are tracked in Founders Hub. This supersedes the account-registration and unconnected-map status below.
 
 ## Published scope as of 17 October
 
@@ -32,9 +34,9 @@ The full map parent remains incomplete while these required steps are open.
 - API documentation: https://api-docs.tcglocker.co.za/
 - OpenStreetMap tile policy: https://operations.osmfoundation.org/policies/tiles/
 
-The public courier locator cannot be relied on as a cross-site iframe, so the current site opens it as a direct link. The OpenStreetMap area map is geography only and is not a courier dataset.
+The public courier locator cannot be relied on as a cross-site iframe, so the current site opens it as a direct link. OpenStreetMap supplies geography; the authenticated courier directory separately supplies the selected locker pin.
 
-## Verification
+## Historical verification, 17 October
 
 - 167 automated tests passed, including coordinates/URL safety and multiword locker search.
 - Public build, SSR/prerender (21 pages) and admin build passed.
