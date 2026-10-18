@@ -71,3 +71,8 @@ No seasonal records are written by this code deployment. Readiness, schedule, da
 Published and verified: implementation `3ef84e1`, cropped thumbnail `042bb0c`; protected website workflow `39128893101` succeeded. Admin version `99a586db-d249-4312-a087-86970649a374`; catalogue version `b7b5158a-8e33-46c5-82cf-a14e17826659`. Deployment guards passed after publication. The live Appearance thumbnail loads; the story cameo has both mittens over the magnet edge. Evidence: `output/christmas-live/thumbnail-after.jpg`, `santa-grip-live.jpg`, `santa-grip-local-desktop.jpg`, `santa-grip-local-mobile.jpg` in the project workspace.
 
 Live settings read after deployment: Christmas OFF, schedule Off, progress In progress, saved draft copy and motion/decorations enabled. This progress value differs from the earlier historical Not started observation and was preserved as found; this repair did not write seasonal settings. Original CustomVibe remains active with nothing scheduled. Local visitor-off check restores the original story and removes the Santa cameo/snow. Founders Hub thumbnail repair is complete; the existing selected-theme build/review task retains final owner design acceptance.
+
+
+## 18 October: remove unused year-copy action
+
+Owner explicitly requested removing Copy to another year because they will never use it. Removed the editor action, its dialog and click handlers. Existing campaigns, the campaign selector, annual repeat rules, saved dates and activation controls remain intact. Shared dialog styles are retained because icon, occasion and activation dialogs use them. No seasonal records are deleted or changed. Admin build and focused seasonal checks are required before the live admin update.
