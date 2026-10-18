@@ -64,6 +64,10 @@ Owner requested the broken live admin thumbnail be replaced with the current Chr
 - [x] Keep the existing Santa asset and original customer photograph. Place the cameo above the photo edge with both mittens visible, aligned to the magnet’s rotation. Scope placement to Christmas, with a smaller mobile size.
 - [x] Verify the story composition at desktop and 375px mobile, plus the admin thumbnail locally.
 - [x] All 301 tests, website/SSR/prerender and admin builds pass. The new regression check verifies every installed theme’s thumbnail exists.
-- [ ] Publish the focused correction and verify the authenticated live thumbnail, cameo and OFF status.
+- [x] Publish the focused correction and verify the authenticated live thumbnail, cameo and OFF status.
 
 No seasonal records are written by this code deployment. Readiness, schedule, dates, repetition, wording, visitor controls, motion, original storefront and other occasions retain their existing behaviour. Final design acceptance and activation remain separate owner decisions.
+
+Published and verified: implementation `3ef84e1`, cropped thumbnail `042bb0c`; protected website workflow `39128893101` succeeded. Admin version `99a586db-d249-4312-a087-86970649a374`; catalogue version `b7b5158a-8e33-46c5-82cf-a14e17826659`. Deployment guards passed after publication. The live Appearance thumbnail loads; the story cameo has both mittens over the magnet edge. Evidence: `output/christmas-live/thumbnail-after.jpg`, `santa-grip-live.jpg`, `santa-grip-local-desktop.jpg`, `santa-grip-local-mobile.jpg` in the project workspace.
+
+Live settings read after deployment: Christmas OFF, schedule Off, progress In progress, saved draft copy and motion/decorations enabled. This progress value differs from the earlier historical Not started observation and was preserved as found; this repair did not write seasonal settings. Original CustomVibe remains active with nothing scheduled. Local visitor-off check restores the original story and removes the Santa cameo/snow. Founders Hub thumbnail repair is complete; the existing selected-theme build/review task retains final owner design acceptance.
