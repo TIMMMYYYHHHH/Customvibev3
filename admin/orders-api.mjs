@@ -7,8 +7,8 @@ export const orderCall=(env,path,body)=>env.AUTH.fetch('https://auth.internal/or
 export async function ordersAPI(request,env,session){
  const url=new URL(request.url),proofMatch=url.pathname.match(/^\/api\/orders\/([a-f0-9-]{36})\/proof\/(seed|prepare|upload|publish|revoke)$/);if(proofMatch)return adminProofAPI(request,env,session,proofMatch[1],proofMatch[2]);const match=url.pathname.match(/^\/api\/orders(?:\/([a-f0-9-]{36})(?:\/(status|preview|send))?)?$/);
  if(!match)return Response.json({error:'Not found.'},{status:404});
- if(request.method==='GET'&&match[2]==='preview'){const r=await orderCall(env,'detail',{id:match[1]});if(!r.ok)return r;return Response.json(orderUpdateEmail(await r.json()));}
- if(request.method==='GET'&&!match[2])return orderCall(env,match[1]?'detail':'list',match[1]?{id:match[1]}:Object.fromEntries(['before','q','stage'].filter(key=>url.searchParams.has(key)).map(key=>[key,url.searchParams.get(key)])));
+ if(request.method==='GET'&&match[2]==='preview'){const r=await orderCall(env,'detail',{id:match[1]});if(!r.ok)return r;return Response.json(orderUpdateEmail(await r.json(),{googleReviewUrl:env.GOOGLE_REVIEW_URL}));}
+ if(request.method==='GET'&&!match[2])return orderCall(env,match[1]?'detail':'list',match[1]?{id:match[1]}:Object.fromEntries(['before','q','stage','fulfilledBefore'].filter(key=>url.searchParams.has(key)).map(key=>[key,url.searchParams.get(key)])));
  if(request.method!=='POST'||!['status','send','preview'].includes(match[2]))return new Response(null,{status:405});
  if(!sameOrigin(request)||!await constantEqual(request.headers.get('X-CSRF-Token')||'',session.csrf))return new Response('Forbidden',{status:403});
  if(!request.headers.get('content-type')?.startsWith('application/json'))return new Response(null,{status:415});

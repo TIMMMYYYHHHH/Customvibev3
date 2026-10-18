@@ -14,3 +14,13 @@ test('customer updates use the recorded recipient without an owner test allowlis
   assert.equal(env.sql.prepare('SELECT state FROM order_updates').get().state,'accepted');
  }
 });
+
+test('fulfilled email thanks the customer, safely gates the review link and remains manual across reopen',async()=>{
+ const {env,id}=await setup();const move=async(status,version)=>env.AUTH.fetch('https://internal/orders/status',{method:'POST',body:JSON.stringify({id,status,version})});
+ assert.equal((await move('fulfilled',0)).status,200);let mail=await previewOrderUpdate(env,id);assert.match(mail.text,/Thank you/);assert.doesNotMatch(mail.html,/Review us on Google/);assert.match(mail.text,/No payment/);
+ env.GOOGLE_REVIEW_URL='https://g.page/r/fictional-test/review';mail=await previewOrderUpdate(env,id);assert.match(mail.html,/Review us on Google/);assert.match(mail.text,/honest review/);assert.match(mail.text,/https:\/\/g.page/);
+ let sends=0;const network=async(url,options)=>{sends++;assert.match(JSON.parse(options.body).html,/Review us on Google/);return Response.json({id:'accepted'})};
+ assert.equal((await sendOrderUpdate(env,id,1,network)).status,200);assert.equal((await move('shipped',1)).status,200);assert.equal((await move('fulfilled',2)).status,200);assert.equal((await sendOrderUpdate(env,id,3,network)).status,409);assert.equal(sends,1);
+ const {orderUpdateEmail}=await import('../server/order-update-email.mjs'),order={reference:'CV-1',status:'fulfilled',version:3,snapshot:{contact:{name:'<Name>',email:'test@example.com'},magnetQty:1}};
+ for(const link of ['javascript:alert(1)','https://evil.example/review','https://g.page@evil.example/review']){const preview=orderUpdateEmail(order,{googleReviewUrl:link});assert.doesNotMatch(preview.html,/Review us on Google/);assert.ok(!preview.html.includes('<Name>'))}
+});
