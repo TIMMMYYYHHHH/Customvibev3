@@ -1,0 +1,12 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-18",
+  "asset": "snow-divider-soft-v2.webp",
+  "source": "exec-f5e8bf43-8c9f-47cd-8829-72861ad7b7dd.png",
+  "dimensions": [
+    2172,
+    724
+  ],
+  "prompt": "Use case: stylized-concept. Production website asset: a continuous panoramic snowbank strip, isolated with real transparent alpha above and below. Wide 3:1 canvas, highest useful resolution. The snowbank extends beyond both left and right sides, its gently undulating top at about 35% of canvas height and bottom at about 66%, leaving generous transparent padding. Soft rounded sculpted fresh powder snow with very fine subtle texture, matte ivory-white upper surfaces, pale lilac underside shadows, warm gentle studio lighting. Charming premium tactile miniature Christmas world, suitable alongside a cute soft 3D Santa. Crisp clean silhouette with tiny natural irregularities, no harsh rectangle, no large crystals, no grainy noise, no sparkles or starbursts, no coarse popcorn or gravel texture, no icicles, no characters, no scenery, no text. Lower edge follows soft shallow irregular curves, continuous across full width. Preserve subtle material detail at large desktop display sizes.",
+  "conversion": "WebP quality 95, alpha quality 100; no crop, retouch or resampling. Original snow-divider.webp preserved."
+}

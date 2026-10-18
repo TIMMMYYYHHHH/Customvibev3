@@ -133,3 +133,19 @@ Owner reported the bar moving when toggling Christmas. Reproduced at desktop wid
 Local verification: exact header, navigation, control, track, basket and create-button rectangles match before/after toggling at 1440px and 1280px browser widths and in the 390px mobile review. Site, SSR/prerender and admin builds pass; all 22 focused seasonal/date/transition/Santa tests pass. Updated on current main e31eef6 to preserve concurrent releases. Evidence: project output/christmas-live/header-slider-stable-local.jpg. No production settings or customer records changed. Publication and live verification await explicit approval for this additional fix; Christmas remains inactive.
 
 Owner approved publication while keeping Christmas inactive. Published 6a08044; protected site workflow 39134721130 passed builds, full tests and protection checks. Matching admin version f7c87388-03fa-44f4-858b-6621a2a15886 passed its protection guard. Authenticated live full-screen draft verification at 1440px confirms identical header/control rectangles when toggling off and back on. Original CustomVibe remains active; Christmas schedule is Off and progress In progress. No seasonal settings, customer records or email actions were changed. Live evidence: project output/christmas-live/header-slider-stable-live.jpg. Final design acceptance and activation remain separate owner decisions.
+
+## 18 October: wide-screen snow and section-edge repair (local review)
+
+Owner supplied five annotated screenshots showing coarse snow, straight horizontal cuts, a 1600px scenery box and a 1400px footer box at 16:9. Root causes: the 2172×724 snow image was painted at full width into a fixed 170px element, clipping its natural silhouette; shared thread-flow and footer width constraints also clipped theme scenery, and the old backdrop's fade extended beyond the image height.
+
+- [x] Keep scenery full width while retaining a 1600px hero and up to 1400px content measure.
+- [x] Put the backdrop on its own fading layer so its image bottom cannot form a hard seam.
+- [x] Replace coarse divider texture with a new soft powder snow asset generated with built-in image_gen. Preserve original artwork as snow-divider.webp. New asset: public/assets/seasons/christmas/santa-world/snow-divider-soft-v2.webp (2172×724, 159 KB); exact prompt and conversion notes in snow-soft-v2-provenance.json alongside it.
+- [x] Render the complete snow silhouette with responsive height, cropped horizontally on phones, rather than cutting its top/bottom. Adjust Santa placements and section spacing to clear products, headings, example thumbnails and action buttons.
+- [x] Extend Christmas footer surface full width; keep its content centred and improve small footer text contrast.
+- [x] Check local 1920×1080, 1440×810 and 390px mobile review. Theme-on has no horizontal overflow; theme-off removes divider/background/footer theme styling. Existing theme-off mobile layout retained unchanged.
+- [x] Site/SSR/prerender and admin builds pass; 22 focused seasonal/date/transition/motion tests pass.
+- [ ] Owner visual review and production deployment approval.
+- [ ] Paired publication and live verification after approval.
+
+All changes use Christmas-only selectors; shared content, original photos, slider behaviour, other occasions and scheduling are unchanged. No production settings, customer records or emails touched. Christmas remains inactive. Evidence in project output/christmas-live/: snow-hero-169-local.jpg, snow-collections-169-local.jpg, snow-story-169-local.jpg, snow-footer-169-local.jpg and snow-mobile-local.jpg. Prior approved production version remains available while this refinement is reviewed.
