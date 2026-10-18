@@ -41,6 +41,10 @@
 @keyframes cv-christmas-switch-spark{0%{opacity:0;transform:translate(0,0) scale(.3)}30%{opacity:1}100%{opacity:0;transform:translate(var(--spark-x),var(--spark-y)) scale(.7)}}
 @media(prefers-reduced-motion:reduce){.cv-christmas-toggle-icon,.cv-christmas-toggle-icon *{transition:none!important;animation:none!important}}
 /* Keep the available switch in the same place during the on/off animation. */
+@media(min-width:1181px){
+ .unified-header:has(.cv-christmas-slider) .header-inner{gap:15px}
+ .unified-header:has(.cv-christmas-slider) nav{gap:16px}
+}
 @media(min-width:761px) and (max-width:1180px){
  .unified-header:has(.cv-christmas-slider) .header-inner{grid-template-columns:minmax(0,1fr) auto auto auto auto;gap:10px}
  .unified-header:has(.cv-christmas-slider) .season-control{grid-column:2;grid-row:1}

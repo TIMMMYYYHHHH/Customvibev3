@@ -83,7 +83,6 @@ html[data-season="christmas"][data-season-motion="true"] .cv-christmas-snow span
 html[data-season="christmas"] .cv-christmas-motion{position:fixed;right:20px;bottom:18px;z-index:50;border:1px solid #cba3d7;background:#24112e;color:#fff9e9;border-radius:6px;min-height:44px;padding:10px 16px;font:500 13px 'DM Sans Variable',sans-serif;cursor:pointer}
 html[data-season="christmas"] :is(a,button,input,select,summary):focus-visible{outline:3px solid #be74d5;outline-offset:4px}
 @keyframes cv-christmas-fall{from{transform:translate3d(0,-100vh,0)}to{transform:translate3d(25px,100vh,0)}}
-@media(min-width:1181px){html[data-season="christmas"] .unified-header .header-inner{gap:15px}html[data-season="christmas"] .unified-header nav{gap:16px}}
 @media(max-width:1000px) and (min-width:761px){
  html[data-season="christmas"] .storefront .cv-christmas-hero{min-height:550px;grid-template-columns:44% 56%}
  html[data-season="christmas"] .storefront .cv-christmas-copy{padding-left:30px}
