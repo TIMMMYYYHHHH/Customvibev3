@@ -23,7 +23,7 @@ export function normalizeLockers(data){
  return locations.sort((a,b)=>a.name.localeCompare(b.name));
 }
 
-export function createLockerSource({network=fetch,cache,now=Date.now}={}){
+export function createLockerSource({network=fetch,cache,now=Date.now,diagnostic=message=>console.warn(message)}={}){
  let pending=null,memory=null,retryAt=0,credential=null;
  return async function source(env){
   if(!enabled(env))throw unavailable();
@@ -35,20 +35,26 @@ export function createLockerSource({network=fetch,cache,now=Date.now}={}){
   pending=(async()=>{
    const store=cache??globalThis.caches?.default;
    const cacheKey='https://customvibe.co.za/internal-cache/locker-directory-v1';
-   let cachedFailure=false;
+   let cachedFailure=false,stage='cache-read',upstreamStatus=0;
    try{
     const cached=await store?.match(cacheKey);
     if(cached){const value=await cached.json();if(value.failed&&value.retryAt>now()){retryAt=value.retryAt;cachedFailure=true;throw unavailable();}if(Array.isArray(value.locations)&&Number.isFinite(value.updatedAt)&&now()>=value.updatedAt&&now()-value.updatedAt<MAX_AGE){memory=value;return value;}}
+    stage='network';
     const response=await network(ENDPOINT,{method:'GET',headers:{Authorization:'Bearer '+env.TCG_LOCKER_API_KEY,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(12000)});
+    upstreamStatus=response.status;stage='upstream-status';
     if(!response.ok)throw unavailable();
-    const locations=normalizeLockers(JSON.parse(await boundedBody(response,MAX_BYTES)));
+    stage='read-body';const body=await boundedBody(response,MAX_BYTES);
+    stage='parse-body';const data=JSON.parse(body);
+    stage='normalize';const locations=normalizeLockers(data);
     const value={locations,updatedAt:now()};
     // Cache contains public location details only. It is not a public HTTP route.
-    if(store)await store.put(cacheKey,Response.json(value,{headers:{'Cache-Control':`public, max-age=${MAX_AGE/1000}`}}));
+    stage='cache-write';if(store)await store.put(cacheKey,Response.json(value,{headers:{'Cache-Control':`public, max-age=${MAX_AGE/1000}`}}));
     memory=value;return value;
    }catch{
     // A negative cache hit must not postpone the original retry deadline.
     if(cachedFailure)throw unavailable();
+    // Fixed labels/status only. Never log credentials, response bodies or exception messages.
+    diagnostic(`Locker directory unavailable: ${stage}; HTTP ${upstreamStatus}`);
     retryAt=Math.max(retryAt,now()+60000);
     try{if(store)await store.put(cacheKey,Response.json({failed:true,retryAt},{headers:{'Cache-Control':'public, max-age=60'}}));}catch{}
     throw unavailable();
