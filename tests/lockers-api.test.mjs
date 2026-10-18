@@ -5,6 +5,12 @@ import {random,signToken} from '../server/auth.mjs';
 const row=(patch={})=>({code:'CG123',status:'online',name:'Example locker',latitude:'-29.8',longitude:'31.04',address:'1 Example Road, Durban North',place:{town:'Durban North',postalCode:'4051'},type:{id:2,name:'Locker'},openinghours:[{day:'Monday',open_time:'08:00:00',close_time:'17:00:00'}],...patch});
 const env=()=>({LOCKER_LOOKUP_ENABLED:'true',TCG_LOCKER_API_KEY:random(),SESSION_SECRET:random()});
 const cache=()=>{const entries=new Map();return {async match(key){return entries.get(String(key))?.clone()},async put(key,response){entries.set(String(key),response.clone())}}};
+test('failure diagnostics contain only fixed stages and status, never credentials or provider details',async()=>{
+ const settings=env(),messages=[];
+ const source=createLockerSource({cache:cache(),diagnostic:m=>messages.push(m),network:async()=>new Response('private upstream detail '+settings.TCG_LOCKER_API_KEY,{status:403})});
+ await assert.rejects(()=>source(settings));
+ assert.deepEqual(messages,['Locker directory unavailable: upstream-status; HTTP 403']);
+});
 test('provider data exposes only valid locker locations, never kiosks or arbitrary upstream fields',()=>{
  const list=normalizeLockers([row({private_token:'hidden'}),row({code:'K1',type:{id:1,name:'Kiosk'}}),row({code:'BAD',latitude:'0'}),row({code:'OFF',status:'offline'}),row({code:'UNKNOWN',status:undefined}),row({code:'DUP',name:''})]);
  assert.equal(list.length,1);assert.deepEqual(list[0],{id:'CG123',name:'Example locker',area:'Durban North',address:'1 Example Road, Durban North',postcode:'4051',lat:-29.8,lon:31.04,hours:'Monday 08:00–17:00'});
