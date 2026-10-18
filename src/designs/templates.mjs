@@ -1,3 +1,4 @@
+import {validateHandyValues} from './handy.mjs';
 import QRCode from 'qrcode';
 export const templateIds=['business','qr','wifi','information'];
 export const colours={mint:'#B8DDC8',lilac:'#D6C3EC',peach:'#F4B293',cream:'#FFF6E6'};
@@ -8,6 +9,7 @@ function field(value,name,max,required=true,trim=true){
  return text;
 }
 export function validateTemplate(id,input={}){
+ if(id==='information'&&input?.handyTemplate!==undefined)return validateHandyValues(input);
  if(!templateIds.includes(id))throw new Error('Choose a supported template.');
  const values={title:field(input.title,'title',44),colour:input.colour||'cream'};
  if(!Object.hasOwn(colours,values.colour))throw new Error('Choose a template colour.');

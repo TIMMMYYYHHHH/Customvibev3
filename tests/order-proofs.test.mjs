@@ -49,3 +49,19 @@ test('all alphabet quantities fit the saved-order name contract',async()=>{
  const order=validateOrder({id,createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'test@example.com',phone:'0123456789'},locker:{name:'Locker',area:'Durban'},consent:true,items:[item]},content,true),snapshot=orderRecord(order,false);
  assert.ok(snapshot.items[0].name.length>200);assert.equal((await call(env,'orders/create',{id,fingerprint:'b'.repeat(64),snapshot,privateArtwork:false})).status,200);
 });
+
+test('Handy template identity and submitted entries survive proof preparation and replacement',async()=>{
+ const {env,id}=await setupProof();
+ const snapshot=JSON.parse(env.sql.prepare('SELECT snapshot FROM orders WHERE id=?').get(id).snapshot);
+ const values={handyTemplate:'07-family-week',edition:1,entries:['Swimming','Library','Soccer','Music','Family time']};
+ snapshot.items[0]={...snapshot.items[0],kind:'information',designMode:'self',values};
+ env.sql.prepare('UPDATE orders SET snapshot=? WHERE id=?').run(JSON.stringify(snapshot),id);
+ assert.equal((await call(env,'proofs/seed',{id,version:0})).status,200);
+ const proof=await(await call(env,'proofs/detail',{id})).json();
+ assert.deepEqual(proof.items[0].values,values);
+ const m=await manifest(),args={id,version:1,requestId:m.id,owner:m.owner,files:m.files};
+ assert.equal((await call(env,'proofs/prepare',args)).status,200);
+ env.sql.prepare('UPDATE artwork_requests SET finalized=1 WHERE id=?').run(m.id);
+ assert.equal((await call(env,'proofs/publish',args)).status,200);
+ assert.deepEqual((await(await call(env,'proofs/detail',{id})).json()).items[0].values,values);
+});

@@ -1,0 +1,33 @@
+@import './handy-details.css';
+.handy-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;min-width:0}
+.handy-gallery img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.handy-chooser{gap:30px;max-width:1000px;margin:32px auto}
+.handy-chooser>button{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid #ddd3d6;border-radius:12px;background:#fffdf7;color:#2c173c;cursor:pointer;font:inherit;text-align:left;box-shadow:none}
+.handy-chooser>button:hover{border-color:#ab2d60;background:#fcf2f4}
+.handy-chooser>button>span:not(.magnet-preview-piece){font-size:18px;font-weight:700}
+.handy-chooser>button>small{font-size:14px;text-decoration:underline;text-underline-offset:4px}
+.handy-studio{max-width:1240px;margin:auto;padding-top:28px}
+.handy-heading{max-width:760px}.handy-heading h1{margin:8px 0 12px;font-size:clamp(36px,5vw,56px)}
+.handy-heading>p:last-child{font-size:18px;line-height:1.6}
+.handy-back{margin:10px 0 24px;min-height:44px}
+.handy-workbench{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:64px;align-items:start}
+.handy-live-preview{margin:0;padding:24px;background:#edeae1;border-radius:12px;position:sticky;top:110px}
+.handy-live-preview figcaption{text-align:center;margin-top:22px;font-size:14px}
+.handy-fields{padding:4px 0;min-width:0}.handy-fields h2{font-size:30px;margin:0 0 12px}
+.handy-fields>p{line-height:1.6}.handy-fields fieldset{border:0;padding:0;margin:24px 0;min-width:0}
+.handy-field{display:grid;gap:7px;margin:0 0 18px}.handy-field label{font-weight:650}
+.handy-field input{box-sizing:border-box;width:100%;font:inherit;color:#2c173c;padding:12px 14px;min-height:48px;border:1px solid #968b97;border-radius:6px;background:#fffdf7;box-shadow:none}
+.handy-field input[aria-invalid=true]{border-color:#a62535}.handy-field input[aria-invalid=true]+small{color:#a62535}
+.handy-field small,.handy-help{color:#625767;font-size:14px;line-height:1.5}
+.handy-fields .button{width:100%;box-shadow:none;background:#a92d5d;color:white;border:0}.handy-fields .button:hover{background:#892148}
+.handy-fields .button:disabled{opacity:.5;cursor:not-allowed}
+.handy-view-basket{margin:32px 0;min-height:44px}
+.handy-studio button:focus-visible,.handy-studio input:focus-visible,.studio-sections a:focus-visible{outline:2px solid #2c173c;outline-offset:4px;box-shadow:none}
+.studio-sections{display:flex;gap:8px;flex-wrap:wrap;max-width:1240px;margin:16px auto 0;padding:0 24px}
+.studio-sections a{min-height:44px;display:flex;align-items:center;padding:10px 18px;color:#2c173c;background:#eee9e7;border-radius:6px;font-weight:650;text-decoration:none}
+.studio-sections a[aria-current=page]{background:#2c173c;color:white}
+@media(max-width:760px){.handy-workbench{grid-template-columns:1fr;gap:28px}.handy-live-preview{position:static;width:min(100%,470px);box-sizing:border-box;justify-self:center}.handy-chooser{gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}.handy-chooser>button{padding:10px}.handy-chooser>button>span:not(.magnet-preview-piece){font-size:16px}}
+@media(max-width:380px){.handy-chooser{gap:10px}.handy-chooser>button>span:not(.magnet-preview-piece){font-size:14px}}
+/* The shared photo overlay is absolute; this standalone editor needs its square in flow. */
+.handy-live-preview .magnet-preview-grid{position:relative;inset:auto;width:100%;aspect-ratio:1}
+.storefront .collection-cards .catalog-art>.handy-gallery{padding:6px;gap:12px;box-sizing:border-box;aspect-ratio:1}

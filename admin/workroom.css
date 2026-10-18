@@ -1,3 +1,4 @@
+@import '../src/designs/handy-details.css';
 /* Shared admin presentation. Keep page-specific layouts in their own stylesheets. */
 .cv-admin.admin-workroom{--ink:#35233f;--berry:#8c2754;--line:#ded7de;--paper:#fffdf8;--workroom-bg:#f5f2ee;--control-bg:#eeeae6;--control-hover:#e2ddd8;--control-radius:8px;--display:'Fredoka Variable',sans-serif;--body:'DM Sans Variable',sans-serif;background:var(--workroom-bg);font:15px/1.5 var(--body);color:var(--ink);font-synthesis:none}
 .admin-workroom .cv-admin-header{padding:22px 40px;gap:40px;background:var(--workroom-bg);border-bottom:1px solid var(--line)}
