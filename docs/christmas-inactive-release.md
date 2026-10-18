@@ -42,3 +42,14 @@ Founders Hub: existing Deploy Christmas theme after owner approval subtask is Do
 ## Motion follow-up, 18 October 2026
 
 Owner reported the live draft lacked the local slider animation and effects. Root cause confirmed: existing saved Allow gentle motion and Seasonal decorations flags were both false, and installation preserved them. The installed runtime gates the slider and theme fade on campaign motion, while snow requires decorations. Owner request authorises enabling these two flags in the existing draft only. After the owner restored admin sign-in, saved the existing draft with both flags enabled using Save draft only. Reloaded the admin and reopened Christmas to confirm both flags persisted. Desktop and mobile checks observed the Santa handle moving between ends and whole-theme crossfade in both directions; Pause snow is available. Christmas remains OFF, original website showing now, nothing scheduled. Wording is preserved. No Apply changes, readiness, schedule, manual activation or code deployment was performed. Founders Hub records the resolved follow-up on the same deployment subtask. This supersedes the earlier disabled-draft-motion state; public applied settings remain unchanged.
+
+## Owner-requested draft wording, 18 October 2026
+
+The owner explicitly requested replacing the saved test wording with the current local preview copy while inactive. Saved only the existing Christmas draft through the authenticated admin:
+
+- Intro: For your favourite people
+- Headline: What do you get / someone who has / everything? (three lines)
+- Body: A little piece of a memory you share.
+- Button: Make your magnets
+
+Reloaded the admin and reopened Christmas to verify all four fields persisted. The overview shows Original CustomVibe and Nothing scheduled to go live; Christmas remains OFF. Motion and decorations remain enabled in the draft. No Apply changes, readiness, schedule, dates, repetition or activation changes. This supersedes preserving the test headline in the draft; applied campaign wording remains unchanged. Evidence: project output/christmas-live/wording-saved.jpg. Recorded on the existing Review local themes and approve final direction subtask in Founders Hub.
