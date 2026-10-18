@@ -19,3 +19,11 @@ Hover uses berry #92234b or mint #83ccb1. Selected choices stay plum. Focus uses
 Preserve quiet links, destructive meanings, status flags, magnet artwork and exact print files. Seasonal themes retain their separately approved scope. Do not turn every element into a coloured button.
 
 Reference concepts: `output/button-directions/P1-soft-sticker.png` and `output/button-directions/P1-secondary-colours.png` (S1).
+
+## Publication
+
+Owner approved publication after local review on 18 October 2026, preserving recent admin updates. Published implementation `5d7f76d72c14b757a4d996fe472a3a841cb2626e` on current main, including the latest Christmas header stability fix. All 305 tests pass; customer, SSR/27-page prerender and matching admin builds pass.
+
+Protected site workflow [39137980447](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39137980447) succeeded, including before/after protection checks. Matching admin version: `3a88181a-cf53-4551-9349-de4ce68f6d8b`. Only three admin preview assets changed; separate admin application source, artwork, catalogue and seasonal records were not changed. Helper configuration restored byte-for-byte.
+
+Post-publication API checks confirm exact live site revision, gate on, fail closed, preview submissions off and unchanged admin/security/catalogue bindings. A concurrent addition of the production locker API secret appeared between snapshots; it was preserved, never read or overwritten. Authenticated browser verification is pending owner sign-in because both website and admin sessions expired.
