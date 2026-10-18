@@ -1,5 +1,6 @@
 // Loopback-only verification server. In-memory database and synthetic auth, never production bindings.
 import http from 'node:http';import {createServer} from 'vite';import {readFile,writeFile} from 'node:fs/promises';import {resolve,extname} from 'node:path';import {DatabaseSync} from 'node:sqlite';import admin from '../admin/worker.mjs';import {random,signToken} from '../server/auth.mjs';
+const port=Number(process.env.CV_ADMIN_REVIEW_PORT||5201);
 const sql=new DatabaseSync(':memory:');sql.exec('CREATE TABLE content (id INTEGER PRIMARY KEY, revision INTEGER, body TEXT)');const db={prepare(q){let args=[];return {bind(...v){args=v;return this},async first(){return sql.prepare(q).get(...args)||null},async run(){return {meta:sql.prepare(q).run(...args)}}}},async batch(rows){sql.exec('BEGIN');try{const out=[];for(const r of rows)out.push(await r.run());sql.exec('COMMIT');return out}catch(e){sql.exec('ROLLBACK');throw e}}};
 // Optional UI-observed owner choices are copied only into this disposable local database.
 // This is not a production backup, migration or replacement seed.
@@ -36,6 +37,9 @@ const banner='<div style="padding:6px 20px;background:#35233f;color:white;font:1
 http.createServer(async(req,res)=>{
  try{
   const path=new URL(req.url,'http://127.0.0.1').pathname;
+  if(/^\/api\/artwork\/(?:11111111-1111-4111-8111-00000000000[1-6]|22222222-2222-4222-8222-222222222222)\/(?:[0-9]|[1-5][0-9])$/.test(path)&&req.method==='GET'){
+   res.writeHead(200,{'Content-Type':'image/jpeg','Cache-Control':'no-store'});res.end(await readFile('tests/fixtures/print-tile.jpg'));return;
+  }
   if(path==='/auth/logout'){res.writeHead(200,{'Content-Type':'text/html'});res.end('<p>Local review only. No live session was signed out.</p><a href="/orders">Return to admin preview</a>');return}
   if(path.startsWith('/api/')||['/content.json','/preview-content.json'].includes(path)){
    if(!['/api/session','/api/seasons','/api/content','/content.json','/preview-content.json'].includes(path)){res.writeHead(403);res.end('Unavailable in local review');return}
@@ -48,4 +52,4 @@ http.createServer(async(req,res)=>{
   if(pages[path]){let html=await readFile(pages[path],'utf8');if(path!=='/preview')html=html.replace('<body>','<body>'+banner);html=await vite.transformIndexHtml(req.url,html);res.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'});res.end(html);return}
   vite.middlewares(req,res,()=>{res.writeHead(404);res.end('Not found')});
  }catch(e){res.statusCode=500;res.end(e.message)}
-}).listen(5201,'127.0.0.1',()=>console.log('Local admin review: http://127.0.0.1:5201/orders'));
+}).listen(port,'127.0.0.1',()=>console.log(`Local admin review: http://127.0.0.1:${port}/orders`));

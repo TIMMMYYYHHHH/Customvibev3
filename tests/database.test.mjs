@@ -3,3 +3,19 @@ function database(schema){const db=new DatabaseSync(':memory:');db.exec(readFile
 const kv=()=>{const data=new Map();return {get:async k=>data.get(k),put:async(k,v)=>data.set(k,v)}};
 test('atomic limiter allows five attempts and persists lockout in separate KV namespaces',async()=>{const env={DB:database('migrations/security/0001.sql'),SITE_LOCKOUT:kv(),ADMIN_LOCKOUT:kv()};const request=scope=>new Request('https://internal/reserve',{method:'POST',body:JSON.stringify({scope,key:'a'.repeat(64)})});const results=await Promise.all(Array.from({length:8},()=>security.fetch(request('site'),env).then(r=>r.json())));assert.equal(results.filter(x=>x.allowed).length,5);assert.equal(await env.SITE_LOCKOUT.get('site:'+ 'a'.repeat(64)),'locked');assert.equal((await (await security.fetch(request('admin'),env)).json()).allowed,true)});
 test('database rejects stale edits and public content excludes hidden products',async()=>{const db=database('migrations/content/0001.sql');const initial=structuredClone(defaultContent);const first=await saveContent(db,initial,initial);assert.equal(first.revision,1);assert.equal(await saveContent(db,initial,initial),null);first.products.find(p=>p.id==='alphabet').status='hidden';assert.equal((await saveContent(db,first,initial)).revision,2);const current=await readContent(db,initial);assert.equal(publicContent(current).products.some(p=>p.id==='alphabet'),false)});
+test('built-in collection Contents survives save and reload without resetting other owner settings',async()=>{
+ const db=database('migrations/content/0001.sql');
+ const initial=await readContent(db,defaultContent);
+ for(const id of ['alphabet','business']){
+  const product=initial.products.find(p=>p.id===id);product.contents=`Owner wording for ${id}`;product.name=`My ${id}`;product.status='hidden';
+ }
+ const saved=await saveContent(db,initial,defaultContent);assert.ok(saved);
+ const reopened=await readContent(db,defaultContent);
+ for(const id of ['alphabet','business']){
+  const product=reopened.products.find(p=>p.id===id);
+  assert.equal(product.contents,`Owner wording for ${id}`);assert.equal(product.name,`My ${id}`);assert.equal(product.status,'hidden');
+ }
+ reopened.products.find(p=>p.id==='alphabet').contents='';
+ await saveContent(db,reopened,defaultContent);
+ assert.equal((await readContent(db,defaultContent)).products.find(p=>p.id==='alphabet').contents,'');
+});

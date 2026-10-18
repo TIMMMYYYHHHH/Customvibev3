@@ -6,6 +6,10 @@ if(scenario==='light-board'){
  const examples=[['CV-000006','Sample order',60,'new','2026-10-17'],['CV-000005','Patrick',3,'new','2026-10-17'],['CV-000001','Timmy',11,'in_progress','2026-10-16'],['CV-000004','Joe',3,'shipped','2026-10-17']];
  orders.splice(4);orders.forEach((order,i)=>{const [reference,name,quantity,status,date]=examples[i];order.reference=reference;order.snapshot.contact.name=name;order.snapshot.magnetQty=quantity;order.status=status;order.created=Date.parse(date+'T08:00:00+02:00')/1000;});
 }
+if(scenario==='replacement-proof'){
+ const o=orders[0];o.snapshot.approvalRequired=true;o.snapshot.contact.name='Replacement proof review';
+ o.proof={revision:2,status:'approved',digest:'local-sample',events:[],items:o.snapshot.items.map((item,n)=>({...item,files:item.files.map((file,j)=>({...file,requestId:n===0?'22222222-2222-4222-8222-222222222222':o.id,index:n===0?7:file.index,copies:item.qty*(item.designQuantities?.[j]??1)}))}))};
+}
 window.fetch=async(path,opts={})=>{
  const url=new URL(path,location.origin);
  if(url.pathname.startsWith('/api/'))console.info('Fixture request:',opts.method||'GET',url.pathname);
