@@ -1,0 +1,47 @@
+[
+  {
+    "id": "01-plumber",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-33a91155-075f-469f-b8ef-24a5dd78b7a0.png",
+    "prompt": "Remove variable text only; preserve the approved composition, photography, fixed wording and blank QR area."
+  },
+  {
+    "id": "02-salon",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-fcb03999-d828-4db1-af60-7b17ebbd9b83.png",
+    "prompt": "Remove variable text only; preserve the approved composition, photography, fixed wording and blank QR area."
+  },
+  {
+    "id": "03-cafe",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-943049d3-cd05-4085-95dc-136e3d41293c.png",
+    "prompt": "Remove variable text only; preserve the approved composition, photography, fixed wording and blank QR area."
+  },
+  {
+    "id": "04-wifi",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-4474fe75-5a67-45c9-ae94-8e0da2f2a2d1.png",
+    "prompt": "Edit target: attached approved square magnet artwork. Surgical text removal for an editable template. Remove only SALT & SHORE at the top. Preserve all other text, beach photograph, thin gold divider, and blank white QR square. Do not add anything, no replacement words, no QR pattern, no mockup, no border or shadow. Keep exact square full-bleed composition and untouched content. Output one square image."
+  },
+  {
+    "id": "05-review",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-36b7c898-1ad9-4e68-8162-ae185e6048c3.png",
+    "prompt": "Edit target: attached approved square magnet artwork. Surgical text removal for an editable template. Remove PETAL & STEM and the headline Loved your flowers? only. Keep Leave us a review, divider, flower photography and blank white QR square. Reconstruct the uninterrupted burgundy background in removed areas. Do not add anything, no replacement words, no QR pattern, no mockup, no border or shadow. Keep exact square full-bleed composition and untouched content. Output one square image."
+  },
+  {
+    "id": "06-bakery",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-8ca50d69-a32f-46de-8b19-9298d9197214.png",
+    "prompt": "Edit target: attached approved square magnet artwork. Surgical text removal for an editable template. Remove business name BUTTER & CRUMB at top and placeholder phone number at bottom only. Keep Freshly baked. Happily shared. and Order on WhatsApp, pastry photography and blank dark brown pill. Do not add anything, no replacement words, no QR pattern, no mockup, no border or shadow. Keep exact square full-bleed composition and untouched content. Output one square image."
+  },
+  {
+    "id": "07-hours",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-7096dee7-5f37-4c0b-8279-2cd6869f7bba.png",
+    "prompt": "Edit target: attached approved square magnet artwork. Surgical text removal for an editable template. Remove business name THE LITTLE EDIT and both opening-hours lines Mon\u2013Fri 9\u20135 and Saturday 9\u20131. Preserve Pop in and explore, divider, cobalt painted background and peach corners. Do not add anything, no replacement words, no QR pattern, no mockup, no border or shadow. Keep exact square full-bleed composition and untouched content. Output one square image."
+  },
+  {
+    "id": "08-offer",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-03075b63-bacb-435d-9244-d1f5b6ffeb87.png",
+    "prompt": "Edit target: attached approved square magnet artwork. Surgical text removal for an editable template. Remove LITTLE JOYS, giant 10%, and entire Use code THANKYOU line. Preserve OFF, A little thank-you, Your next order, heart, ribbon, purple bottom pill and all layout. Do not add anything, no replacement words, no QR pattern, no mockup, no border or shadow. Keep exact square full-bleed composition and untouched content. Output one square image."
+  },
+  {
+    "id": "09-groomer",
+    "source": "/Users/timothymorton/.codex/generated_images/01a14a95-64a2-7af1-9c61-20d6cb84ac06/exec-b95dfd3c-ffb6-4662-b7d3-725261c08b28.png",
+    "prompt": "Edit target: attached approved square magnet artwork. Surgical text removal for an editable template. Remove only PAWS & POLISH business name. Preserve paw icon, divider, dog, See you next time, Your next groom:, blank writing line and all layout. Do not add anything, no replacement words, no QR pattern, no mockup, no border or shadow. Keep exact square full-bleed composition and untouched content. Output one square image."
+  }
+]

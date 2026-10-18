@@ -1,27 +1,31 @@
 /* C3: colour chapters. Shared by the homepage and full catalogue. */
-.storefront .catalog-grid.collection-cards{gap:20px}
-.storefront .catalog-grid.collection-cards>article{display:flex;flex-direction:column;border:0;border-radius:16px;overflow:hidden;background:#e8e4da;padding:28px 24px 20px;text-align:center}
+.storefront .catalog-grid.collection-cards{gap:48px 20px;margin-top:36px}
+.storefront .catalog-grid.collection-cards>article{position:relative;display:flex;flex-direction:column;border:0;border-radius:16px;overflow:visible;background:#e8e4da;padding:28px 24px 20px;text-align:center}
 .storefront .collection-cards>article[data-collection=alphabet],.storefront .collection-cards>article[data-collection=business]{background:#ccebd8}
 .storefront .collection-cards>article[data-collection=counting],.storefront .collection-cards>article[data-collection=wifi]{background:#f8d7bf}
 .storefront .collection-cards>article[data-collection=words],.storefront .collection-cards>article[data-collection=qr]{background:#e0d0ee}
 .storefront .collection-cards>article[data-collection=colours],.storefront .collection-cards>article[data-collection=photos]{background:#d8e7ef}
 .storefront .collection-cards>article[data-collection=reminders],.storefront .collection-cards>article[data-collection=information]{background:#f0e4be}
 .storefront .collection-cards>article[data-collection=thanks],.storefront .collection-cards>article[data-collection=puzzle]{background:#f2d9de}
-.storefront .collection-cards .catalog-card-heading{min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px}
+.storefront .collection-cards .catalog-card-heading{min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
 .storefront .collection-cards .catalog-card-heading h3{font:650 clamp(26px,2.25vw,34px)/1.12 'Fredoka Variable',sans-serif;letter-spacing:-.025em;margin:0;color:#291438}
-.storefront .collection-cards .catalog-card-heading .product-status{position:static;background:none;color:#291438;border:0;border-radius:0;font-size:14px;font-weight:450;padding:0;min-height:22px;margin:0}
+/* F1: one centred status tab for every collection, freeing the heading space. */
+.storefront .collection-cards .catalog-card-heading .product-status{position:absolute;top:-26px;left:50%;transform:translateX(-50%);z-index:1;display:block;width:max-content;max-width:calc(100% - 32px);padding:9px 20px;margin:0;min-height:0;border:0;border-radius:6px 6px 0 0;background:#291438;color:#fff;font:700 15px/20px 'DM Sans Variable',sans-serif;white-space:nowrap;box-shadow:none}
 .storefront .catalog-grid.collection-cards .catalog-art{aspect-ratio:1;border:0;border-radius:0;overflow:visible;background:transparent;max-width:none;margin:12px 0 0}
 .storefront .collection-cards .catalog-art>.design-gallery{position:static;transform:none;width:100%;height:auto;aspect-ratio:1;max-width:none;padding:6px;gap:12px}
 .storefront .collection-cards .catalog-art>.design-gallery:has(figure:only-child){padding:18px}
 .storefront .collection-cards .catalog-art .magnet-preview-piece{box-shadow:0 7px 10px #29143820,0 2px 2px #29143828}
-.storefront .collection-cards .catalog-card-copy{display:flex;flex:1;flex-direction:column;padding:24px 0 0}
-.storefront .collection-cards .catalog-card-copy>p{font-size:16px;line-height:1.55;margin:0 auto 20px;min-height:0;max-width:32ch}
-.storefront .collection-cards .catalog-card-actions{display:flex;flex-direction:column;gap:4px;margin-top:auto;border:0;padding:0}
-.storefront .collection-cards .catalog-explore{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;padding:14px 12px;border:0;border-radius:9px;background:#ae2e5b;color:#fff;font:650 16px/1.3 'DM Sans Variable',sans-serif;text-decoration:none;box-shadow:none}
+.storefront .collection-cards .catalog-card-copy{display:flex;flex:1;flex-direction:column;padding:20px 0 0}
+.storefront .collection-cards .catalog-card-copy>p{font-size:16px;line-height:1.55;margin:0 auto 14px;min-height:0;max-width:32ch}
+.storefront .collection-cards .catalog-card-actions{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:8px;margin-top:auto;border:0;padding:0}
+.storefront .collection-cards .catalog-explore{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;min-height:52px;padding:12px 10px;border:0;border-radius:8px;background:#ae2e5b;color:#fff;font:650 16px/1.3 'DM Sans Variable',sans-serif;text-decoration:none;box-shadow:none}
 .storefront .collection-cards .catalog-explore:hover{background:#92254c;filter:none;transform:none}
-.storefront .collection-cards .catalog-details{display:inline-flex;align-items:center;align-self:center;min-height:44px;font-size:13px;color:#493b50;text-decoration:underline;text-underline-offset:4px}
-@media(max-width:650px){.storefront .catalog-grid.collection-cards{gap:24px}.storefront .catalog-grid.collection-cards>article{padding:26px 22px 16px}.storefront .collection-cards .catalog-card-heading{min-height:0;margin-bottom:14px}.storefront .collection-cards .catalog-card-heading h3{font-size:32px}.storefront .collection-cards .catalog-card-copy{padding-top:22px}}
+.storefront .collection-cards .catalog-card-actions>:focus-visible{outline:3px solid #291438;outline-offset:3px}
+@media(max-width:650px){.storefront .catalog-grid.collection-cards{gap:48px}.storefront .catalog-grid.collection-cards>article{padding:30px 22px 16px}.storefront .collection-cards .catalog-card-heading{min-height:0;margin-bottom:0}.storefront .collection-cards .catalog-card-heading h3{font-size:32px}.storefront .collection-cards .catalog-card-copy{padding-top:20px}}
 
 /* Match the puzzle's nine physical pieces to the neighbouring 3×3 previews. */
 .storefront .collection-cards .catalog-art>.puzzle-visual{position:static;inset:auto;transform:none;width:100%;height:auto;max-width:none;aspect-ratio:1;margin:0;padding:6px}
 .storefront .collection-cards .puzzle-visual .magnet-preview-grid{position:relative;inset:auto;gap:12px;width:100%;height:100%}
+
+/* Override the older catalogue rule that reserves two description lines. */
+.storefront .catalog-grid.collection-cards .catalog-card-copy>p{min-height:0}

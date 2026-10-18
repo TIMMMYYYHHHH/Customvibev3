@@ -1,3 +1,4 @@
+import {businessTemplate} from './business.mjs';
 import {handyTemplate} from './handy.mjs';
 import {artworkStyleName} from './artwork.mjs';
 import {collectionDesigns,packIds} from './catalogue.mjs';
@@ -36,7 +37,7 @@ export function selectionLabel(product,designIds,quantities){
  const counts=selectionQuantities(product,designIds,quantities);
  return selectedPrintManifest(product,designIds).designs.map((d,i)=>(d.values.title??d.values.number)+(counts[i]>1?` × ${counts[i]}`:'')).join(', ');
 }
-export function collectionItemName(product,item){const label=selectionLabel(product,item?.designIds,item?.designQuantities);return product.name+(item?.values?.handyTemplate?' · '+(handyTemplate(item.values.handyTemplate)?.name||'Personalised design'):'')+(item?.style?' · '+artworkStyleName(item.style):'')+(label?' · '+label:'');}
+export function collectionItemName(product,item){const label=selectionLabel(product,item?.designIds,item?.designQuantities);return product.name+(item?.values?.handyTemplate?' · '+(handyTemplate(item.values.handyTemplate)?.name||'Personalised design'):'')+(item?.values?.businessTemplate?' · '+(businessTemplate(item.values.businessTemplate)?.name||'Personalised design'):'')+(item?.style?' · '+artworkStyleName(item.style):'')+(label?' · '+label:'');}
 export function mergeCollectionItem(basket,incoming,editingId){
  const same=i=>i.kind===incoming.kind&&i.style===incoming.style&&JSON.stringify(i.designIds)===JSON.stringify(incoming.designIds)&&JSON.stringify(i.designQuantities||i.designIds?.map(()=>1))===JSON.stringify(incoming.designQuantities||incoming.designIds?.map(()=>1));
  const remaining=basket.filter(i=>i.id!==editingId),matches=remaining.filter(same);

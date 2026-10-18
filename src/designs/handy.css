@@ -31,3 +31,5 @@
 /* The shared photo overlay is absolute; this standalone editor needs its square in flow. */
 .handy-live-preview .magnet-preview-grid{position:relative;inset:auto;width:100%;aspect-ratio:1}
 .storefront .collection-cards .catalog-art>.handy-gallery{padding:6px;gap:12px;box-sizing:border-box;aspect-ratio:1}
+
+.business-qr>legend{font-weight:700;font-size:22px;margin-bottom:18px}.handy-field select{width:100%;padding:12px;min-height:48px;border:1px solid #968b97;border-radius:6px;background:#fffdf7;color:#2c173c;font:inherit}.handy-chooser>button:hover{border-color:#2c173c;background:#f0ede8}

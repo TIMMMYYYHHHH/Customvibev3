@@ -7,16 +7,17 @@ import './collection-cards.css';
 
 export default function CollectionCard({item,Puzzle,onExplore}) {
   const template=isTemplateProduct(item);
-  const href=item.id==='information'?'/studio/handy':item.href||(template?'/studio':null);
+  const productHref='/products/'+item.id;
+  const explore=e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();onExplore(item)};
+  const href=item.id==='business'?'/studio/business':item.id==='information'?'/studio/handy':item.href||(template?'/studio':null);
   const preview=item.id==='puzzle'&&!item.image?<Puzzle/>:<CollectionPackPreview kind={item.id} style={collectionPreviewStyle(item.id)}/>;
   return <article data-collection={item.id}>
     <header className="catalog-card-heading"><h3>{item.name}</h3><ProductStatus product={item}/></header>
-    {href?<a className="catalog-art" href={href} aria-label={(template?'Open studio for ':'Create ')+item.name}>{preview}</a>:<button className="catalog-art" onClick={()=>onExplore(item)} aria-label={'Explore '+item.name}>{preview}</button>}
+    {href?<a className="catalog-art" href={href} aria-label={(template?'Open studio for ':'Create ')+item.name}>{preview}</a>:<a className="catalog-art" href={productHref} onClick={explore} aria-label={'Explore '+item.name}>{preview}</a>}
     <div className="catalog-card-copy">
       <p>{item.description}</p>
       <div className="catalog-card-actions">
-        {href?<a className="catalog-explore" href={href}>{item.id==='information'?'Add your details':template?'Open the studio':item.id==='puzzle'?'Create a 3 × 3 or 5 × 5 puzzle':'Use your own photos'}</a>:<button className="catalog-explore" onClick={()=>onExplore(item)}>Explore collection</button>}
-        <a className="catalog-details" href={'/products/'+item.id}>{template?'See idea':'Details'}</a>
+        {href?<a className="catalog-explore" href={href}>{['information','business'].includes(item.id)?'Add your details':template?'Open the studio':item.id==='puzzle'?'Make a puzzle':'Make magnets'}</a>:<a className="catalog-explore" href={productHref} onClick={explore}>Explore collection</a>}
       </div>
     </div>
   </article>;

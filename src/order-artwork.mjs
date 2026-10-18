@@ -1,3 +1,4 @@
+import {renderBusiness} from './designs/business-render.mjs';
 import {renderHandy} from './designs/handy-render.mjs';
 import {designContract} from './designs/state.mjs';
 import {selectedPrintManifest,isTemplateProduct} from './designs/products.mjs';
@@ -16,6 +17,7 @@ export async function prepareOrderItems(basket,photos,render,privateArtwork=fals
    const artwork=await render(photo,{puzzle:item.kind==='puzzle',gridSize:item.gridSize||3,size:1200});
    images=item.kind==='puzzle'?[item.preview,...artwork.tiles]:[artwork.url];
   }else if(contract.designMode==='assisted')images=item.reference?[item.reference]:[];
+  else if(contract.values?.businessTemplate)images=[(await renderBusiness(contract.values)).url];
   else if(contract.values?.handyTemplate)images=[(await renderHandy(contract.values)).url];
   else if(isTemplateProduct(product))images=[item.preview];
   else if(selectedPrintManifest(product,item.designIds))images=await Promise.all(selectedPrintManifest(product,item.designIds).designs.map(async d=>(await renderDesign({...d,style:item.style})).url));

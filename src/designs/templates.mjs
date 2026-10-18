@@ -1,3 +1,4 @@
+import {validateBusinessValues} from './business.mjs';
 import {validateHandyValues} from './handy.mjs';
 import QRCode from 'qrcode';
 export const templateIds=['business','qr','wifi','information'];
@@ -9,6 +10,7 @@ function field(value,name,max,required=true,trim=true){
  return text;
 }
 export function validateTemplate(id,input={}){
+ if(id==='business'&&input?.businessTemplate!==undefined)return validateBusinessValues(input);
  if(id==='information'&&input?.handyTemplate!==undefined)return validateHandyValues(input);
  if(!templateIds.includes(id))throw new Error('Choose a supported template.');
  const values={title:field(input.title,'title',44),colour:input.colour||'cream'};

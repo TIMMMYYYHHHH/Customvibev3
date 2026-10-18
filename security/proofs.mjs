@@ -15,7 +15,7 @@ function mapFiles(snapshot,requestId,files,selection,reusable=[]){
   const f=reusable[n];if(!f||choice?.requestId!==f.requestId||choice?.index!==f.index)throw Error('Only unchanged artwork from this design position can be reused.');return f;
  });
  if(used.size!==files.length)throw Error('Every uploaded file must belong to the final design.');
- let at=0;return snapshot.items.map((item,n)=>({id:item.id||`item-${n+1}`,name:item.name,kind:item.kind,qty:item.qty,...(item.values?.handyTemplate?{values:item.values}:{}),...(item.gridSize?{gridSize:item.gridSize}:{}),files:expected.filter(e=>e.itemId===(item.id||`item-${n+1}`)).map(row=>({...resolved[at++],copies:row.copies}))}));
+ let at=0;return snapshot.items.map((item,n)=>({id:item.id||`item-${n+1}`,name:item.name,kind:item.kind,qty:item.qty,...((item.values?.handyTemplate||item.values?.businessTemplate)?{values:item.values}:{}),...(item.gridSize?{gridSize:item.gridSize}:{}),files:expected.filter(e=>e.itemId===(item.id||`item-${n+1}`)).map(row=>({...resolved[at++],copies:row.copies}))}));
 }
 async function session(env,id){if(!artworkHash(id))return null;return env.DB.prepare('SELECT s.*,p.digest,p.status,COALESCE(o.artwork_expires,o.expires) AS order_expires FROM proof_sessions s JOIN proof_state p ON p.order_id=s.order_id AND p.revision=s.revision AND p.token_hash=s.token_hash JOIN orders o ON o.id=s.order_id WHERE s.id=? AND s.expires>? AND MIN(o.expires,COALESCE(o.artwork_expires,o.expires))>?').bind(id,now(),now()).first();}
 export async function proofService(request,env){

@@ -4,7 +4,7 @@ test('live content creates new product routes and updates HTML metadata without 
 test('server JSON cannot escape script element and valid pages return 200',()=>{const content=structuredClone(defaultContent);content.products[0].description='</script><script>alert(1)</script>';const r=renderDocument(template,'/collections',content,'abc');assert.equal(r.status,200);assert.equal(r.html.includes('</script><script>alert(1)'),false);assert.match(r.html,/nonce="abc"/)});
 test('practical collections are inspiration and retired designer links lead to the studio',()=>{
  const content=structuredClone(defaultContent);content.products.forEach(p=>p.status='available');
- for(const kind of ['business','qr','wifi']){
+ for(const kind of ['qr','wifi']){
   const idea=renderDocument(template,'/products/'+kind,content,'testnonce');assert.equal(idea.status,200);assert.match(idea.html,/Inspiration/);assert.match(idea.html,/Open the studio/);assert.doesNotMatch(idea.html,/Choose your design option|Design it for me/);
   const retired=renderDocument(template,'/design/'+kind,content,'testnonce');assert.equal(retired.status,200);assert.match(retired.html,/Notes for our team/);assert.doesNotMatch(retired.html,/Design it for me|Business and contact details/);
  }
@@ -16,3 +16,10 @@ test('Handy at home shows nine choices and leads into its existing-studio sectio
  assert.equal(detail.status,200);assert.match(detail.html,/Add your details/);assert.match(detail.html,/href="\/studio\/handy"/);
  const studio=renderDocument(template,'/studio/handy',content,'testnonce');assert.equal(studio.status,200);assert.match(studio.html,/Nine Handy at home designs/);assert.match(studio.html,/Family week/);assert.match(studio.html,/Pet care/);
 });
+
+ test('business product routes into editable studio with nine designs',()=>{
+ const content=structuredClone(defaultContent);content.products.find(p=>p.id==='business').status='available';
+ const detail=renderDocument(template,'/products/business',content,'testnonce');
+ assert.equal(detail.status,200);assert.match(detail.html,/Add your details/);assert.match(detail.html,/href="\/studio\/business"/);
+ const studio=renderDocument(template,'/studio/business',content,'testnonce');assert.equal(studio.status,200);assert.match(studio.html,/Business magnets/);assert.match(studio.html,/Guest Wi-Fi/);assert.match(studio.html,/Business contact/);
+ });
