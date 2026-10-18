@@ -4,6 +4,7 @@
   "pages_build_output_dir": "dist/client",
   "vars": {
     "SITE_GATE_ENABLED": "true",
+    "LOCKER_LOOKUP_ENABLED": "false",
     "SUBMISSIONS_ENABLED": "false",
     "ARTWORK_STORAGE_ENABLED": "false",
     "ORDER_RECORDS_ENABLED": "false"
@@ -22,6 +23,7 @@
     "production": {
       "vars": {
         "SITE_GATE_ENABLED": "true",
+        "LOCKER_LOOKUP_ENABLED": "true",
         "SUBMISSIONS_ENABLED": "true",
         "ARTWORK_STORAGE_ENABLED": "true",
         "ORDER_RECORDS_ENABLED": "true"
@@ -40,6 +42,7 @@
     "preview": {
       "vars": {
         "SITE_GATE_ENABLED": "true",
+        "LOCKER_LOOKUP_ENABLED": "false",
         "SUBMISSIONS_ENABLED": "false",
         "ARTWORK_STORAGE_ENABLED": "false",
         "ORDER_RECORDS_ENABLED": "false"

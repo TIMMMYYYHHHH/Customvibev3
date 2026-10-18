@@ -22,7 +22,9 @@ export function validateOrder(x,catalogue,privateArtwork=false){
  const base=identity(x),notes=validateOrderNotes(x.notes);if(notes)base.notes=notes;if(x.referenceVersion!==undefined){if(![1,2].includes(x.referenceVersion))invalid();base.referenceVersion=x.referenceVersion;}if(!plain(x.contact)||!plain(x.locker)||x.consent!==true||!Array.isArray(x.items)||!x.items.length)invalid();
  const contact={name:line(x.contact.name,100),email:email(x.contact.email),phone:line(x.contact.phone,30)};
  if(!/^\+?[\d ()-]{7,30}$/.test(contact.phone)||contact.phone.replace(/\D/g,'').length<7||contact.phone.replace(/\D/g,'').length>15)invalid();
- const locker={name:line(x.locker.name,140),area:line(x.locker.area,140)};let totalBytes=0,fileCount=0;
+ const locker={name:line(x.locker.name,140),area:line(x.locker.area,140)};
+ if(x.locker.id!==undefined){if(typeof x.locker.id!=='string'||!/^[A-Za-z0-9_-]{1,40}$/.test(x.locker.id))invalid();locker.id=x.locker.id;}
+ let totalBytes=0,fileCount=0;
  const ids=new Set();
  const items=x.items.map((item,index)=>{
   if(!plain(item)||!Number.isSafeInteger(item.qty)||item.qty<1)invalid();

@@ -20,3 +20,7 @@ test('locker search matches all words across name, area and code without changin
  assert.deepEqual(searchLockers(list,'  NORTH garden '),[list[0]]);assert.deepEqual(searchLockers(list,'sample-02'),[list[1]]);
  assert.deepEqual(searchLockers(list,'Durban'),list);assert.deepEqual(searchLockers(list,''),list);assert.deepEqual(searchLockers(list,'missing'),[]);assert.equal(list.length,2);
 });
+test('locker search accepts postcodes and street-address words',()=>{
+ const location={id:'CG123',name:'Example locker',area:'Durban North',address:'1 Example Road',postcode:'4051'};
+ assert.deepEqual(searchLockers([location],'4051 road'),[location]);
+});

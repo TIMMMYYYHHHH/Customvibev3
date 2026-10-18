@@ -5,6 +5,11 @@ import {validateContact,validateOrder,orderEmails} from '../server/submission-mo
 import {defaultContent} from '../src/content/model.mjs';
 const jpeg=()=>readFileSync('tests/fixtures/print-tile.jpg').toString('base64');
 const input=()=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test customer',email:'customer@example.com',phone:'+27821234567'},locker:{name:'Preferred PUDO locker',area:'Durban'},consent:true,items:[{kind:'photo',qty:2,files:[jpeg()]}]});
+test('order parsing retains a bounded locker ID without accepting client verification claims',()=>{
+ const raw=input();raw.locker={...raw.locker,id:'CG123',provider:'spoof',verified:true};
+ assert.deepEqual(validateOrder(raw,defaultContent).locker,{id:'CG123',name:raw.locker.name,area:'Durban'});
+ for(const id of ['',123,'https://evil.test','a'.repeat(41),'CG123\n']){raw.locker.id=id;assert.throws(()=>validateOrder(raw,defaultContent));}
+});
 test('orders use catalogue prices and fixed unpaid status, never client totals',()=>{
  const raw=input();raw.total=1;raw.paymentStatus='paid';const order=validateOrder(raw,defaultContent);
  assert.equal(order.subtotalCents,defaultContent.pricing.single*2);assert.equal(order.paymentStatus,'unpaid');assert.equal(order.deliveryCents,null);

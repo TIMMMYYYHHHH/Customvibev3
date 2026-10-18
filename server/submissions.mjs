@@ -1,4 +1,5 @@
 import {requestReference} from '../src/request-reference.mjs';
+import {lockerLookupEnabled,verifyLockerSelection} from './lockers.mjs';
 import {orderRecord} from './order-record.mjs';
 import {ORDER_LIMITS} from '../src/artwork-policy.mjs';
 import {boundedBody,cookie,sameOrigin,constantEqual,random,signToken,verifyToken} from './auth.mjs';
@@ -10,7 +11,7 @@ const ready=(env,kind)=>env.SUBMISSIONS_ENABLED==='true'&&(kind==='contact'?env.
 async function digest(value,secret){const key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(value))),b=>b.toString(16).padStart(2,'0')).join('');}
 async function state(env,path,body){const r=await env.AUTH.fetch('https://auth.internal/submissions/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('Unavailable');return r.json();}
 async function mail(payload,id,env,network){const r=await network('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':id},body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)});if(!r.ok)throw new Error('Email unavailable');const result=await r.json();if(typeof result.id!=='string')throw new Error('Email unavailable');}
-export async function submissions(request,env,network=fetch){
+export async function submissions(request,env,network=fetch,lockerSource){
  const url=new URL(request.url),name='__Host-cv-form',kind=url.pathname==='/api/contact'||url.pathname==='/api/forms'&&url.searchParams.get('kind')==='contact'?'contact':'order';
  if(!['/api/forms','/api/contact','/api/order-request','/api/artwork/init','/api/artwork/upload'].includes(url.pathname))return fail(404,'Not found');
  if(url.hostname!=='customvibe.co.za')return fail(403,'Forbidden');
@@ -19,7 +20,7 @@ export async function submissions(request,env,network=fetch){
   if(!ready(env,kind))return Response.json({available:false,paymentStatus:'coming-soon'});
   let token=cookie(request,name),session=await verifyToken(token,env.SESSION_SECRET,'form');
   if(!session){session={scope:'form',jti:random(),csrf:random(),exp:Math.floor(Date.now()/1000)+3600};token=await signToken(session,env.SESSION_SECRET);}
-  const r=Response.json({available:true,csrf:session.csrf,siteKey:env.TURNSTILE_SITE_KEY,paymentStatus:'coming-soon',maxEncodedArtwork:2000000,orderRecords:kind==='order'&&env.ORDER_RECORDS_ENABLED==='true',artworkStorage:kind==='order'&&env.ARTWORK_STORAGE_ENABLED==='true'});
+  const r=Response.json({available:true,csrf:session.csrf,siteKey:env.TURNSTILE_SITE_KEY,paymentStatus:'coming-soon',lockerSearch:kind==='order'&&env.ARTWORK_STORAGE_ENABLED==='true'&&lockerLookupEnabled(env),maxEncodedArtwork:2000000,orderRecords:kind==='order'&&env.ORDER_RECORDS_ENABLED==='true',artworkStorage:kind==='order'&&env.ARTWORK_STORAGE_ENABLED==='true'});
   r.headers.set('Set-Cookie',`${name}=${token}; Path=/; Max-Age=${Math.max(0,session.exp-Math.floor(Date.now()/1000))}; HttpOnly; Secure; SameSite=Lax`);return r;
  }
  if(request.method!=='POST')return fail(405,'Method not allowed');
@@ -45,6 +46,17 @@ export async function submissions(request,env,network=fetch){
    else{const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)throw new Error('Unavailable');submission=validateOrder(body.payload,await r.json(),privateArtwork);}
    if(kind==='order'&&env.ORDER_RECORDS_ENABLED==='true'&&JSON.stringify(orderRecord(submission,privateArtwork)).length>ORDER_LIMITS.recordCharacters)throw new Error('Order details too large');
   }catch{return fail(400,'Check your details, products and artwork. Check the artwork and order-detail size limits.');}
+  if(kind==='order'&&submission.locker.id){
+   if(!privateArtwork)return fail(400,'Enter the locker name and area as a manual preference before sending this order.');
+   if(finishing||body.resume){
+    // Exact snapshot shape from fresh validation. Signed grant/resume verification
+    // below must succeed before any side effects; it proves the initial lookup.
+    const {id,name,area}=submission.locker;submission.locker={id,name,area,provider:'tcg-locker'};
+   }else{
+    try{submission.locker=await verifyLockerSelection(submission.locker,env,lockerSource);}
+    catch(error){return fail(400,error.status===409?error.message:'We could not check your selected locker. Retry, or use a manually entered preference before starting the order.');}
+   }
+  }
   if(privateArtwork){
    if(url.pathname==='/api/artwork/init')return initArtwork(env,session,submission,ip,body.resume);
    const grant=await verifyArtworkGrant(body.grant,env,session,submission);if(!grant)return fail(403,'Refresh the security check and retry this same order.');

@@ -2,9 +2,9 @@
 import React,{useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {LockerPicker} from '../../src/LockerPicker';
-import '../../src/fonts.css';import '../../src/shop-base.css';import '../../src/shop.css';import '../../src/studio.css';import '../../src/consistency.css';import '../../src/mobile.css';
+import '../../src/fonts.css';import '../../src/shop-base.css';import '../../src/shop.css';import '../../src/studio.css';import '../../src/consistency.css';import '../../src/mobile.css';import '../../src/button-system.css';
 const sampleLocations=[
- {id:'SAMPLE-001',name:'Sample: Garden Square locker',area:'Durban North',lat:-29.8,lon:31.04,hours:'Sample hours: 08:00 to 18:00'},
+ {id:'SAMPLE-001',name:'Sample: Garden Square locker',area:'Durban North',lat:-29.8,lon:31.04,address:'Fictional sample address, Garden Square, Durban North',postcode:'4051',hours:'Monday 08:00–18:00; Tuesday 08:00–18:00; Wednesday 08:00–18:00; Thursday 08:00–18:00; Friday 08:00–18:00; Saturday 09:00–13:00'},
  {id:'SAMPLE-002',name:'Sample: Village Centre locker',area:'Umhlanga',lat:-29.73,lon:31.08,hours:'Sample hours: 08:00 to 18:00'},
  {id:'SAMPLE-003',name:'Sample: City Corner locker',area:'Durban Central',lat:-29.86,lon:31.02,hours:'Sample hours: 08:00 to 18:00'}
 ];

@@ -7,5 +7,5 @@ export function mapLinks(location){
 }
 export function searchLockers(locations,query){
  const words=query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
- return locations.filter(item=>words.every(word=>[item.name,item.area,item.id].join(' ').toLocaleLowerCase().includes(word)));
+ return locations.filter(item=>words.every(word=>[item.name,item.area,item.id,item.address,item.postcode].join(' ').toLocaleLowerCase().includes(word)));
 }

@@ -29,7 +29,7 @@ export default function HandyStudio({selected,onSelect,drafts,setDrafts,editing,
  return <main className="handy-studio section">
  <header className="handy-heading"><p className="eyebrow">LITTLE DETAILS. RIGHT AT HOME.</p><h1>Handy at home.</h1><p>Choose a design and add the details that make it yours. Each magnet is 7.5 × 7.5 cm.</p></header>
  {!design?<><HandyGallery onChoose={onSelect}/><p className="handy-help">Pick any individual design. Add copies or mix different designs in your basket.</p></>:<>
- <button className="text-button handy-back" onClick={back} disabled={busy}>{editing?'Cancel editing':'Choose another design'}</button>
+ <button className="button secondary handy-back" onClick={back} disabled={busy}>{editing?'Cancel editing':'Choose another design'}</button>
  <div className="handy-workbench"><figure className="handy-live-preview" aria-busy={!preview&&!invalid&&!error}>
  <MagnetPreview urls={[preview||design.image]} label={design.name+' preview'}/><figcaption>7.5 × 7.5 cm · Square magnet</figcaption>
  {invalid&&<p role="status">Shorten the marked details to update your preview.</p>}

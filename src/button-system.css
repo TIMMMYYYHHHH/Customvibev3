@@ -1,0 +1,41 @@
+/* P1 Soft sticker + S1 Fresh mint, approved 18 October 2026.
+   Canonical customer control roles: docs/design/button-system.md. */
+:root {
+  --cv-action: #ae2e5b;
+  --cv-action-hover: #92234b;
+  --cv-secondary: #9ddcc4;
+  --cv-secondary-hover: #83ccb1;
+  --cv-selected: #291438;
+  --cv-disabled: #e7e2dd;
+  --cv-disabled-text: #776e7a;
+  --cv-radius: 14px;
+}
+.shop-shell .button.button,.storefront .action.action,.unified-header .site-create,
+.shop-shell .studio-add {
+  border-radius:var(--cv-radius);border-color:transparent;box-shadow:none;
+  font-family:'Fredoka Variable',sans-serif;font-weight:650;
+  text-decoration:none;letter-spacing:0;
+}
+.unified-header .site-create {background:var(--cv-action);color:#fff}
+.unified-header .site-create:hover {background:var(--cv-action-hover)}
+.shop-shell .studio-add {min-height:48px}
+.shop-shell .studio-choice-row button,.storefront .collection-filters button,
+.help-topics button,.storefront .grid-switch button,
+.shop-shell .studio-zoom button,.shop-shell .studio-rotate button,
+.shop-shell .zoom-control button,.shop-shell .locker-official-link {
+  border-radius:var(--cv-radius);
+}
+.shop-shell .studio-choice-row button:hover:not(:disabled):not([aria-pressed=true]),
+.storefront .collection-filters button:hover:not([aria-pressed=true]),
+.help-topics button:hover:not([aria-pressed=true]),
+.storefront .grid-switch button:hover:not([aria-pressed=true]) {background:var(--cv-secondary-hover)}
+.shop-shell :is(.button,.studio-add,.studio-choice-row button,.studio-zoom button,.studio-rotate button,.zoom-control button):hover,
+.storefront :is(.action,.collection-filters button,.grid-switch button):hover,
+.studio-sections a:hover {filter:none;transform:none}
+.shop-shell :is(.button,.studio-add,.studio-choice-row button,.studio-zoom button,.studio-rotate button,.zoom-control button):disabled,
+.storefront :is(.action,.collection-filters button,.grid-switch button):disabled {
+  background:var(--cv-disabled);color:var(--cv-disabled-text);opacity:1;cursor:not-allowed;box-shadow:none;
+}
+.shop-shell :is(.button,.studio-add):focus-visible,
+.storefront :is(.action,.catalog-explore):focus-visible,
+.unified-header .site-create:focus-visible {outline:3px solid var(--cv-selected);outline-offset:3px}

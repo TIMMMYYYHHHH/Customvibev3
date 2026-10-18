@@ -2,7 +2,11 @@
 
 17 October 2026. Owner requested the site map and visuals while the courier account/API are pending.
 
-## Current scope
+## Current position, 18 October 2026
+
+The owner has completed courier account setup and authorised a dedicated CustomVibe API key, Cloudflare secret storage and live locker selection. The TCG Locker portal was inspected while signed in and its API Keys list was empty. Local integration is now implemented, with tests and visual checks recorded in [locker-integration.md](locker-integration.md). The dedicated CustomVibe key is now created and stored as an encrypted production-only Cloudflare secret. Authenticated production access returned 2,138 valid online lockers. Deployment/live checkout and free-tier CPU verification are pending. Provider API fees and refresh quotas were not stated in the reviewed portal/docs; no paid service was accepted. This replaces the account-registration dependency below.
+
+## Published scope as of 17 October
 
 Checkout uses a shared LockerPicker component with a direct link to the official The Courier Guy locker finder, an optional OpenStreetMap area map, required manual locker name/town fields and a preference summary. No locker locations, availability or shipping prices are invented. Manual entry does not create a map pin. This saves the same name/area preference as before; it does not reserve a locker or book delivery.
 
@@ -10,7 +14,7 @@ The map is loaded only after Show area map. It uses the existing allowed OpenStr
 
 The local-only fixture at `tests/fixtures/locker-picker.html` exercises future town/name/code search, accessible result selection, a selected-location pin and manual fallback. Every location is labelled Sample and the page clearly states that the locations are fictional. The fixture is not a production build entry and has no order submission or sending actions. The production checkout passes no dataset and therefore exposes no sample search or pins.
 
-## Still required before live locker selection
+## Original implementation plan, 17 October (historical)
 
 - Tim completes the official courier account registration, tracked under Required business information in Founders Hub.
 - Confirm the authorised live locker endpoint, permitted display/use, current-data refresh approach and free-tier limits. Do not scrape the public locator or reuse its client credentials.

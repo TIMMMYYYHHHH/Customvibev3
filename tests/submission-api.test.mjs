@@ -10,6 +10,14 @@ test('forms fail closed without provider credentials and reject cross-origin POS
  assert.equal((await (await submissions(new Request(origin+'/api/forms'),{})).json()).available,false);
  assert.equal((await submissions(post('/api/contact',{cookie:'',csrf:''},payload(),{origin:'https://attacker.invalid'}),setup())).status,403);
 });
+test('legacy order mode does not advertise locker search or accept selected IDs before side effects',async()=>{
+ const env={...setup(),LOCKER_LOOKUP_ENABLED:'true',TCG_LOCKER_API_KEY:random()},context=await form(env),jpeg=readFileSync('tests/fixtures/print-tile.jpg').toString('base64');let sends=0,storage=0;
+ const data={id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'customer@example.com',phone:'0821234567'},locker:{id:'CG123',name:'Example locker',area:'Durban North'},consent:true,items:[{kind:'photo',qty:1,files:[jpeg]}]};
+ const realAuth=env.AUTH;env.AUTH={fetch:(...args)=>{storage++;return realAuth.fetch(...args)}};
+ const network=async url=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});sends++;return Response.json({id:'accepted'})};
+ assert.equal((await submissions(post('/api/order-request',context,data),env,network,async()=>{throw Error('Must not look up')})).status,400);assert.equal(sends,0);assert.equal(storage,0);
+ const config=await (await submissions(new Request(origin+'/api/forms'),env)).json();assert.equal(config.lockerSearch,false);assert.equal(config.paymentStatus,'coming-soon');assert.ok(!JSON.stringify(config).includes(env.TCG_LOCKER_API_KEY));
+});
 test('contact uses only W3Forms and repeated or concurrent requests cannot duplicate delivery',async()=>{
  const env={...setup(),W3FORMS_ACCESS_KEY:'w3f_test_key'},context=await form(env),data=payload(),calls=[];
  const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'contact'});calls.push({url,headers:init.headers,body:JSON.parse(init.body)});return Response.json({success:true,message:'Form submitted successfully'});};
