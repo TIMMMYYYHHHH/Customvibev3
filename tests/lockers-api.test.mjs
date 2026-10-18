@@ -1,10 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeLockers,createLockerSource,lockerAPI,verifyLockerSelection} from '../server/lockers.mjs';
+import {normalizeLockers,createLockerSource,lockerAPI,verifyLockerSelection,cachedLockerResponse} from '../server/lockers.mjs';
 import {random,signToken} from '../server/auth.mjs';
 const row=(patch={})=>({code:'CG123',status:'online',name:'Example locker',latitude:'-29.8',longitude:'31.04',address:'1 Example Road, Durban North',place:{town:'Durban North',postalCode:'4051'},type:{id:2,name:'Locker'},openinghours:[{day:'Monday',open_time:'08:00:00',close_time:'17:00:00'}],...patch});
 const env=()=>({LOCKER_LOOKUP_ENABLED:'true',TCG_LOCKER_API_KEY:random(),SESSION_SECRET:random()});
 const cache=()=>{const entries=new Map();return {async match(key){return entries.get(String(key))?.clone()},async put(key,response){entries.set(String(key),response.clone())}}};
+test('validated cached directory streams privately, with expiry enforced and negative cache excluded',async()=>{
+ const store=cache(),settings=env(),time=100000;
+ await createLockerSource({cache:store,now:()=>time,network:async()=>Response.json([row()])})(settings);
+ const response=await cachedLockerResponse(store,time+1);
+ assert.equal(response.headers.get('Cache-Control'),'private, no-store');assert.equal(response.headers.get('X-CV-Directory-Time'),null);
+ assert.equal((await response.json()).locations[0].id,'CG123');
+ assert.equal(await cachedLockerResponse(store,time-1),null);assert.equal(await cachedLockerResponse(store,time+6*3600000),null);
+ const failed=cache();await assert.rejects(()=>createLockerSource({cache:failed,now:()=>time,network:async()=>new Response('',{status:503})})(settings));
+ assert.equal(await cachedLockerResponse(failed,time+1),null);
+});
 test('failure diagnostics contain only fixed stages and status, never credentials or provider details',async()=>{
  const settings=env(),messages=[];
  const source=createLockerSource({cache:cache(),diagnostic:m=>messages.push(m),network:async()=>new Response('private upstream detail '+settings.TCG_LOCKER_API_KEY,{status:403})});

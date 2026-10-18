@@ -3,6 +3,7 @@ import {boundedBody,cookie,verifyToken} from './auth.mjs';
 // This adapter has no booking, billing, rate or arbitrary-proxy capability.
 const ENDPOINT='https://api-pudo.co.za/api/v1/lockers-data';
 const MAX_AGE=6*60*60*1000,MAX_BYTES=8000000;
+const CACHE_KEY='https://customvibe.co.za/internal-cache/locker-directory-v2';
 const unavailable=()=>Object.assign(new Error('Locker lookup unavailable'),{status:503});
 export const lockerLookupEnabled=env=>env.LOCKER_LOOKUP_ENABLED==='true'&&typeof env.TCG_LOCKER_API_KEY==='string'&&env.TCG_LOCKER_API_KEY.length>=20;
 const enabled=lockerLookupEnabled;
@@ -34,7 +35,7 @@ export function createLockerSource({network=fetch,cache,now=Date.now,diagnostic=
   if(pending)return pending;
   pending=(async()=>{
    const store=cache??globalThis.caches?.default;
-   const cacheKey='https://customvibe.co.za/internal-cache/locker-directory-v1';
+   const cacheKey=CACHE_KEY;
    let cachedFailure=false,stage='cache-read',upstreamStatus=0;
    try{
     const cached=await store?.match(cacheKey);
@@ -48,7 +49,7 @@ export function createLockerSource({network=fetch,cache,now=Date.now,diagnostic=
     stage='normalize';const locations=normalizeLockers(data);
     const value={locations,updatedAt:now()};
     // Cache contains public location details only. It is not a public HTTP route.
-    stage='cache-write';if(store)await store.put(cacheKey,Response.json(value,{headers:{'Cache-Control':`public, max-age=${MAX_AGE/1000}`}}));
+    stage='cache-write';if(store)await store.put(cacheKey,Response.json(value,{headers:{'Cache-Control':`public, max-age=${MAX_AGE/1000}`,'X-CV-Directory-Time':String(value.updatedAt)}}));
     memory=value;return value;
    }catch{
     // A negative cache hit must not postpone the original retry deadline.
@@ -64,6 +65,15 @@ export function createLockerSource({network=fetch,cache,now=Date.now,diagnostic=
  };
 }
 const source=createLockerSource();
+// This cache was written only after validation. Stream its JSON without parsing and
+// serializing the full directory again. Call only after the site's form-session check.
+export async function cachedLockerResponse(store=globalThis.caches?.default,now=Date.now()){
+ try{
+  const cached=await store?.match(CACHE_KEY),stamp=Number(cached?.headers.get('X-CV-Directory-Time'));
+  if(!cached?.ok||!cached.headers.has('X-CV-Directory-Time')||!Number.isFinite(stamp)||now<stamp||now-stamp>=MAX_AGE)return null;
+  return new Response(cached.body,{headers:{'Content-Type':'application/json','Cache-Control':'private, no-store'}});
+ }catch{return null;}
+}
 export async function lockerAPI(request,env,getLocations=source){
  const url=new URL(request.url),fail=(status,error)=>Response.json({error},{status,headers:{'Cache-Control':'private, no-store'}});
  if(url.hostname!=='customvibe.co.za'||request.headers.get('sec-fetch-site')==='cross-site')return fail(403,'Forbidden');
@@ -71,6 +81,7 @@ export async function lockerAPI(request,env,getLocations=source){
  if(!enabled(env))return fail(503,'Locker search is temporarily unavailable. You can still enter a preference below.');
  const session=await verifyToken(cookie(request,'__Host-cv-form'),env.SESSION_SECRET,'form');
  if(!session)return fail(401,'Refresh the page to search for lockers.');
+ if(getLocations===source){const cached=await cachedLockerResponse();if(cached)return cached;}
  try{return Response.json(await getLocations(env),{headers:{'Cache-Control':'private, no-store'}});}catch{return fail(503,'Locker search is temporarily unavailable. Retry or enter a preference below.');}
 }
 export async function verifyLockerSelection(locker,env,getLocations=source){
