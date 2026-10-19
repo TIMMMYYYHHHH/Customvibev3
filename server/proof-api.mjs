@@ -3,7 +3,10 @@ export const proofCall=(env,path,body)=>env.AUTH.fetch('https://auth.internal/pr
 export const proofHash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),b=>b.toString(16).padStart(2,'0')).join('');
 const fail=(status,error)=>Response.json({error},{status});
 export async function proofAPI(request,env){
- const path=new URL(request.url).pathname,secret=env.SESSION_SECRET;
+ const url=new URL(request.url);
+ // Preview bindings may point at production storage; only the live public host can use customer proofs.
+ if(url.hostname!=='customvibe.co.za')return fail(403,'Private proof review is only available on the live website.');
+ const path=url.pathname,secret=env.SESSION_SECRET;
  if(!/^[a-f0-9]{64}$/i.test(secret||''))return fail(503,'Review is temporarily unavailable.');
  if(request.method==='POST'&&path==='/api/proof/session'){
   if(!sameOrigin(request))return fail(403,'Open your review link on this website.');
