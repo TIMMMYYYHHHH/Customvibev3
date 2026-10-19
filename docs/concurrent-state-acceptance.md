@@ -29,3 +29,27 @@ The runner writes sanitized actor/method/path/status traces and synthetic screen
 This is not Cloudflare D1 deployment/availability, transport/TLS, independent identity-provider or live authentication acceptance. SQLite cannot establish every distributed edge timing. The simultaneous API race and browser stale-save journeys are distinct evidence. Browser scope is installed desktop Chrome at1280x1000, not physical-device, cross-engine, measured performance or accessibility conformance.
 
 Calendar/time-boundary activation, public rollout, complete expired-session recovery, manual email retry journeys, proof replacement/approval and production concurrency remain separate TECH28 work. No clock, seeded setting, fixture session or database enters production. Root owns integration/current-head CI and any later publication or Hub acceptance; this tranche does not close TECH28/GAP-A06.
+
+## Fixed-clock seasonal and preview acceptance
+
+The separate timed tranche reuses the real Worker/SQLite harness with its default race behavior unchanged. Its storefront adapter is opt-in: `createConcurrencyHarness({storefront:true})` exposes `dispatchStorefront`. It serves matching built client assets and dispatches `/content.json` and `/season.json` to the actual internal Catalogue Worker with disposable D1 storage. The existing Admin preview forms response supplies disabled fixture forms; no sending service is configured. It does not exercise production middleware, password-gate routing, transport or edge caches.
+
+Run from an isolated checkout with Node 22 and matching private dependencies:
+
+```sh
+node --test tests/season-boundaries.test.mjs tests/theme-concurrency.test.mjs tests/sast-time.test.mjs tests/christmas-theme.test.mjs tests/occasion-date-rules.test.mjs tests/seasons-storage.test.mjs tests/seasons.test.mjs tests/database.test.mjs tests/season-editor-drafts.test.mjs
+npm run build
+npm run build:admin
+node tests/season-boundaries.browser.mjs
+node tests/theme-concurrency.browser.mjs
+```
+
+The new Node cases use fresh signed fixtures and scoped `Date.now` mocks for each literal UTC instant. Actual Catalogue Worker responses must select the synthetic installed Christmas campaign at SAST 23:59 on 31 December 2027, keep the 2027 occurrence at SAST 00:00 on 1 January 2028, and remove it at 00:01. Leap-day cases cover just before/at the start, exact end, non-leap 2029 and recurrence in 2032. Off and not-ready saved states remain authoritative. Expected identities come from literal tables, never the resolver under test. Stored content/seasonal rows and SQLite change counts must remain unchanged after setup.
+
+The browser runner uses one matching local public/SSR/Admin build, actual installed Chrome and the existing Playwright package. `TECH28_BOUNDARY_EVIDENCE` may select its evidence directory. Context-level interception is installed before any page is created, including the first navigation of `noopener` popups. Service workers are blocked, WebSockets and all external/write requests fail, and no route continues to a network. Clocks are confined to the runner process and disposable contexts; popup clocks are installed through context init scripts before runtime code. No clock is saved to seasonal records.
+
+Public timer-clock setup installs the explicitly earlier UTC 20:58 instant, then pauses at the intended UTC 21:58 boundary before navigation and asserts the exact initial browser Date. Installing and pausing at the same instant would race elapsed real time. The paused-clock public navigation waits for DOMContentLoaded, then the actual seasonal API response, collections heading and rendered seasonal state. This avoids depending on the global load event while timers are paused; it retains the ten-second deadline and all response/DOM/counterfactual and immutable-state assertions. The original independently observed clock/navigation failures remain review evidence, not application defects.
+
+Six journeys cover actual public 60-second polling across SAST New Year; selected-time versus identical-current-time collections previews in UTC and America/Los_Angeles; off authority under the same selected query; annual leap/non-leap preview output; and calendar midday selection, actual visitor popup, leap/non-leap cells and Return to today. The selected-time counterfactual requires actual Christmas appearance and switch state versus original appearance without `at`, as well as the correct collections page/query. A retained query or rendered heading alone cannot prove which clock was selected. Public polling uses actual service responses; preview uses the actual authenticated Admin seasonal API and client resolution. No canned campaign response or injected preview message selects the appearance.
+
+After synthetic setup through the real Admin API, every journey checks immutable saved row/change-count snapshots and zero further writes. Sanitized evidence records controlled server/browser instants, selected query values, GET/status traces, actual response campaign identity, rendered appearance/switch results and snapshot digests. It contains no cookies, CSRF values, tokens, request bodies or customer data. A successful local run is boundary acceptance only. It does not approve live theme readiness, schedule activation, public launch, calendar changes, full expired-session/proof/email journeys, distributed D1 timing, cross-engine/device/assistive-technology acceptance or TECH28 completion. PR34 race and PR22 focus acceptance remain separate.

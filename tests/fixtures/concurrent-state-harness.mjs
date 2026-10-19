@@ -5,12 +5,14 @@ import {readFile} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import admin from '../../admin/worker.mjs';
+import catalogue from '../../catalogue/index.mjs';
 import {random,signToken} from '../../server/auth.mjs';
 import {saveSeasons} from '../../server/seasons.mjs';
 import {seedState} from '../../src/seasons/model.mjs';
 export const origin='https://admin.local';
+export const storefrontOrigin='https://storefront.local';
 const root=fileURLToPath(new URL('../..',import.meta.url));
-export async function createConcurrencyHarness(){
+export async function createConcurrencyHarness({storefront=false}={}){
  const sql=new DatabaseSync(':memory:');sql.exec(readFileSync(resolve(root,'migrations/content/0001.sql'),'utf8'));
  const sqlUpdates=[];let seasonReadBarrier=null;
  function armSeasonReadBarrier({timeoutMs=2000}={}){
@@ -41,7 +43,21 @@ export async function createConcurrencyHarness(){
   const cookie=request.headers.get('cookie')||'',actor=Object.entries(actors).find(([,a])=>cookie.includes('__Host-cv-admin='+a.token))?.[0]||'anonymous';
   const response=await admin.fetch(request,env);if(url.pathname.startsWith('/api/')||url.pathname==='/content.json')operations.push({actor,method:request.method,path:url.pathname,status:response.status});return response;
  }
- return {actors,operations,forbidden,sql,sqlUpdates,armSeasonReadBarrier,dispatch,close(){if(seasonReadBarrier){clearTimeout(seasonReadBarrier.timer);seasonReadBarrier.reject(Error('Fixture closed before both readers arrived'));seasonReadBarrier=null}sql.close()}};
+ async function dispatchStorefront(request){
+  const url=new URL(request.url);
+  if(!storefront||url.origin!==storefrontOrigin||request.method!=='GET'||url.pathname.startsWith('/api/')&&url.pathname!=='/api/forms'){forbidden.push(request.method+' '+url.origin+url.pathname);return new Response('Forbidden in disconnected fixture',{status:403})}
+  let response;
+  if(['/content.json','/season.json'].includes(url.pathname))response=await catalogue.fetch(request,{CONTENT_DB:DB});
+  // Existing authenticated preview response disables forms. No sending service is configured.
+  else if(url.pathname==='/api/forms')response=await dispatch(new Request(origin+'/api/forms',{headers:{cookie:'__Host-cv-admin='+actors.A.token}}));
+  else{
+   const clientRoot=resolve(root,'dist/client'),mapped=url.pathname==='/'?'/index.html':extname(url.pathname)?url.pathname:url.pathname+'.html',file=resolve(clientRoot,'.'+mapped);
+   if(!file.startsWith(clientRoot+'/'))response=new Response('Not found',{status:404});
+   else try{response=new Response(await readFile(file),{headers:{'Content-Type':types[extname(file)]||'application/octet-stream'}})}catch{response=new Response('Not found',{status:404})}
+  }
+  operations.push({actor:'visitor',method:request.method,path:url.pathname,status:response.status});return response;
+ }
+ return {actors,operations,forbidden,sql,sqlUpdates,armSeasonReadBarrier,dispatch,dispatchStorefront,close(){if(seasonReadBarrier){clearTimeout(seasonReadBarrier.timer);seasonReadBarrier.reject(Error('Fixture closed before both readers arrived'));seasonReadBarrier=null}sql.close()}};
 }
 export function actorRequest(harness,actor,path,{method='GET',body,csrf=harness.actors[actor].csrf}={}){
  return harness.dispatch(new Request(origin+path,{method,headers:{cookie:'__Host-cv-admin='+harness.actors[actor].token,...(method==='PUT'?{origin,'Content-Type':'application/json','X-CSRF-Token':csrf}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})}));
