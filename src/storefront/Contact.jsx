@@ -2,13 +2,14 @@ import {PUBLIC_CONTACT_EMAIL} from '../../shared/business-constants.mjs';
 import React,{useEffect,useRef,useState} from 'react';
 import {BrandDoodle} from './ReferenceThread';
 import './contact.css';
-import {useFormService,FormSecurity} from '../FormService';
+import {useFormService,FormSecurity,useDraftProtection} from '../FormService';
 
 export default function Contact({standalone=false}){
  const Heading=standalone?'h1':'h2';
  const form=useRef(null),dialog=useRef(null),submitButton=useRef(null),restoreFocus=useRef(false);
  const service=useFormService('contact');
  const [values,setValues]=useState(()=>service.attempt||{name:'',email:'',message:''});
+ useDraftProtection('contact',['name','email','message'].some(key=>!!values[key]?.trim()));
  const [errors,setErrors]=useState({});
  const [status,setStatus]=useState('');
  useEffect(()=>{if(service.result&&!dialog.current?.open)dialog.current?.showModal();},[service.result]);
