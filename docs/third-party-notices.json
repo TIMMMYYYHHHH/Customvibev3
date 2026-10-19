@@ -1,0 +1,509 @@
+{
+  "schemaVersion": 1,
+  "scope": "Browser code and font assets distributed in the public and admin applications, including the embedded storefront preview and gated presentation assets. Not a whole-repository asset-rights audit.",
+  "baseline": "07702ec",
+  "notices": [
+    {
+      "id": "react",
+      "distribution": "react",
+      "version": "19.2.0",
+      "licence": "MIT",
+      "source": "node_modules/react/LICENSE",
+      "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "id": "react-dom",
+      "distribution": "react-dom",
+      "version": "19.2.0",
+      "licence": "MIT",
+      "source": "node_modules/react-dom/LICENSE",
+      "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "id": "scheduler",
+      "distribution": "scheduler",
+      "version": "0.27.0",
+      "licence": "MIT",
+      "source": "node_modules/scheduler/LICENSE",
+      "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "id": "@phosphor-icons/react",
+      "distribution": "@phosphor-icons/react",
+      "version": "2.1.10",
+      "licence": "MIT",
+      "source": "node_modules/@phosphor-icons/react/LICENSE",
+      "sourceSha256": "6918b72504641180600cbbd4a86b0dfa9dfccf788775694325b71b9a029f6eb4"
+    },
+    {
+      "id": "leaflet",
+      "distribution": "leaflet",
+      "version": "1.9.4",
+      "licence": "BSD-2-Clause",
+      "source": "node_modules/leaflet/LICENSE",
+      "sourceSha256": "53e8dc25862014e4324741ca18fbe3611e11d42ef69f59f86ea8c5389647d4cb"
+    },
+    {
+      "id": "qrcode",
+      "distribution": "qrcode",
+      "version": "1.5.4",
+      "licence": "MIT",
+      "source": "node_modules/qrcode/license",
+      "sourceSha256": "8df47c6ad9ac2c41eb9b2a72def9908959da0ede8dadd56c7b249c1bdb0c5ce6"
+    },
+    {
+      "id": "dijkstrajs",
+      "distribution": "dijkstrajs",
+      "version": "1.0.3",
+      "licence": "MIT",
+      "source": "node_modules/dijkstrajs/LICENSE.md",
+      "sourceSha256": "c46324e45a005413535a6fb7a97e9eacd3cc6bf30335b7d5c10b8ee3af9e60c2"
+    },
+    {
+      "id": "@fontsource-variable/fredoka",
+      "distribution": "@fontsource-variable/fredoka",
+      "version": "5.3.0",
+      "licence": "OFL-1.1",
+      "source": "node_modules/@fontsource-variable/fredoka/LICENSE",
+      "sourceSha256": "9bbd4f5f107895d5a213579b73821fadd05105241cf4360e86050199fcfd6034"
+    },
+    {
+      "id": "@fontsource-variable/dm-sans",
+      "distribution": "@fontsource-variable/dm-sans",
+      "version": "5.3.0",
+      "licence": "OFL-1.1",
+      "source": "node_modules/@fontsource-variable/dm-sans/LICENSE",
+      "sourceSha256": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7"
+    },
+    {
+      "id": "patrick-hand",
+      "version": "1.003",
+      "licence": "OFL-1.1",
+      "source": "public/assets/fonts/PatrickHand-OFL.txt",
+      "sourceSha256": "377f4f9c19e935228552478eb68cc2ed82910988a60ba60e2ac73b09f32d02d1"
+    },
+    {
+      "id": "vite-generated-preload-helpers",
+      "distribution": "vite",
+      "version": "6.4.4",
+      "licence": "MIT",
+      "source": "node_modules/vite/LICENSE.md",
+      "sourceSha256": "008938a3441801ca3960f8e3ccb4c0738e7996442a53063141d57d3769a7344d",
+      "extract": {
+        "before": "# Licenses of bundled dependencies"
+      },
+      "virtualModules": [
+        "\u0000vite/modulepreload-polyfill.js",
+        "\u0000vite/preload-helper.js"
+      ]
+    },
+    {
+      "id": "vite-vendored-commonjs-helpers",
+      "distribution": "vite",
+      "version": "6.4.4",
+      "licence": "MIT",
+      "source": "node_modules/vite/LICENSE.md",
+      "sourceSha256": "008938a3441801ca3960f8e3ccb4c0738e7996442a53063141d57d3769a7344d",
+      "extract": {
+        "start": "## @rollup/plugin-alias,",
+        "end": "\n---------------------------------------"
+      },
+      "virtualModules": [
+        "\u0000commonjsHelpers.js"
+      ],
+      "provenance": "CommonJS helper bundled in the pinned Vite distribution. The separate upstream plugin version is not asserted; the exact Vite distribution and notice source are pinned."
+    },
+    {
+      "id": "qrcode-embedded-upstream-notice",
+      "distribution": "qrcode",
+      "version": "1.5.4",
+      "licence": "MIT",
+      "source": "node_modules/qrcode/lib/core/qrcode.js",
+      "sourceSha256": "216e490908ed95df74992a05d44efa35ea7bc8dcab27b49b446725964704e833",
+      "extract": {
+        "start": "/**\n * QRCode for JavaScript",
+        "end": "\n\n/**\n * Add finder patterns"
+      }
+    }
+  ],
+  "fonts": [
+    {
+      "path": "src/assets/fonts/fredoka-hebrew-wght-normal.woff2",
+      "matches": "node_modules/@fontsource-variable/fredoka/files/fredoka-hebrew-wght-normal.woff2",
+      "sha256": "ab46fdbead875af9c6e967705a149f398554e9bb0f2f50c19d13b54ea4fa3195",
+      "notice": "@fontsource-variable/fredoka"
+    },
+    {
+      "path": "src/assets/fonts/fredoka-latin-ext-wght-normal.woff2",
+      "matches": "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-ext-wght-normal.woff2",
+      "sha256": "18a1723c878c0d8acc2e45a108fd62fbb976e408337804afa2908982fac13e2a",
+      "notice": "@fontsource-variable/fredoka"
+    },
+    {
+      "path": "src/assets/fonts/fredoka-latin-wght-normal.woff2",
+      "matches": "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
+      "sha256": "99d6c78e043710d4f83ed90716779798b7b04eb690f73e0ad0e8f32d1f0e98c2",
+      "notice": "@fontsource-variable/fredoka"
+    },
+    {
+      "path": "public/coming-soon/fredoka.woff2",
+      "matches": "src/assets/fonts/fredoka-latin-wght-normal.woff2",
+      "sha256": "99d6c78e043710d4f83ed90716779798b7b04eb690f73e0ad0e8f32d1f0e98c2",
+      "notice": "@fontsource-variable/fredoka"
+    },
+    {
+      "path": "src/assets/fonts/dm-sans-latin-ext-wght-normal.woff2",
+      "matches": "node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-ext-wght-normal.woff2",
+      "sha256": "a5d38fe99f930275684999b462c7123faa063d9e44e73b4b241723d884aa0f49",
+      "notice": "@fontsource-variable/dm-sans"
+    },
+    {
+      "path": "src/assets/fonts/dm-sans-latin-wght-normal.woff2",
+      "matches": "node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2",
+      "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543",
+      "notice": "@fontsource-variable/dm-sans"
+    },
+    {
+      "path": "public/coming-soon/dm-sans.woff2",
+      "matches": "src/assets/fonts/dm-sans-latin-wght-normal.woff2",
+      "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543",
+      "notice": "@fontsource-variable/dm-sans"
+    },
+    {
+      "path": "public/assets/fonts/PatrickHand-Regular.ttf",
+      "sha256": "0f173b3e6cb6d1af25babf7f0057c5ac4ee11f9992b0469bb817e967ef4ad0fc",
+      "notice": "patrick-hand",
+      "metadata": {
+        "family": "Patrick Hand",
+        "version": "1.003",
+        "copyright": "Copyright (c) 2012 Patrick Wagesreiter (mail@patrickwagesreiter.at)",
+        "licence": "SIL Open Font License, Version 1.1"
+      }
+    }
+  ],
+  "applications": {
+    "public": {
+      "renderedPackageModules": {
+        "@fontsource-variable/dm-sans": [
+          "@fontsource-variable/dm-sans/files/dm-sans-latin-ext-wght-normal.woff2?inline",
+          "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?inline"
+        ],
+        "@fontsource-variable/fredoka": [
+          "@fontsource-variable/fredoka/files/fredoka-hebrew-wght-normal.woff2?inline",
+          "@fontsource-variable/fredoka/files/fredoka-latin-ext-wght-normal.woff2?inline",
+          "@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2?inline"
+        ],
+        "@phosphor-icons/react": [
+          "@phosphor-icons/react/dist/csr/ArrowClockwise.es.js",
+          "@phosphor-icons/react/dist/csr/ArrowCounterClockwise.es.js",
+          "@phosphor-icons/react/dist/csr/ArrowLeft.es.js",
+          "@phosphor-icons/react/dist/csr/ArrowsOutCardinal.es.js",
+          "@phosphor-icons/react/dist/csr/Bag.es.js",
+          "@phosphor-icons/react/dist/csr/CaretDown.es.js",
+          "@phosphor-icons/react/dist/csr/CaretRight.es.js",
+          "@phosphor-icons/react/dist/csr/Check.es.js",
+          "@phosphor-icons/react/dist/csr/CheckCircle.es.js",
+          "@phosphor-icons/react/dist/csr/Crop.es.js",
+          "@phosphor-icons/react/dist/csr/GridNine.es.js",
+          "@phosphor-icons/react/dist/csr/Heart.es.js",
+          "@phosphor-icons/react/dist/csr/ImageSquare.es.js",
+          "@phosphor-icons/react/dist/csr/List.es.js",
+          "@phosphor-icons/react/dist/csr/Magnet.es.js",
+          "@phosphor-icons/react/dist/csr/MapPin.es.js",
+          "@phosphor-icons/react/dist/csr/Minus.es.js",
+          "@phosphor-icons/react/dist/csr/PencilSimple.es.js",
+          "@phosphor-icons/react/dist/csr/Plus.es.js",
+          "@phosphor-icons/react/dist/csr/SquaresFour.es.js",
+          "@phosphor-icons/react/dist/csr/Trash.es.js",
+          "@phosphor-icons/react/dist/csr/UploadSimple.es.js",
+          "@phosphor-icons/react/dist/csr/X.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowClockwise.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowCounterClockwise.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowLeft.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowsOutCardinal.es.js",
+          "@phosphor-icons/react/dist/defs/Bag.es.js",
+          "@phosphor-icons/react/dist/defs/CaretDown.es.js",
+          "@phosphor-icons/react/dist/defs/CaretRight.es.js",
+          "@phosphor-icons/react/dist/defs/Check.es.js",
+          "@phosphor-icons/react/dist/defs/CheckCircle.es.js",
+          "@phosphor-icons/react/dist/defs/Crop.es.js",
+          "@phosphor-icons/react/dist/defs/GridNine.es.js",
+          "@phosphor-icons/react/dist/defs/Heart.es.js",
+          "@phosphor-icons/react/dist/defs/ImageSquare.es.js",
+          "@phosphor-icons/react/dist/defs/List.es.js",
+          "@phosphor-icons/react/dist/defs/Magnet.es.js",
+          "@phosphor-icons/react/dist/defs/MapPin.es.js",
+          "@phosphor-icons/react/dist/defs/Minus.es.js",
+          "@phosphor-icons/react/dist/defs/PencilSimple.es.js",
+          "@phosphor-icons/react/dist/defs/Plus.es.js",
+          "@phosphor-icons/react/dist/defs/SquaresFour.es.js",
+          "@phosphor-icons/react/dist/defs/Trash.es.js",
+          "@phosphor-icons/react/dist/defs/UploadSimple.es.js",
+          "@phosphor-icons/react/dist/defs/X.es.js",
+          "@phosphor-icons/react/dist/lib/IconBase.es.js",
+          "@phosphor-icons/react/dist/lib/context.es.js"
+        ],
+        "dijkstrajs": [
+          "dijkstrajs/dijkstra.js",
+          "dijkstrajs/dijkstra.js?commonjs-module"
+        ],
+        "leaflet": [
+          "leaflet/dist/leaflet-src.js",
+          "leaflet/dist/leaflet-src.js?commonjs-es-import",
+          "leaflet/dist/leaflet-src.js?commonjs-module"
+        ],
+        "qrcode": [
+          "qrcode/lib/browser.js",
+          "qrcode/lib/browser.js?commonjs-es-import",
+          "qrcode/lib/browser.js?commonjs-exports",
+          "qrcode/lib/can-promise.js",
+          "qrcode/lib/core/alignment-pattern.js",
+          "qrcode/lib/core/alignment-pattern.js?commonjs-exports",
+          "qrcode/lib/core/alphanumeric-data.js",
+          "qrcode/lib/core/bit-buffer.js",
+          "qrcode/lib/core/bit-matrix.js",
+          "qrcode/lib/core/byte-data.js",
+          "qrcode/lib/core/error-correction-code.js",
+          "qrcode/lib/core/error-correction-code.js?commonjs-exports",
+          "qrcode/lib/core/error-correction-level.js",
+          "qrcode/lib/core/error-correction-level.js?commonjs-exports",
+          "qrcode/lib/core/finder-pattern.js",
+          "qrcode/lib/core/finder-pattern.js?commonjs-exports",
+          "qrcode/lib/core/format-info.js",
+          "qrcode/lib/core/format-info.js?commonjs-exports",
+          "qrcode/lib/core/galois-field.js",
+          "qrcode/lib/core/galois-field.js?commonjs-exports",
+          "qrcode/lib/core/kanji-data.js",
+          "qrcode/lib/core/mask-pattern.js",
+          "qrcode/lib/core/mask-pattern.js?commonjs-exports",
+          "qrcode/lib/core/mode.js",
+          "qrcode/lib/core/mode.js?commonjs-exports",
+          "qrcode/lib/core/numeric-data.js",
+          "qrcode/lib/core/polynomial.js",
+          "qrcode/lib/core/polynomial.js?commonjs-exports",
+          "qrcode/lib/core/qrcode.js",
+          "qrcode/lib/core/qrcode.js?commonjs-exports",
+          "qrcode/lib/core/reed-solomon-encoder.js",
+          "qrcode/lib/core/regex.js",
+          "qrcode/lib/core/regex.js?commonjs-exports",
+          "qrcode/lib/core/segments.js",
+          "qrcode/lib/core/segments.js?commonjs-exports",
+          "qrcode/lib/core/utils.js",
+          "qrcode/lib/core/utils.js?commonjs-exports",
+          "qrcode/lib/core/version-check.js",
+          "qrcode/lib/core/version-check.js?commonjs-exports",
+          "qrcode/lib/core/version.js",
+          "qrcode/lib/core/version.js?commonjs-exports",
+          "qrcode/lib/renderer/canvas.js",
+          "qrcode/lib/renderer/canvas.js?commonjs-exports",
+          "qrcode/lib/renderer/svg-tag.js",
+          "qrcode/lib/renderer/svg-tag.js?commonjs-exports",
+          "qrcode/lib/renderer/utils.js",
+          "qrcode/lib/renderer/utils.js?commonjs-exports"
+        ],
+        "react": [
+          "react/cjs/react-jsx-runtime.production.js",
+          "react/cjs/react-jsx-runtime.production.js?commonjs-exports",
+          "react/cjs/react.production.js",
+          "react/cjs/react.production.js?commonjs-exports",
+          "react/index.js",
+          "react/index.js?commonjs-es-import",
+          "react/index.js?commonjs-module",
+          "react/jsx-runtime.js",
+          "react/jsx-runtime.js?commonjs-es-import",
+          "react/jsx-runtime.js?commonjs-module"
+        ],
+        "react-dom": [
+          "react-dom/cjs/react-dom-client.production.js",
+          "react-dom/cjs/react-dom-client.production.js?commonjs-exports",
+          "react-dom/cjs/react-dom.production.js",
+          "react-dom/cjs/react-dom.production.js?commonjs-exports",
+          "react-dom/client.js",
+          "react-dom/client.js?commonjs-es-import",
+          "react-dom/client.js?commonjs-module",
+          "react-dom/index.js",
+          "react-dom/index.js?commonjs-es-import",
+          "react-dom/index.js?commonjs-module"
+        ],
+        "scheduler": [
+          "scheduler/cjs/scheduler.production.js",
+          "scheduler/cjs/scheduler.production.js?commonjs-exports",
+          "scheduler/index.js",
+          "scheduler/index.js?commonjs-module"
+        ]
+      },
+      "generatedModules": [
+        "\u0000commonjsHelpers.js",
+        "\u0000vite/modulepreload-polyfill.js",
+        "\u0000vite/preload-helper.js"
+      ]
+    },
+    "admin": {
+      "renderedPackageModules": {
+        "@fontsource-variable/dm-sans": [
+          "@fontsource-variable/dm-sans/files/dm-sans-latin-ext-wght-normal.woff2?inline",
+          "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?inline"
+        ],
+        "@fontsource-variable/fredoka": [
+          "@fontsource-variable/fredoka/files/fredoka-hebrew-wght-normal.woff2?inline",
+          "@fontsource-variable/fredoka/files/fredoka-latin-ext-wght-normal.woff2?inline",
+          "@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2?inline"
+        ],
+        "@phosphor-icons/react": [
+          "@phosphor-icons/react/dist/csr/ArrowClockwise.es.js",
+          "@phosphor-icons/react/dist/csr/ArrowCounterClockwise.es.js",
+          "@phosphor-icons/react/dist/csr/ArrowLeft.es.js",
+          "@phosphor-icons/react/dist/csr/ArrowsOutCardinal.es.js",
+          "@phosphor-icons/react/dist/csr/Bag.es.js",
+          "@phosphor-icons/react/dist/csr/CaretDown.es.js",
+          "@phosphor-icons/react/dist/csr/CaretRight.es.js",
+          "@phosphor-icons/react/dist/csr/Check.es.js",
+          "@phosphor-icons/react/dist/csr/CheckCircle.es.js",
+          "@phosphor-icons/react/dist/csr/Crop.es.js",
+          "@phosphor-icons/react/dist/csr/DownloadSimple.es.js",
+          "@phosphor-icons/react/dist/csr/GridNine.es.js",
+          "@phosphor-icons/react/dist/csr/Heart.es.js",
+          "@phosphor-icons/react/dist/csr/ImageSquare.es.js",
+          "@phosphor-icons/react/dist/csr/List.es.js",
+          "@phosphor-icons/react/dist/csr/Magnet.es.js",
+          "@phosphor-icons/react/dist/csr/MapPin.es.js",
+          "@phosphor-icons/react/dist/csr/Minus.es.js",
+          "@phosphor-icons/react/dist/csr/PencilSimple.es.js",
+          "@phosphor-icons/react/dist/csr/Plus.es.js",
+          "@phosphor-icons/react/dist/csr/SquaresFour.es.js",
+          "@phosphor-icons/react/dist/csr/Trash.es.js",
+          "@phosphor-icons/react/dist/csr/UploadSimple.es.js",
+          "@phosphor-icons/react/dist/csr/X.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowClockwise.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowCounterClockwise.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowLeft.es.js",
+          "@phosphor-icons/react/dist/defs/ArrowsOutCardinal.es.js",
+          "@phosphor-icons/react/dist/defs/Bag.es.js",
+          "@phosphor-icons/react/dist/defs/CaretDown.es.js",
+          "@phosphor-icons/react/dist/defs/CaretRight.es.js",
+          "@phosphor-icons/react/dist/defs/Check.es.js",
+          "@phosphor-icons/react/dist/defs/CheckCircle.es.js",
+          "@phosphor-icons/react/dist/defs/Crop.es.js",
+          "@phosphor-icons/react/dist/defs/DownloadSimple.es.js",
+          "@phosphor-icons/react/dist/defs/GridNine.es.js",
+          "@phosphor-icons/react/dist/defs/Heart.es.js",
+          "@phosphor-icons/react/dist/defs/ImageSquare.es.js",
+          "@phosphor-icons/react/dist/defs/List.es.js",
+          "@phosphor-icons/react/dist/defs/Magnet.es.js",
+          "@phosphor-icons/react/dist/defs/MapPin.es.js",
+          "@phosphor-icons/react/dist/defs/Minus.es.js",
+          "@phosphor-icons/react/dist/defs/PencilSimple.es.js",
+          "@phosphor-icons/react/dist/defs/Plus.es.js",
+          "@phosphor-icons/react/dist/defs/SquaresFour.es.js",
+          "@phosphor-icons/react/dist/defs/Trash.es.js",
+          "@phosphor-icons/react/dist/defs/UploadSimple.es.js",
+          "@phosphor-icons/react/dist/defs/X.es.js",
+          "@phosphor-icons/react/dist/lib/IconBase.es.js",
+          "@phosphor-icons/react/dist/lib/context.es.js"
+        ],
+        "dijkstrajs": [
+          "dijkstrajs/dijkstra.js",
+          "dijkstrajs/dijkstra.js?commonjs-module"
+        ],
+        "leaflet": [
+          "leaflet/dist/leaflet-src.js",
+          "leaflet/dist/leaflet-src.js?commonjs-es-import",
+          "leaflet/dist/leaflet-src.js?commonjs-module"
+        ],
+        "qrcode": [
+          "qrcode/lib/browser.js",
+          "qrcode/lib/browser.js?commonjs-es-import",
+          "qrcode/lib/browser.js?commonjs-exports",
+          "qrcode/lib/can-promise.js",
+          "qrcode/lib/core/alignment-pattern.js",
+          "qrcode/lib/core/alignment-pattern.js?commonjs-exports",
+          "qrcode/lib/core/alphanumeric-data.js",
+          "qrcode/lib/core/bit-buffer.js",
+          "qrcode/lib/core/bit-matrix.js",
+          "qrcode/lib/core/byte-data.js",
+          "qrcode/lib/core/error-correction-code.js",
+          "qrcode/lib/core/error-correction-code.js?commonjs-exports",
+          "qrcode/lib/core/error-correction-level.js",
+          "qrcode/lib/core/error-correction-level.js?commonjs-exports",
+          "qrcode/lib/core/finder-pattern.js",
+          "qrcode/lib/core/finder-pattern.js?commonjs-exports",
+          "qrcode/lib/core/format-info.js",
+          "qrcode/lib/core/format-info.js?commonjs-exports",
+          "qrcode/lib/core/galois-field.js",
+          "qrcode/lib/core/galois-field.js?commonjs-exports",
+          "qrcode/lib/core/kanji-data.js",
+          "qrcode/lib/core/mask-pattern.js",
+          "qrcode/lib/core/mask-pattern.js?commonjs-exports",
+          "qrcode/lib/core/mode.js",
+          "qrcode/lib/core/mode.js?commonjs-exports",
+          "qrcode/lib/core/numeric-data.js",
+          "qrcode/lib/core/polynomial.js",
+          "qrcode/lib/core/polynomial.js?commonjs-exports",
+          "qrcode/lib/core/qrcode.js",
+          "qrcode/lib/core/qrcode.js?commonjs-exports",
+          "qrcode/lib/core/reed-solomon-encoder.js",
+          "qrcode/lib/core/regex.js",
+          "qrcode/lib/core/regex.js?commonjs-exports",
+          "qrcode/lib/core/segments.js",
+          "qrcode/lib/core/segments.js?commonjs-exports",
+          "qrcode/lib/core/utils.js",
+          "qrcode/lib/core/utils.js?commonjs-exports",
+          "qrcode/lib/core/version-check.js",
+          "qrcode/lib/core/version-check.js?commonjs-exports",
+          "qrcode/lib/core/version.js",
+          "qrcode/lib/core/version.js?commonjs-exports",
+          "qrcode/lib/renderer/canvas.js",
+          "qrcode/lib/renderer/canvas.js?commonjs-exports",
+          "qrcode/lib/renderer/svg-tag.js",
+          "qrcode/lib/renderer/svg-tag.js?commonjs-exports",
+          "qrcode/lib/renderer/utils.js",
+          "qrcode/lib/renderer/utils.js?commonjs-exports"
+        ],
+        "react": [
+          "react/cjs/react-jsx-runtime.production.js",
+          "react/cjs/react-jsx-runtime.production.js?commonjs-exports",
+          "react/cjs/react.production.js",
+          "react/cjs/react.production.js?commonjs-exports",
+          "react/index.js",
+          "react/index.js?commonjs-es-import",
+          "react/index.js?commonjs-module",
+          "react/jsx-runtime.js",
+          "react/jsx-runtime.js?commonjs-es-import",
+          "react/jsx-runtime.js?commonjs-module"
+        ],
+        "react-dom": [
+          "react-dom/cjs/react-dom-client.production.js",
+          "react-dom/cjs/react-dom-client.production.js?commonjs-exports",
+          "react-dom/cjs/react-dom.production.js",
+          "react-dom/cjs/react-dom.production.js?commonjs-exports",
+          "react-dom/client.js",
+          "react-dom/client.js?commonjs-es-import",
+          "react-dom/client.js?commonjs-module",
+          "react-dom/index.js",
+          "react-dom/index.js?commonjs-es-import",
+          "react-dom/index.js?commonjs-module"
+        ],
+        "scheduler": [
+          "scheduler/cjs/scheduler.production.js",
+          "scheduler/cjs/scheduler.production.js?commonjs-exports",
+          "scheduler/index.js",
+          "scheduler/index.js?commonjs-module"
+        ]
+      },
+      "generatedModules": [
+        "\u0000commonjsHelpers.js",
+        "\u0000vite/modulepreload-polyfill.js",
+        "\u0000vite/preload-helper.js"
+      ]
+    }
+  },
+  "notBrowserShipped": [
+    "pngjs and yargs: server/CLI branches of qrcode excluded from both rendered browser bundles",
+    "jsqr: test dependency only",
+    "Wrangler, Babel, Vite server/build dependencies and Rollup native binary: build tools, except the explicitly listed generated browser helpers"
+  ],
+  "unknowns": [
+    "The separate upstream version of Vite-vendored CommonJS helpers is not independently pinned. Exact Vite 6.4.4 distribution, source and notice are identified.",
+    "Dijkstrajs 1.0.3 provides an MIT-labelled copyright/disclaimer and licence URL rather than restating the permission grant. Its complete distributed notice is reproduced without paraphrase."
+  ]
+}
