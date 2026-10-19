@@ -1,2 +1,2 @@
-import React from 'react';import {renderToString} from 'react-dom/server';import {ContentProvider} from './content/ContentProvider';import {App} from './App';
-export function render(path,content){return renderToString(<ContentProvider initialContent={content}><App initialPage={path.replace(/^\/|\/$/g,'')||'home'}/></ContentProvider>)}
+import React from 'react';import {renderToString} from 'react-dom/server';import {ContentProvider} from './content/ContentProvider';import {App} from './App';import {serverRouteViews} from './routes/server-views.jsx';
+export function render(path,content){return renderToString(<ContentProvider initialContent={content}><App routeViews={serverRouteViews} initialPage={path.replace(/^\/|\/$/g,'')||'home'}/></ContentProvider>)}

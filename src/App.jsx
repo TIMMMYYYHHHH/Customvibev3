@@ -1,5 +1,4 @@
-import BusinessStudio from './designs/BusinessStudio';
-import HandyStudio from './designs/HandyStudio';
+import './designs/handy.css';
 import {saveHandyItem} from './designs/handy.mjs';
 import {SeasonProvider} from './seasons/runtime.jsx';
 import ProofReview from './ProofReview';
@@ -8,14 +7,19 @@ import React,{useEffect,useLayoutEffect,useState,useRef,useReducer} from 'react'
 import {Bag,Plus,Minus,X,Check,Trash,ArrowLeft} from '@phosphor-icons/react';
 import './fonts.css';
 
-import {Editor,StudioProgress} from './Editor';
-import {CollectionReview} from './CollectionReview';
+import {StudioProgress} from './StudioProgress';
+import './designs/magnet-satin.css';
+import './designs/business-games.css';
+import {clientRouteViews} from './routes/client-views.mjs';
+import {useRouteView} from './routes/use-route-view.mjs';
+import RouteStatus from './routes/RouteStatus.jsx';
 import {renderPhoto,releasePhotos,releaseUnusedImages} from './artwork';
 import {createStudio,studioReducer,createDesignItems} from './studio-state.mjs';
 import {removeBasketItem,restoreBasketItem,basketImageSources,mergeBasketDesigns} from './basket-undo.mjs';
 import {money,summarize} from './commerce.mjs';
 import {SubmissionProvider,useSubmissionSnapshot,useDraftProtection} from './FormService';
-import {Checkout} from './Checkout';
+import 'leaflet/dist/leaflet.css';
+import './locker-picker.css';
 import {SiteHeader,SiteFooter,HelpPage} from './SiteChrome';
 import TierNudge from './TierNudge';
 import Storefront from './storefront/Storefront';
@@ -35,7 +39,7 @@ const removalSources=removal=>basketImageSources([removal.item],removal.photos.m
 const routes=['studio/business','studio/handy','proof','home','collections','studio','puzzle','basket','checkout','help',...Object.keys(policies)];
 
 export function App(props){return <SeasonProvider><SubmissionProvider><AppContent {...props}/></SubmissionProvider></SeasonProvider>}
-function AppContent({initialPage}){
+function AppContent({initialPage,routeViews=clientRouteViews}){
  const orderState=useSubmissionSnapshot('order'),orderLocked=orderState.pending;
  const {content}=useContent();const PACKS=Object.fromEntries(content.products.map(p=>[p.id,p]));
  const [routeVersion,setRouteVersion]=useState(0);
@@ -54,6 +58,9 @@ function AppContent({initialPage}){
  const undoBuffer=useRef(null),undoTimer=useRef(),undoButton=useRef(null),restoredFocus=useRef(null),liveBasket=useRef();
  const [studio,dispatchStudio]=useReducer(studioReducer,undefined,createStudio);
  const photos=studio.photos;const setPhotos=value=>dispatchStudio({type:'photos',value});
+ const designProduct=page.startsWith('design/')?content.products.find(p=>p.id===page.slice(7)&&isTemplateProduct(p)):null;
+ const viewKey=page==='checkout'?'checkout':orderLocked?null:page==='studio/handy'?'handy':page==='studio/business'?'business':['studio','puzzle'].includes(page)||designProduct?'editor':page==='basket'?'basket':null;
+ const routeView=useRouteView(viewKey,routeViews),View=routeView.Component;
  const undoLocked=orderLocked||orderState.busy||!!orderState.result;
  liveBasket.current={basket,photos,locked:undoLocked};
  useEffect(()=>{
@@ -82,6 +89,7 @@ function AppContent({initialPage}){
  }
  useEffect(()=>{const update=()=>{requestRouteFocus();setPage(currentPage());setRouteVersion(v=>v+1);};addEventListener('popstate',update);addEventListener('hashchange',update);return()=>{removeEventListener('popstate',update);removeEventListener('hashchange',update);clearTimeout(timer.current);}},[]);
  useLayoutEffect(()=>{
+  if(routeView.status!=='ready')return;
   const section=(window.__CV_ADMIN_PREVIEW__?new URLSearchParams(location.search).get('page')?.split('#')[1]:location.hash.slice(1))||'';
   const frame=requestAnimationFrame(()=>{
    const target=section&&document.getElementById(section);
@@ -92,9 +100,9 @@ function AppContent({initialPage}){
    else window.scrollTo({top:0,behavior:'instant'});
   });
   return()=>cancelAnimationFrame(frame);
- },[page,routeVersion]);
+ },[page,routeVersion,routeView.status]);
  useLayoutEffect(()=>{
-  if(!routeFocus.current||collectionBusy)return;
+  if(!routeFocus.current||collectionBusy||routeView.status!=='ready')return;
   const frame=requestAnimationFrame(()=>{
    const request=routeFocus.current;if(!request)return;
    const section=(window.__CV_ADMIN_PREVIEW__?new URLSearchParams(location.search).get('page')?.split('#')[1]:location.hash.slice(1))||'';
@@ -109,7 +117,7 @@ function AppContent({initialPage}){
    heading.focus({preventScroll:true});
   });
   return()=>cancelAnimationFrame(frame);
- },[page,routeVersion,collectionBusy,collectionError]);
+ },[page,routeVersion,collectionBusy,collectionError,routeView.status]);
  function startNewRequest(){replaceUndo(null);setBusinessDrafts({});setBusinessSelected('');setEditingBusiness(null);setHandyDrafts({});setHandySelected('');setEditingHandy(null);releasePhotos(photos);setBasket([]);dispatchStudio({type:'reset'});setCheckoutDraft({query:'',locker:null,step:1,contact:{name:'',email:'',phone:''},confirmed:false});setCollectionError('');setToast('');navigate('/studio');setPage('studio');window.scrollTo(0,0);}
  function notify(message){setToast(message);clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),4500);}
  function changeQuantity(item,delta){setBasket(b=>b.map(x=>x.id===item.id?{...x,qty:x.qty+delta}:x));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.map(p=>p.id===(item.sourceId||item.id)?{...p,qty:item.qty+delta}:p));}
@@ -163,23 +171,23 @@ function AppContent({initialPage}){
  }
  useEffect(()=>{if(!page.startsWith('products/'))setEditingPack(null);if(page!=='studio/handy')setEditingHandy(null);if(page!=='studio/business')setEditingBusiness(null);},[page]);
 
- const designProduct=page.startsWith('design/')?content.products.find(p=>p.id===page.slice(7)&&isTemplateProduct(p)):null;
  useEffect(()=>{if(designProduct){history.replaceState(null,'','/studio');setPage('studio');}},[designProduct]);
  const detailProduct=page.startsWith('products/')?content.products.find(p=>p.id===page.slice(9)&&p.status!=='hidden'):null;
  return <><SEO page={page} content={content}/><a className="global-skip" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus()}}>Skip to content</a>
  <SiteHeader page={page} count={sum.magnetQty} onSectionNavigate={navigateSection}/>
  <div className={storefront||page==='contact'?'':'shop-shell'}>
 
- <div id="main-content" tabIndex={-1}>
+ <div id="main-content" tabIndex={-1} aria-busy={routeView.status==='loading'||undefined}>
+ {viewKey&&routeView.status!=='ready'&&<RouteStatus error={routeView.error} onRetry={routeView.retry} backLabel={viewKey==='editor'||orderLocked?'Back to CustomVibe':'Back to the designer'} onBack={()=>go(viewKey==='editor'||orderLocked?'home':'studio')}/>}
  {['studio','studio/business','studio/handy','puzzle','basket','checkout'].includes(page)&&<div className="purchase-progress"><StudioProgress step={page==='checkout'?'delivery':page==='basket'?'review':'make'} hasPhotos={photos.length>0||basket.some(i=>!['photo','puzzle'].includes(i.kind))} busy={collectionBusy} onStep={step=>go({make:'studio',review:'basket',delivery:'checkout'}[step])}/>{collectionBusy&&<p className="flow-loading" role="status">Preparing your collection…</p>}{collectionError&&<div className="error" role="alert">{collectionError}<button className="text-button" onClick={()=>setRetry(r=>r+1)}>Try again</button><button className="text-button" onClick={()=>go('studio')}>Back to the designer</button></div>}</div>}
 
  {storefront&&<Storefront page={page} onAddPack={addPack} basketCount={sum.magnetQty}/>}
  {!orderLocked&&['studio','studio/business','studio/handy'].includes(page)&&<nav className="studio-sections" aria-label="Studio designs"><a href="/studio" aria-current={page==='studio'?'page':undefined}>Photos & puzzles</a><a href="/studio/handy" aria-current={page==='studio/handy'?'page':undefined}>Handy at home</a><a href="/studio/business" aria-current={page==='studio/business'?'page':undefined}>Business magnets</a></nav>}
- {!orderLocked&&page==='studio/handy'&&<HandyStudio selected={handySelected} onSelect={setHandySelected} drafts={handyDrafts} setDrafts={setHandyDrafts} editing={editingHandy} onEditing={setEditingHandy} basket={basket} go={go} onSave={item=>{setBasket(saveHandyItem(basket,item,editingHandy?.id));setEditingHandy(null);setHandySelected('');go('basket');notify('Your magnet is saved in your basket.')}}/>}
- {!orderLocked&&page==='studio/business'&&<BusinessStudio selected={businessSelected} onSelect={setBusinessSelected} drafts={businessDrafts} setDrafts={setBusinessDrafts} editing={editingBusiness} onEditing={setEditingBusiness} basket={basket} go={go} onSave={item=>{setBasket(saveHandyItem(basket,item,editingBusiness?.id));setEditingBusiness(null);setBusinessSelected('');go('basket');notify('Your magnet is saved in your basket.')}}/>}
- {!orderLocked&&(['studio','puzzle'].includes(page)||designProduct)&&<Editor {...{studio,dispatchStudio,photos,setPhotos,basket,setBasket,go,notify}} notes={checkoutDraft.notes||''} onNotesChange={notes=>setCheckoutDraft(d=>({...d,notes}))}/>}
- {(!collectionBusy||basket.length>0)&&!collectionError&&!orderLocked&&page==='basket'&&<CollectionReview photos={photos} basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{if(isSelectableCollection(PACKS[item.kind])){setEditingPack(item);go('products/'+item.kind);return;}if(item.values?.businessTemplate){setEditingBusiness({...item,values:structuredClone(item.values)});go('studio/business');return;}if(item.values?.handyTemplate){setEditingHandy({...item,values:{...item.values,entries:[...item.values.entries]}});go('studio/handy');return;}if(item.designMode){go('studio');return;}dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
- {(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<Checkout photos={photos} basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft} onStartNew={startNewRequest}/>}
+ {View&&!orderLocked&&page==='studio/handy'&&<View selected={handySelected} onSelect={setHandySelected} drafts={handyDrafts} setDrafts={setHandyDrafts} editing={editingHandy} onEditing={setEditingHandy} basket={basket} go={go} onSave={item=>{setBasket(saveHandyItem(basket,item,editingHandy?.id));setEditingHandy(null);setHandySelected('');go('basket');notify('Your magnet is saved in your basket.')}}/>}
+ {View&&!orderLocked&&page==='studio/business'&&<View selected={businessSelected} onSelect={setBusinessSelected} drafts={businessDrafts} setDrafts={setBusinessDrafts} editing={editingBusiness} onEditing={setEditingBusiness} basket={basket} go={go} onSave={item=>{setBasket(saveHandyItem(basket,item,editingBusiness?.id));setEditingBusiness(null);setBusinessSelected('');go('basket');notify('Your magnet is saved in your basket.')}}/>}
+ {View&&!orderLocked&&(['studio','puzzle'].includes(page)||designProduct)&&<View {...{studio,dispatchStudio,photos,setPhotos,basket,setBasket,go,notify}} notes={checkoutDraft.notes||''} onNotesChange={notes=>setCheckoutDraft(d=>({...d,notes}))}/>}
+ {View&&(!collectionBusy||basket.length>0)&&!collectionError&&!orderLocked&&page==='basket'&&<View photos={photos} basket={displayBasket} packs={PACKS} go={go} onQuantity={changeQuantity} onRemove={removeItem} onEdit={item=>{if(isSelectableCollection(PACKS[item.kind])){setEditingPack(item);go('products/'+item.kind);return;}if(item.values?.businessTemplate){setEditingBusiness({...item,values:structuredClone(item.values)});go('studio/business');return;}if(item.values?.handyTemplate){setEditingHandy({...item,values:{...item.values,entries:[...item.values.entries]}});go('studio/handy');return;}if(item.designMode){go('studio');return;}dispatchStudio({type:'settings',patch:{selected:item.sourceId||item.id}});go('studio');}}/>}
+ {View&&(!collectionBusy||basket.length>0)&&!collectionError&&page==='checkout'&&<View photos={photos} basket={displayBasket} go={go} draft={checkoutDraft} setDraft={setCheckoutDraft} onStartNew={startNewRequest}/>}
 
  {page==='proof'&&<ProofReview/>}
  {page==='help'&&<HelpPage/>}
