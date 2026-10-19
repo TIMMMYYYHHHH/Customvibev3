@@ -32,7 +32,7 @@
 /* One navigation and site map, shared by every route. */
 .unified-header{background:var(--surface);position:fixed;inset:0 0 auto;z-index:80}
 .header-inner{width:min(1400px,90%);min-height:96px;margin:auto;display:flex;align-items:center;gap:28px;border-bottom:1px solid #26133d18}
-.site-wordmark{display:flex;align-items:center;gap:8px;font:700 30px/1 var(--display);letter-spacing:-1px;text-decoration:none;white-space:nowrap}
+.site-wordmark{color:var(--cv-brand);display:flex;align-items:center;gap:8px;font:700 30px/1 var(--display);letter-spacing:-1px;text-decoration:none;white-space:nowrap}
 .site-wordmark img{width:34px;height:34px}
 .unified-header nav{display:flex;align-items:center;gap:25px;margin:auto}
 .unified-header nav a{font-size:13px;text-decoration:none;min-height:44px;display:flex;align-items:center;white-space:nowrap}
@@ -89,3 +89,7 @@
 .order-consent{display:flex;align-items:flex-start;gap:12px;line-height:1.6}.order-consent input{flex:0 0 20px;width:20px;height:20px;margin-top:4px}.form-security{margin:20px 0;overflow-wrap:anywhere}.form-security>div{max-width:100%;overflow:hidden}.payment-coming-soon{line-height:1.6}.completion-details{overflow-wrap:anywhere}.delivery-flow-page fieldset:disabled{opacity:.8}.contact-form fieldset{min-width:0}.contact-form .action:disabled,.delivery-summary .button:disabled{cursor:not-allowed;opacity:.55}
 
 .order-notes{max-width:760px;margin:24px 0}.order-notes label{display:block;font-weight:650;margin-bottom:8px}.order-notes label span{font-weight:400}.order-notes p{font-size:14px;line-height:1.5;margin:0 0 12px;max-width:65ch}.order-notes textarea{display:block;width:100%;box-sizing:border-box;resize:vertical;min-height:100px;padding:14px;border:1px solid #84718f;border-radius:8px;background:#fffdf8;color:#291438;font:inherit;line-height:1.5}.order-notes small{display:block;margin-top:6px;font-size:12px;color:#665371}.checkout-page .order-notes{margin:0 0 24px}
+
+/* Brand lettering follows the owner reference, independently of action colours. */
+.unified-header .site-wordmark,.unified-footer .site-wordmark,.cv-brand-name{color:var(--cv-brand)}
+.storefront .thread-brand .chaos-title h1 em{color:var(--cv-brand)}

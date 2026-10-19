@@ -2,7 +2,7 @@
 html[data-season="christmas"]{--cv-action:#b92353;--cv-action-hover:#9c1d46;background:#24112e}
 html[data-season="christmas"] body{background:#24112e}
 html[data-season="christmas"] .unified-header{background:#24112e;color:#fff9e9;border-color:#e8c8f12b}
-html[data-season="christmas"] .unified-header :is(.site-wordmark,.site-basket,.site-menu,nav a){color:#fff9e9}
+html[data-season="christmas"] .unified-header :is(.site-basket,.site-menu,nav a){color:#fff9e9}
 html[data-season="christmas"] .unified-header .site-create{background:#b92353;color:white;border:0;box-shadow:none}
 html[data-season="christmas"] .storefront,
 html[data-season="christmas"] .storefront .concept.thread-brand{--ink:#fff9e9;--surface:#24112e;--accent:#e4b2f1;background:#24112e;color:#fff9e9}

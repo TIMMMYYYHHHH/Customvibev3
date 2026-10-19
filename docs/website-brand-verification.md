@@ -20,3 +20,9 @@ Reviewed homepage pricing, Help, checkout/confirmation and shipping wording agai
 - One live touch-icon request encountered the known temporary-unavailability response; a single reload succeeded. The held investigation was not resumed.
 
 No changes to email templates, sending, records, stages, payments, authentication, retention or resource plans.
+
+## Owner colour reference and studio consistency, 19 October 2026
+
+The supplied CustomVibe screenshot has an embedded Display colour profile. Its dominant lettering converts to sRGB #C02258 (raw unconverted pixels are #B03359). Brand lettering now uses that web colour across shared storefront wordmarks, the homepage slogan, the footer slogan, coming-soon branding and login, admin branding/sign-in, and email header/signoff. The icon, ordinary prose, button palette and artwork stay unchanged. Email dark mode uses #ED8EAF to retain readable live text; this is a browser palette preview, not a claim about actual Gmail phone rendering.
+
+All three studio routes use the same 1400px/94% container, 92% at phone widths, matching heading typography, and a 28px navigation-to-heading gap (24px at widths up to 600px). Handy and Business no longer inherit the generic section top padding. Local browser checks covered all three routes on desktop and at 390px without horizontal overflow. Client/admin/SSR builds, prerender and all 319 tests passed. Changes do not send emails or alter customer records. Publication and live verification are recorded in Founders Hub.

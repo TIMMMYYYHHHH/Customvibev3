@@ -1,5 +1,6 @@
 /* Shared approved P1 / Fresh mint palette. Layout rules remain surface-scoped. */
 :root {
+  --cv-brand: #c02258;
   --cv-action: #ae2e5b;
   --cv-action-hover: #92234b;
   --cv-secondary: #9ddcc4;
