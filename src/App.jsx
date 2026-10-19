@@ -10,8 +10,9 @@ import './fonts.css';
 
 import {Editor,StudioProgress} from './Editor';
 import {CollectionReview} from './CollectionReview';
-import {renderPhoto,releasePhotos} from './artwork';
-import {createStudio,studioReducer,createDesignItems,mergeStudioItems} from './studio-state.mjs';
+import {renderPhoto,releasePhotos,releaseUnusedImages} from './artwork';
+import {createStudio,studioReducer,createDesignItems} from './studio-state.mjs';
+import {removeBasketItem,restoreBasketItem,basketImageSources,mergeBasketDesigns} from './basket-undo.mjs';
 import {money,summarize} from './commerce.mjs';
 import {SubmissionProvider,useSubmissionSnapshot,useDraftProtection} from './FormService';
 import {Checkout} from './Checkout';
@@ -29,6 +30,8 @@ import {canPurchase} from './content/model.mjs';
 
 
 import {currentPage,navigate,pagePath} from './routing.mjs';
+const BASKET_UNDO_MS=10000;
+const removalSources=removal=>basketImageSources([removal.item],removal.photos.map(entry=>entry.photo));
 const routes=['studio/business','studio/handy','proof','home','collections','studio','puzzle','basket','checkout','help',...Object.keys(policies)];
 
 export function App(props){return <SeasonProvider><SubmissionProvider><AppContent {...props}/></SubmissionProvider></SeasonProvider>}
@@ -40,20 +43,24 @@ function AppContent({initialPage}){
  const [businessSelected,setBusinessSelected]=useState(''),[businessDrafts,setBusinessDrafts]=useState({}),[editingBusiness,setEditingBusiness]=useState(null);
  const [handySelected,setHandySelected]=useState(''),[handyDrafts,setHandyDrafts]=useState({}),[editingHandy,setEditingHandy]=useState(null);
  const [page,setPage]=useState(()=>initialPage||currentPage()),[basket,setBasket]=useState([]),[toast,setToast]=useState('');
+ const [removal,setRemoval]=useState(null);
+ const undoBuffer=useRef(null),undoTimer=useRef(),undoButton=useRef(null),restoredFocus=useRef(null),liveBasket=useRef();
  const [studio,dispatchStudio]=useReducer(studioReducer,undefined,createStudio);
  const photos=studio.photos;const setPhotos=value=>dispatchStudio({type:'photos',value});
+ const undoLocked=orderLocked||orderState.busy||!!orderState.result;
+ liveBasket.current={basket,photos,locked:undoLocked};
  useEffect(()=>{
   if(page==='puzzle')dispatchStudio({type:'settings',patch:{defaultFormat:'puzzle'}});
   if(page==='puzzle'){history.replaceState(null,'','/studio');setPage('studio');}
  },[page]);
  const [checkoutDraft,setCheckoutDraft]=useState({query:'',locker:null,step:1,contact:{name:'',email:''},confirmed:false});
  const draftHasDetails=values=>!!values&&(values.entries?.some(value=>String(value).trim())||['url','network','password'].some(key=>values.qr?.[key]?.trim()));
- useDraftProtection('order',photos.length>0||basket.length>0||Object.values(businessDrafts).some(draftHasDetails)||Object.values(handyDrafts).some(draftHasDetails)||draftHasDetails(editingBusiness?.values)||draftHasDetails(editingHandy?.values)||['id','name','area'].some(key=>!!checkoutDraft.locker?.[key]?.trim())||!!checkoutDraft.query?.trim()||!!checkoutDraft.notes?.trim()||Object.values(checkoutDraft.contact||{}).some(value=>String(value).trim()));
+ useDraftProtection('order',!!removal||photos.length>0||basket.length>0||Object.values(businessDrafts).some(draftHasDetails)||Object.values(handyDrafts).some(draftHasDetails)||draftHasDetails(editingBusiness?.values)||draftHasDetails(editingHandy?.values)||['id','name','area'].some(key=>!!checkoutDraft.locker?.[key]?.trim())||!!checkoutDraft.query?.trim()||!!checkoutDraft.notes?.trim()||Object.values(checkoutDraft.contact||{}).some(value=>String(value).trim()));
  const [collectionBusy,setCollectionBusy]=useState(false),[collectionError,setCollectionError]=useState(''),[retry,setRetry]=useState(0);
  useEffect(()=>{
   if(!['basket','checkout'].includes(page)){setCollectionBusy(false);setCollectionError('');return;}
   let active=true;setCollectionBusy(true);setCollectionError('');
-  createDesignItems(photos,renderPhoto).then(items=>{if(active)setBasket(b=>mergeStudioItems(b,items));}).catch(e=>{if(active)setCollectionError(e.message);}).finally(()=>{if(active)setCollectionBusy(false);});
+  createDesignItems(photos,renderPhoto).then(items=>{if(active)setBasket(b=>mergeBasketDesigns(b,items));}).catch(e=>{if(active)setCollectionError(e.message);}).finally(()=>{if(active)setCollectionBusy(false);});
   return()=>{active=false;};
  },[page,photos,retry]);
  const displayBasket=basket.map(i=>['photo','puzzle'].includes(i.kind)?i:{...i,name:PACKS[i.kind]?collectionItemName(PACKS[i.kind],i):i.name,preview:i.preview||PACKS[i.kind]?.image});
@@ -79,10 +86,42 @@ function AppContent({initialPage}){
   });
   return()=>cancelAnimationFrame(frame);
  },[page,routeVersion]);
- function startNewRequest(){setBusinessDrafts({});setBusinessSelected('');setEditingBusiness(null);setHandyDrafts({});setHandySelected('');setEditingHandy(null);releasePhotos(photos);setBasket([]);dispatchStudio({type:'reset'});setCheckoutDraft({query:'',locker:null,step:1,contact:{name:'',email:'',phone:''},confirmed:false});setCollectionError('');setToast('');navigate('/studio');setPage('studio');window.scrollTo(0,0);}
+ function startNewRequest(){replaceUndo(null);setBusinessDrafts({});setBusinessSelected('');setEditingBusiness(null);setHandyDrafts({});setHandySelected('');setEditingHandy(null);releasePhotos(photos);setBasket([]);dispatchStudio({type:'reset'});setCheckoutDraft({query:'',locker:null,step:1,contact:{name:'',email:'',phone:''},confirmed:false});setCollectionError('');setToast('');navigate('/studio');setPage('studio');window.scrollTo(0,0);}
  function notify(message){setToast(message);clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),4500);}
  function changeQuantity(item,delta){setBasket(b=>b.map(x=>x.id===item.id?{...x,qty:x.qty+delta}:x));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.map(p=>p.id===(item.sourceId||item.id)?{...p,qty:item.qty+delta}:p));}
- function removeItem(item){setBasket(b=>b.filter(x=>x.id!==item.id));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.filter(p=>p.id!==(item.sourceId||item.id))); }
+ function replaceUndo(next){
+  clearTimeout(undoTimer.current);
+  const previous=undoBuffer.current;undoBuffer.current=next;setRemoval(next);
+  if(previous)releaseUnusedImages(removalSources(previous),[...basketImageSources(liveBasket.current.basket,liveBasket.current.photos),...(next?removalSources(next):[])]);
+ }
+ function removeItem(item,trigger){
+  const current=liveBasket.current;if(current.locked)return;
+  const next=removeBasketItem(current.basket,current.photos,item.id);if(!next.removal)return;
+  liveBasket.current={...current,basket:next.basket,photos:next.photos};
+  replaceUndo({...next.removal,focusUndo:trigger===document.activeElement});
+  setBasket(next.basket);if(next.photos!==current.photos)setPhotos(next.photos);
+  clearTimeout(timer.current);setToast('');
+  undoTimer.current=setTimeout(()=>replaceUndo(null),BASKET_UNDO_MS);
+ }
+ function undoRemoval(){
+  const current=liveBasket.current,saved=undoBuffer.current;if(current.locked||!saved)return;
+  const next=restoreBasketItem(current.basket,current.photos,saved);
+  liveBasket.current={...current,...next};restoredFocus.current=page==='basket'?saved.item.id:null;
+  replaceUndo(null);setBasket(next.basket);if(next.photos!==current.photos)setPhotos(next.photos);
+  notify('Restored to your basket.');
+ }
+ useLayoutEffect(()=>{if(removal?.focusUndo&&!undoLocked)undoButton.current?.focus({preventScroll:true});},[removal,undoLocked]);
+ useLayoutEffect(()=>{
+  if(!restoredFocus.current)return;
+  const card=[...document.querySelectorAll('[data-basket-item]')].find(node=>node.dataset.basketItem===restoredFocus.current);
+  if(card){card.querySelector('[data-basket-remove]')?.focus({preventScroll:true});restoredFocus.current=null;}
+ },[basket,page]);
+ useEffect(()=>{if(undoLocked)replaceUndo(null);},[undoLocked]);
+ useEffect(()=>()=>{
+  clearTimeout(undoTimer.current);
+  if(undoBuffer.current)releaseUnusedImages(removalSources(undoBuffer.current),basketImageSources(liveBasket.current.basket,liveBasket.current.photos));
+  undoBuffer.current=null;
+ },[]);
  function addPack(kind,chosenIds,chosenQuantities,style='watercolour'){
   if(orderLocked){notify('Your current order is saved. Return to checkout to view its status.');return;}
   const pack=PACKS[kind];if(!canPurchase(pack)){notify('This collection is not available yet.');return;}
@@ -129,6 +168,6 @@ function AppContent({initialPage}){
  </div>
  {page!=='contact'&&page!=='home'&&page!=='proof'&&<div className="storefront"><div className="concept happy-chaos thread-brand"><Contact/></div></div>}
  <SiteFooter/>
- {toast&&<div className="app-toast" role="status"><Check size={20}/><span>{toast}</span><button aria-label="Dismiss notification" onClick={()=>setToast('')}><X size={18}/></button></div>}
+ {(removal&&!undoLocked||toast)&&<div className="app-toast" role="status"><Check size={20}/><span>{removal&&!undoLocked?'Removed from your basket. Undo within 10 seconds.':toast}</span>{removal&&!undoLocked&&<button ref={undoButton} type="button" onClick={undoRemoval}>Undo</button>}<button aria-label="Dismiss notification" onClick={()=>{replaceUndo(null);setToast('');}}><X size={18}/></button></div>}
  </>;
 }
