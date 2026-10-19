@@ -8,6 +8,7 @@ const {SiteHeader,SiteFooter}=await vite.ssrLoadModule('/src/SiteChrome.jsx');
 const {AdminChrome}=await vite.ssrLoadModule('/admin/AdminShell.jsx');
 const {StudioProgress}=await vite.ssrLoadModule('/src/Editor.jsx');
 const {default:Contact}=await vite.ssrLoadModule('/src/storefront/Contact.jsx');
+const {default:Admin}=await vite.ssrLoadModule('/src/content/Admin.jsx');
 const wrap=child=>renderToStaticMarkup(React.createElement(ContentProvider,{initialContent:defaultContent},React.createElement(SubmissionProvider,null,child)));
 test('public navigation and progress name the basket and checkout consistently',()=>{
  const header=wrap(React.createElement(SiteHeader,{page:'home'}));assert.match(header,/>Contact us<\/a>/);assert.match(header,/href="\/contact"/);
@@ -23,5 +24,12 @@ test('public footer, admin and Themes chrome render the notice entry point',()=>
   ['Themes workroom',renderToStaticMarkup(React.createElement(AdminChrome,{section:'themes',logout:()=>{},connectionStatus:true}))]
  ];
  for(const [surface,html] of surfaces)assert.match(html,/<a\b[^>]*href="\/third-party-notices\.txt"[^>]*>Third-party notices<\/a>/,surface+' must expose the readable notices link');
+});
+test('contact display and Admin View website link retain their exact destinations',()=>{
+ assert.match(wrap(React.createElement(Contact,{standalone:true})),/<a href="mailto:hello@customvibe\.co\.za">hello@customvibe\.co\.za<\/a>/);
+ const previous=Object.getOwnPropertyDescriptor(globalThis,'sessionStorage');
+ try{Object.defineProperty(globalThis,'sessionStorage',{configurable:true,value:{getItem(){return null}}});
+  assert.match(wrap(React.createElement(Admin)),/<a class="button secondary" href="https:\/\/customvibe\.co\.za\/">View website<\/a>/);
+ }finally{if(previous)Object.defineProperty(globalThis,'sessionStorage',previous);else delete globalThis.sessionStorage}
 });
 test.after(async()=>{await vite.close()});
