@@ -18,8 +18,12 @@ Removed the four obsolete Cloudflare routing rules for hello, orders, privacy an
 
 ## Validation
 
-Updated owner-address expectation failed against the old Gmail destination. After changing the destination, all 24 focused submission/API tests passed, including failed customer receipt retry without duplicate owner mail. Storefront and admin builds passed. Full suite: 328 tests passed, zero failures. The initial sandbox run could not bind the local Vite test port; the complete run with local-server access passed. Production publication remains to be verified.
+Updated owner-address expectation failed against the old Gmail destination. After changing the destination, all 24 focused submission/API tests passed, including failed customer receipt retry without duplicate owner mail. Storefront and admin builds passed. Full suite: 328 tests passed, zero failures. The initial sandbox run could not bind the local Vite test port; the complete run with local-server access passed. Production publication and post-deployment protection verification succeeded in GitHub run 39243896685 for commit 73936b2.
 
 ## Remaining service work
 
 W3Forms notification and Reply-To settings; Google billing contact; any verified service notification contacts. Account login changes may need owner verification and must not be claimed from a contact edit. Founders Hub numeric cost currently rejects saves; EUR/ZAR estimates are in saved notes.
+
+## Owner handoff
+
+19 October: owner explicitly chose to keep W3Forms. Do not migrate contact delivery to Resend. Provider edits were attempted in Chrome, but the first reload retained the old recipient and blank Reply-To; later saves were unconfirmed. Tim will manually save notification address hello@customvibe.co.za and documented Reply-To {{email}}, refresh, then request the live delivery test. Google billing/service contacts remain to verify. Cloudflare profile email is a sign-in identity and was not changed.
