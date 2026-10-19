@@ -63,3 +63,7 @@ Publication and live verification are recorded below when confirmed.
 Published as c123372 (branding implementation 21e660a, with concurrent documentation preserved). [Protected website run 39241420520](https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39241420520) passed both builds, 328 tests, deployment and before/after protection checks. Matching admin version fcde4436-7428-48d2-a17c-c83084b68721 published successfully; bindings and compatibility were identical before/after, and the helper configuration was restored.
 
 Live signed-in storefront and admin Orders visually verified. DOM checks confirm every shared wordmark contains CustomVibe text with no image inside, purple rgb(41,20,56) and berry rgb(174,46,91); the separate puzzle icon loads successfully. Mobile admin was also reviewed locally at 390px. Anonymous command-line checks received provider 403 responses and were not treated as application sign-in verification; the deployment protection checks passed. Live screenshot: project output/puzzly-cv-concepts/live-branding.png. No real emails, order mutations or provider-setting changes were made for this release.
+
+## Approved transparent seam correction, 19 October 2026
+
+Owner approved the local light/dark comparison: the gap between puzzle pieces is transparent; C and V retain ivory fill. Versioned web/admin asset puzzle-logo-v2.png avoids stale logo caching. Regenerated matching email and favicon/touch icons. Live brand text and current email routing remain unchanged. Latest main 73936b2 preserved. Publication verification follows.
