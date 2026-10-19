@@ -1,0 +1,40 @@
+name: Diagnose existing admin settings read
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact reviewed main commit to diagnose
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: customvibe-production
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    if: github.repository == 'TIMMMYYYHHHH/Customvibev3' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.expected_sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Verify reviewed current main before using the existing credential
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          [[ "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$EXPECTED_SHA" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          current_main=$(git ls-remote --exit-code origin refs/heads/main | awk '{print $1}')
+          test "$current_main" = "$EXPECTED_SHA"
+      - name: Diagnose one read-only existing admin settings request
+        run: node scripts/diagnose-admin-deployment.mjs
+        env:
+          CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
