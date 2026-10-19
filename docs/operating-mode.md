@@ -1,3 +1,5 @@
+> Current capacity decision, 19 October 2026: Workers Paid US$5/month is approved and active, with a total Cloudflare target below US$10/month. The prior free-only restriction is superseded for this scoped rollout. Site/admin locks and payments-off remain. See [capacity rollout](paid-capacity-rollout.md).
+
 # Production behaviour behind the site lock
 
 Owner decision: 16 October 2026. This supersedes historical test-only restrictions in migration, artwork and admin plans.

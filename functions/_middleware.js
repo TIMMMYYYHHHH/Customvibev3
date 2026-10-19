@@ -1,3 +1,4 @@
+import {mapAPI} from '../server/map-api.mjs';
 import {proofAPI} from '../server/proof-api.mjs';
 import {gate,secure,unavailable,random} from '../server/auth.mjs';
 import {renderDocument,sitemap} from '../server/render.mjs';
@@ -6,6 +7,7 @@ import {lockerAPI} from '../server/lockers.mjs';
 export async function onRequest(context){const {request,env}=context;try{const url=new URL(request.url);if(url.protocol!=='https:'||url.hostname==='www.customvibe.co.za'){url.protocol='https:';if(url.hostname==='www.customvibe.co.za')url.hostname='customvibe.co.za';return secure(Response.redirect(url.toString(),308))}
  const auth=await gate(request,env,'site');if(auth.response){const response=secure(auth.response,{privateResponse:url.pathname!=='/robots.txt'});if(url.pathname==='/proof')response.headers.set('Referrer-Policy','no-referrer');return response;}
  if(auth.publicAsset)return secure(await context.next(),{privateResponse:false});
+ if(url.pathname.startsWith('/api/map/'))return secure(await mapAPI(request,env));
  if(url.pathname==='/api/lockers')return secure(await lockerAPI(request,env));
  if(url.pathname.startsWith('/api/proof')){const response=secure(await proofAPI(request,env));response.headers.set('Referrer-Policy','no-referrer');return response;}
  if(['/api/forms','/api/contact','/api/order-request','/api/artwork/init','/api/artwork/upload'].includes(url.pathname))return secure(await submissions(request,env));

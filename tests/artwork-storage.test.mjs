@@ -24,14 +24,14 @@ test('corrupt or mismatched artwork never reaches the bucket',async()=>{
  assert.equal((await call(env,'init',{...await manifest(),files:[{...m.files[0],size:4000001}]})).status,400);
 });
 test('concurrent request admission enforces shared storage budget atomically',async()=>{
- const env=artworkEnv(),base=await manifest();env.sql.exec("INSERT INTO artwork_usage (id,amount) VALUES ('retained',490000000)");
+ const env=artworkEnv(),base=await manifest();env.sql.exec("INSERT INTO artwork_usage (id,amount) VALUES ('retained',1990000000)");
  const files=Array.from({length:3},(_,i)=>({...base.files[0],size:2000000,name:`design-0${i+1}-photo.jpg`}));
  const results=await Promise.all(Array.from({length:4},()=>call(env,'init',{...base,id:crypto.randomUUID(),files})));
  assert.equal(results.filter(r=>r.status===200).length,1);assert.equal(results.filter(r=>r.status===429).length,3);
 });
 test('R2 operation quota fails closed before upload or download',async()=>{
  const env=artworkEnv(),m=await manifest();await call(env,'init',m);
- const month=new Date().toISOString().slice(0,7);env.sql.prepare('INSERT INTO artwork_usage (id,amount) VALUES (?,10000)').run('ops:'+month);
+ const month=new Date().toISOString().slice(0,7);env.sql.prepare('INSERT INTO artwork_usage (id,amount) VALUES (?,100000)').run('ops:'+month);
  assert.equal((await upload(env,m)).status,429);assert.equal(env.objects.size,0);
 });
 test('an upload finishing during expiry cleanup cannot leave late artwork behind',async()=>{
@@ -55,10 +55,10 @@ test('a maximum-file order uploads one file with bounded database payload and ca
 
 test('concurrent file uploads cannot overspend the last storage operation',async()=>{
  const env=artworkEnv(),m=await manifest();m.files=[m.files[0],{...m.files[0],name:'design-02-photo.jpg'}];await call(env,'init',m);
- env.sql.prepare('INSERT INTO artwork_usage(id,amount) VALUES (?,9999)').run('ops:'+new Date().toISOString().slice(0,7));
+ env.sql.prepare('INSERT INTO artwork_usage(id,amount) VALUES (?,99999)').run('ops:'+new Date().toISOString().slice(0,7));
  const send=index=>security.fetch(new Request('https://auth.internal/artwork/upload',{method:'POST',headers:{'Content-Type':'image/jpeg','X-Artwork-Id':m.id,'X-Artwork-Owner':m.owner,'X-Artwork-Index':String(index)},body:tile}),env);
  const results=await Promise.all([send(0),send(1)]);assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(env.objects.size,1);
- assert.equal(env.sql.prepare('SELECT amount FROM artwork_usage WHERE id=?').get('ops:'+new Date().toISOString().slice(0,7)).amount,10000);
+ assert.equal(env.sql.prepare('SELECT amount FROM artwork_usage WHERE id=?').get('ops:'+new Date().toISOString().slice(0,7)).amount,100000);
  assert.equal(env.sql.prepare('SELECT count(*) AS n FROM artwork_files WHERE ready=0 AND lease_until=0').get().n,1);
 });
 

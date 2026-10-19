@@ -1,3 +1,5 @@
+> Decision update, 19 October 2026: the owner activated Workers Paid US$5/month, reported R83 charged, and approved implementation with a total Cloudflare target below US$10/month. Geoapify Free was selected. The recommendations and unapproved status below are historical. Current rollout and verification: [paid-capacity-rollout.md](paid-capacity-rollout.md).
+
 # CustomVibe Cloudflare capacity and locker map review
 
 19 October 2026. Recommendation: use **Workers Paid, US$5/month plus metered overages**, while keeping the customvibe.co.za website plan Free. This addresses the measured processing-time constraint without buying unrelated website features. No subscription, quota, payment, security or runtime change was made during this review. A paid plan and spending budget still need owner selection.

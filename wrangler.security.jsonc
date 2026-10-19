@@ -6,7 +6,8 @@
   "preview_urls": false,
   "triggers": {
     "crons": [
-      "17 * * * *"
+      "17 * * * *",
+      "*/5 * * * *"
     ]
   },
   "d1_databases": [
@@ -33,5 +34,19 @@
       "binding": "ARTWORK",
       "bucket_name": "customvibe-test-artwork"
     }
-  ]
+  ],
+  "limits": {
+    "cpu_ms": 1000
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.01,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false
+    }
+  },
+  "vars": {
+    "LOCKER_REFRESH_ENABLED": "true"
+  }
 }

@@ -3,9 +3,9 @@ import {boundedBody,cookie,verifyToken} from './auth.mjs';
 // This adapter has no booking, billing, rate or arbitrary-proxy capability.
 const ENDPOINT='https://api-pudo.co.za/api/v1/lockers-data';
 const MAX_AGE=6*60*60*1000,MAX_BYTES=8000000;
-const CACHE_KEY='https://customvibe.co.za/internal-cache/locker-directory-v2';
+const CACHE_KEY='https://customvibe.co.za/internal-cache/locker-directory-v3';
 const unavailable=()=>Object.assign(new Error('Locker lookup unavailable'),{status:503});
-export const lockerLookupEnabled=env=>env.LOCKER_LOOKUP_ENABLED==='true'&&typeof env.TCG_LOCKER_API_KEY==='string'&&env.TCG_LOCKER_API_KEY.length>=20;
+export const lockerLookupEnabled=env=>env.LOCKER_LOOKUP_ENABLED==='true'&&(env.LOCKER_SHARED_ENABLED==='true'?!!env.AUTH:typeof env.TCG_LOCKER_API_KEY==='string'&&env.TCG_LOCKER_API_KEY.length>=20);
 const enabled=lockerLookupEnabled;
 const text=(value,max)=>typeof value==='string'?value.replace(/[\u0000-\u001f\u007f]/g,' ').trim().slice(0,max):'';
 export function normalizeLockers(data){
@@ -64,7 +64,15 @@ export function createLockerSource({network=fetch,cache,now=Date.now,diagnostic=
   try{return await pending;}finally{pending=null;}
  };
 }
-const source=createLockerSource();
+const legacySource=createLockerSource();
+async function source(env){
+ if(env.LOCKER_SHARED_ENABLED!=='true')return legacySource(env);
+ const response=await env.AUTH.fetch('https://auth.internal/maps/directory',{method:'POST'});
+ if(!response.ok)throw unavailable();
+ const value=JSON.parse(await boundedBody(response,3000000));
+ if(!Array.isArray(value.locations)||!Number.isFinite(value.updatedAt)||Date.now()-value.updatedAt>=MAX_AGE||value.updatedAt>Date.now())throw unavailable();
+ return value;
+}
 // This cache was written only after validation. Stream its JSON without parsing and
 // serializing the full directory again. Call only after the site's form-session check.
 export async function cachedLockerResponse(store=globalThis.caches?.default,now=Date.now()){
@@ -82,7 +90,7 @@ export async function lockerAPI(request,env,getLocations=source){
  const session=await verifyToken(cookie(request,'__Host-cv-form'),env.SESSION_SECRET,'form');
  if(!session)return fail(401,'Refresh the page to search for lockers.');
  if(getLocations===source){const cached=await cachedLockerResponse();if(cached)return cached;}
- try{return Response.json(await getLocations(env),{headers:{'Cache-Control':'private, no-store'}});}catch{return fail(503,'Locker search is temporarily unavailable. Retry or enter a preference below.');}
+ try{const value=await getLocations(env);if(env.LOCKER_SHARED_ENABLED==='true'&&globalThis.caches?.default)await caches.default.put(CACHE_KEY,Response.json(value,{headers:{'Cache-Control':`public, max-age=${Math.max(1,Math.floor((MAX_AGE-(Date.now()-value.updatedAt))/1000))}`,'X-CV-Directory-Time':String(value.updatedAt)}}));return Response.json(value,{headers:{'Cache-Control':'private, no-store'}});}catch{return fail(503,'Locker search is temporarily unavailable. Retry or enter a preference below.');}
 }
 export async function verifyLockerSelection(locker,env,getLocations=source){
  if(!locker.id)return {name:locker.name,area:locker.area};

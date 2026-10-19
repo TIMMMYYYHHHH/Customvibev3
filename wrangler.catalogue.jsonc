@@ -12,5 +12,16 @@
       "migrations_dir": "migrations/content"
     }
   ],
-  "account_id": "4f57d4e924674cb87b33d4c884745cf6"
+  "account_id": "4f57d4e924674cb87b33d4c884745cf6",
+  "limits": {
+    "cpu_ms": 1000
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.01,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false
+    }
+  }
 }

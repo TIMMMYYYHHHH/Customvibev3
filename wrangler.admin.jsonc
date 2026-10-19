@@ -35,5 +35,16 @@
     "SITE_GATE_ENABLED": "true",
     "SUBMISSIONS_ENABLED": "true",
     "ADMIN_SEND_ENABLED": "true"
+  },
+  "limits": {
+    "cpu_ms": 1000
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.01,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false
+    }
   }
 }
