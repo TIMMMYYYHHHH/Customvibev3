@@ -13,7 +13,7 @@ import {CollectionReview} from './CollectionReview';
 import {renderPhoto,releasePhotos} from './artwork';
 import {createStudio,studioReducer,createDesignItems,mergeStudioItems} from './studio-state.mjs';
 import {money,summarize} from './commerce.mjs';
-import {SubmissionProvider,useSubmissionSnapshot} from './FormService';
+import {SubmissionProvider,useSubmissionSnapshot,useDraftProtection} from './FormService';
 import {Checkout} from './Checkout';
 import {SiteHeader,SiteFooter,HelpPage} from './SiteChrome';
 import TierNudge from './TierNudge';
@@ -47,6 +47,8 @@ function AppContent({initialPage}){
   if(page==='puzzle'){history.replaceState(null,'','/studio');setPage('studio');}
  },[page]);
  const [checkoutDraft,setCheckoutDraft]=useState({query:'',locker:null,step:1,contact:{name:'',email:''},confirmed:false});
+ const draftHasDetails=values=>!!values&&(values.entries?.some(value=>String(value).trim())||['url','network','password'].some(key=>values.qr?.[key]?.trim()));
+ useDraftProtection('order',photos.length>0||basket.length>0||Object.values(businessDrafts).some(draftHasDetails)||Object.values(handyDrafts).some(draftHasDetails)||draftHasDetails(editingBusiness?.values)||draftHasDetails(editingHandy?.values)||['id','name','area'].some(key=>!!checkoutDraft.locker?.[key]?.trim())||!!checkoutDraft.query?.trim()||!!checkoutDraft.notes?.trim()||Object.values(checkoutDraft.contact||{}).some(value=>String(value).trim()));
  const [collectionBusy,setCollectionBusy]=useState(false),[collectionError,setCollectionError]=useState(''),[retry,setRetry]=useState(0);
  useEffect(()=>{
   if(!['basket','checkout'].includes(page)){setCollectionBusy(false);setCollectionError('');return;}
