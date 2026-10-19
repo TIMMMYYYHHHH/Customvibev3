@@ -39,6 +39,13 @@ function AppContent({initialPage}){
  const orderState=useSubmissionSnapshot('order'),orderLocked=orderState.pending;
  const {content}=useContent();const PACKS=Object.fromEntries(content.products.map(p=>[p.id,p]));
  const [routeVersion,setRouteVersion]=useState(0);
+ const routeFocus=useRef(null),lastRoute=useRef(null);
+ const routeIdentity=()=>window.__CV_ADMIN_PREVIEW__?new URLSearchParams(location.search).get('page')||'/':location.pathname+location.hash;
+ useEffect(()=>{lastRoute.current=routeIdentity();},[]);
+ function requestRouteFocus(){
+  const next=routeIdentity();
+  if(lastRoute.current!==next){routeFocus.current={source:document.activeElement};lastRoute.current=next;}
+ }
  const [editingPack,setEditingPack]=useState(null);
  const [businessSelected,setBusinessSelected]=useState(''),[businessDrafts,setBusinessDrafts]=useState({}),[editingBusiness,setEditingBusiness]=useState(null);
  const [handySelected,setHandySelected]=useState(''),[handyDrafts,setHandyDrafts]=useState({}),[editingHandy,setEditingHandy]=useState(null);
@@ -71,9 +78,9 @@ function AppContent({initialPage}){
  function navigateSection(route){
   const hash=route.startsWith('home/')?'/#'+route.slice(5):pagePath(route);
   if(location.pathname+location.hash!==hash)history.pushState(null,'',hash);
-  setPage(currentPage());setRouteVersion(v=>v+1);
+  requestRouteFocus();setPage(currentPage());setRouteVersion(v=>v+1);
  }
- useEffect(()=>{const update=()=>{setPage(currentPage());setRouteVersion(v=>v+1);};addEventListener('popstate',update);addEventListener('hashchange',update);return()=>{removeEventListener('popstate',update);removeEventListener('hashchange',update);clearTimeout(timer.current);}},[]);
+ useEffect(()=>{const update=()=>{requestRouteFocus();setPage(currentPage());setRouteVersion(v=>v+1);};addEventListener('popstate',update);addEventListener('hashchange',update);return()=>{removeEventListener('popstate',update);removeEventListener('hashchange',update);clearTimeout(timer.current);}},[]);
  useLayoutEffect(()=>{
   const section=(window.__CV_ADMIN_PREVIEW__?new URLSearchParams(location.search).get('page')?.split('#')[1]:location.hash.slice(1))||'';
   const frame=requestAnimationFrame(()=>{
@@ -86,6 +93,23 @@ function AppContent({initialPage}){
   });
   return()=>cancelAnimationFrame(frame);
  },[page,routeVersion]);
+ useLayoutEffect(()=>{
+  if(!routeFocus.current||collectionBusy)return;
+  const frame=requestAnimationFrame(()=>{
+   const request=routeFocus.current;if(!request)return;
+   const section=(window.__CV_ADMIN_PREVIEW__?new URLSearchParams(location.search).get('page')?.split('#')[1]:location.hash.slice(1))||'';
+   const target=section&&document.getElementById(section),main=document.getElementById('main-content');
+   const heading=target?(target.matches('h1,h2,h3,summary')?target:target.querySelector('h1,h2,h3,summary')||target):(main?.querySelector('[data-studio-workbench]')||main?.querySelector('h1'));
+   if(!heading)return;
+   routeFocus.current=null;
+   // A dialog or a control focused since navigation owns focus, including recovery and Undo.
+   const active=document.activeElement;
+   if(active?.closest('.form-security')||document.querySelector('dialog[open],[role="dialog"][aria-modal="true"]')||(active!==document.body&&active!==request.source&&active?.isConnected))return;
+   if(!heading.hasAttribute('tabindex'))heading.setAttribute('tabindex','-1');
+   heading.focus({preventScroll:true});
+  });
+  return()=>cancelAnimationFrame(frame);
+ },[page,routeVersion,collectionBusy,collectionError]);
  function startNewRequest(){replaceUndo(null);setBusinessDrafts({});setBusinessSelected('');setEditingBusiness(null);setHandyDrafts({});setHandySelected('');setEditingHandy(null);releasePhotos(photos);setBasket([]);dispatchStudio({type:'reset'});setCheckoutDraft({query:'',locker:null,step:1,contact:{name:'',email:'',phone:''},confirmed:false});setCollectionError('');setToast('');navigate('/studio');setPage('studio');window.scrollTo(0,0);}
  function notify(message){setToast(message);clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),4500);}
  function changeQuantity(item,delta){setBasket(b=>b.map(x=>x.id===item.id?{...x,qty:x.qty+delta}:x));if(['photo','puzzle'].includes(item.kind))setPhotos(ps=>ps.map(p=>p.id===(item.sourceId||item.id)?{...p,qty:item.qty+delta}:p));}
