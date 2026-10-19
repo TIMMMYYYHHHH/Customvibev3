@@ -6,7 +6,7 @@
     {
       "id": "react",
       "distribution": "react",
-      "version": "19.2.0",
+      "version": "19.2.9",
       "licence": "MIT",
       "source": "node_modules/react/LICENSE",
       "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
@@ -14,7 +14,7 @@
     {
       "id": "react-dom",
       "distribution": "react-dom",
-      "version": "19.2.0",
+      "version": "19.2.9",
       "licence": "MIT",
       "source": "node_modules/react-dom/LICENSE",
       "sourceSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
