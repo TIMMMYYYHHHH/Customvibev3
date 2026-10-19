@@ -28,16 +28,29 @@ D1 paid recovery history and increased runtime do not prove intermittent availab
 
 ## Verification record
 
-Release 8967c8b published successfully through protected workflow 39235846903. CI passed 328 tests, public/SSR/admin builds and before/after deployment protection checks. The independent code review found one refresh/expiry timing issue, fixed with a 15-minute grace and regression coverage. Local map verification passed explicit location search, pin details/selection, distance-sorted list and manual edits clearing verified selection.
+Release 0c9d648 published successfully through protected workflow 39238283845, including the final keyboard fix. The preceding infrastructure release was 8967c8b (workflow 39235846903). CI passed 328 tests, public/SSR/admin builds and before/after deployment protection checks. The independent code review found one refresh/expiry timing issue, fixed with a 15-minute grace and regression coverage. Local map verification passed explicit location search, pin details/selection, distance-sorted list and manual edits clearing verified selection.
 
 Deployed versions:
-- Pages: 83de790b-52c1-4b7a-99b8-8d8416bcd716.
+- Pages: release 0c9d648; protected publish and post-deployment checks passed.
 - Security: 7ab57005-8723-484b-95ce-bf626ca6091e; migration 0009 applied.
-- Admin: 371798cf-f592-4897-a65a-3babb61e2717, matching public source/build.
+- Admin: 2582692a-a323-45e7-8089-5c8d9d6a7ca8, matching final public source/build.
 - Catalogue: f6a20f47-cce3-417d-952f-54d4426f43a4.
 
 Read-only Cloudflare API verification confirmed 1,000 ms limits on Pages production and all three Workers, plus 1% Worker diagnostic sampling with invocation logs off. Map feature flags and encrypted provider secrets are production-only. Website gate remains true. The scheduled refresh created the private 896.01 kB locker snapshot at 12:17:12 SAST on 19 October, verified in R2 with public access disabled.
 
 Founders Hub Finance verification: the Cloudflare service amount is R83 monthly, automatic renewal. Recording the owner's reported payment in Tools & services generated one committed R83 cost/payment dated 19 October and one planned R83 renewal dated 15 November. A separate freshly loaded Finance view confirmed both linked records and the R83 cash movement, without manually entering any Finance expense. Subsequent rand charges may vary. Intermittent Hub response interruptions were recovered with Check original save, avoiding duplicates.
 
-Live signed-in desktop acceptance passed: Durban North location search, real road tiles and attribution, 129 lockers within 25 km and 73 within 10 km, Kensington Boulevard (CG793) pin details/selection, and manual edits clearing the verified identity. The scheduled directory contains 2,199 lockers. Enter and Space pin activation passed in the local fixture after an explicit keyboard-handler fix. Mobile acceptance remains separately pending. Increased runtime is not a new hosted maximum-artwork acceptance result; the existing availability/recovery follow-ups remain open. Website password gate, separate admin sign-in and payments-off remain mandatory. Founders Hub Tools & services is the source for linked Finance costs; do not create duplicate manual expenses.
+Live signed-in desktop acceptance passed: Durban North location search, real road tiles and attribution, 129 lockers within 25 km and 73 within 10 km, Kensington Boulevard (CG793) pin details/selection, and manual edits clearing the verified identity. The scheduled directory contains 2,199 lockers. Enter and Space pin activation and keyboard selection passed in both the local fixture and the final live release. Search this area and manual fallback also passed live. No customer order, email, payment or courier booking was submitted. Mobile acceptance remains separately pending. Increased runtime is not a new hosted maximum-artwork acceptance result; the existing availability/recovery follow-ups remain open. Website password gate, separate admin sign-in and payments-off remain mandatory. Founders Hub Tools & services is the source for linked Finance costs; do not create duplicate manual expenses.
+
+## Founders Hub follow-up record
+
+Confirmed saved: Cloudflare hosting service R83 monthly, automatic renewal, next 15 November; linked committed/payment and planned Finance entries; Geoapify service renamed from the existing OpenStreetMap record, R0 cost, provider dashboard link, and current setup/limits/live-map notes. No duplicate service or manual Finance expense was created. Cloudflare data/backups and PUDO notes now reflect the deployed capacity and encrypted scheduled refresh. Spending-controls task is Done; the map implementation activity and corrected parent scope/blocker are saved.
+
+Hub returned repeated interrupted responses and HTML instead of JSON during subsequent edits. Its original-save recovery and refresh/review flow must be used before retrying any retained draft. Do not assume a failed save succeeded.
+
+Remaining updates to reconcile when the frontend is reliable:
+- Geoapify Setup status: connected Free production map with encrypted server key, live desktop verification 19 October.
+- Finance cost-flow subtask created. Its evidence comment encountered an unconfirmed save; check the original request before retrying, then mark Done once the recorded evidence is confirmed. The actual linked Finance cost/payment and renewal were verified. Spending-controls subtask is already Done.
+- Map implementation subtask activity and parent scope/blocker are now saved. Desktop/keyboard acceptance passed; mobile remains open and parent stays Blocked for courier terms.
+- Refresh CPU subtask: scheduled private snapshot and 1-second ceiling deployed; retain any required post-rollout CPU measurement before completion.
+- Report Hub's interrupted-save / HTML-response bug under existing Upkeep coverage.
