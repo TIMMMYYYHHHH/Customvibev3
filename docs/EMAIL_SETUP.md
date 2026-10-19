@@ -1,3 +1,7 @@
+# Current Workspace migration, 19 October 2026
+
+The owner approved hello@customvibe.co.za for business notifications and service contacts, correcting W3Forms Reply-To, and removing obsolete Cloudflare forwarding routes. Google Workspace now receives domain mail, with orders/privacy/security aliases verified. Keep Resend for transactional delivery. Account login/recovery identities must be checked separately, not blindly replaced in historical setup instructions. Preserve Google MX and Google/Resend authentication records. Do not use Cloudflare Fix DNS to restore forwarding MX. See docs/workspace-email-migration.md for verification and remaining service changes.
+
 # Email and unpaid order setup
 
 Keep the site password gate ON. The live site uses normal production behaviour with payments disabled; preview and local sending stay OFF. See [operating-mode.md](operating-mode.md) for the latest policy. All Cloudflare and email services stay on free plans. Never paste API keys, passwords, cookies or secret values into chat.
@@ -8,7 +12,7 @@ The migration destination is Cloudflare account `4f57d4e924674cb87b33d4c884745cf
 
 Status updates remain manual through Preview update and Send update in order details. No owner-recipient allowlist is used. Saving a stage does not send an email. The historical seven-day setup notes below are superseded by the 14-day policy in operating-mode.md.
 
-- Send unpaid order notifications with private artwork access to customvibe03@gmail.com.
+- Send unpaid order notifications with private artwork access to hello@customvibe.co.za.
 - Current live payment-disabled flow must remain truthful about unpaid status. Intended paid production checkout completes an order and sends its confirmation only after verified successful gateway payment. Pending/failed/cancelled payments do neither. There is no separate owner-acceptance step. The local proposal shows a labelled fictional paid order; payment integration remains pending in “Choose a payment provider and approve paid-checkout scope”. Later stage emails stay manual.
 - Online payments: coming soon. No card form, payment link or implied paid status.
 - Handmade magnets, intended delivery by PUDO lockers. Locker names entered by customers are preferences, not verified bookings.
@@ -26,7 +30,7 @@ The old connected account is full at three domains. The separate CustomVibe acco
 
 1. In the new account, add `customvibe.co.za` as a sending domain. Use the Europe region if available. Keep receiving disabled, because Cloudflare will handle inbound forwarding. Keep open and click tracking disabled.
 2. Add the exact DNS records Resend supplies in Cloudflare. DKIM is a TXT record. This account uses the Resend-managed CNAME records `send` and `rsend`, both DNS-only, plus a DKIM TXT record at `resend._domainkey`. A monitoring DMARC TXT record is present at `_dmarc`. Do not overwrite root MX or create a second SPF record at an existing name. Copy provider values exactly.
-3. Verify the domain in Resend. Use `orders@customvibe.co.za` as the sender. Replies go to customvibe03@gmail.com until aliases are verified.
+3. Verify the domain in Resend. Use `orders@customvibe.co.za` as the sender. Customer replies go to orders@customvibe.co.za, a verified Google Workspace alias of hello@customvibe.co.za.
 4. Create a sending-only API key restricted to this domain. Keep it in your password manager. Do not send it in chat.
 5. From the migration checkout, with the temporary credential helper still running, run the local hidden-input installer:
 
@@ -46,7 +50,7 @@ The owner approved Enforced TLS only if available on the dedicated account's fre
 The owner selected **w3forms.com**, a different service from web3forms.com. W3Forms is for text enquiries only. Photos and unpaid requests use Resend. Google sign-in currently fails in the interactive browser, so the owner can complete sign-in in normal Chrome.
 
 1. Sign in with customvibe03@gmail.com and create a form named CustomVibe Contact on the free plan.
-2. Set notify email to customvibe03@gmail.com, Reply-To to `{{email}}`, allowed domain to `customvibe.co.za`, and leave CC, auto-response and webhooks off. Keep file uploads off. The site verifies Cloudflare Turnstile server-side; do not enable a second provider CAPTCHA without integrating it.
+2. Set notify email to hello@customvibe.co.za, Reply-To to `{{email}}`, allowed domain to `customvibe.co.za`, and leave CC, auto-response and webhooks off. Keep file uploads off. The site verifies Cloudflare Turnstile server-side; do not enable a second provider CAPTCHA without integrating it.
 3. Keep the access key private. W3Forms shows it only when created. Save it in a password manager, then run `"$CV_NODE" scripts/set-email.mjs w3forms` and paste into its hidden prompt. It installs `W3FORMS_ACCESS_KEY` in Pages without displaying or writing the value.
 4. Confirm a labelled test appears in the W3Forms dashboard and owner inbox, and that Reply reaches the submitted test email. Provider acceptance alone does not prove inbox delivery.
 

@@ -70,7 +70,7 @@ test('atomic form limits are separate from login attempts and persist across req
 test('a failed customer receipt does not resend owner artwork on retry',async()=>{
  const env=setup(),context=await form(env);const jpeg=readFileSync('tests/fixtures/print-tile.jpg').toString('base64');
  const data={id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'customer@example.com',phone:'0821234567'},locker:{name:'Preferred locker',area:'Durban'},consent:true,items:[{kind:'photo',qty:1,files:[jpeg]}]};let owner=0,receipt=0;
- const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});const mail=JSON.parse(init.body);if(mail.to[0]==='customvibe03@gmail.com')owner++;else{receipt++;if(receipt===1)return new Response(null,{status:503});}return Response.json({id:'accepted'});};
+ const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});const mail=JSON.parse(init.body);if(mail.to[0]==='hello@customvibe.co.za')owner++;else{receipt++;if(receipt===1)return new Response(null,{status:503});}return Response.json({id:'accepted'});};
  const first=await (await submissions(post('/api/order-request',context,data),env,network)).json();assert.equal(first.ok,true);assert.equal(first.receiptSent,false);
  const next=await (await submissions(post('/api/order-request',context,data),env,network)).json();assert.equal(next.receiptSent,true);assert.equal(owner,1);assert.equal(receipt,2);
 });

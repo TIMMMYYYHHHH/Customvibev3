@@ -9,7 +9,7 @@ import {emailLayout,escapeHTML,paragraph,note,details,row,signoff,unpaid} from '
 import {emailOrderSummary} from './email-order-summary.mjs';
 import {canPurchase} from '../src/content/model.mjs';
 export const MAX_BODY=2100000;
-export const DESTINATION='customvibe03@gmail.com';
+export const DESTINATION='hello@customvibe.co.za';
 export const SENDER='CustomVibe <orders@customvibe.co.za>';
 const invalid=()=>{throw new Error('Invalid request')};
 const plain=v=>v&&typeof v==='object'&&!Array.isArray(v);
