@@ -1,3 +1,4 @@
+import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
 const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 export async function submissionState(request,env){
@@ -28,7 +29,7 @@ export async function submissionState(request,env){
  }
  if(!Number.isSafeInteger(body.createdAt)||body.createdAt<now-3600||body.createdAt>now+60)return Response.json({expired:true});
  const day=Math.floor(now/86400),month=new Date(now*1000).toISOString().slice(0,7),weight=body.kind==='order'?2:1;
- const counters=[['forms:ip:'+body.key,1,now+900,5],['forms:day:'+day,weight,(day+1)*86400,80],['forms:month:'+month,weight,Math.floor(Date.UTC(new Date(now*1000).getUTCFullYear(),new Date(now*1000).getUTCMonth()+1,1)/1000),2400]];
+ const counters=[['forms:ip:'+body.key,1,now+900,5],['forms:day:'+day,weight,(day+1)*86400,DAILY_SEND_LIMIT],['forms:month:'+month,weight,Math.floor(Date.UTC(new Date(now*1000).getUTCFullYear(),new Date(now*1000).getUTCMonth()+1,1)/1000),MONTHLY_SEND_LIMIT]];
  // The conditional insert and all counter updates run in one D1 transaction.
  // A rejected IP, an exhausted budget or a duplicate ID reserves no global quota.
  const reservation=crypto.randomUUID();

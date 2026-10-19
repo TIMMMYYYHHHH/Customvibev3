@@ -1,3 +1,4 @@
+import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
 import {sixMonthsAfter,artworkExpiry,retainedSnapshot} from '../server/order-retention.mjs';
 import {proofDetail,cleanProofs} from './proofs.mjs';
@@ -64,7 +65,7 @@ export async function orderService(request,env){
   if(existing&&(!retry||row.status==='fulfilled'))return Response.json({claimed:false,state:existing.state});
   if(!existing&&b.retryAttempt!==undefined)return fail(409,'The previous attempt changed.');
   const day=Math.floor(time/86400),date=new Date(time*1000),month=date.toISOString().slice(0,7),reservation=crypto.randomUUID();
-  const counters=[['forms:day:'+day,(day+1)*86400,80],['forms:month:'+month,Math.floor(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)/1000),2400]];
+  const counters=[['forms:day:'+day,(day+1)*86400,DAILY_SEND_LIMIT],['forms:month:'+month,Math.floor(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)/1000),MONTHLY_SEND_LIMIT]];
   const available=counters.map(()=>'(NOT EXISTS(SELECT 1 FROM attempts WHERE id=? AND until>? AND count+1>?))').join(' AND ');
   // The summary swap, attempt trigger and allowance charges share one transaction.
   const insert=env.DB.prepare(`INSERT INTO order_updates(order_id,version,status,created,updated,reservation)

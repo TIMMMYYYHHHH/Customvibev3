@@ -1,3 +1,4 @@
+import {PUBLIC_CONTACT_EMAIL} from '../../shared/business-constants.mjs';
 import React,{useEffect,useRef,useState} from 'react';
 import {BrandDoodle} from './ReferenceThread';
 import './contact.css';
@@ -39,7 +40,7 @@ export default function Contact({standalone=false}){
    <p className="overline">CONTACT US</p>
    <Heading id="contact-title">Good things start<br/>with a <span>hello.</span></Heading>
    <p>A question about your magnets? A gift idea you’re dreaming up? Tell us what’s on your mind.</p>
-   <div className="contact-direct"><span>Prefer email?</span><a href="mailto:hello@customvibe.co.za">hello@customvibe.co.za</a></div>
+   <div className="contact-direct"><span>Prefer email?</span><a href={"mailto:"+PUBLIC_CONTACT_EMAIL}>{PUBLIC_CONTACT_EMAIL}</a></div>
    {!standalone&&<span className="contact-scribble">Let’s make something personal.<BrandDoodle kind="heart" className="contact-heart berry"/></span>}
   </div>
   <form className="contact-form" ref={form} onSubmit={submit} noValidate aria-label="Contact us">
