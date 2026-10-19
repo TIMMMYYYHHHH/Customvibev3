@@ -35,3 +35,9 @@ export async function renderPhoto(photo,{puzzle=false,gridSize=3,size=480}={}){
 
 // Release completed request originals only when the customer starts another request.
 export function releasePhotos(photos){const sources=new Set([...photos.map(photo=>photo.src),...[...images.keys()].filter(src=>src.startsWith('blob:'))]);for(const src of sources){images.delete(src);if(src?.startsWith('blob:'))URL.revokeObjectURL(src);}}
+
+// Discard one expired removal without evicting originals still used by the order.
+export function releaseUnusedImages(sources,retainedSources=[]){
+ const retained=new Set(retainedSources);
+ for(const src of new Set(sources))if(src?.startsWith('blob:')&&!retained.has(src)){images.delete(src);URL.revokeObjectURL(src);}
+}
