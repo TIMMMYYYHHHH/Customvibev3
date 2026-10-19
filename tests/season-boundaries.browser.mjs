@@ -82,6 +82,18 @@ try{
   const current=await client({timezoneId});await preview(current.page,{active:false,observed});
   observed.push({timezoneId,browserCurrentUTC:await selected.page.evaluate(()=>new Date().toISOString())});
  });
+ await scenario('selected clock survives actual storefront navigation and reload versus identical current clock',{},async({client,observed,trace})=>{
+  for(const [at,active]of [['2028-02-29T12:30',true],[null,false]]){
+   const {page}=await client(),loaded=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/seasons');
+   await page.goto(origin+'/preview'+(at?'?at='+encodeURIComponent(at):''));await(await loaded).finished();
+   await page.getByRole('link',{name:'View more designs',exact:true}).waitFor();observed.push({stage:'home',at,...await appearance(page,active)});
+   await page.getByRole('link',{name:'View more designs',exact:true}).click();await page.getByRole('heading',{level:1,name:/Find your kind.*fridge joy/s}).waitFor();
+   assert.equal(new URL(page.url()).searchParams.get('page'),'/collections');assert.equal(new URL(page.url()).searchParams.get('at'),at);observed.push({stage:'after-navigation',at,...await appearance(page,active)});
+   const refreshed=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/seasons');await page.reload();await(await refreshed).finished();await page.getByRole('heading',{level:1,name:/Find your kind.*fridge joy/s}).waitFor();
+   assert.equal(new URL(page.url()).searchParams.get('page'),'/collections');assert.equal(new URL(page.url()).searchParams.get('at'),at);observed.push({stage:'after-reload',at,...await appearance(page,active)});
+  }
+  assert.equal(trace.filter(x=>x.path==='/api/forms'||x.path.startsWith('/api/contact')||x.path.startsWith('/api/order')).length,0,'No customer forms or submissions');
+ });
  await scenario('selected preview cannot override saved schedule-off authority',{mode:'off'},async({h,client,observed})=>{
   const {page}=await client();await preview(page,{at:'2028-02-29T12:30',active:false,observed});assert.equal((await(await actorRequest(h,'A','/api/seasons')).json()).mode,'off');
  });
@@ -101,7 +113,7 @@ try{
   observed.push({year:2029,feb29:false,returnedToCurrent:true});await page.screenshot({path:resolve(out,'calendar-returned-to-current.png'),fullPage:true});
  });
  assert.deepEqual(errors,[],'No uncaught page errors');assert.deepEqual(blocked,[],'No external/write/WebSocket requests');assert.deepEqual(bridgeErrors,[],'No bridge failures');
- console.log('PASS: six actual-runtime boundary/counterfactual/calendar journeys; zero browser writes or network fallback');
+ console.log('PASS: seven actual-runtime boundary/counterfactual/calendar journeys; zero browser writes or network fallback');
 }catch(error){failure=error;console.error(error)}finally{
  Date.now=originalNow;await writeFile(resolve(out,'browser-results.json'),JSON.stringify({results,errors,blocked,bridgeErrors},null,2)+'\n');await browser.close();
 }

@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';
-import {readSeasons,saveSeasons,publicSeason} from '../server/seasons.mjs';import {seedState} from '../src/seasons/model.mjs';import {previewPath,previewURL} from '../src/seasons/preview-routing.mjs';
+import {readSeasons,saveSeasons,publicSeason} from '../server/seasons.mjs';import {seedState} from '../src/seasons/model.mjs';import {previewPath,previewURL,installPreviewRouting} from '../src/seasons/preview-routing.mjs';
 import fallback from '../data/site-content.json' with {type:'json'};
 import admin from '../admin/worker.mjs';import {random,signToken} from '../server/auth.mjs';
 function storage(){const sql=new DatabaseSync(':memory:');return {sql,prepare(query){let args=[];return {bind(...v){args=v;return this},async first(){return sql.prepare(query).get(...args)||null},async run(){const r=sql.prepare(query).run(...args);return {meta:{changes:r.changes}}}}},async batch(statements){sql.exec('BEGIN');try{const result=[];for(const s of statements)result.push(await s.run());sql.exec('COMMIT');return result}catch(e){sql.exec('ROLLBACK');throw e}}}}
@@ -10,3 +10,27 @@ test('preview framing is private and limited to the preview document; submission
 test('preview routes reject external paths and retain selected pages',()=>{assert.equal(previewPath('https://admin.example'+previewURL('/collections')),'/collections');assert.equal(previewPath('https://admin.example/preview?page=https://evil.invalid'),'/');assert.equal(previewPath('https://admin.example/preview?page=//evil.invalid'),'/');assert.equal(previewPath('https://admin.example'+previewURL('/#photo-pricing')),'/#photo-pricing')});
 
 test('preview reads current shared catalogue and excludes hidden products',async()=>{const {env,cookie,db}=await setup();db.sql.exec('CREATE TABLE content (id INTEGER PRIMARY KEY, revision INTEGER, body TEXT)');const content=structuredClone(fallback);content.products[0].name='Current catalogue name';content.products[1].status='hidden';db.sql.prepare('INSERT INTO content VALUES (1,?,?)').run(content.revision,JSON.stringify(content));const read=async()=>{const r=await admin.fetch(new Request('https://admin.customvibe.co.za/preview-content.json',{headers:{cookie}}),env);assert.equal(r.status,200);assert.equal(r.headers.get('Cache-Control'),'private, no-store');return r.json()};let result=await read();assert.equal(result.products[0].name,'Current catalogue name');assert.ok(!result.products.some(p=>p.id===content.products[1].id));content.products[0].name='Updated catalogue name';db.sql.prepare('UPDATE content SET body=? WHERE id=1').run(JSON.stringify(content));result=await read();assert.equal(result.products[0].name,'Updated catalogue name');db.sql.close()});
+
+// Exercise the real history converter. The browser-like boundary commits its returned URL.
+function previewHistory(start,run){
+ const saved={history:globalThis.history,location:globalThis.location};globalThis.location=new URL(start);
+ const commit=(_state,_title,url)=>{if(url!=null)globalThis.location=new URL(url,globalThis.location.href)};
+ globalThis.history={pushState:commit,replaceState:commit};
+ try{installPreviewRouting();run()}finally{for(const key of ['history','location'])if(saved[key]===undefined)delete globalThis[key];else globalThis[key]=saved[key]}
+}
+test('preview navigation retains the selected SAST minute across push and replace, with explicit preview URLs authoritative',()=>{
+ previewHistory('https://admin.example/preview?at=2028-02-29T12:30&unrelated=private',()=>{
+  history.pushState(null,'','/collections?ignored=1');assert.equal(location.href,'https://admin.example/preview?page=%2Fcollections&at=2028-02-29T12%3A30');
+  history.replaceState(null,'','/#photo-pricing');assert.equal(location.href,'https://admin.example/preview?page=%2F%23photo-pricing&at=2028-02-29T12%3A30');assert.equal(previewPath(location.href),'/#photo-pricing');
+  const before=location.href;assert.throws(()=>history.pushState(null,'','https://external.invalid/collections'),/stays on this website/);assert.equal(location.href,before);
+  history.replaceState(null,'','/preview?at=2032-02-29T09%3A00&page=%2Fcollections');assert.equal(location.search,'?at=2032-02-29T09%3A00&page=%2Fcollections');
+  history.pushState(null,'','/studio');assert.equal(location.search,'?page=%2Fstudio&at=2032-02-29T09%3A00');
+  history.pushState(null,'','/preview?page=%2Fcollections');history.replaceState(null,'','/studio');assert.equal(location.search,'?page=%2Fstudio');
+ });
+});
+test('preview navigation never propagates duplicate or unsafe dates, destination query data or invalid page grammar',()=>{
+ for(const query of ['','?unrelated=private','?at=','?at=2028-02-30T12%3A30','?at=2028-02-29T12%3A30Z','?at=2028-02-29T12%3A30%3A00','?at=%202028-02-29T12%3A30','?at=2028-02-29T12%3A30%0A','?at=https%3A%2F%2Fexternal.invalid','?at=2028-02-29T12%3A30&at=2028-02-29T12%3A30','?at=2028-02-29T12%3A30&%61t=2032-02-29T09%3A00']){
+  previewHistory('https://admin.example/preview'+query,()=>{history.pushState(null,'','/collections?at=2032-02-29T09:00&unrelated=private');assert.equal(location.search,'?page=%2Fcollections',query)});
+ }
+ previewHistory('https://admin.example/preview?at=2028-02-29T12%3A30',()=>{history.pushState(null,'','/%5Cunsafe');assert.equal(previewPath(location.href),'/')});
+});
