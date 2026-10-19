@@ -18,7 +18,7 @@ pinned distribution without claiming a separately resolved plugin version.
 
 
 ========================================================================
-react | 19.2.0 | MIT
+react | 19.2.9 | MIT
 Source: node_modules/react/LICENSE
 ========================================================================
 
@@ -45,7 +45,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ========================================================================
-react-dom | 19.2.0 | MIT
+react-dom | 19.2.9 | MIT
 Source: node_modules/react-dom/LICENSE
 ========================================================================
 
