@@ -13,7 +13,7 @@ import {MagnetPreview} from './MagnetPreview';
 export function CollectionReview({basket,photos=[],packs,go,onEdit,onQuantity,onRemove}){
  const {content}=useContent();const sum=summarize(basket,content);
  return <main className="basket-page section collection-review-page">
-  <div className="section-heading"><div><p className="eyebrow">A LITTLE LOOK BEFORE YOU ORDER</p><h1>Your basket.</h1><p>All your magnets and puzzles, together.</p></div><button className="back-to-designer" onClick={()=>go('studio')}><ArrowLeft size={18}/>Back to the designer</button></div>
+  <div className="section-heading"><div><p className="eyebrow">A LITTLE LOOK BEFORE YOU ORDER</p><h1>Your basket.</h1><p>All your magnets and puzzles, together.</p></div><button className="text-button" onClick={()=>go('studio')}><ArrowLeft size={18}/>Back to the designer</button></div>
   {!basket.length?<div className="empty-basket"><Bag size={44}/><h2>A little room for your favourites.</h2><p>Add photos in the designer to start your basket.</p><button className="button" onClick={()=>go('studio')}>Open the designer</button></div>:<div className="basket-layout collection-layout">
    <div className="collection-cards">{basket.map((item,index)=>{
     const editable=['photo','puzzle'].includes(item.kind)||!!item.designMode||isSelectableCollection(packs[item.kind]);
