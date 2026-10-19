@@ -34,6 +34,12 @@ const safeReturns=[
  ['/preview?at=1900-12-25T00%3A00','/preview?at=1900-12-25T00%3A00'],
  ['/preview?at=9999-12-31T23%3A59','/preview?at=9999-12-31T23%3A59'],
  ['/preview?at=2026-12-25T12%3A00&page=%2F%23photo-pricing','/preview?page=%2F%23photo-pricing&at=2026-12-25T12%3A00'],
+ ['/themes.html','/themes'],
+ ['/themes.html?view=occasions','/themes?view=occasions'],
+ ['/preview.html','/preview'],
+ ['/preview.html?page=%2fcollections%2falphabet%23choose-style','/preview?page=%2Fcollections%2Falphabet%23choose-style'],
+ ['/preview.html?at=2028-02-29T12:30','/preview?at=2028-02-29T12%3A30'],
+ ['/preview.html?at=2026-12-25T12%3A00&page=%2F%23photo-pricing','/preview?page=%2F%23photo-pricing&at=2026-12-25T12%3A00'],
  ['/orders','/orders'],['/artwork','/artwork'],['/content','/content'],
 ];
 for(const [requested,expected] of safeReturns){
@@ -51,7 +57,21 @@ for(const [requested,expected] of safeReturns){
  });
 }
 
+const unsafeAliases=[
+ '/themes.html?view=calendar','/themes.html?view=occasions&view=occasions',
+ '/themes.html?view=occasions&year=2027','/themes.html/extra','/themes.html.html',
+ '/themes.HTML','/%74hemes.html','/themes%2Ehtml',
+ '/preview.html?next=https://evil.example','/preview.html?page=%2F&page=%2Fcollections',
+ '/preview.html?page=%2F&unknown=1','/preview.html?%70age=%2F','/preview.html?page=%',
+ '/preview.html?page=%2F%2Fevil.example','/preview.html?page=%252F%252Fevil.example',
+ '/preview.html?page=%2F..%2Forders','/preview.html?at=2026-02-29T12:00',
+ '/preview.html?at=2026-12-25T12:00Z','/preview.html?','/preview.html/extra',
+ '/preview.html.html','/preview.html%3Fpage=%2F',
+];
 const unsafeReturns=[
+ ...unsafeAliases,
+ 'https://evil.example/preview.html','//evil.example/preview.html',
+ '/themes.html\n','/preview.html\n','/preview.html\u2028','/preview.html#outside',
  'https://evil.example/preview','//evil.example/preview','/\\evil.example',
  '/%2f/evil.example','/%70review?page=%2Fcollections',
  '/themes?view=calendar','/themes?view=occasions&view=occasions','/themes?view=occasions&year=2027',
@@ -86,7 +106,15 @@ test('invalid return destinations fall back on both incorrect-password and succe
 });
 
 test('invalid preview query cannot be retained in the initial sign-in form',async()=>{
- for(const path of unsafeReturns.filter(path=>path.startsWith('/preview')&&!path.includes('#')&&path!=='/preview?')){
+ // Request URLs omit an empty query and strip raw linefeeds; login POST cases above still test those literal values.
+ for(const path of unsafeReturns.filter(path=>path.startsWith('/preview')&&!path.includes('#')&&!path.includes('\n')&&!['/preview?','/preview.html?'].includes(path))){
+  const form=await challenge(environment(),path);
+  assert.equal(hidden(form.html,'next'),'/',path);
+ }
+});
+
+test('unsupported alias queries and lookalikes cannot be retained in the initial sign-in form',async()=>{
+ for(const path of unsafeAliases.filter(path=>path!=='/preview.html?')){
   const form=await challenge(environment(),path);
   assert.equal(hidden(form.html,'next'),'/',path);
  }

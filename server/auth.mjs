@@ -21,6 +21,8 @@ export const unavailable=()=>new Response('Temporarily unavailable. Please try a
 async function authCall(env,path,body){let status;try{if(!env.AUTH)throw new Error('Missing auth binding');const r=await env.AUTH.fetch('https://auth.internal'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){status=r.status;throw new Error('Auth unavailable')}return await r.json()}catch(cause){const error=new Error('Auth unavailable',{cause});error.step=path==='/status'?'auth_status':path==='/reserve'?'auth_reserve':'auth_revoke';error.status=status;throw error}}
 function adminReturn(value){
  if(typeof value!=='string')return '/';
+ const pathname=value.split('?')[0];
+ if(pathname==='/themes.html'||pathname==='/preview.html')value=pathname.slice(0,-5)+value.slice(pathname.length);
  if(/^\/(?:orders(?:\?order=[a-f0-9-]{36})?|artwork(?:\?request=[a-f0-9-]{36})?|content|themes(?:\?view=occasions)?|preview)$/.test(value))return value;
  if(!value.startsWith('/preview?')||value.includes('#'))return '/';
  const params=new Map();
