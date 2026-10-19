@@ -1,6 +1,6 @@
 import {renderComingSoon,comingSoonAssets} from './coming-soon.mjs';
 import {reportUnavailable} from './availability.mjs';
-import {millis} from '../src/seasons/model.mjs';
+import {millis} from '../src/seasons/time.mjs';
 const enc=new TextEncoder();
 const hex=b=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
 const unhex=s=>{if(typeof s!=='string'||!/^(?:[a-f0-9]{2})+$/i.test(s))throw new Error('Invalid configuration');return Uint8Array.from(s.match(/../g),v=>parseInt(v,16))};
