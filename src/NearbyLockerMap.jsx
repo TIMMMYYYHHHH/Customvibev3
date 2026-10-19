@@ -32,7 +32,10 @@ export default function NearbyLockerMap({locations,center,selectedId,onChoose,on
     for(const group of clusterLockers(visible,map.getZoom())){
      const multiple=group.items.length>1,item=group.items[0],selected=group.items.some(p=>p.id===state.selectedId);
      const icon=L.divIcon({className:`cv-map-marker${multiple?' cv-map-cluster':''}${selected?' selected':''}`,html:multiple?String(group.items.length):'<span aria-hidden="true"></span>',iconSize:multiple?[42,42]:[30,30],iconAnchor:multiple?[21,21]:[15,15]});
-     L.marker([group.lat,group.lon],{icon,keyboard:true,title:multiple?`${group.items.length} lockers. Zoom in.`:item.name,alt:multiple?`${group.items.length} lockers`:item.name}).addTo(markers).on('click',()=>{if(multiple){map.fitBounds(group.items.map(p=>[p.lat,p.lon]),{padding:[35,35],maxZoom:16});}else setActive(item);});
+     const activate=()=>{if(multiple){map.fitBounds(group.items.map(p=>[p.lat,p.lon]),{padding:[35,35],maxZoom:16});}else setActive(item);};
+     const marker=L.marker([group.lat,group.lon],{icon,keyboard:true,title:multiple?`${group.items.length} lockers. Zoom in.`:item.name,alt:multiple?`${group.items.length} lockers`:item.name}).addTo(markers).on('click',activate);
+     const element=marker.getElement();element.setAttribute('aria-label',multiple?`${group.items.length} lockers. Zoom in.`:item.name);
+     element.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopImmediatePropagation();activate();}});
     }
    }
    map.on('moveend',()=>{draw();setMoved(true);});draw();
