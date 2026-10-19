@@ -99,8 +99,33 @@ try{
  });
  await check('refresh control remains visible and keyboard usable at narrow width',async()=>{
   await page.setViewportSize({width:375,height:812});await reset('library');await page.locator('#outside-control').focus();await page.keyboard.press('Tab');await focused('[data-action="refresh-themes"]');
-  const bounds=await page.locator('[data-action="refresh-themes"]').boundingBox();assert.ok(bounds.x>=0&&bounds.x+bounds.width<=375);await page.keyboard.press('Enter');await focused('[data-action="refresh-themes"]');
+  const bounds=await page.locator('[data-action="refresh-themes"]').boundingBox();assert.ok(bounds.x>=0&&bounds.x+bounds.width<=375);remote.revision=2;remote.occasionSettings.christmas={name:'Keyboard refresh'};await page.keyboard.press('Enter');await page.getByRole('heading',{name:'Keyboard refresh',exact:true}).waitFor();await focused('[data-action="refresh-themes"]');
   if(process.env.SCREENSHOT_DIR){await mkdir(process.env.SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:resolve(process.env.SCREENSHOT_DIR,'TECH-09-themes-narrow.png')});await page.setViewportSize({width:1280,height:900});await page.screenshot({path:resolve(process.env.SCREENSHOT_DIR,'TECH-09-themes-desktop.png')})}
+ });
+ await page.clock.install();
+ for(const stage of ['response','body'])await check(`stalled ${stage} times out without losing focus and explicit retry ignores late completion`,async()=>{
+  await reset('library');await page.locator('[data-action="add-occasion"]').focus();
+  const late=structuredClone(remote);late.revision=99;late.occasionSettings.christmas={name:'Late stale completion'};
+  await page.evaluate(({stage,late})=>{
+   const fetcher=window.fetch;window.lateReadFinished=false;
+   window.fetch=(url,options)=>{
+    window.fetch=fetcher;window.stalledSignal=options.signal;
+    const response=stage==='body'?new Response(new ReadableStream({start(controller){window.releaseStall=()=>{controller.enqueue(new TextEncoder().encode(JSON.stringify(late)));controller.close()}}})):Response.json(late);
+    const json=response.json.bind(response);response.json=async()=>{const result=await json();window.lateReadFinished=true;return result};
+    // Deliberately ignore abort here so the deadline must also release the lock independently.
+    return stage==='response'?new Promise(resolve=>window.releaseStall=()=>resolve(response)):Promise.resolve(response);
+   };
+   window.refreshDone=false;window.runSeasonRefresh().finally(()=>window.refreshDone=true);
+  },{stage,late});
+  await page.clock.fastForward(16000);
+  assert.equal(await page.evaluate(()=>window.refreshDone),true,'Stalled refresh must settle within its deadline');
+  assert.equal(await page.evaluate(()=>window.stalledSignal.aborted),true);await focused('[data-action="add-occasion"]');
+  assert.equal(await page.getByRole('heading',{name:'Christmas',exact:true}).count(),1);assert.match(await page.locator('#connection-status').innerText(),/timed out/i);
+  remote.revision=3;remote.occasionSettings.christmas={name:'Successful retry'};
+  await page.getByRole('button',{name:'Refresh saved themes',exact:true}).click();await page.getByRole('heading',{name:'Successful retry',exact:true}).waitFor();await focused('[data-action="refresh-themes"]');
+  await page.evaluate(()=>window.releaseStall());await page.waitForFunction(()=>window.lateReadFinished);
+  assert.equal(await page.getByRole('heading',{name:'Successful retry',exact:true}).count(),1);assert.equal(await page.getByText('Late stale completion',{exact:true}).count(),0);await focused('[data-action="refresh-themes"]');
+  assert.match(await page.locator('.status-strip').innerText(),/Automatic starts are paused/);assert.equal(await page.locator('#connection-status').innerText(),'Saved');
  });
  assert.deepEqual(errors,[]);assert.deepEqual(forbidden,[]);console.log(JSON.stringify({passed:results.length,results,pageErrors:errors,forbiddenRequests:forbidden},null,2));
 }finally{await browser.close();await new Promise(r=>server.close(r))}

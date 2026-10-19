@@ -16,7 +16,7 @@ const btn=(text,action,cls='',extra='')=>`<button type="button" class="button ${
 const check=(id,label,detail,checked,disabled=false)=>`<label class="check"><input type="checkbox" id="${id}" ${checked?'checked':''} ${disabled?'disabled':''}><span><strong>${label}</strong><small>${detail}</small></span></label>`;
 function notify(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4500)}
 let serverRevision=0,busy=false,loaded=false,renderGeneration=0,refreshing=false;
-async function readRemote(){const r=await adminFetch('/api/seasons',{cache:'no-store'});if(!r.ok)throw Error('Could not load saved themes. Reload and sign in again.');return r.json()}
+async function readRemote(signal){const r=await adminFetch('/api/seasons',{cache:'no-store',signal});if(!r.ok)throw Error('Could not load saved themes. Reload and sign in again.');return r.json()}
 async function refreshRemote(){const clock=state.clock;state=await readRemote();serverRevision=state.revision;state.clock=clock||{simulated:false,at:nowSAST()};return state}
 async function persist(action){
  if(!loaded)throw Error('Wait for settings to load.');
@@ -110,16 +110,18 @@ function refreshProtected(){return busy||view==='editor'||!!document.querySelect
 async function refreshThemes({manual=false}={}){
  if(!loaded||refreshing)return;
  if(refreshProtected()){if(manual)notify('Close open menus or schedule details before refreshing saved themes. Your edits are kept.');return}
- const generation=renderGeneration,revision=serverRevision;refreshing=true;
+ const generation=renderGeneration,revision=serverRevision,controller=new AbortController();let timeout;refreshing=true;
  try{
-  const next=await readRemote();
+  // Race the complete fetch and JSON read so even an unresponsive body releases the refresh lock.
+  const deadline=new Promise((_,reject)=>{timeout=setTimeout(()=>{reject(new DOMException('Theme refresh timed out.','TimeoutError'));controller.abort()},15000)});
+  const next=await Promise.race([readRemote(controller.signal),deadline]);
   // A pending response must not overwrite a new view, a save, or an interaction opened meanwhile.
   if(refreshProtected()||generation!==renderGeneration||revision!==serverRevision){$('connection-status').textContent='Refresh paused. Use Refresh saved themes after finishing your current task.';return}
   if(next.revision<serverRevision)return;
   const clock=state.clock;state=next;state.clock=clock;serverRevision=next.revision;
   render({preserveFocus:true});$('connection-status').textContent='Saved';
- }catch{$('connection-status').textContent='Connection lost. Keep this tab open, check sign-in above, then use Refresh saved themes.'}
- finally{refreshing=false}
+ }catch(error){$('connection-status').textContent=error.name==='TimeoutError'?'Refresh timed out. Saved settings and edits are unchanged. Use Refresh saved themes to try again.':'Connection lost. Keep this tab open, check sign-in above, then use Refresh saved themes.'}
+ finally{clearTimeout(timeout);refreshing=false}
 }
 function render({preserveFocus=false}={}){const focus=preserveFocus?captureRefreshFocus():null;renderGeneration++;const focusTab=document.activeElement?.getAttribute('role')==='tab';const focusLabel=document.activeElement?.getAttribute('role')==='combobox'?document.activeElement.getAttribute('aria-label'):null;frameObserver?.disconnect();$('app').innerHTML=view==='editor'?editorHTML():shell(view==='calendar'?renderCalendar():view==='library'?renderLibrary():view==='history'?renderHistory():renderOverview());enhanceSelects($('app'));if(!preserveFocus&&focusTab)$('app').querySelector('[role=tab][aria-selected=true]')?.focus({preventScroll:true});if(!preserveFocus&&focusLabel)[...$('app').querySelectorAll('[role=combobox]')].find(el=>el.getAttribute('aria-label')===focusLabel)?.focus({preventScroll:true});if(preserveFocus)restoreRefreshFocus(focus);if(view==='editor'){const frame=$('site-preview');frame.onload=postPreview;frameObserver=new ResizeObserver(resizeFrame);frameObserver.observe($('view-port'));resizeFrame();updateRuleDates();updateValidation()} }
 function openEditor(id){selectedId=id;const current=state.drafts[id]||state.campaigns.find(c=>c.id===id);draft=editorDrafts.open(id,{...current,manualSelected:false,manualType:state.override?.until?'date':'forever',manualUntil:state.override?.until||current.end});view='editor';render();const heading=$('app').querySelector('h1');heading.tabIndex=-1;heading.focus({preventScroll:true});window.scrollTo(0,0)}
