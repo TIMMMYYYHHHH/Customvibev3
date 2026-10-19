@@ -7,7 +7,8 @@ The `Validate proposed CustomVibe changes` workflow in `.github/workflows/valida
 1. `npm ci`
 2. `npm run build` for the storefront, SSR bundle and prerendered pages
 3. `npm run build:admin` for the admin and shared storefront preview
-4. `npm test` for the local fixture suite
+4. `npm test` for the Node local fixture suite
+5. `python3 -B -m unittest discover tests/python` for the Python security-helper fixtures
 
 Each command must succeed. A failing command stops the job; no step permits failure. The job has a 15-minute limit, and a newer revision cancels validation of an older revision on the same pull request. There are no path filters, so configuration, documentation and dependency changes also get validation.
 
@@ -17,10 +18,10 @@ Before merging, review the diff and require a successful result for the latest r
 
 ### Repository enforcement and evidence
 
-Read-only inspection on 19 October 2026 returned `Branch not protected` for `main` and no repository rulesets. Therefore successful validation is not currently enforced by a repository rule. Once this workflow has run in GitHub, configuring pull-request requirements and requiring `Node 22 build and fixture tests` remains a separate repository administration action. Confirm the exact check name in the run and inspect the latest settings before making any authorized change. Do not claim merge protection merely because the workflow exists, and do not buy a plan upgrade to enable it without owner approval.
+Verified repository ruleset `25416396` is active on `main` as of 19 October 2026. It requires the exact check `Node 22 build and fixture tests`, bound to GitHub Actions integration `15368`, with no bypass actors. The effective branch rules were reread to confirm enforcement. This replaces the earlier observation that the branch had no protection. Enforcement was configured without a paid upgrade. Rule enforcement does not establish that a particular proposed revision passed: require a successful GitHub check for the current pull-request head and its proposed merge revision before merging.
 
-Local Node 22 verification and an actual GitHub Actions run are separate evidence. Record the tested revision, exact runtime, install/build/test results and any warnings in the release or task activity. An actual pull-request run and required-check enforcement remain pending until independently verified. Do not mark those checks complete from local results.
+Local Node 22 verification and an actual GitHub Actions run are separate evidence. Record the tested revision, exact runtime, install/build/test results and any warnings in the release or task activity. Required-check enforcement is verified as described above; CI acceptance for each current pull-request revision remains separate and must be confirmed from its completed GitHub run. Local results or a passing run for an older revision do not satisfy that requirement.
 
-To reproduce validation locally, use a clean disposable checkout with no production credentials, install Node 22 and run the four commands above in order. A negative control may add a deliberately failing fixture only in that disposable checkout and confirm `npm test` exits nonzero; remove the fixture afterwards and rerun the suite. Never commit the negative fixture or run it against live data.
+To reproduce validation locally, use a clean disposable checkout with no production credentials, install Node 22 and Python 3 and run the five commands above in order. The Python fixtures use only the standard library and stub provider requests; they need no packages, credentials or live connection. A negative control may add a deliberately failing fixture only in that disposable checkout and confirm its test command exits nonzero; remove the fixture afterwards and rerun that suite. Never commit the negative fixture or run it against live data.
 
 If validation itself is broken, correct or revert only the new validation workflow through review. Preserve the protected publish workflow and its existing destination and protection checks.

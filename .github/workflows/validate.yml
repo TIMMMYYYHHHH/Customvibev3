@@ -29,5 +29,11 @@ jobs:
         run: npm run build
       - name: Build admin and storefront preview
         run: npm run build:admin
+      - name: Verify shipped third-party notices
+        run: node scripts/check-dependency-notices.mjs --outputs --bundles
       - name: Run local fixture tests
         run: npm test
+        env:
+          CV_CHECK_BUILT_NOTICES: '1'
+      - name: Run Python security-helper fixtures
+        run: python3 -B -m unittest discover tests/python
