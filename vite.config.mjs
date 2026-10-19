@@ -2,9 +2,10 @@ import { defineConfig } from "vite";
 import {contentPlugin} from './scripts/content-store.mjs';
 import react from "@vitejs/plugin-react";
 
-export default defineConfig({
+export default defineConfig(({isSsrBuild})=>({
   ssr: {noExternal: ['@fontsource-variable/fredoka','@fontsource-variable/dm-sans','@phosphor-icons/react']},
   build: {
+    manifest: !isSsrBuild,
     outDir: "dist/client",
     rollupOptions: { input: { main: "index.html", directions: "directions.html" } },
   },
@@ -19,4 +20,4 @@ export default defineConfig({
     },
   },
   plugins: [react(),contentPlugin(import.meta.url)],
-});
+}));

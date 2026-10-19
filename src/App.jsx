@@ -18,8 +18,6 @@ import {createStudio,studioReducer,createDesignItems} from './studio-state.mjs';
 import {removeBasketItem,restoreBasketItem,basketImageSources,mergeBasketDesigns} from './basket-undo.mjs';
 import {money,summarize} from './commerce.mjs';
 import {SubmissionProvider,useSubmissionSnapshot,useDraftProtection} from './FormService';
-import 'leaflet/dist/leaflet.css';
-import './locker-picker.css';
 import {SiteHeader,SiteFooter,HelpPage} from './SiteChrome';
 import TierNudge from './TierNudge';
 import Storefront from './storefront/Storefront';
