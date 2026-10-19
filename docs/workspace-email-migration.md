@@ -28,6 +28,8 @@ W3Forms notification and Reply-To settings; Google billing contact; any verified
 
 The handoff below is superseded for W3Forms Reply-To. Keep W3Forms and the later working blank Reply-To/manual-address workaround recorded in Founders Hub. Do not set `{{email}}` on the strength of the historical handoff. Reuse “Fix contact delivery, Reply-To and email aliases” and audit EXT-01 for current provider settings, the remaining legacy contact hop and an owner-controlled delivery/header check. Existing Workspace mailbox ownership, alias checks and the Resend transactional path above remain dated evidence; this correction does not claim fresh contact delivery or Reply-To verification.
 
+20 October 2026: Public privacy wording now distinguishes Workspace business mail from the retained legacy contact notification account. This is based on the dated mailbox/DNS records and existing application routes above, not a new provider, forwarding, delivery or header check. Keep W3Forms contact delivery, Resend transactional mail and the blank Reply-To/manual-customer-address workaround unchanged; EXT-01 retains the remaining verification.
+
 ## Historical owner handoff, superseded
 
 19 October: owner explicitly chose to keep W3Forms. Do not migrate contact delivery to Resend. Provider edits were attempted in Chrome, but the first reload retained the old recipient and blank Reply-To; later saves were unconfirmed. Tim will manually save notification address hello@customvibe.co.za and documented Reply-To {{email}}, refresh, then request the live delivery test. Google billing/service contacts remain to verify. Cloudflare profile email is a sign-in identity and was not changed.
