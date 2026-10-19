@@ -19,4 +19,11 @@ dialog{position:fixed;inset:0;margin:auto;width:min(480px,calc(100% - 32px));max
 @media(max-width:1023px) and (min-height:600px), (max-width:599px), (max-aspect-ratio:4/3) and (min-height:600px){.scene-desktop{display:none}.scene-mobile{display:block}}
 
 /* Owner-approved brand lettering, shared with the open storefront. */
-.brand span,.intro h1 em,.cv-brand-name{color:#c02258}
+.brand span,.intro h1 em,.cv-brand-name{color:#291438}
+
+/* Approved purple wordmark with orange i dot. */
+img.wordmark{display:inline-block;width:6em;height:1em;object-fit:contain;vertical-align:-.04em;border-radius:0}
+.brand img.wordmark{width:clamp(174px,24vw,270px);height:auto;border-radius:0}
+.intro h1 em{white-space:nowrap}.intro h1 img.wordmark{width:5.4em;height:.9em}
+#login-title img.wordmark{max-width:100%;height:auto;width:6em}
+@media(max-width:360px){.brand img.wordmark{width:160px}}

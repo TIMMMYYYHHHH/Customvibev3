@@ -1,0 +1,7 @@
+.cv-wordmark,.storefront img.cv-wordmark{display:inline-block;width:6em;height:1em;max-width:100%;object-fit:contain;vertical-align:-.04em}
+.site-wordmark img.cv-wordmark{width:210px;height:35px;flex-shrink:0}
+.cv-admin-brand img.cv-wordmark{display:block;width:210px;height:35px}
+@media(max-width:540px){.site-wordmark img.cv-wordmark{width:174px;height:29px}.cv-admin-brand img.cv-wordmark{width:192px;height:32px}}
+
+.storefront .chaos-title h1 em,.footer-slogan .cv-brand-name{display:inline-flex;align-items:baseline;white-space:nowrap;gap:0}
+.storefront .chaos-title h1 img.cv-wordmark{width:5.5em;height:.917em;max-width:none}

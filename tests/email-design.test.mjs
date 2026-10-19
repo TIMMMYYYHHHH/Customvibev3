@@ -51,7 +51,7 @@ test('essential email headings and branding remain readable without image loadin
   const heading=withoutImages.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/)?.[1].replace(/<[^>]+>/g,'').trim();
   assert.ok(heading?.length>10,'Order heading must be live text, not a fixed-background image');
   assert.match(withoutImages,/From our tribe to yours\./);
-  assert.match(withoutImages,/>CustomVibe<\/span>/);
+  assert.match(mail.html,/alt="CustomVibe"/);assert.match(mail.text,/CustomVibe/);
  }
 });
 test('one magnet is singular in customer and owner HTML and plain text',()=>{
@@ -60,4 +60,10 @@ test('one magnet is singular in customer and owner HTML and plain text',()=>{
   assert.doesNotMatch(mail.text,/\b1 magnets\b/);assert.doesNotMatch(mail.html,/\b1 magnets\b/);
   assert.match(mail.text,/1 magnet in total/);assert.match(mail.html,/1 magnet in total/);
  }
+});
+test('approved wordmark is embedded with accessible text and no remote image dependency',()=>{
+ const mail=orderEmails(fixture(),true).customer;
+ assert.match(mail.html,/<img[^>]+src="cid:cv-wordmark"[^>]+alt="CustomVibe"/);
+ assert.ok(mail.attachments.some(a=>a.content_id==='cv-wordmark'));
+ assert.match(mail.text,/CustomVibe/);
 });

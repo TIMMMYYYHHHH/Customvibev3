@@ -5,7 +5,7 @@ import {gate,secure,sameOrigin,constantEqual,boundedBody,unavailable} from '../s
 import {readContent,saveContent,publicContent} from '../server/content.mjs';
 import fallback from '../data/site-content.json' with {type:'json'};
 export default {async fetch(request,env){let phase='admin_request';try{const url=new URL(request.url);if(url.protocol!=='https:')return secure(Response.redirect('https://'+url.host+url.pathname+url.search,308),{admin:true});// Only public brand files are available before sign-in, never application assets or data.
- if(['/favicon.png','/icon-180.png','/admin-brand/fonts.css','/admin-brand/fredoka.woff2','/admin-brand/dm-sans.woff2'].includes(url.pathname))return secure(['GET','HEAD'].includes(request.method)?await env.ASSETS.fetch(request):new Response('Method not allowed',{status:405}),{admin:true});
+ if(['/favicon.png','/icon-180.png','/admin-brand/wordmark-v1.png','/admin-brand/fonts.css','/admin-brand/fredoka.woff2','/admin-brand/dm-sans.woff2'].includes(url.pathname))return secure(['GET','HEAD'].includes(request.method)?await env.ASSETS.fetch(request):new Response('Method not allowed',{status:405}),{admin:true});
  const auth=await gate(request,env,'admin');if(auth.response)return secure(auth.response,{admin:true});const reply=r=>{const response=secure(r,{admin:true});
  // Only authenticated preview documents may be framed, and only by this same admin origin.
  if(['/themes','/themes.html'].includes(url.pathname))response.headers.set('Content-Security-Policy',response.headers.get('Content-Security-Policy').replace('frame-src https://www.openstreetmap.org',"frame-src 'self' https://www.openstreetmap.org"));
