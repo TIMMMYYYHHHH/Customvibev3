@@ -1,5 +1,7 @@
 import {ruleDates,validDateRule} from './date-rules.mjs';
 import {INSTALLED_THEMES} from './registry.mjs';
+import {millis,localTime} from './time.mjs';
+export {millis,localTime} from './time.mjs';
 export const STORE_KEY='cv-seasons-live-v1';
 export const PREF_KEY='cv-season-visitor-v1';
 export const ORIGINAL_COPY={eyebrow:'YOUR CAMERA ROLL CALLED. IT WANTS OUT.',headline:'Find your tribe\nat CustomVibe.',body:'All your favourite humans. In tiny, ridiculously lovable squares.',button:'Make your magnets'};
@@ -30,8 +32,6 @@ export function saveOccasion(state,id,name){name=name.trim();if(!name||name.leng
 export function removeOccasion(state,id){state.occasionSettings??={};state.occasionSettings[id]={...state.occasionSettings[id],removed:true};state.campaigns.filter(c=>c.occasion===id).forEach(c=>{c.enabled=false});if(state.campaigns.some(c=>c.occasion===id&&c.id===state.override?.id)){state.override=null;state.mode='schedule'}}
 export function restoreOccasion(state,id){state.occasionSettings[id].removed=false}
 
-export const millis=value=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)&&localTime(Date.parse(value+':00+02:00'))===value?Date.parse(value+':00+02:00'):NaN;
-export const localTime=ms=>Number.isFinite(ms)?new Date(ms+7200000).toISOString().slice(0,16):'';
 export const nowSAST=()=>localTime(Date.now());
 export const yearOf=value=>Number(value?.slice(0,4))||new Date().getFullYear();
 export const formatDate=value=>Number.isFinite(millis(value))?new Date(millis(value)).toLocaleString('en-ZA',{timeZone:'Africa/Johannesburg',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'Choose a date';
