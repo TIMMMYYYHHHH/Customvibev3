@@ -1,6 +1,8 @@
 # TCG Locker integration
 
-18 October 2026. Deployed and verified on the locked live storefront. Payments and courier booking remain off. Provider API fee/refresh terms and cold-refresh CPU headroom remain open launch checks.
+19 October 2026 owner correction: the deployed text search and optional single-selected-pin map do not meet the requested location-first map. Required next behaviour: enter a location, centre the map there, display nearby selectable locker pins and a matching accessible list. The existing implementation remains live; the revised map is not implemented. The owner also authorised a paid Cloudflare review, not a subscription purchase. See [capacity and map review](cloudflare-capacity-review.md). Payments and courier booking remain off. Provider API fee/refresh terms remain unconfirmed.
+
+The following records the 18 October implementation and verification, not acceptance of the revised map brief.
 
 ## Status and remaining dependencies
 
