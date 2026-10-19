@@ -1,3 +1,4 @@
+export {StudioProgress} from './StudioProgress';
 import OrderNotes from './OrderNotes';
 import {useContent} from './content/ContentProvider';
 import React,{useState,useEffect,useRef} from 'react';
@@ -16,9 +17,6 @@ export function CropView({photo,onChange,puzzle=false,gridSize=3,onRendered,onEr
  return <div className="magnet-crop-preview">{surface&&<MagnetPreview urls={surface.urls} columns={surface.columns}/>}<canvas ref={canvas} className={`crop-canvas ${puzzle?'puzzle-canvas':''} ${surface?'magnet-interaction-layer':''}`} tabIndex={0} aria-label="Photo crop preview. Use arrow keys to reposition your image." onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);drag.current={px:e.clientX,py:e.clientY,x:photo.x,y:photo.y};}} onPointerMove={move} onPointerUp={()=>drag.current=null} onPointerCancel={()=>drag.current=null} onKeyDown={e=>{const d={ArrowLeft:{x:clamp(photo.x+.03,0,1)},ArrowRight:{x:clamp(photo.x-.03,0,1)},ArrowUp:{y:clamp(photo.y+.03,0,1)},ArrowDown:{y:clamp(photo.y-.03,0,1)}}[e.key];if(d){e.preventDefault();onChange(d);}}}/></div>;
 }
 
-export function StudioProgress({step,hasPhotos,busy,onStep}){
- return <nav className="studio-progress" aria-label="Design progress"><ol>{[['make','Make'],['review','Basket'],['delivery','Checkout']].map(([id,label],i)=><li key={id} className={step===id?'current':''}><button aria-current={step===id?'step':undefined} disabled={busy||(i>0&&!hasPhotos)} onClick={()=>onStep(id)}><span>{i+1}</span>{label}</button></li>)}</ol></nav>;
-}
 
 export function Editor({studio,dispatchStudio,photos,setPhotos,basket=[],setBasket,go,notes='',onNotesChange}){
  const {content}=useContent();
