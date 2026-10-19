@@ -30,7 +30,7 @@ D1 paid recovery history and increased runtime do not prove intermittent availab
 
 Release 0c9d648 published successfully through protected workflow 39238283845, including the final keyboard fix. The preceding infrastructure release was 8967c8b (workflow 39235846903). CI passed 328 tests, public/SSR/admin builds and before/after deployment protection checks. The independent code review found one refresh/expiry timing issue, fixed with a 15-minute grace and regression coverage. Local map verification passed explicit location search, pin details/selection, distance-sorted list and manual edits clearing verified selection.
 
-Deployed versions:
+Original map rollout versions (later unrelated branding/email releases may supersede the application version):
 - Pages: release 0c9d648; protected publish and post-deployment checks passed.
 - Security: 7ab57005-8723-484b-95ce-bf626ca6091e; migration 0009 applied.
 - Admin: 2582692a-a323-45e7-8089-5c8d9d6a7ca8, matching final public source/build.
@@ -40,7 +40,11 @@ Read-only Cloudflare API verification confirmed 1,000 ms limits on Pages product
 
 Founders Hub Finance verification: the Cloudflare service amount is R83 monthly, automatic renewal. Recording the owner's reported payment in Tools & services generated one committed R83 cost/payment dated 19 October and one planned R83 renewal dated 15 November. A separate freshly loaded Finance view confirmed both linked records and the R83 cash movement, without manually entering any Finance expense. Subsequent rand charges may vary. Intermittent Hub response interruptions were recovered with Check original save, avoiding duplicates.
 
-Live signed-in desktop acceptance passed: Durban North location search, real road tiles and attribution, 129 lockers within 25 km and 73 within 10 km, Kensington Boulevard (CG793) pin details/selection, and manual edits clearing the verified identity. The scheduled directory contains 2,199 lockers. Enter and Space pin activation and keyboard selection passed in both the local fixture and the final live release. Search this area and manual fallback also passed live. No customer order, email, payment or courier booking was submitted. Mobile acceptance remains separately pending. Increased runtime is not a new hosted maximum-artwork acceptance result; the existing availability/recovery follow-ups remain open. Website password gate, separate admin sign-in and payments-off remain mandatory. Founders Hub Tools & services is the source for linked Finance costs; do not create duplicate manual expenses.
+Live signed-in desktop acceptance passed: Durban North location search, real road tiles and attribution, 129 lockers within 25 km and 73 within 10 km, Kensington Boulevard (CG793) pin details/selection, and manual edits clearing the verified identity. The scheduled directory contains 2,199 lockers. Enter and Space pin activation and keyboard selection passed in both the local fixture and the final live release. Search this area and manual fallback also passed live. No customer order, email, payment or courier booking was submitted. Live responsive acceptance also passed on 19 October at 320×740 and 393×852: search, map tiles and attribution, clustered pins, CG793 pin selection, RVM00535 list selection, radius changes, Show/Hide, no-match guidance, Search this area and manual fallback. Document width matched viewport width at both sizes, with no horizontal overflow. These are responsive browser checks, not physical-device email rendering tests. Increased runtime is not a new hosted maximum-artwork acceptance result; the existing availability/recovery follow-ups remain open. Website password gate, separate admin sign-in and payments-off remain mandatory. Founders Hub Tools & services is the source for linked Finance costs; do not create duplicate manual expenses.
+
+## Follow-up verification, 19 October
+
+Read-only Cloudflare verification at approximately 13:15 SAST confirmed the website gate in both production and preview, the separate admin gate, 1,000 ms Pages/Worker CPU limits, and 1% Worker logs with automatic invocation logs off. The live Pages version was c123372 during mobile checks; concurrent branding and email work is preserved. The Workers dashboard showed 68.74k requests, 97.8k ms CPU and US$0 metered usage for the current cycle. R2 billing also showed US$0. US$1 and US$5 usage alerts plus the existing US$10 alert remain. No new paid feature was enabled. These observations support the US$5 base expectation, but alerts cannot enforce a US$10 hard cap.
 
 ## Founders Hub follow-up record
 
@@ -48,9 +52,14 @@ Confirmed saved: Cloudflare hosting service R83 monthly, automatic renewal, next
 
 Hub returned repeated interrupted responses and HTML instead of JSON during subsequent edits. Its original-save recovery and refresh/review flow must be used before retrying any retained draft. Do not assume a failed save succeeded.
 
-Remaining updates to reconcile when the frontend is reliable:
-- Geoapify Setup status: connected Free production map with encrypted server key, live desktop verification 19 October.
-- Finance cost-flow subtask created and its evidence comment is confirmed saved after original-request recovery. Its final Done status encountered another unconfirmed save; check the original request before retrying. The actual linked Finance cost/payment and renewal were verified. Spending-controls subtask is already Done.
-- Map implementation subtask activity and parent scope/blocker are now saved. Desktop/keyboard acceptance passed; mobile remains open and parent stays Blocked for courier terms.
-- Refresh CPU subtask: scheduled private snapshot and 1-second ceiling deployed; retain any required post-rollout CPU measurement before completion.
-- Report Hub's interrupted-save / HTML-response bug under existing Upkeep coverage.
+Follow-up reconciliation on 19 October:
+- Geoapify Setup status and purpose now describe the connected Free map. Notes include desktop and 320/393 px acceptance. These fields were verified after reloading and reopening the service.
+- Cloudflare hosting notes now record completed desktop/mobile acceptance, while retaining R83/month and automatic renewal. Original-save recovery confirmed the note.
+- A fresh Finance session confirmed exactly one committed R83 cost and payment on 19 October and one planned R83 renewal on 15 November, each linked to Tools & services. The Finance verification subtask is confirmed Done.
+- Map implementation scope and mobile evidence were saved, and its status is Done. The parent scope/blocker now removes mobile acceptance and retains the courier terms and separate CPU measurement follow-up.
+- Refresh measurement scope now reflects the approved Paid plan instead of obsolete free-tier-only acceptance. Its post-rollout cold/cached/selection measurement remains required.
+- Capacity rollout is now In progress with a saved activity recording deployed limits and the outstanding hosted artwork/stability/recovery acceptance. Its parent remains In progress. No new customer test order was submitted.
+- Fresh unauthenticated checkout request returned HTTP 401 with noindex and private/no-store. Payments remain unavailable; the test-only browser basket was discarded by closing its temporary tab, and browser viewport settings were restored.
+- Added Upkeep subtask “Resolve interrupted Founders Hub saves” under the existing service-maintenance parent, with reproduction and acceptance criteria. It covers HTML-instead-of-JSON responses, interrupted writes, stale disabled editors after revision conflicts, original-request recovery and field-limit validation. No Hub application fix is claimed.
+
+The initial attempt to add the capacity subtask description remained an unconfirmed original request. A fresh read showed it absent; the deployed settings, remaining acceptance and supporting link were instead saved as an activity on the existing task, whose In progress status was confirmed. Do not replay the older description request blindly. The separate refresh comment met a revision conflict and was reconciled against a fresh read before re-saving, preserving other chats’ Workspace email changes.
