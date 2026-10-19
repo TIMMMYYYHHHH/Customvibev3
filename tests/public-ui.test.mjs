@@ -4,7 +4,8 @@ import {createServer} from 'vite';import React from 'react';import {renderToStat
 const vite=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
 const {ContentProvider}=await vite.ssrLoadModule('/src/content/ContentProvider.jsx');
 const {SubmissionProvider}=await vite.ssrLoadModule('/src/FormService.jsx');
-const {SiteHeader}=await vite.ssrLoadModule('/src/SiteChrome.jsx');
+const {SiteHeader,SiteFooter}=await vite.ssrLoadModule('/src/SiteChrome.jsx');
+const {AdminChrome}=await vite.ssrLoadModule('/admin/AdminShell.jsx');
 const {StudioProgress}=await vite.ssrLoadModule('/src/Editor.jsx');
 const {default:Contact}=await vite.ssrLoadModule('/src/storefront/Contact.jsx');
 const wrap=child=>renderToStaticMarkup(React.createElement(ContentProvider,{initialContent:defaultContent},React.createElement(SubmissionProvider,null,child)));
@@ -14,5 +15,13 @@ test('public navigation and progress name the basket and checkout consistently',
 });
 test('contact form has a privacy link without provider copy, photos warning or reference',()=>{
  const contact=wrap(React.createElement(Contact,{standalone:true}));assert.match(contact,/href="\/privacy"/);assert.doesNotMatch(contact,/W3Forms|keep photos|payment details|Message reference/);assert.match(contact,/aria-label="Contact us"/);
+});
+test('public footer, admin and Themes chrome render the notice entry point',()=>{
+ const surfaces=[
+  ['public footer',wrap(React.createElement(SiteFooter))],
+  ['admin workroom',renderToStaticMarkup(React.createElement(AdminChrome,{section:'orders',logout:()=>{}}))],
+  ['Themes workroom',renderToStaticMarkup(React.createElement(AdminChrome,{section:'themes',logout:()=>{},connectionStatus:true}))]
+ ];
+ for(const [surface,html] of surfaces)assert.match(html,/<a\b[^>]*href="\/third-party-notices\.txt"[^>]*>Third-party notices<\/a>/,surface+' must expose the readable notices link');
 });
 test.after(async()=>{await vite.close()});
