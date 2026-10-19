@@ -15,7 +15,7 @@ test('only the latest definitive non-Fulfilled rejection offers an explicit fres
  }
 });
 test('additive migration preserves historical attempts without silently enabling historical failures',()=>{
- const db=new DatabaseSync(':memory:');for(const f of readdirSync('migrations/security').filter(f=>f.endsWith('.sql')&&!f.startsWith('0010')).sort())db.exec(readFileSync('migrations/security/'+f,'utf8'));
+ const db=new DatabaseSync(':memory:');for(const f of readdirSync('migrations/security').filter(f=>f.endsWith('.sql')&&f<'0010').sort())db.exec(readFileSync('migrations/security/'+f,'utf8'));
  db.prepare('INSERT INTO order_updates(order_id,version,status,state,created,updated,reservation) VALUES(?,?,?,?,?,?,?)').run('legacy-order',2,'new','failed',10,11,'legacy-reservation');
  const before=db.prepare('SELECT * FROM order_updates').get();db.exec(readFileSync('migrations/security/0010_manual_update_attempts.sql','utf8'));assert.deepEqual(db.prepare('SELECT * FROM order_updates').get(),before);
  const old=db.prepare('SELECT * FROM order_update_attempts').get();assert.equal(old.attempt,'legacy-reservation');assert.equal(old.state,'failed');assert.equal(old.rejected,0);assert.equal(old.preview_hash,null);

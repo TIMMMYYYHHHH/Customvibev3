@@ -1,3 +1,4 @@
+import {validProviderMessageId} from '../server/mail-receipt.mjs';
 const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 export async function submissionState(request,env){
  const body=await request.json(),path=new URL(request.url).pathname,now=Math.floor(Date.now()/1000);
@@ -9,6 +10,13 @@ export async function submissionState(request,env){
  }
  if(path==='/submissions/mark'){
   if(!['owner_sent','receipt_sent'].includes(body.stage))return new Response(null,{status:400});
+  if(body.providerMessageId!==undefined){
+   if(!validProviderMessageId(body.providerMessageId)||!Number.isSafeInteger(now)||now<1)return new Response(null,{status:400});
+   const prefix=body.stage==='owner_sent'?'owner':'receipt';
+   // Success and its first receipt share one write; retries cannot replace the receipt.
+   const marked=await env.DB.prepare(`UPDATE submissions SET ${body.stage}=1,${prefix}_provider_id=COALESCE(${prefix}_provider_id,?),${prefix}_accepted_at=COALESCE(${prefix}_accepted_at,?) WHERE id=? AND expires>? AND kind='order' RETURNING id`).bind(body.providerMessageId,now,body.id,now).first();
+   return Response.json({ok:!!marked},{status:marked?200:409});
+  }
   await env.DB.prepare(`UPDATE submissions SET ${body.stage}=1 WHERE id=? AND expires>?`).bind(body.id,now).run();return Response.json({ok:true});
  }
  if(path!=='/submissions/reserve'||!hex(body.key)||!hex(body.fingerprint)||!['order','contact'].includes(body.kind))return new Response(null,{status:400});

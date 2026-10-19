@@ -1,3 +1,4 @@
+import {validProviderMessageId} from '../server/mail-receipt.mjs';
 import {sixMonthsAfter,artworkExpiry,retainedSnapshot} from '../server/order-retention.mjs';
 import {proofDetail,cleanProofs} from './proofs.mjs';
 import {readSelect} from './read.mjs';
@@ -47,7 +48,7 @@ export async function orderService(request,env){
  }
  if(!row)return fail(404,'Order not found. Older orders may only have artwork.');
  if(row.expires<=time)return fail(410,'This order has expired.');
- if(path==='detail')return Response.json({...view(row),...(JSON.parse(row.snapshot).approvalRequired?{proof:await proofDetail(env,b.id)}:{}),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,"SELECT attempt,version,status,state,created,updated,rejected,(state='failed' AND rejected=1 AND status<>'fulfilled') AS retryable FROM order_update_attempts WHERE order_id=? ORDER BY version DESC,rowid DESC",[b.id],'all')).results});
+ if(path==='detail')return Response.json({...view(row),...(JSON.parse(row.snapshot).approvalRequired?{proof:await proofDetail(env,b.id)}:{}),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,"SELECT attempt,version,status,state,created,updated,rejected,CASE WHEN ? THEN provider_message_id ELSE NULL END AS providerMessageId,CASE WHEN ? THEN accepted_at ELSE NULL END AS acceptedAt,'manual-update' AS purpose,(state='failed' AND rejected=1 AND status<>'fulfilled') AS retryable FROM order_update_attempts WHERE order_id=? ORDER BY version DESC,rowid DESC",[artworkExpiry(row)>time?1:0,artworkExpiry(row)>time?1:0,b.id],'all')).results});
  if(path==='preview-retry'){
   if(!Number.isSafeInteger(b.version)||b.version!==row.version||!artworkHash(b.tokenHash))return fail(409,'Order changed. Preview again.');
   const proof=JSON.parse(row.snapshot).approvalRequired&&(await proofDetail(env,b.id)).status==='awaiting_approval';
@@ -84,12 +85,14 @@ export async function orderService(request,env){
  }
  if(path==='mark-update'){
   if(!Number.isSafeInteger(b.version)||!['accepted','failed','uncertain'].includes(b.state)||b.attempt!==undefined&&!artworkId(b.attempt))return fail(400,'Invalid update.');
+  if(b.providerMessageId!==undefined&&(b.state!=='accepted'||!validProviderMessageId(b.providerMessageId)||!Number.isSafeInteger(time)||time<1))return fail(400,'Invalid receipt.');
   // Legacy workers may finish their first reservation, but cannot mark a retry by version alone.
   const attempt=b.attempt??(await env.DB.prepare('SELECT attempt FROM order_update_attempts WHERE order_id=? AND version=? GROUP BY order_id,version HAVING count(*)=1').bind(b.id,b.version).first())?.attempt;
   if(!attempt)return fail(409,'Attempt identity is required.');
+  const receipt=b.providerMessageId&&artworkExpiry(row)>time?b.providerMessageId:null;
   await env.DB.batch([
    env.DB.prepare("UPDATE order_updates SET state=?,updated=? WHERE order_id=? AND version=? AND reservation=? AND state='pending'").bind(b.state,time,b.id,b.version,attempt),
-   env.DB.prepare("UPDATE order_update_attempts SET rejected=?,preview_hash=NULL,preview_until=NULL WHERE order_id=? AND version=? AND attempt=? AND state=? AND EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND version=? AND reservation=? AND updated=? AND state=?) AND changes()>0").bind(b.state==='failed'&&b.rejected===true&&b.attempt!==undefined?1:0,b.id,b.version,attempt,b.state,b.id,b.version,attempt,time,b.state)
+   env.DB.prepare("UPDATE order_update_attempts SET provider_message_id=?,accepted_at=?,rejected=?,preview_hash=NULL,preview_until=NULL WHERE order_id=? AND version=? AND attempt=? AND state=? AND EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND version=? AND reservation=? AND updated=? AND state=?) AND changes()>0").bind(receipt,receipt?time:null,b.state==='failed'&&b.rejected===true&&b.attempt!==undefined?1:0,b.id,b.version,attempt,b.state,b.id,b.version,attempt,time,b.state)
   ]);return Response.json({ok:true});
  }
  if(path==='delivery'){
@@ -108,4 +111,5 @@ export async function orderService(request,env){
 export async function cleanOrders(env){const time=now();await cleanProofs(env);
  const expired=(await env.DB.prepare("SELECT id,snapshot FROM orders WHERE artwork_expires<=? AND expires>? AND json_extract(snapshot,'$.artworkRemoved') IS NULL LIMIT 50").bind(time,time).all()).results;
  for(const row of expired)await env.DB.prepare('UPDATE orders SET snapshot=? WHERE id=?').bind(JSON.stringify({...retainedSnapshot(JSON.parse(row.snapshot)),artworkRemoved:true}),row.id).run();
- await env.DB.batch([env.DB.prepare('DELETE FROM order_update_attempts WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_updates WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_history WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM orders WHERE expires<=?').bind(time)]);}
+ // Receipt metadata ends at the original artwork deadline; attempt history keeps its existing lifetime.
+ await env.DB.batch([env.DB.prepare('UPDATE order_update_attempts SET provider_message_id=NULL,accepted_at=NULL WHERE (provider_message_id IS NOT NULL OR accepted_at IS NOT NULL) AND order_id IN (SELECT id FROM orders WHERE artwork_expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_update_attempts WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_updates WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_history WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM orders WHERE expires<=?').bind(time)]);}
