@@ -12,3 +12,14 @@ test('disabled and preview map calls fail closed without provider requests',asyn
  const {env,req}=await setup();const network=()=>{throw Error('must not call')};assert.equal((await mapAPI(req({query:'Durban'}),{...env,MAP_LOOKUP_ENABLED:'false'},{network})).status,503);
  assert.equal((await mapAPI(new Request('https://preview.pages.dev/api/map/tiles/10/600/600.png'),env,{network})).status,403);
 });
+test('tile proxy bounds provider access, caches public bytes and keeps session protection on warm requests',async()=>{
+ const {env,req}=await setup();let calls=0,reservations=0;const entries=new Map();
+ env.AUTH.fetch=async()=>{reservations++;return Response.json({allowed:true})};
+ const cache={match:async key=>entries.get(key)?.clone(),put:async(key,value)=>entries.set(key,value.clone())};
+ const network=async(url,options)=>{calls++;assert.match(url,/^https:\/\/maps\.geoapify\.com\/v1\/tile\/osm-carto\/11\/1200\/1201\.png\?/);assert.equal(options.redirect,'manual');return new Response(new Uint8Array([137,80,78,71]),{headers:{'Content-Type':'image/png'}})};
+ const tile=path=>new Request('https://customvibe.co.za'+path,{headers:req().headers});
+ for(const path of ['/api/map/tiles/18/1/1.png','/api/map/tiles/11/1/1.png','/api/map/tiles/11/3000/1.png'])assert.equal((await mapAPI(tile(path),env,{network,cache})).status,400);
+ const path='/api/map/tiles/11/1200/1201.png';assert.equal((await mapAPI(tile(path),env,{network,cache})).status,200);
+ assert.equal((await mapAPI(tile(path),env,{network,cache})).status,200);assert.equal(calls,1);assert.equal(reservations,1);
+ assert.equal((await mapAPI(new Request('https://customvibe.co.za'+path),env,{network,cache})).status,401);assert.equal(calls,1);
+});

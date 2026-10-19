@@ -2,7 +2,7 @@ import {boundedBody,cookie,verifyToken} from './auth.mjs';
 
 // This adapter has no booking, billing, rate or arbitrary-proxy capability.
 const ENDPOINT='https://api-pudo.co.za/api/v1/lockers-data';
-const MAX_AGE=6*60*60*1000,MAX_BYTES=8000000;
+const MAX_AGE=(6*60+15)*60*1000,MAX_BYTES=8000000;
 const CACHE_KEY='https://customvibe.co.za/internal-cache/locker-directory-v3';
 const unavailable=()=>Object.assign(new Error('Locker lookup unavailable'),{status:503});
 export const lockerLookupEnabled=env=>env.LOCKER_LOOKUP_ENABLED==='true'&&(env.LOCKER_SHARED_ENABLED==='true'?!!env.AUTH:typeof env.TCG_LOCKER_API_KEY==='string'&&env.TCG_LOCKER_API_KEY.length>=20);

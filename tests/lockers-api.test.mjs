@@ -11,7 +11,7 @@ test('validated cached directory streams privately, with expiry enforced and neg
  const response=await cachedLockerResponse(store,time+1);
  assert.equal(response.headers.get('Cache-Control'),'private, no-store');assert.equal(response.headers.get('X-CV-Directory-Time'),null);
  assert.equal((await response.json()).locations[0].id,'CG123');
- assert.equal(await cachedLockerResponse(store,time-1),null);assert.equal(await cachedLockerResponse(store,time+6*3600000),null);
+ assert.equal(await cachedLockerResponse(store,time-1),null);assert.equal(await cachedLockerResponse(store,time+(6*60+15)*60000),null);
  const failed=cache();await assert.rejects(()=>createLockerSource({cache:failed,now:()=>time,network:async()=>new Response('',{status:503})})(settings));
  assert.equal(await cachedLockerResponse(failed,time+1),null);
 });
@@ -63,7 +63,7 @@ test('selected IDs are checked against provider records and cannot override name
 test('expired directories refresh, failures back off, and stale locations are not silently accepted',async()=>{
  let time=10000000,calls=0,failing=false;
  const source=createLockerSource({now:()=>time,cache:cache(),network:async()=>{calls++;if(failing)throw Error('private upstream detail');return Response.json([row()]);}}),settings=env();
- await source(settings);time+=6*3600000+1;failing=true;
+ await source(settings);time+=(6*60+15)*60000+1;failing=true;
  await assert.rejects(()=>source(settings),/Locker lookup unavailable/);assert.equal(calls,2);
  await assert.rejects(()=>source(settings));assert.equal(calls,2);
  time+=60001;failing=false;assert.equal((await source(settings)).updatedAt,time);assert.equal(calls,3);

@@ -1,6 +1,6 @@
 import {normalizeLockers} from '../server/lockers.mjs';
 import {boundedBody} from '../server/auth.mjs';
-const AGE=6*3600000,KEY='system/lockers/directory-v1.json';
+const AGE=6*3600000,FRESH=AGE+15*60000,KEY='system/lockers/directory-v1.json';
 export async function reserveMapUsage(env,session,now=Date.now()){
  if(!env.DB||!/^\w{64}$/.test(session))return false;
  // A global 250 ms lease avoids bursts across a fixed second boundary.
@@ -30,7 +30,7 @@ export async function refreshLockerSnapshot(env,{network=fetch,now=Date.now()}={
 export async function lockerSnapshotService(env,now=Date.now()){
  const fail=()=>Response.json({error:'Locker directory is temporarily unavailable.'},{status:503});
  const record=await env.DB.prepare('SELECT updated_at FROM locker_refresh WHERE id=1').first();
- if(!record?.updated_at||record.updated_at>now||now-record.updated_at>=AGE)return fail();
+ if(!record?.updated_at||record.updated_at>now||now-record.updated_at>=FRESH)return fail();
  const object=await env.ARTWORK.get(KEY);if(!object||object.size>3000000)return fail();
  return new Response(object.body,{headers:{'Content-Type':'application/json','X-CV-Directory-Time':String(record.updated_at)}});
 }

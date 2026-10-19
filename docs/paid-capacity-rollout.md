@@ -14,7 +14,7 @@
 
 ## Locker directory and selection
 
-The private security Worker owns a single six-hour refresh lease, with at most four Courier Guy directory requests/day. A five-minute cron checks whether a refresh is due; separate hourly cleanup is preserved. There is no per-customer directory download/normalization. The validated public directory is stored in private R2, with its freshness stamp in D1, then cached at the edge for the remaining freshness interval. Stale or unavailable data fails to the manual preference flow. Map maintenance errors do not prevent order/artwork retention cleanup.
+The private security Worker owns a single six-hour refresh lease, with at most four Courier Guy directory requests/day. A five-minute cron checks whether a refresh is due; separate hourly cleanup is preserved. There is no per-customer directory download/normalization. The validated public directory is stored in private R2, with its freshness stamp in D1, then cached at the edge for the remaining freshness interval. A 15-minute freshness grace beyond the six-hour refresh interval covers cron jitter and fetch time. Stale or unavailable data fails to the manual preference flow. Map maintenance errors do not prevent order/artwork retention cleanup.
 
 The owner explicitly approved a second broadly scoped courier key, CustomVibe locker refresh, because the existing key cannot be revealed. The new key is encrypted in the private security Worker; code uses it only for the fixed read-only directory endpoint. The original production Pages key remains as a rollback reference. Neither key belongs in source, logs, browser responses or Founders Hub.
 

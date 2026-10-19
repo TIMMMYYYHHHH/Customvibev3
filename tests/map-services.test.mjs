@@ -15,6 +15,7 @@ test('shared refresh has one atomic owner and at most one courier call per six h
  assert.equal((await lockerSnapshotService(e,now)).status,200);assert.equal((await (await lockerSnapshotService(e,now)).json()).locations[0].id,'CG1');
  await refreshLockerSnapshot(e,{now:now+3600000,network});assert.equal(count,1);
  await refreshLockerSnapshot(e,{now:now+6*3600000+1,network:async()=>{count++;throw Error('secret detail')}});assert.equal(count,2);
- assert.equal((await lockerSnapshotService(e,now+6*3600000+2)).status,503);
+ assert.equal((await lockerSnapshotService(e,now+6*3600000+2)).status,200);
+ assert.equal((await lockerSnapshotService(e,now+(6*60+15)*60000+2)).status,503);
  await refreshLockerSnapshot(e,{now:now+6*3600000+3,network});assert.equal(count,2);
 });
