@@ -43,3 +43,16 @@ test('entry accounting includes static dependencies and preloads but excludes de
  const result=await measure.measureEntryAssets(join(root,'index.html'));assert.deepEqual(result.files.map(f=>f.path).sort(),['assets/main.css','assets/main.js','assets/preload.js','assets/shared.js']);assert.equal(result.js.raw,files['assets/main.js'].length+files['assets/shared.js'].length+files['assets/preload.js'].length);assert.equal(result.css.gzip,gzipSync(files['assets/main.css']).length);
  }finally{await rm(root,{recursive:true,force:true})}
 });
+
+test('route readiness waits for CSS before code and cannot bypass a failed stylesheet with cached code',async()=>{
+ const css=deferred();let ready=false,calls=0;const Component=()=>null;
+ const styles={ready:()=>ready,load:()=>css.promise};
+ const views=api.createClientRouteViews({checkout:()=>{calls++;return Component}},styles);
+ const first=views.load('checkout');await Promise.resolve();await Promise.resolve();
+ assert.equal(calls,0,'code must not run before stylesheet readiness');assert.equal(views.peek('checkout'),null);
+ ready=true;css.resolve();assert.equal(await first,Component);assert.equal(calls,1);
+ ready=false;assert.equal(views.peek('checkout'),null,'cached code alone is not ready');
+ styles.load=()=>Promise.reject(Error('stylesheet unavailable'));
+ await assert.rejects(views.load('checkout'),/stylesheet unavailable/);assert.equal(calls,1);
+ styles.load=async()=>{ready=true};assert.equal(await views.load('checkout'),Component);assert.equal(calls,1);
+});

@@ -1,3 +1,7 @@
+import manifest from '../dist/admin/.vite/manifest.json' with {type:'json'};
+import {routeStyleCatalogue,composeRouteStyles} from '../shared/route-styles.mjs';
+import {previewPath} from '../src/seasons/preview-routing.mjs';
+const routeStyles=routeStyleCatalogue(manifest,'admin/preview.html');
 import {seasonsAPI} from '../server/seasons.mjs';
 import {reportUnavailable} from '../server/availability.mjs';
 import {ordersAPI} from './orders-api.mjs';
@@ -31,5 +35,12 @@ export default {async fetch(request,env){let phase='admin_request';try{const url
  if(url.pathname.startsWith('/api/')||url.pathname.startsWith('/internal/')||url.pathname.includes('..')||/\.(?:map|sql|log|bak)$/.test(url.pathname))return reply(new Response('Not found',{status:404}));
  if(!['GET','HEAD'].includes(request.method))return reply(new Response('Method not allowed',{status:405}));
  phase='admin_assets';
+ if(['/preview','/preview.html'].includes(url.pathname)){
+  const asset=await env.ASSETS.fetch(new Request(request,{method:'GET'}));
+  if(!asset.ok||!asset.headers.get('content-type')?.includes('text/html'))return reply(request.method==='HEAD'?new Response(null,{status:asset.status,headers:asset.headers}):asset);
+  const html=composeRouteStyles(await asset.text(),routeStyles,previewPath(url));
+  const headers=new Headers(asset.headers);headers.delete('Content-Length');headers.delete('ETag');
+  return reply(new Response(request.method==='HEAD'?null:html,{status:asset.status,headers}));
+ }
  const target={'/artwork':'/','/orders':'/','/content':'/'}[url.pathname];return reply(await env.ASSETS.fetch(target?new Request(url.origin+target,request):request));
  }catch(error){reportUnavailable(phase,error);return secure(unavailable(),{admin:true})}}};
