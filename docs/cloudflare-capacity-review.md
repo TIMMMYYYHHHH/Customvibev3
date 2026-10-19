@@ -4,7 +4,7 @@
 
 ## Current account and usage
 
-Signed-in business Cloudflare dashboard, approximately 10:56 to 11:10 SAST. Billing period shown: 15 October to 15 November. These are developing-period observations, not a traffic forecast. The secure deployment helper was unavailable; live inventory came from the dashboard. Source review includes current main through 4ef5879, preserving newer work from other chats.
+Signed-in business Cloudflare dashboard, approximately 10:56 to 11:22 SAST. Billing period shown: 15 October to 15 November. These are developing-period observations, not a traffic forecast. The secure deployment helper was unavailable; live inventory came from the dashboard. Source review includes current main through 4ef5879, preserving newer work from other chats.
 
 | Service | Verified setup and usage | Useful next step |
 | --- | --- | --- |
@@ -14,7 +14,9 @@ Signed-in business Cloudflare dashboard, approximately 10:56 to 11:10 SAST. Bill
 | Workers KV | Separate site/admin lockout namespaces. 212 bytes; 127 reads, four writes, four lists, no deletes; $0 billable usage. | Existing authentication use is tiny. A separate compact locker cache could use the increased allowance. |
 | Domain, DNS, HTTPS and security | customvibe.co.za Free; Bot Fight Mode active; one of one rate-limiting rules used by CustomVibe login burst protection on /auth/login. Last 24 hours: 79 visitors, 8.64k requests, 50.49% cached, 1 GB served. | Keep Free initially. Reconsider Pro if managed security rules and additional edge controls become necessary. These numbers include testing/bots and are not sales demand. |
 | Monitoring and deployment | Period observability events and Workers build minutes show zero. GitHub Actions builds and directly uploads Pages. Private Worker publishing remains separate. | Add privacy-safe sampled diagnostics and spending alerts. Improve paired deployment verification; buying Workers build capacity does not speed the existing GitHub workflow. |
-| Other existing services | Repository and service records show Turnstile, hourly private-artwork cleanup, email forwarding and Web Analytics. These were not individually re-audited in this pass. | Retain them. Their purpose does not require a website Pro upgrade. |
+| Turnstile | One Managed public-forms widget, no pre-clearance. Last seven days: 3.35k challenges issued, 37 Siteverify requests, all 37 valid. Last 24 hours: 431 challenges and zero Siteverify requests. | A dashboard warning about missing Siteverify calls is not sufficient evidence of a broken integration: the wider window confirms validation, and server code enforces it. Retain live submission verification in the existing form-testing work. |
+| Email Routing | Enabled, DNS records locked; four routing rules, one destination and one domain. Four messages received and four delivered/forwarded in seven days. | Keep forwarding. It does not replace transactional sending through Resend. |
+| Other existing services | Repository and service records show hourly private-artwork cleanup and Web Analytics; those were not individually re-audited in this pass. | Retain them. Their purpose does not require a website Pro upgrade. |
 
 Billing lists Workers Free, R2 Paid and the domain Free Plan. This corrects any earlier shorthand suggesting that every product has billing disabled. R2 currently costs $0 within its allowance; it can charge above that allowance.
 
