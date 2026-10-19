@@ -11,13 +11,21 @@ export function requireDestination(env=process.env){
 }
 
 // A token is never obtained from Wrangler's default login or written to disk.
-export function createRequest(env=process.env){
+export function cloudflareErrorCodes(value){
+ const errors=Array.isArray(value?.errors)?value.errors:[];
+ return [...new Set(errors.map(error=>error?.code).filter(code=>Number.isInteger(code)&&code>=0&&code<=1000000))].slice(0,5);
+}
+
+export function createRequest(env=process.env,{diagnostic=false}={}){
  const account=requireDestination(env);
  const socket=env.CUSTOMVIBE_MIGRATION_SOCKET;
+ if(diagnostic&&socket)throw new Error('Diagnostic mode requires the explicit API token, without a migration socket.');
  if(!socket&&!env.CLOUDFLARE_API_TOKEN)throw new Error('Provide the destination API token or the temporary migration socket.');
  return async(path,method='GET',body)=>{
   if(path!==`accounts/${account}`&&!path.startsWith(`accounts/${account}/`))throw new Error('Request outside destination account.');
+  if(diagnostic&&method!=='GET')throw new Error('Diagnostic requests are read-only.');
   if(!['GET','PATCH','PUT'].includes(method))throw new Error('Credential operation is not allowed.');
+  let detail={category:socket?'SOCKET_ERROR':'NETWORK_ERROR'};
   try{
    if(socket)return await new Promise((resolve,reject)=>{
     const connection=createConnection(socket);let response='';
@@ -28,9 +36,23 @@ export function createRequest(env=process.env){
     connection.on('end',()=>{if(!response.includes('\n'))reject(new Error('Incomplete response'))});
    });
    const response=await fetch(`https://api.cloudflare.com/client/v4/${path}`,{method,headers:{Authorization:`Bearer ${env.CLOUDFLARE_API_TOKEN}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(90000)});
-   if(!response.ok)throw new Error('Request rejected');
+   if(!response.ok){
+    detail={category:'HTTP_ERROR',...(Number.isInteger(response.status)&&response.status>=100&&response.status<=599?{httpStatus:response.status}:{})};
+    if(diagnostic)try{detail.cloudflareCodes=cloudflareErrorCodes(await response.json())}catch{}
+    throw new Error('Request rejected');
+   }
+   detail={category:'INVALID_JSON'};
    return await response.json();
-  }catch{throw new Error('Cloudflare request failed. No credential details are displayed.');}
+  }catch(cause){
+   if(detail.category==='NETWORK_ERROR'){
+    if(['AbortError','TimeoutError'].includes(cause?.name)||['ETIMEDOUT','UND_ERR_CONNECT_TIMEOUT'].includes(cause?.cause?.code))detail={category:'TIMEOUT'};
+    else if(['ENOTFOUND','EAI_AGAIN'].includes(cause?.cause?.code))detail={category:'DNS_ERROR'};
+    else if(['CERT_HAS_EXPIRED','UNABLE_TO_VERIFY_LEAF_SIGNATURE','DEPTH_ZERO_SELF_SIGNED_CERT'].includes(cause?.cause?.code))detail={category:'TLS_ERROR'};
+   }
+   const error=new Error('Cloudflare request failed. No credential details are displayed.');
+   if(diagnostic)error.diagnostic=detail;
+   throw error;
+  }
  };
 }
 
