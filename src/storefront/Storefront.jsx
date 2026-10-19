@@ -33,7 +33,20 @@ const photos=[
 const asset=i=>ROOT+'cutouts/'+photos[i][0];
 // Trim only transparent canvas in the layout, keeping every supplied pixel intact.
 const magnetBounds=[[116,109,1022],[149,142,964],[97,101,1059],[100,107,1054],[104,104,1049]];
-function MagnetPhoto({i,priority=false}){const {content}=useContent();const src=content.images[`hero${i}`];const custom=src!==defaultContent.images[`hero${i}`];const [x,y,size]=custom?[0,0,1254]:magnetBounds[i];return <div className="magnet-face"><img src={src} alt={custom?'A favourite moment on a square photo magnet':photos[i][2]} loading={priority?'eager':'lazy'} style={{...(custom?{height:'100%',objectFit:'cover'}:{}),width:`${1254/size*100}%`,left:`${-x/size*100}%`,top:`${-y/size*100}%`}}/></div>}
+function displayImage(i,src,placement){
+ if(src!==defaultContent.images[`hero${i}`])return {src};
+ const base=ROOT+'cutouts/display/'+photos[i][0].replace('.webp','');
+ // sizes includes the crop scale. Hero widths match mobile.css and shop.css.
+ // Mobile: three magnets across a 560px maximum with 24px total gaps.
+ // Desktop: 17.5% of the viewport-height-limited hero (at most 1600px).
+ // The story reserves enough resolution for its largest seasonal layout.
+ const scale=1254/magnetBounds[i][2];
+ const sizes=placement==='thumbnail'?'64px':placement==='hero'
+  ?`(max-width: 900px) min(${(536/3)*scale}px, calc((100vw - 64px) * ${scale/3})), min(${280*scale}px, ${17.5*scale}vw, calc((100svh - 150px) * ${.315*scale}))`
+  :`${370*scale}px`;
+ return {src:`${base}-320.webp`,srcSet:`${base}-320.webp 320w, ${base}-640.webp 640w, ${asset(i)} 1254w`,sizes};
+}
+function MagnetPhoto({i,priority=false}){const {content}=useContent();const src=content.images[`hero${i}`];const custom=src!==defaultContent.images[`hero${i}`];const [x,y,size]=custom?[0,0,1254]:magnetBounds[i];const display=displayImage(i,src,priority?'hero':'story');return <div className="magnet-face"><img src={display.src} srcSet={display.srcSet} sizes={display.sizes} alt={custom?'A favourite moment on a square photo magnet':photos[i][2]} loading={priority?'eager':'lazy'} style={{...(custom?{height:'100%',objectFit:'cover'}:{}),width:`${1254/size*100}%`,left:`${-x/size*100}%`,top:`${-y/size*100}%`}}/></div>}
 function BuilderLink({children='Make your magnets',puzzle=false,className=''}){return <a className={'action '+className} href={'/'+(puzzle?'puzzle':'studio')}>{children}</a>}
 function Tray(){const {content}=useContent();return <figure className="tray"><img loading="lazy" src={content.images.tray} alt="Styled composition using your five magnet photos in and around a mint tray"/></figure>}
 function Puzzle({n=3}){const {content}=useContent();const [tiles,setTiles]=useState([]);useEffect(()=>{let alive=true;demoPhoto(content.images.puzzle).then(p=>renderPhoto(p,{puzzle:true,gridSize:n,size:160})).then(r=>{if(alive)setTiles(r.tiles)}).catch(()=>{});return()=>{alive=false}},[n,content.images.puzzle]);return <div className="puzzle-visual"><MagnetPreview urls={tiles} columns={n} label={`${n} by ${n} grid of ${n*n} square magnets forming one coastal picture`}/></div>}
@@ -64,7 +77,7 @@ function Story(){
  return <section id="the-story" className="story content">
   <div className="story-image" ref={gallery}>
       <><div className="story-photo"><MagnetPhoto i={active}/><BrandDoodle className="photo-accent story-accent mint"/><span className="photo-scribble">{['good times','the big day','beach days','my people','date night'][active]}</span></div><span className="story-scribble">Tiny<br/>moments.<br/>Big joy.</span></>
-   <div className="photo-options" aria-label="Choose a real magnet example">{photos.map((p,i)=><button aria-label={'View '+p[1]+' magnet'} aria-pressed={active===i} onClick={()=>choose(i)} key={p[0]}><img src={content.images[`hero${i}`]} alt="" loading="lazy"/></button>)}</div>
+   <div className="photo-options" aria-label="Choose a real magnet example">{photos.map((p,i)=>{const display=displayImage(i,content.images[`hero${i}`],'thumbnail');return <button aria-label={'View '+p[1]+' magnet'} aria-pressed={active===i} onClick={()=>choose(i)} key={p[0]}><img src={display.src} srcSet={display.srcSet} sizes={display.sizes} alt="" loading="lazy"/></button>})}</div>
   </div>
   <div className="story-copy"><p className="overline">REAL MAGNETS. REAL MEMORIES.</p><h2>A fridge full of your favourite weirdos.</h2><p>The wedding. That day at the beach. Dinner with your favourite person. Bring the photos you love out of your camera roll and into your everyday.</p><p><strong>Handmade in Durban.</strong> We print your chosen photos, make your magnets and check each one by hand before it leaves us.</p><BuilderLink>Choose your favourites</BuilderLink></div>
  </section>;

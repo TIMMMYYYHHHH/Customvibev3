@@ -1,0 +1,128 @@
+{
+  "generator": {
+    "sharp": "0.35.5",
+    "vips": "8.18.7",
+    "webp": "1.6.0",
+    "kernel": "lanczos3",
+    "quality": 94,
+    "alphaQuality": 100,
+    "effort": 6
+  },
+  "images": [
+    {
+      "source": "05-sunglasses-square.webp",
+      "sha256": "a93bfddf9ce78f290c96a8c9abb8371569db08af786c13b47ef581e7de797bc1",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 183090,
+      "variants": [
+        {
+          "file": "05-sunglasses-square-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 29014,
+          "sha256": "7f472339f6b54d27e321df63ebc19daa0554c81f63d2f714f60fad0e40cde8e9"
+        },
+        {
+          "file": "05-sunglasses-square-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 85968,
+          "sha256": "6639cd9bdfa33a967976a0436b3f69710f51e90078868883624000fe0f7fc59f"
+        }
+      ]
+    },
+    {
+      "source": "02-wedding-square.webp",
+      "sha256": "88fbf69f57c97892a280aa79e764a79467a4cdc9a1ab294cfb8cf761e71f43d2",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 133676,
+      "variants": [
+        {
+          "file": "02-wedding-square-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 22798,
+          "sha256": "60e6c2609812d82b78ce1a8eef8d15f698d5f685f7e0a1f025482698f9de6c89"
+        },
+        {
+          "file": "02-wedding-square-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 62882,
+          "sha256": "3290cf2b65ca8a241a73273248d289017e16623cb7d7e338b4b15bbba11495c8"
+        }
+      ]
+    },
+    {
+      "source": "03-beach-square.webp",
+      "sha256": "ac68dafc3d463bab25b0bd119122416ac015027b5477d2fb36fd4191cc067e22",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 274672,
+      "variants": [
+        {
+          "file": "03-beach-square-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 41796,
+          "sha256": "0e09508040c501035d6afea9eb2cda96f6ee8cb8ba9e00361ee946d20ce4ca49"
+        },
+        {
+          "file": "03-beach-square-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 134092,
+          "sha256": "62efca1671e2331f4d32a5e3b9ff67fb9cc822b8139bdc797b92a076769e46a2"
+        }
+      ]
+    },
+    {
+      "source": "04-pink-group-square.webp",
+      "sha256": "5af277f1225573a0e289976aa9b18eaa565f9a3bbbb860c0b11e3d74a96d14ef",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 179908,
+      "variants": [
+        {
+          "file": "04-pink-group-square-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 28360,
+          "sha256": "bcf7cdecd49190264e1fd34a81537a6c56740dbbf46c4d705c23594bfa02c463"
+        },
+        {
+          "file": "04-pink-group-square-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 84798,
+          "sha256": "ed957ae40d088d82a7a52848effcc27adcae487c7eddae0420a1062ee35440db"
+        }
+      ]
+    },
+    {
+      "source": "01-restaurant-square.webp",
+      "sha256": "b71d17e3d2be4a89836ee43246d30b7c94ca444594c4f622751a29598e229ed9",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 231032,
+      "variants": [
+        {
+          "file": "01-restaurant-square-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 37954,
+          "sha256": "60102ac34779354c258d300c16836e7c5bef573ac7402d604b1503bba5fdfa85"
+        },
+        {
+          "file": "01-restaurant-square-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 116114,
+          "sha256": "2cc39c714946b1f6b7de7046fb747cdc453a355f182a5cdaea5f1ed49e9fab7a"
+        }
+      ]
+    }
+  ]
+}

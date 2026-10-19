@@ -22,10 +22,7 @@ export default function CollectionPicker({product,onAdd,initialItem}){
  function toggle(id){changeQuantity(id,selected[id]>0?0:1);}
  return <div className="collection-picker">
   <fieldset className="artwork-styles"><legend>Choose your style</legend><div className="artwork-style-options">{artworkStyles.map(s=><label key={s.id}><input type="radio" name={`artwork-style-${product.id}`} value={s.id} checked={style===s.id} onChange={()=>setStyle(s.id)}/><span className="artwork-style-card"><ArtworkFace id={designs[0].id} style={s.id}/><strong>{s.name}</strong><small>{style===s.id?'Selected':'Choose style'}</small></span></label>)}</div></fieldset>
-  <div className="collection-picker-art" tabIndex="0" role="region" aria-label="Browse all magnets">
-   <p>{mode==='all'?`One of every design in ${artworkStyleName(style)}.`:`Choose your ${noun}, then set how many of each you need.`}</p>
-   <DesignGallery style={style} kind={product.id} all selectedIds={mode==='choose'?ids:undefined} onToggle={mode==='choose'?toggle:undefined} quantities={mode==='choose'?selected:undefined} onQuantity={mode==='choose'?changeQuantity:undefined}/>
-  </div><aside className="collection-picker-summary">
+  <aside className="collection-picker-summary">
    <h3>Choose how you’d like to shop</h3>
   <div className="collection-choice" role="group" aria-label="Collection options">
    <button type="button" aria-pressed={mode==='all'} onClick={()=>setMode('all')}>Full set <span>{product.id==='alphabet'?'A–Z · 26 letters':product.id==='counting'?'1–10 · 10 numbers':`${designs.length} designs`}</span></button>
@@ -43,5 +40,9 @@ export default function CollectionPicker({product,onAdd,initialItem}){
    <a href="/basket" className="collection-picker-basket">View basket</a>
    <div className="collection-about"><h4>About this collection</h4><p>{product.description}</p><p>Each magnet is a 7.5 × 7.5 cm square.</p></div>
   </aside>
+  <div className="collection-picker-art" tabIndex="0" role="region" aria-label="Browse all magnets">
+   <p>{mode==='all'?`One of every design in ${artworkStyleName(style)}.`:`Choose your ${noun}, then set how many of each you need.`}</p>
+   <DesignGallery style={style} kind={product.id} all selectedIds={mode==='choose'?ids:undefined} onToggle={mode==='choose'?toggle:undefined} quantities={mode==='choose'?selected:undefined} onQuantity={mode==='choose'?changeQuantity:undefined}/>
+  </div>
  </div>;
 }

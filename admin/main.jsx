@@ -6,4 +6,5 @@ import React from 'react';import {createRoot} from 'react-dom/client';import Adm
 import {logout} from './logout.mjs';
 import './workroom.css';
 const section=location.pathname==='/content'?'content':location.pathname==='/artwork'?'artwork':'orders';
+document.title=({orders:'Orders',content:'Store content',artwork:'Order artwork'}[section])+' | CustomVibe admin';
 createRoot(document.getElementById('root')).render(<AdminShell section={section} logout={logout}>{section==='content'?<ContentProvider onSave={saveAdminContent}><Admin/></ContentProvider>:section==='artwork'?<Artwork/>:<Orders/>}</AdminShell>);

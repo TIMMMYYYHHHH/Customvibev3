@@ -24,6 +24,10 @@ Updated owner-address expectation failed against the old Gmail destination. Afte
 
 W3Forms notification and Reply-To settings; Google billing contact; any verified service notification contacts. Account login changes may need owner verification and must not be claimed from a contact edit. Founders Hub numeric cost currently rejects saves; EUR/ZAR estimates are in saved notes.
 
-## Owner handoff
+## Current handoff correction, 19 October 2026
+
+The handoff below is superseded for W3Forms Reply-To. Keep W3Forms and the later working blank Reply-To/manual-address workaround recorded in Founders Hub. Do not set `{{email}}` on the strength of the historical handoff. Reuse “Fix contact delivery, Reply-To and email aliases” and audit EXT-01 for current provider settings, the remaining legacy contact hop and an owner-controlled delivery/header check. Existing Workspace mailbox ownership, alias checks and the Resend transactional path above remain dated evidence; this correction does not claim fresh contact delivery or Reply-To verification.
+
+## Historical owner handoff, superseded
 
 19 October: owner explicitly chose to keep W3Forms. Do not migrate contact delivery to Resend. Provider edits were attempted in Chrome, but the first reload retained the old recipient and blank Reply-To; later saves were unconfirmed. Tim will manually save notification address hello@customvibe.co.za and documented Reply-To {{email}}, refresh, then request the live delivery test. Google billing/service contacts remain to verify. Cloudflare profile email is a sign-in identity and was not changed.
