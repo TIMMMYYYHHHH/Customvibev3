@@ -45,7 +45,9 @@ async function main(){
  const response=await request(`accounts/${DESTINATION_ACCOUNT}/pages/projects/${PAGES_PROJECT}`);
  requireSafe(response.success&&response.result,'Business project verification failed.');
  validateProject(response.result,{requireSendingCredentials:sending==='true',expectedProductionSending:phase==='after'?sending:undefined});
- if(phase==='after')validateDeployment(response.result.canonical_deployment,sending,process.env.GITHUB_SHA);
+ const expectedCommit=process.env.EXPECTED_RELEASE_SHA||process.env.GITHUB_SHA;
+ if(expectedCommit&&!/^[a-f0-9]{40}$/.test(expectedCommit))throw Error('Expected an exact release SHA.');
+ if(phase==='after')validateDeployment(response.result.canonical_deployment,sending,expectedCommit);
  console.log('Verified business account, gated fail-closed environments, disabled preview sending, internal services and credential presence'+(phase==='after'?', including the deployed production configuration.':'.'));
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)main().catch(error=>{console.error(error.message);process.exitCode=1});
