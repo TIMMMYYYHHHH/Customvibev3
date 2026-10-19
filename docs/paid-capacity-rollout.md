@@ -50,7 +50,7 @@ Hub returned repeated interrupted responses and HTML instead of JSON during subs
 
 Remaining updates to reconcile when the frontend is reliable:
 - Geoapify Setup status: connected Free production map with encrypted server key, live desktop verification 19 October.
-- Finance cost-flow subtask created. Its evidence comment encountered an unconfirmed save; check the original request before retrying, then mark Done once the recorded evidence is confirmed. The actual linked Finance cost/payment and renewal were verified. Spending-controls subtask is already Done.
+- Finance cost-flow subtask created and its evidence comment is confirmed saved after original-request recovery. Its final Done status encountered another unconfirmed save; check the original request before retrying. The actual linked Finance cost/payment and renewal were verified. Spending-controls subtask is already Done.
 - Map implementation subtask activity and parent scope/blocker are now saved. Desktop/keyboard acceptance passed; mobile remains open and parent stays Blocked for courier terms.
 - Refresh CPU subtask: scheduled private snapshot and 1-second ceiling deployed; retain any required post-rollout CPU measurement before completion.
 - Report Hub's interrupted-save / HTML-response bug under existing Upkeep coverage.
