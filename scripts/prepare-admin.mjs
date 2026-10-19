@@ -6,3 +6,5 @@ await mkdir('dist/admin/admin-brand',{recursive:true});
 await copyFile('src/assets/fonts/fredoka-latin-wght-normal.woff2','dist/admin/admin-brand/fredoka.woff2');
 await copyFile('src/assets/fonts/dm-sans-latin-wght-normal.woff2','dist/admin/admin-brand/dm-sans.woff2');
 await writeFile('dist/admin/admin-brand/fonts.css',"@font-face{font-family:'Fredoka Variable';font-style:normal;font-weight:300 700;font-display:swap;src:url('./fredoka.woff2') format('woff2')}@font-face{font-family:'DM Sans Variable';font-style:normal;font-weight:100 1000;font-display:swap;src:url('./dm-sans.woff2') format('woff2')}");
+
+await copyFile('public/coming-soon/wordmark-v1.png','dist/admin/admin-brand/wordmark-v1.png');

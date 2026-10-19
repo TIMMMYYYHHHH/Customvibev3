@@ -61,11 +61,11 @@
  .unified-header:has(.cv-christmas-slider) .site-menu{grid-column:4;grid-row:1}
  .unified-header:has(.cv-christmas-slider) nav{grid-row:2}
  .unified-header:has(.cv-christmas-slider) .site-wordmark{font-size:20px;gap:4px}
- .unified-header:has(.cv-christmas-slider) .site-wordmark img{width:24px;height:24px}
+ .unified-header:has(.cv-christmas-slider) .site-wordmark img:not(.cv-wordmark){width:24px;height:24px}
 }
 @media(max-width:374px){
  .unified-header:has(.cv-christmas-slider) .header-inner{width:calc(100% - 16px);gap:2px}
  .unified-header:has(.cv-christmas-slider) .site-wordmark{font-size:16px;letter-spacing:-.5px}
- .unified-header:has(.cv-christmas-slider) .site-wordmark img{width:22px;height:22px}
+ .unified-header:has(.cv-christmas-slider) .site-wordmark img:not(.cv-wordmark){width:22px;height:22px}
  .unified-header:has(.cv-christmas-slider) .cv-christmas-toggle-icon{width:76px;flex-basis:76px;--cv-santa-travel:40px}
 }
