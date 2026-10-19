@@ -39,3 +39,23 @@ test('search finds retained orders beyond the first page and paginates matching 
  for(const query of ['q='+ 'x'.repeat(161),'stage=invalid'])assert.equal((await admin.fetch(new Request('https://admin.customvibe.co.za/api/orders?'+query,{headers:{cookie}}),env)).status,400);
  assert.equal((await admin.fetch(new Request('https://admin.customvibe.co.za/api/orders?q=target'),env)).status,401);
 });
+
+test('retry preview is a CSRF-protected POST and GET previews cannot rotate a prepared capability',async t=>{
+ const {env,csrf,cookie}=await setup(),id=crypto.randomUUID(),origin='https://admin.customvibe.co.za',root=origin+'/api/orders/'+id;
+ Object.assign(env,{ADMIN_SEND_ENABLED:'true',RESEND_API_KEY:'synthetic-only'});
+ await env.AUTH.fetch('https://internal/orders/create',{method:'POST',body:JSON.stringify({id,fingerprint:'a'.repeat(64),snapshot:{contact:{name:'Synthetic',email:'synthetic@example.invalid',phone:'0000000'},locker:{name:'Synthetic',area:'Test'},items:[{kind:'photo',name:'Photo',qty:1,files:[]}],magnetQty:1,subtotalCents:100,paymentStatus:'unpaid'}})});
+ let sends=0;t.mock.method(globalThis,'fetch',async()=>{sends++;return sends===1?Response.json({name:'validation_error',message:'Synthetic rejected sender'},{status:403}):Response.json({id:'synthetic-accepted'});});
+ const headers={cookie,origin,'X-CSRF-Token':csrf,'Content-Type':'application/json'};
+ const post=(path,body,custom=headers)=>admin.fetch(new Request(root+path,{method:'POST',headers:custom,body:JSON.stringify(body)}),env);
+ assert.equal((await post('/send',{version:0})).status,503);
+ const original=env.sql.prepare('SELECT * FROM order_update_attempts').get();
+ const get=await admin.fetch(new Request(root+'/preview',{headers:{cookie,origin:'https://other.invalid','Sec-Fetch-Site':'cross-site'}}),env);
+ assert.equal(get.status,200);assert.equal((await get.json()).retryToken,undefined);assert.deepEqual(env.sql.prepare('SELECT * FROM order_update_attempts').get(),original);
+ for(const custom of [{...headers,origin:'https://other.invalid','Sec-Fetch-Site':'cross-site'},{cookie,origin,'Content-Type':'application/json'}]){assert.equal((await post('/preview-retry',{version:0},custom)).status,403);assert.deepEqual(env.sql.prepare('SELECT * FROM order_update_attempts').get(),original);}
+ assert.equal((await post('/preview-retry',{version:0},{...headers,cookie:'__Host-cv-admin=invalid'})).status,401);
+ const issued=await post('/preview-retry',{version:0});assert.equal(issued.status,200);const preview=await issued.json();assert.match(preview.retryToken,/^[a-f0-9]{64}$/);assert.ok(preview.retryAttempt);assert.equal(sends,1);
+ const prepared=env.sql.prepare('SELECT * FROM order_update_attempts').get();assert.ok(prepared.preview_hash);
+ const again=await admin.fetch(new Request(root+'/preview',{headers:{cookie}}),env);assert.equal((await again.json()).retryToken,undefined);assert.deepEqual(env.sql.prepare('SELECT * FROM order_update_attempts').get(),prepared);
+ assert.equal((await post('/preview-retry',{version:99})).status,409);assert.deepEqual(env.sql.prepare('SELECT * FROM order_update_attempts').get(),prepared);
+ const outcomes=await Promise.all([post('/send',{version:0,retryAttempt:preview.retryAttempt,retryToken:preview.retryToken}),post('/send',{version:0,retryAttempt:preview.retryAttempt,retryToken:preview.retryToken})]);assert.equal(outcomes.filter(r=>r.status===200).length,1);assert.equal(sends,2);assert.equal(env.sql.prepare('SELECT count(*) n FROM order_update_attempts').get().n,2);
+});
