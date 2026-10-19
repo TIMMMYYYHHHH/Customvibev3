@@ -28,7 +28,11 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run build:admin
+      - name: Verify shipped third-party notices
+        run: node scripts/check-dependency-notices.mjs --outputs --bundles
       - run: npm test
+        env:
+          CV_CHECK_BUILT_NOTICES: '1'
       - name: Verify destination before publishing
         id: verify_destination
         run: node scripts/check-deployment.mjs before
