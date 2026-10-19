@@ -28,4 +28,16 @@ D1 paid recovery history and increased runtime do not prove intermittent availab
 
 ## Verification record
 
-Implementation and local verification in progress. Deployment and live acceptance must be recorded after completion. Website password gate, separate admin sign-in and payments-off remain mandatory. Founders Hub Tools & services is the source for linked Finance costs; do not create duplicate manual expenses.
+Release 8967c8b published successfully through protected workflow 39235846903. CI passed 328 tests, public/SSR/admin builds and before/after deployment protection checks. The independent code review found one refresh/expiry timing issue, fixed with a 15-minute grace and regression coverage. Local map verification passed explicit location search, pin details/selection, distance-sorted list and manual edits clearing verified selection.
+
+Deployed versions:
+- Pages: 83de790b-52c1-4b7a-99b8-8d8416bcd716.
+- Security: 7ab57005-8723-484b-95ce-bf626ca6091e; migration 0009 applied.
+- Admin: 371798cf-f592-4897-a65a-3babb61e2717, matching public source/build.
+- Catalogue: f6a20f47-cce3-417d-952f-54d4426f43a4.
+
+Read-only Cloudflare API verification confirmed 1,000 ms limits on Pages production and all three Workers, plus 1% Worker diagnostic sampling with invocation logs off. Map feature flags and encrypted provider secrets are production-only. Website gate remains true. The scheduled refresh created the private 896.01 kB locker snapshot at 12:17:12 SAST on 19 October, verified in R2 with public access disabled.
+
+Founders Hub Finance verification: the Cloudflare service amount is R83 monthly, automatic renewal. Recording the owner's reported payment in Tools & services generated one committed R83 cost/payment dated 19 October and one planned R83 renewal dated 15 November. A separate freshly loaded Finance view confirmed both linked records and the R83 cash movement, without manually entering any Finance expense. Subsequent rand charges may vary. Intermittent Hub response interruptions were recovered with Check original save, avoiding duplicates.
+
+Live signed-in customer map and mobile acceptance remain pending the owner's refreshed site sign-in. Increased runtime is not a new hosted maximum-artwork acceptance result; the existing availability/recovery follow-ups remain open. Website password gate, separate admin sign-in and payments-off remain mandatory. Founders Hub Tools & services is the source for linked Finance costs; do not create duplicate manual expenses.
