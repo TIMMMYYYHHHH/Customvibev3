@@ -30,7 +30,7 @@ test('metadata observation retains only current version IDs and public source SH
 });
 test('workflow keeps immutable checkout, automatic required pairing and always-saved evidence',async()=>{
  const {readFile}=await import('node:fs/promises');const workflow=await readFile(new URL('../.github/workflows/publish.yml',import.meta.url),'utf8');
- assert.match(workflow,/ref: \$\{\{ github.sha \}\}/);assert.match(workflow,/steps.release_plan.outputs.publish_admin == 'true'/);assert.match(workflow,/if: always\(\)/);assert.match(workflow,/group: customvibe-production/);
+ assert.match(workflow,/ref: \$\{\{ github.sha \}\}/);assert.match(workflow,/steps.release_plan.outputs.publish_admin == 'true'/);assert.match(workflow,/if: always\(\)/);assert.match(workflow,/if: always\(\) && steps.release_plan.outcome == 'success'/);assert.match(workflow,/RELEASE_PUBLICATION_SUCCEEDED:/);assert.match(workflow,/group: customvibe-production/);
  assert.doesNotMatch(workflow,/d1 migrations apply|db import|set-password|set-email|content-store/);
 });
 

@@ -151,23 +151,33 @@ async function baseline(){
 }
 async function plan(){
  let record={schemaVersion:1,repository:REPOSITORY,state:'blocked',required:[],completed:{},reasons:[]};
+ let phase='CONTEXT';
  try{
   const ctx=context();record={...record,...ctx};
+  phase='GUARDS';
   command(process.execPath,['scripts/check-deployment.mjs','before']);
   command(process.execPath,['scripts/check-admin-deployment.mjs']);
   command(process.execPath,['scripts/check-catalogue-deployment.mjs']);
   command(process.execPath,['scripts/check-security-deployment.mjs']);
+  phase='BASELINE';
   const previous=await baseline();const baseSha=previous.baseSha;
+  phase='SCOPE';
   ensure(git('merge-base',baseSha,ctx.sourceSha)===baseSha,'Release baseline is not an ancestor of reviewed main.');
   const paths=git('diff','--name-only',baseSha,ctx.sourceSha).split('\n').filter(Boolean);
   const dep=dependencies(ctx.sourceSha);const priorDep=dependencies(baseSha);
   const classification=classifyChanges(paths,Object.fromEntries(['security','catalogue'].map(c=>[c,[...new Set([...dep[c],...priorDep[c]])]])));
   if(process.env.PUBLISH_ADMIN==='true'&&!classification.components.includes('admin'))classification.components.push('admin');
-  record={...record,baseSha,paths,required:classification.components,schemas:classification.schemas,before:(await observeVersions()).versions,components:{},migration:await migrationState(),guards:{publication:'pending',gates:'existing guards required',payments:'disabled; runtime acceptance remains separate',customerEmails:'manual only; runtime acceptance remains separate'}};
+  phase='VERSIONS';
+  const before=(await observeVersions()).versions;
+  phase='SCHEMA';
+  const migration=await migrationState();
+  record={...record,baseSha,paths,required:classification.components,schemas:classification.schemas,before,components:{},migration,guards:{publication:'pending',gates:'existing guards required',payments:'disabled; runtime acceptance remains separate',customerEmails:'manual only; runtime acceptance remains separate'}};
+  phase='BUILD';
   const privateBuild=await readJson('dist/release/private-build-manifest.json');ensure(privateBuild.sourceSha===ctx.sourceSha,'Private runtime comparison was built from a different source revision.');
   for(const component of ['security','catalogue']){ensure((await bundleDigest(`dist/release/private/${component}`,{runtimeOnly:true})).sha256===privateBuild.components[component].runtimeDigest&&hash(await readFile(`wrangler.${component}.jsonc`))===privateBuild.components[component].configDigest,'Private runtime comparison changed after build.');}
   const build={schemaVersion:1,sourceSha:ctx.sourceSha,private:privateBuild.components,pages:await bundleDigest('dist/client'),admin:await bundleDigest('dist/admin')};
   await writeFile('dist/release/build-manifest.json',JSON.stringify(build,null,2)+'\n');record.build=build;
+  phase='RECEIPTS';
   for(const component of COMPONENTS){
    const sourceDigest=fingerprint(ctx.sourceSha,component);
    record.components[component]={account:DESTINATION_ACCOUNT,component,desiredSourceSha:ctx.sourceSha,sourceDigest};
@@ -180,11 +190,23 @@ async function plan(){
   }
   record.state='planned';await save(record);
   if(process.env.GITHUB_OUTPUT)await writeFile(process.env.GITHUB_OUTPUT,`publish_admin=${record.required.includes('admin')}\n`,{flag:'a'});
- }catch(error){record.reasons.push(error.message);await save(record);throw error;}
+ }catch(error){record.reasons.push(`PLAN_${phase}_FAILED: Planning stopped. Review the recorded stage, baseline and required read permissions.`);await save(record);throw error;}
 }
+// Every check is read-only and independently attempted. Never serialize caught errors.
+async function observeProtection(components){
+ const checks=[];
+ for(const component of components){
+  const script=component==='pages'?'scripts/check-deployment.mjs':`scripts/check-${component}-deployment.mjs`;
+  try{command(process.execPath,[script,...(component==='pages'?['after']:[])]);checks.push({component,status:'passed'});}
+  catch{checks.push({component,status:'failed',code:'PROTECTION_OBSERVATION_FAILED'});}
+ }
+ return {status:checks.every(check=>check.status==='passed')?'passed':'failed',observedAt:new Date().toISOString(),checks};
+}
+function incompleteState(record){return record.attempts?.length||Object.keys(record.completed||{}).length?'partial':'blocked';}
 async function publish(component){
  ensure(['pages','admin'].includes(component),'Only existing client publication is automated.');
  const record=await readJson(OUTPUT);
+ let attempted=false,failure;
  try{
   const ctx=context();ensure(ctx.sourceSha===record.sourceSha,'Planned source revision changed.');
   ensure(record.required.includes(component)&&['planned','partial'].includes(record.state),'Component is not in this release plan.');
@@ -194,6 +216,7 @@ async function publish(component){
   command(process.execPath,[component==='pages'?'scripts/check-deployment.mjs':'scripts/check-admin-deployment.mjs',...(component==='pages'?['before']:[])]);
   const args=component==='pages'?['--no-install','wrangler','pages','deploy','dist/client','--project-name',PAGES_PROJECT,'--branch','main','--commit-hash',record.sourceSha]:['--no-install','wrangler','deploy','--config','wrangler.admin.jsonc'];
   record.attempts??=[];record.attempts.push({component,startedAt:new Date().toISOString(),outcome:'unconfirmed'});await save(record);
+  attempted=true;
   const output=command('npx',args);
   // Do not persist provider output: it may contain URLs or configuration details.
   const observed=await observeVersions();
@@ -202,19 +225,46 @@ async function publish(component){
   const unaffected=Object.fromEntries(Object.entries(expected).filter(([c])=>c!==component));assertUnchanged(unaffected,observed.versions);
   record.components[component].receipt={account:DESTINATION_ACCOUNT,component,id:observed.versions[component],sourceSha:record.sourceSha,sourceDigest:record.components[component].sourceDigest,origin:'guarded-upload',evidenceUrl:record.workflow.url,observedAt:new Date().toISOString()};
   record.attempts.at(-1).outcome='observed';
-  record.completed[component]={id:observed.versions[component]};record.state='partial';await save(record);
-  command(process.execPath,[component==='pages'?'scripts/check-deployment.mjs':'scripts/check-admin-deployment.mjs',...(component==='pages'?['after']:[])]);
- }catch(error){record.state=record.attempts?.length||Object.keys(record.completed).length?'partial':'blocked';record.reasons.push('Publication or observation failed; inspect provider deployment metadata before retrying.');await save(record);throw error;}
+  record.completed[component]={id:observed.versions[component]};record.state='partial';
+ }catch(error){
+  failure=error;record.state=incompleteState(record);
+  record.reasons.push('PUBLICATION_FAILED: Publication or observation failed; inspect provider deployment metadata before retrying.');
+ }finally{
+  // A rejected command can still have reached Cloudflare. Observe protection even
+  // when its acknowledgement or the subsequent version read was lost.
+  if(attempted){
+   const protection=await observeProtection([component]);record.attempts.at(-1).protection=protection;
+   if(protection.status!=='passed'){
+    record.state='partial';record.reasons.push('POST_ATTEMPT_GUARD_FAILED: Protection/source observation after the upload attempt failed.');
+    failure??=Error('Post-attempt protection observation failed.');
+   }
+  }
+  await save(record);
+ }
+ if(failure)throw failure;
 }
 async function finish(){
- const record=await readJson(OUTPUT);
+ const record=await readJson(OUTPUT);let failure;
  try{
   context();assertUnchanged({...record.before,...Object.fromEntries(Object.entries(record.completed).map(([c,v])=>[c,v.id]))},(await observeVersions()).versions);
   for(const component of COMPONENTS)validateReceipt(record.components[component].receipt,{component,id:record.completed[component]?.id||record.before[component],sourceDigest:record.components[component].sourceDigest,...record.build.private[component]});
   const migration=await migrationState();ensure(JSON.stringify(migration)===JSON.stringify(record.migration),'Migration state changed during release.');
-  command(process.execPath,['scripts/check-deployment.mjs','after']);command(process.execPath,['scripts/check-admin-deployment.mjs']);command(process.execPath,['scripts/check-catalogue-deployment.mjs']);command(process.execPath,['scripts/check-security-deployment.mjs']);
-  record.guards.publication='passed';record.state=releaseState(record);ensure(record.state==='verified','Required components remain incomplete.');record.observedAt=new Date().toISOString();await save(record);
- }catch(error){record.state=Object.keys(record.completed||{}).length?'partial':'blocked';record.reasons.push('Final release verification failed. Do not treat upload success as paired completion.');await save(record);throw error;}
+  ensure(process.env.RELEASE_PUBLICATION_SUCCEEDED!=='false'&&record.reasons.length===0&&!record.attempts?.some(a=>a.outcome!=='observed'),'A prior publication remains failed or unconfirmed.');
+  ensure(releaseState(record)==='verified','Required components remain incomplete.');
+ }catch(error){failure=error;record.reasons.push('FINAL_VERIFICATION_FAILED: Release remains incomplete. Inspect recorded versions, receipts and schema.');}
+ finally{
+  // Best effort across every surface, even if source/version/schema validation
+  // failed first. A successful safety read never clears the original failure.
+  record.finalProtection=await observeProtection(COMPONENTS);
+  record.guards??={};record.guards.protection=record.finalProtection.status;
+  if(record.finalProtection.status!=='passed'){
+   record.reasons.push('FINAL_GUARD_FAILED: One or more final protection/source observations failed.');
+   failure??=Error('Final protection observation failed.');
+  }
+  record.guards.publication=failure?'incomplete':'passed';
+  record.state=failure?incompleteState(record):'verified';record.observedAt=new Date().toISOString();await save(record);
+ }
+ if(failure)throw failure;
 }
 async function main(){
  await mkdir('dist/release',{recursive:true});

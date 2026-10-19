@@ -56,19 +56,23 @@ jobs:
           PUBLISH_ADMIN: ${{ inputs.publish_admin }}
           RELEASE_EVIDENCE_JSON: ${{ inputs.release_evidence_json }}
       - name: Publish protected Pages from the reviewed build
+        id: publish_pages
         run: node scripts/release-manifest.mjs publish pages
         env:
           GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
       - name: Publish matching admin when required by the release plan
+        id: publish_admin
         if: steps.release_plan.outputs.publish_admin == 'true'
         run: node scripts/release-manifest.mjs publish admin
         env:
           GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
       - name: Verify paired versions and protection
+        if: always() && steps.release_plan.outcome == 'success'
         run: node scripts/release-manifest.mjs finish
         env:
+          RELEASE_PUBLICATION_SUCCEEDED: ${{ steps.publish_pages.outcome == 'success' && (steps.publish_admin.outcome == 'success' || steps.publish_admin.outcome == 'skipped') }}
           GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
       - name: Preserve complete or incomplete release evidence
