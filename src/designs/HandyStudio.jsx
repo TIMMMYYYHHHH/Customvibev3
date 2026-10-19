@@ -1,4 +1,4 @@
-import React,{useEffect,useState,useRef} from 'react';
+import React,{useEffect,useLayoutEffect,useState,useRef} from 'react';
 import {handyTemplate,defaultHandyValues,handyFieldError,validateHandyValues} from './handy.mjs';
 import {renderHandy} from './handy-render.mjs';
 import HandyGallery from './HandyGallery';
@@ -12,6 +12,15 @@ export default function HandyStudio({selected,onSelect,drafts,setDrafts,editing,
  const design=handyTemplate(editing?.values?.handyTemplate||selected);
  useEffect(()=>{if(design)window.scrollTo({top:0,behavior:'instant'});},[design?.id]);
  const values=design?(editing?.values||drafts[design.id]||defaultHandyValues(design.id)):null;
+ const studioRoot=useRef(null),focusRequest=useRef(null);
+ useLayoutEffect(()=>{
+  const request=focusRequest.current;if(!request)return;
+  const root=studioRoot.current;
+  const target=request==='workbench'?root?.querySelector('[data-studio-workbench]'):request==='heading'?root?.querySelector('h1'):[...root.querySelectorAll('[data-design-id]')].find(button=>button.dataset.designId===request);
+  focusRequest.current=null;
+  if(!document.querySelector('dialog[open],[role="dialog"][aria-modal="true"]'))target?.focus({preventScroll:true});
+ },[design?.id,editing?.id]);
+ function choose(id){focusRequest.current='workbench';onSelect(id);}
  const mounted=useRef(true);
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false}},[]);
  const [preview,setPreview]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
@@ -25,15 +34,15 @@ export default function HandyStudio({selected,onSelect,drafts,setDrafts,editing,
   const next=[...basket.filter(i=>i.id!==item.id),item],capacity=orderCapacity(next,content);if(!capacity.allowed)throw Error(capacity.issues.join(' '));
   const artwork=await renderHandy(clean);if(!mounted.current)return;onSave({...item,preview:artwork.url});
  }catch(e){setError(e.message)}finally{setBusy(false)}}
- function back(){onEditing(null);onSelect('');}
- return <main className="handy-studio section">
- <header className="handy-heading"><p className="eyebrow">LITTLE DETAILS. RIGHT AT HOME.</p><h1>Handy at home.</h1><p>Choose a design and add the details that make it yours. Each magnet is 7.5 × 7.5 cm.</p></header>
- {!design?<><HandyGallery onChoose={onSelect}/><p className="handy-help">Pick any individual design. Add copies or mix different designs in your basket.</p></>:<>
+ function back(){focusRequest.current=editing?'heading':design.id;onEditing(null);onSelect('');}
+ return <main className="handy-studio section" ref={studioRoot}>
+ <header className="handy-heading"><p className="eyebrow">LITTLE DETAILS. RIGHT AT HOME.</p><h1 tabIndex={-1}>Handy at home.</h1><p>Choose a design and add the details that make it yours. Each magnet is 7.5 × 7.5 cm.</p></header>
+ {!design?<><HandyGallery onChoose={choose}/><p className="handy-help">Pick any individual design. Add copies or mix different designs in your basket.</p></>:<>
  <button className="button secondary handy-back" onClick={back} disabled={busy}>{editing?'Cancel editing':'Choose another design'}</button>
  <div className="handy-workbench"><figure className="handy-live-preview" aria-busy={!preview&&!invalid&&!error}>
  <MagnetPreview urls={[preview||design.image]} label={design.name+' preview'}/><figcaption>7.5 × 7.5 cm · Square magnet</figcaption>
  {invalid&&<p role="status">Shorten the marked details to update your preview.</p>}
- </figure><form className="handy-fields" onSubmit={save}><h2>{design.name}</h2><p>The headings stay as they are. Your details are printed in the handwriting shown here.</p>
+ </figure><form className="handy-fields" onSubmit={save}><h2 tabIndex={-1} data-studio-workbench>{design.name}</h2><p>The headings stay as they are. Your details are printed in the handwriting shown here.</p>
  <fieldset disabled={busy}><legend className="sr-only">Your printed details</legend>{design.fields.map((field,i)=><div className="handy-field" key={field.label}><label htmlFor={'handy-field-'+i}>{field.label}</label><input id={'handy-field-'+i} value={values.entries[i]} placeholder={field.placeholder} maxLength={field.limit} autoComplete="off" aria-invalid={!!fieldErrors[i]} aria-describedby={'handy-hint-'+i} onChange={event=>change(i,event.target.value)}/><small id={'handy-hint-'+i}>{fieldErrors[i]||`Up to ${field.limit} characters · Optional`}</small></div>)}</fieldset>
  <p className="handy-help">Check the spelling and numbers in your preview. Empty fields will stay blank.</p>
  {error&&<p role="alert" className="error">{error}</p>}

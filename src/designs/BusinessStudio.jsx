@@ -1,4 +1,4 @@
-import React,{useEffect,useState,useRef} from 'react';
+import React,{useEffect,useLayoutEffect,useState,useRef} from 'react';
 import {businessTemplate,defaultBusinessValues,businessFieldError,validateBusinessValues} from './business.mjs';
 import {renderBusiness} from './business-render.mjs';
 import BusinessGallery from './BusinessGallery';
@@ -12,6 +12,15 @@ export default function BusinessStudio({selected,onSelect,drafts,setDrafts,editi
  const design=businessTemplate(editing?.values?.businessTemplate||selected);
  useEffect(()=>{if(design)window.scrollTo({top:0,behavior:'instant'});},[design?.id]);
  const values=design?(editing?.values||drafts[design.id]||defaultBusinessValues(design.id)):null;
+ const studioRoot=useRef(null),focusRequest=useRef(null);
+ useLayoutEffect(()=>{
+  const request=focusRequest.current;if(!request)return;
+  const root=studioRoot.current;
+  const target=request==='workbench'?root?.querySelector('[data-studio-workbench]'):request==='heading'?root?.querySelector('h1'):[...root.querySelectorAll('[data-design-id]')].find(button=>button.dataset.designId===request);
+  focusRequest.current=null;
+  if(!document.querySelector('dialog[open],[role="dialog"][aria-modal="true"]'))target?.focus({preventScroll:true});
+ },[design?.id,editing?.id]);
+ function choose(id){focusRequest.current='workbench';onSelect(id);}
  const mounted=useRef(true);
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false}},[]);
  const [preview,setPreview]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
@@ -27,15 +36,15 @@ export default function BusinessStudio({selected,onSelect,drafts,setDrafts,editi
   const next=[...basket.filter(i=>i.id!==item.id),item],capacity=orderCapacity(next,content);if(!capacity.allowed)throw Error(capacity.issues.join(' '));
   const artwork=await renderBusiness(clean);if(!mounted.current)return;onSave({...item,preview:artwork.url});
  }catch(e){setError(e.message)}finally{setBusy(false)}}
- function back(){onEditing(null);onSelect('');}
- return <main className="handy-studio section">
- <header className="handy-heading"><p className="eyebrow">YOUR BUSINESS. ALWAYS HANDY.</p><h1>Business magnets.</h1><p>Choose a design and add the details that make it yours. Each magnet is 7.5 × 7.5 cm.</p></header>
- {!design?<><BusinessGallery onChoose={onSelect}/><p className="handy-help">Pick any individual design. Add copies or mix different designs in your basket.</p></>:<>
+ function back(){focusRequest.current=editing?'heading':design.id;onEditing(null);onSelect('');}
+ return <main className="handy-studio section" ref={studioRoot}>
+ <header className="handy-heading"><p className="eyebrow">YOUR BUSINESS. ALWAYS HANDY.</p><h1 tabIndex={-1}>Business magnets.</h1><p>Choose a design and add the details that make it yours. Each magnet is 7.5 × 7.5 cm.</p></header>
+ {!design?<><BusinessGallery onChoose={choose}/><p className="handy-help">Pick any individual design. Add copies or mix different designs in your basket.</p></>:<>
  <button className="button secondary handy-back" onClick={back} disabled={busy}>{editing?'Cancel editing':'Choose another design'}</button>
  <div className="handy-workbench"><figure className="handy-live-preview" aria-busy={!preview&&!invalid&&!error}>
  <MagnetPreview urls={[preview||design.image]} label={design.name+' preview'}/><figcaption>7.5 × 7.5 cm · Square magnet</figcaption>
  {invalid&&<p role="status">Shorten the marked details to update your preview.</p>}
- </figure><form className="handy-fields" onSubmit={save}><h2>{design.name}</h2><p>Add your business details below. Your wording and QR code will be printed exactly as shown.</p>
+ </figure><form className="handy-fields" onSubmit={save}><h2 tabIndex={-1} data-studio-workbench>{design.name}</h2><p>Add your business details below. Your wording and QR code will be printed exactly as shown.</p>
  <fieldset disabled={busy}><legend className="sr-only">Your printed details</legend>{design.fields.map((field,i)=><div className="handy-field" key={field.label}><label htmlFor={'handy-field-'+i}>{field.label}</label><input id={'handy-field-'+i} value={values.entries[i]} placeholder={field.sample} required={!field.optional} maxLength={field.limit} autoComplete="off" aria-invalid={!!fieldErrors[i]} aria-describedby={'handy-hint-'+i} onChange={event=>change(i,event.target.value)}/><small id={'handy-hint-'+i}>{fieldErrors[i]||`Up to ${field.limit} characters${field.optional?' · Optional':''}`}</small></div>)}</fieldset>
  {design.qr&&<fieldset disabled={busy} className="business-qr"><legend>Your QR code</legend>
  {design.wifi&&<div className="handy-field"><label htmlFor="qr-mode">When someone scans</label><select id="qr-mode" value={values.qr.mode} onChange={e=>update({...values,qr:e.target.value==='url'?{mode:'url',url:''}:{mode:'wifi',network:'',password:'',security:'WPA'}})}><option value="wifi">Join Wi-Fi</option><option value="url">Open a link</option></select></div>}
