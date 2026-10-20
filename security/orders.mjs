@@ -1,3 +1,4 @@
+import {sourceBindingInsert,acceptanceBindingGuard,validRecipientBinding,deliveryForOrder} from './mail-delivery.mjs';
 import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
 import {sixMonthsAfter,artworkExpiry,retainedSnapshot} from '../server/order-retention.mjs';
@@ -40,16 +41,17 @@ export async function orderService(request,env){
  let row=await (path==='detail'?readSelect(env.DB,'SELECT * FROM orders WHERE id=?',[b.id]):env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first());
  if(path==='create'){
   if(!artworkHash(b.fingerprint)||!validSnapshot(b.snapshot)||(b.snapshot.referenceVersion!==undefined&&(b.snapshot.referenceVersion!==2||b.snapshot.reference!==undefined))||JSON.stringify(b.snapshot).length>ORDER_LIMITS.recordCharacters||(b.snapshot.reference!==undefined&&b.snapshot.reference!==requestReference({id:b.id,referenceVersion:1})))return fail(400,'Invalid order.');
-  if(row)return row.expires<=time?fail(410,'Order expired.'):row.fingerprint!==b.fingerprint||row.snapshot!==JSON.stringify(b.snapshot)?fail(409,'Order changed.'):Response.json({ok:true,reference:reference(row)});
+  if(b.submissionId!==undefined&&!artworkHash(b.submissionId))return fail(400,'Invalid association.');
+  if(row){if(row.expires<=time)return fail(410,'Order expired.');if(row.fingerprint!==b.fingerprint||row.snapshot!==JSON.stringify(b.snapshot))return fail(409,'Order changed.');if(b.submissionId){try{await linkOrder(env.DB,b,time,[],true)}catch{return fail(409,'Order association changed.')}}return Response.json({ok:true,reference:reference(row)});}
   let expires=time+ARTWORK_LIMITS.retentionSeconds;
   if(b.privateArtwork){const a=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(b.id).first();if(!a?.finalized||a.expires<=time)return fail(409,'Complete artwork first.');const files=b.snapshot.items.flatMap(i=>i.files),manifest=JSON.parse(a.manifest);if(files.length!==manifest.length||files.some((f,n)=>f.index!==n||f.name!==manifest[n].name||f.size!==manifest[n].size||f.proof!==manifest[n].proof||(b.snapshot.approvalRequired&&f.sha256!==manifest[n].sha256)))return fail(409,'Artwork does not match order.');expires=Math.min(expires,a.expires);}
   // This single insert checks the display label atomically. No migration or legacy rewrite.
-  await env.DB.prepare("INSERT INTO orders(id,fingerprint,snapshot,created,expires,artwork_expires) SELECT ?,?,?,?,?,? WHERE ? IS NULL OR NOT EXISTS (SELECT 1 FROM orders WHERE json_extract(snapshot,'$.reference')=?) ON CONFLICT(id) DO NOTHING").bind(b.id,b.fingerprint,JSON.stringify(b.snapshot),time,sixMonthsAfter(time),expires,b.snapshot.reference??null,b.snapshot.reference??null).run();
+  const insert=env.DB.prepare("INSERT INTO orders(id,fingerprint,snapshot,created,expires,artwork_expires) SELECT ?,?,?,?,?,? WHERE ? IS NULL OR NOT EXISTS (SELECT 1 FROM orders WHERE json_extract(snapshot,'$.reference')=?) ON CONFLICT(id) DO NOTHING").bind(b.id,b.fingerprint,JSON.stringify(b.snapshot),time,sixMonthsAfter(time),expires,b.snapshot.reference??null,b.snapshot.reference??null);if(b.submissionId){try{await linkOrder(env.DB,b,time,[insert])}catch{return fail(409,'Order association changed.')}}else await insert.run();
   row=await env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first();if(!row)return fail(409,'Order reference needs review. Keep this draft and contact CustomVibe.');return row.fingerprint===b.fingerprint&&row.snapshot===JSON.stringify(b.snapshot)?Response.json({ok:true,reference:reference(row)}):fail(409,'Order changed.');
  }
  if(!row)return fail(404,'Order not found. Older orders may only have artwork.');
  if(row.expires<=time)return fail(410,'This order has expired.');
- if(path==='detail')return Response.json({...view(row),...(JSON.parse(row.snapshot).approvalRequired?{proof:await proofDetail(env,b.id)}:{}),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,"SELECT attempt,version,status,state,created,updated,rejected,CASE WHEN ? THEN provider_message_id ELSE NULL END AS providerMessageId,CASE WHEN ? THEN accepted_at ELSE NULL END AS acceptedAt,'manual-update' AS purpose,(state='failed' AND rejected=1 AND status<>'fulfilled') AS retryable FROM order_update_attempts WHERE order_id=? ORDER BY version DESC,rowid DESC",[artworkExpiry(row)>time?1:0,artworkExpiry(row)>time?1:0,b.id],'all')).results});
+ if(path==='detail')return Response.json({...view(row),mailDelivery:await deliveryForOrder(env,b.id),...(JSON.parse(row.snapshot).approvalRequired?{proof:await proofDetail(env,b.id)}:{}),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,"SELECT attempt,version,status,state,created,updated,rejected,CASE WHEN ? THEN provider_message_id ELSE NULL END AS providerMessageId,CASE WHEN ? THEN accepted_at ELSE NULL END AS acceptedAt,'manual-update' AS purpose,(state='failed' AND rejected=1 AND status<>'fulfilled') AS retryable FROM order_update_attempts WHERE order_id=? ORDER BY version DESC,rowid DESC",[artworkExpiry(row)>time?1:0,artworkExpiry(row)>time?1:0,b.id],'all')).results});
  if(path==='preview-retry'){
   if(!Number.isSafeInteger(b.version)||b.version!==row.version||!artworkHash(b.tokenHash))return fail(409,'Order changed. Preview again.');
   const proof=JSON.parse(row.snapshot).approvalRequired&&(await proofDetail(env,b.id)).status==='awaiting_approval';
@@ -87,13 +89,15 @@ export async function orderService(request,env){
  if(path==='mark-update'){
   if(!Number.isSafeInteger(b.version)||!['accepted','failed','uncertain'].includes(b.state)||b.attempt!==undefined&&!artworkId(b.attempt))return fail(400,'Invalid update.');
   if(b.providerMessageId!==undefined&&(b.state!=='accepted'||!validProviderMessageId(b.providerMessageId)||!Number.isSafeInteger(time)||time<1))return fail(400,'Invalid receipt.');
+  if(b.recipientBinding!==undefined&&!validRecipientBinding(b.recipientBinding))return fail(400,'Invalid recipient binding.');
   // Legacy workers may finish their first reservation, but cannot mark a retry by version alone.
   const attempt=b.attempt??(await env.DB.prepare('SELECT attempt FROM order_update_attempts WHERE order_id=? AND version=? GROUP BY order_id,version HAVING count(*)=1').bind(b.id,b.version).first())?.attempt;
   if(!attempt)return fail(409,'Attempt identity is required.');
   const receipt=b.providerMessageId&&artworkExpiry(row)>time?b.providerMessageId:null;
   await env.DB.batch([
    env.DB.prepare("UPDATE order_updates SET state=?,updated=? WHERE order_id=? AND version=? AND reservation=? AND state='pending'").bind(b.state,time,b.id,b.version,attempt),
-   env.DB.prepare("UPDATE order_update_attempts SET provider_message_id=?,accepted_at=?,rejected=?,preview_hash=NULL,preview_until=NULL WHERE order_id=? AND version=? AND attempt=? AND state=? AND EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND version=? AND reservation=? AND updated=? AND state=?) AND changes()>0").bind(receipt,receipt?time:null,b.state==='failed'&&b.rejected===true&&b.attempt!==undefined?1:0,b.id,b.version,attempt,b.state,b.id,b.version,attempt,time,b.state)
+   env.DB.prepare("UPDATE order_update_attempts SET provider_message_id=?,accepted_at=?,rejected=?,preview_hash=NULL,preview_until=NULL WHERE order_id=? AND version=? AND attempt=? AND state=? AND EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND version=? AND reservation=? AND updated=? AND state=?) AND changes()>0").bind(receipt,receipt?time:null,b.state==='failed'&&b.rejected===true&&b.attempt!==undefined?1:0,b.id,b.version,attempt,b.state,b.id,b.version,attempt,time,b.state),
+   ...(receipt&&b.recipientBinding?[sourceBindingInsert(env.DB,{purpose:'manual-update',reference:b.id,providerMessageId:receipt,binding:b.recipientBinding,attempt}),acceptanceBindingGuard(env.DB,{purpose:'manual-update',reference:b.id,providerMessageId:receipt})]:[])
   ]);return Response.json({ok:true});
  }
  if(path==='delivery'){
@@ -114,3 +118,18 @@ export async function cleanOrders(env){const time=now();await cleanProofs(env);
  for(const row of expired)await env.DB.prepare('UPDATE orders SET snapshot=? WHERE id=?').bind(JSON.stringify({...retainedSnapshot(JSON.parse(row.snapshot)),artworkRemoved:true}),row.id).run();
  // Receipt metadata ends at the original artwork deadline; attempt history keeps its existing lifetime.
  await env.DB.batch([env.DB.prepare('UPDATE order_update_attempts SET provider_message_id=NULL,accepted_at=NULL WHERE (provider_message_id IS NOT NULL OR accepted_at IS NOT NULL) AND order_id IN (SELECT id FROM orders WHERE artwork_expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_update_attempts WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_updates WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_history WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM orders WHERE expires<=?').bind(time)]);}
+
+// Existing accepted unlinked requests may recover without creating historical associations.
+// Only the already-existing exact order branch enables that no-association outcome.
+async function linkOrder(db,b,time,statements=[],allowUnlinkedRecovery=false){
+ await db.batch([...statements,
+  db.prepare("UPDATE submissions SET order_id=? WHERE id=? AND fingerprint=? AND kind='order' AND expires>? AND (order_id=? OR (order_id IS NULL AND owner_sent=0 AND receipt_sent=0)) AND EXISTS(SELECT 1 FROM orders WHERE id=? AND fingerprint=? AND expires>?)").bind(b.id,b.submissionId,b.fingerprint,time,b.id,b.id,b.fingerprint,time),
+  db.prepare(`INSERT INTO mail_delivery_assert(ok) SELECT CASE WHEN EXISTS(
+   SELECT 1 FROM submissions s JOIN orders o ON o.id=?
+   WHERE s.id=? AND s.kind='order' AND s.fingerprint=? AND o.fingerprint=s.fingerprint AND o.snapshot=?
+   AND s.expires>unixepoch() AND o.expires>unixepoch()
+   AND (s.order_id=o.id OR (?=1 AND s.order_id IS NULL AND (s.owner_sent=1 OR s.receipt_sent=1)
+    AND NOT EXISTS(SELECT 1 FROM submissions competing WHERE competing.order_id=o.id AND competing.id<>s.id)))
+  ) THEN 1 ELSE 0 END`).bind(b.id,b.submissionId,b.fingerprint,JSON.stringify(b.snapshot),allowUnlinkedRecovery?1:0)
+ ]);
+}

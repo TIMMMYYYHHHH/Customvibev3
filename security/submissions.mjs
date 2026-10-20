@@ -1,3 +1,4 @@
+import {sourceBindingInsert,acceptanceBindingGuard,validRecipientBinding} from './mail-delivery.mjs';
 import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
 const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
@@ -14,6 +15,9 @@ export async function submissionState(request,env){
   if(body.providerMessageId!==undefined){
    if(!validProviderMessageId(body.providerMessageId)||!Number.isSafeInteger(now)||now<1)return new Response(null,{status:400});
    const prefix=body.stage==='owner_sent'?'owner':'receipt';
+   if(body.recipientBinding!==undefined&&!validRecipientBinding(body.recipientBinding))return new Response(null,{status:400});
+   if(body.recipientBinding){const fresh=env.DB.prepare(`UPDATE submissions SET ${body.stage}=1,${prefix}_provider_id=?,${prefix}_accepted_at=? WHERE id=? AND expires>? AND kind='order' AND ${body.stage}=0 AND ${prefix}_provider_id IS NULL AND ${prefix}_accepted_at IS NULL RETURNING id`).bind(body.providerMessageId,now,body.id,now);const done=await env.DB.batch([fresh,sourceBindingInsert(env.DB,{purpose:prefix==='owner'?'owner-notification':'customer-receipt',reference:body.id,providerMessageId:body.providerMessageId,binding:body.recipientBinding}),acceptanceBindingGuard(env.DB,{purpose:prefix==='owner'?'owner-notification':'customer-receipt',reference:body.id,providerMessageId:body.providerMessageId})]);if(done[0].results.length)return Response.json({ok:true});}
+
    // Success and its first receipt share one write; retries cannot replace the receipt.
    const marked=await env.DB.prepare(`UPDATE submissions SET ${body.stage}=1,${prefix}_provider_id=COALESCE(${prefix}_provider_id,?),${prefix}_accepted_at=COALESCE(${prefix}_accepted_at,?) WHERE id=? AND expires>? AND kind='order' RETURNING id`).bind(body.providerMessageId,now,body.id,now).first();
    return Response.json({ok:!!marked},{status:marked?200:409});
