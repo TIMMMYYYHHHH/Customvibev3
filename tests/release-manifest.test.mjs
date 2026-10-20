@@ -426,7 +426,7 @@ const reviewedDeliveryFixture={
  "catalogue": {
   "id": "92f3472a-3153-447d-a8be-c79db9498407",
   "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
-  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a1ac2c60cb3930087adfd5018f373",
+  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
   "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
   "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
   "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json"
@@ -691,4 +691,29 @@ test('inactive Delivery binds fixed forty tuples, genuine T rollback and mixed a
  for(const mutate of [v=>v.extra=true,v=>v.inactiveDelivery.entries[0].candidateBlob=old,v=>v.inactiveDelivery.entries[0].mode='100755',v=>v.inactiveDelivery.entries.pop(),v=>v.baselineSourceInputDigest=v.sourceInputDigest,v=>v.inactiveDelivery.protectedInputDigest=digest,v=>v.adminAssetManifest={}]){const v=structuredClone(value);mutate(v);assert.throws(()=>validateActivationCompatibility(v,expected));}
  for(const mutate of [v=>v.paths.push('server/foreign.mjs'),v=>v.deliveryBaseline.rollback.pagesBuildDigest=digest,v=>v.before.admin=id,v=>v.archivedRelease.sha256=digest,v=>v.archivedRelease.receiptDigest=digest,v=>delete v.archivedRelease.recoveryDocChanges,v=>v.evidence.receipts.security.sourceSha=old,v=>v.evidence.receipts.security.sourceDigest='f'.repeat(64),v=>v.evidence.receipts.catalogue.sourceSha=v.sourceSha,v=>v.evidence.receipts.catalogue.evidenceUrl='https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/1',v=>v.privateBuild.catalogue.runtimeDigest=digest,v=>v.privateBuild.catalogue.configDigest=digest,v=>delete v.privateBuild.catalogue.inputClosure,v=>v.privateBuild.catalogue.inputClosure.importGraphDigest=digest,v=>v.privateBuild.catalogue.inputClosure.inputInventoryDigest=digest,v=>v.privateBuild.catalogue.inputClosure.extra=true,v=>v.inactiveIngress.production='true',v=>v.inactiveIngress.preview='unknown',v=>v.inactiveIngress.id=id,v=>v.inactiveIngress.observedAt=new Date(Date.now()-31000).toISOString()]){const e=structuredClone(expected);mutate(e);assert.throws(()=>validateActivationCompatibility(value,e));}
  assert.throws(()=>inactiveDeliveryBaseline({schemaVersion:1,state:'partial',sourceSha:reviewedDeliveryFixture.baselineSha}));
+});
+
+// Exact immutable K receipt bytes from commit431a4814c6fa717e38d81f64a54c50dd846000e5.
+// Its hash anchors the real publication independently of the policy and synthetic fixture.
+const immutableKCatalogueReceipt = `{
+  "schemaVersion": 1,
+  "account": "4f57d4e924674cb87b33d4c884745cf6",
+  "component": "catalogue",
+  "id": "92f3472a-3153-447d-a8be-c79db9498407",
+  "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
+  "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+  "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+  "origin": "guarded-upload",
+  "observedAt": "2026-10-20T20:49:33.383Z"
+}
+`;
+test('inactive Delivery accepts the immutable actual K Catalogue receipt and rejects its mistyped fingerprint',async()=>{
+ const {validateActivationCompatibility}=await import('../scripts/release-manifest.mjs');
+ assert.equal(createHash('sha256').update(immutableKCatalogueReceipt).digest('hex'),'884d7d35be1ab4e23aa996c192dc23480dfe90559862b04f08dd1215fa6df6dd');
+ const {value,expected}=inactiveDeliveryCompatibilityFixture();
+ expected.evidence.receipts.catalogue={...JSON.parse(immutableKCatalogueReceipt),evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json'};
+ assert.equal(validateActivationCompatibility(value,expected).basis,'reviewed-inactive-delivery-v1');
+ expected.evidence.receipts.catalogue.sourceDigest='33e4c7ce5545c7db61633546fc61a3bc239a1ac2c60cb3930087adfd5018f373';
+ assert.throws(()=>validateActivationCompatibility(value,expected),/Inactive Delivery must retain the actual K Catalogue receipt/);
 });
