@@ -14,8 +14,136 @@ const ensure=(condition,message)=>{if(!condition)throw Error(message);};
 const hash=value=>createHash('sha256').update(value).digest('hex');
 function command(program,args,{env=process.env}={}){return execFileSync(program,args,{env,encoding:'utf8',maxBuffer:16*1024*1024,stdio:['ignore','pipe','pipe']}).trim();}
 function git(...args){return command('git',args);}
+// Official fixed-origin evidence under the existing native token authorizes publication.
+const VALIDATION_PATH='.github/workflows/validate.yml',VALIDATION_HASH='1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389';
+const VALIDATION_JOB='Node 22 build and fixture tests',VALIDATION_NAME='Validate proposed CustomVibe changes';
+const CHECKOUT='Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262',SETUP_NODE='Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020';
+const VALIDATION_STEPS=['Set up job',CHECKOUT,SETUP_NODE,'Install locked dependencies','Build storefront and server-rendered pages','Build admin and storefront preview','Verify shipped third-party notices','Run local fixture tests','Run Python security-helper fixtures','Post '+SETUP_NODE,'Post '+CHECKOUT,'Complete job'];
+const SELECTOR_KEYS=['version','origin','reviewed','repository','repositoryId','candidateSha','candidateTreeSha','pullRequestNumber','prHeadSha','prBaseSha','checkedMergeSha','checkedTreeSha','workflowId','workflowPath','workflowSha256','runId','runAttempt','jobId','checkRunId','checkSuiteId','url','nodeVersion','nodeTests','pythonTests','originalJobLogSha256','ownerProofSha256'];
+const safeNumber=n=>Number.isSafeInteger(n)&&n>0;
+const node22=v=>typeof v==='string'&&/^v22[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$/.test(v);
+function validationSelector(s){
+ ensure(exactKeys(s,SELECTOR_KEYS)&&s.version===1&&s.origin==='owner-selected-github-validation'&&s.reviewed===true&&s.repository===REPOSITORY&&s.repositoryId===1269416306,'Invalid mandatory validation selector.');
+ for(const k of ['candidateSha','candidateTreeSha','prHeadSha','prBaseSha','checkedMergeSha','checkedTreeSha'])ensure(SHA.test(s[k]||''),'Invalid validation SHA.');
+ for(const k of ['pullRequestNumber','workflowId','runId','runAttempt','jobId','checkRunId','checkSuiteId','nodeTests','pythonTests'])ensure(safeNumber(s[k]),'Invalid validation identifier.');
+ for(const k of ['workflowSha256','originalJobLogSha256','ownerProofSha256'])ensure(DIGEST.test(s[k]||''),'Invalid validation digest.');
+ ensure(s.workflowPath===VALIDATION_PATH&&s.workflowSha256===VALIDATION_HASH&&s.url===`https://github.com/${REPOSITORY}/actions/runs/${s.runId}`&&node22(s.nodeVersion),'Unapproved validation workflow/runtime.');return s;
+}
+function apiTime(v){ensure(typeof v==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:[.]\d{3})?Z$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString()===v.replace(/Z$/,v.includes('.')?'Z':'.000Z'),'Invalid validation clock.');return new Date(v).toISOString();}
+const success=v=>v?.status==='completed'&&v.conclusion==='success';
+function sameRepo(r){return r?.full_name===REPOSITORY&&r.id===1269416306&&r.private===false;}
+function sameIdentityRepo(r){return r?.id===1269416306&&r.name==='Customvibev3'&&r.url===`https://api.github.com/repos/${REPOSITORY}`;}
+export function parseMandatoryValidationLog(log){
+ ensure(typeof log==='string'&&Buffer.byteLength(log)<=4*1024*1024&&!log.includes('\ufffd'),'Invalid validation log.');
+ // Parse actual API bytes; display-format projections belong only in local tests.
+ const lines=log.split(/\r?\n/).map(l=>l.replace(/^\ufeff?(?:\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d+Z) /,'').replace(/\x1b\[[0-9;]*m/g,''));
+ const once=value=>{const found=lines.map((l,i)=>l===value?i:-1).filter(i=>i>=0);ensure(found.length===1,'Ambiguous validation log boundary.');return found[0];};
+ const checkout=once('##[group]'+CHECKOUT),setup=once('##[group]'+SETUP_NODE),install=once('##[group]Run npm ci'),node=once('##[group]Run npm test'),python=once('##[group]Run python3 -B -m unittest discover tests/python');
+ const os=once('##[group]Operating System'),osEnd=lines.indexOf('##[endgroup]',os);
+ ensure(os<osEnd&&osEnd<checkout&&lines.slice(os+1,osEnd).includes('Ubuntu')&&checkout<setup&&setup<install&&install<node&&node<python,'Validation log platform/step order differs.');
+ const c=lines.slice(checkout,setup),fetch=c.filter(l=>/^\[command\]\/usr\/bin\/git -c protocol[.]version=2 fetch /.test(l));
+ ensure(fetch.length===1,'Missing pinned checkout fetch.');const selected=/^\[command\]\/usr\/bin\/git -c protocol[.]version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin \+([a-f0-9]{40}):refs\/remotes\/pull\/([1-9][0-9]*)\/merge$/.exec(fetch[0]);ensure(selected,'Wrong checkout merge ref.');
+ const ref=`refs/remotes/pull/${selected[2]}/merge`,select='[command]/usr/bin/git checkout --progress --force '+ref;ensure(safeNumber(Number(selected[2]))&&c.filter(l=>l===select).length===1,'Wrong checkout selection.');
+ const fetching=once('##[group]Fetching the repository')-checkout,selecting=once('##[group]Checking out the ref')-checkout;ensure(0<fetching&&fetching<c.indexOf(fetch[0])&&c.indexOf(fetch[0])<selecting&&selecting<c.indexOf(select),'Checkout order differs.');
+ const logIndex=c.indexOf('[command]/usr/bin/git log -1 --format=%H');ensure(logIndex>c.indexOf(select)&&c.filter(l=>l==='[command]/usr/bin/git log -1 --format=%H').length===1&&c[logIndex+1]===selected[1],'Wrong checked synthetic source.');
+ const versions=lines.slice(setup,install).filter(l=>l.startsWith('node: '));ensure(versions.length===1&&node22(versions[0].slice(6)),'Missing exact tested runtime.');
+ const n=lines.slice(node,python),summaries=n.map((l,i)=>/^# tests /.test(l)?i:-1).filter(i=>i>=0);ensure(summaries.length===1,'Missing or duplicate Node footer.');
+ const tail=n.slice(summaries[0]);const m=/^# tests ([1-9][0-9]*)\n# suites (?:0|[1-9][0-9]*)\n# pass ([1-9][0-9]*)\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms [0-9]+(?:[.][0-9]+)?\s*$/.exec(tail.join('\n'));ensure(m&&m[1]===m[2]&&safeNumber(Number(m[1])),'Incomplete or skipped Node tests.');
+ const p=lines.slice(python),pythonSummaries=p.filter(l=>/^Ran /.test(l));ensure(pythonSummaries.length===1,'Missing or duplicate Python footer.');const pm=/^Ran ([1-9][0-9]*) tests? in [0-9]+(?:[.][0-9]+)?s$/.exec(pythonSummaries[0]);const pi=p.indexOf(pythonSummaries[0]);ensure(pm&&safeNumber(Number(pm[1]))&&p[pi+1]===''&&p[pi+2]==='OK'&&p.filter(l=>l==='OK').length===1,'Incomplete or skipped Python tests.');
+ ensure(!p.slice(pi+3).some(l=>/^(?:Ran |OK|FAILED|# tests |# skipped )/.test(l)),'Conflicting log suffix.');
+ return {checkoutRef:ref,pullRequestNumber:Number(selected[2]),checkedMergeSha:selected[1],nodeVersion:versions[0].slice(6),nodeTests:Number(m[1]),pythonTests:Number(pm[1]),originalJobLogSha256:hash(log)};
+}
+export function validateMandatoryValidation(selector,facts,local,checkedAt){
+ const s=validationSelector(selector),f=facts,r=f.run,j=f.jobs?.jobs?.[0];utc(checkedAt);
+ ensure(local?.sourceSha===s.candidateSha&&local.treeSha===s.candidateTreeSha&&local.workflowSha256===VALIDATION_HASH&&local.parents?.length===2&&local.parents[0]===s.prBaseSha&&local.parents[1]===s.prHeadSha,'Candidate ancestry/workflow differs.');
+ ensure(node22(local.publisherRuntime)&&local.publisherRuntime===s.nodeVersion&&local.compilerRuntime===s.nodeVersion,'CI/publisher/compiler runtime differs.');
+ ensure(f.workflow?.id===s.workflowId&&f.workflow.path===VALIDATION_PATH&&f.workflow.state==='active','Workflow differs.');
+ function run(v){ensure(v?.id===s.runId&&v.run_attempt===s.runAttempt&&v.workflow_id===s.workflowId&&v.path===VALIDATION_PATH&&v.name===VALIDATION_NAME&&v.event==='pull_request'&&v.head_sha===s.prHeadSha&&sameRepo(v.repository)&&sameRepo(v.head_repository)&&v.check_suite_id===s.checkSuiteId&&v.html_url===s.url&&success(v),'Validation run differs.');ensure(Array.isArray(v.pull_requests)&&v.pull_requests.length<=1,'Ambiguous PR association.');for(const pr of v.pull_requests)ensure(pr.number===s.pullRequestNumber&&pr.head?.sha===s.prHeadSha&&sameIdentityRepo(pr.head?.repo)&&pr.base?.ref==='main'&&sameIdentityRepo(pr.base?.repo),'Contradictory PR association.');return {id:v.id,attempt:v.run_attempt,createdAt:apiTime(v.created_at),startedAt:apiTime(v.run_started_at),updatedAt:apiTime(v.updated_at)};}
+ const runProjection=run(r);ensure(utc(runProjection.createdAt)<=utc(runProjection.startedAt)&&utc(runProjection.startedAt)<=utc(runProjection.updatedAt),'Reversed validation run.');for(const v of [f.attempt,f.finalRun])ensure(canonical(run(v))===canonical(runProjection),'Latest attempt drifted.');
+ ensure(f.jobs.total_count===1&&f.jobs.jobs.length===1&&j.id===s.jobId&&j.run_id===s.runId&&j.run_attempt===s.runAttempt&&j.head_sha===s.prHeadSha&&j.name===VALIDATION_JOB&&success(j)&&j.url===`https://api.github.com/repos/${REPOSITORY}/actions/jobs/${s.jobId}`&&j.run_url===`https://api.github.com/repos/${REPOSITORY}/actions/runs/${s.runId}`&&j.html_url===`https://github.com/${REPOSITORY}/actions/runs/${s.runId}/job/${s.jobId}`&&j.check_run_url===`https://api.github.com/repos/${REPOSITORY}/check-runs/${s.checkRunId}`,'Validation job differs.');
+ const startedAt=apiTime(j.started_at),completedAt=apiTime(j.completed_at);ensure(utc(startedAt)<=utc(completedAt)&&utc(runProjection.createdAt)<=utc(startedAt)&&utc(completedAt)<=utc(runProjection.updatedAt),'Validation job clock differs.');
+ ensure(j.steps?.length===VALIDATION_STEPS.length,'Unknown validation steps.');let last=utc(startedAt);
+ const steps=j.steps.map((v,i)=>{ensure(v.name===VALIDATION_STEPS[i]&&v.number===[1,2,3,4,5,6,7,8,9,17,18,19][i]&&success(v),'Unsuccessful validation step.');const a=apiTime(v.started_at),b=apiTime(v.completed_at);ensure(last<=utc(a)&&utc(a)<=utc(b)&&utc(b)<=utc(completedAt),'Validation step clock differs.');last=utc(b);return {number:v.number,name:v.name,status:'completed',conclusion:'success',startedAt:a,completedAt:b};});
+ function check(v){ensure(v?.id===s.checkRunId&&v.name===VALIDATION_JOB&&success(v)&&v.head_sha===s.prHeadSha&&v.app?.id===15368&&v.check_suite?.id===s.checkSuiteId&&apiTime(v.started_at)===startedAt&&apiTime(v.completed_at)===completedAt,'Required check differs.');return {id:v.id,suiteId:v.check_suite.id,appId:15368,name:VALIDATION_JOB,status:'completed',conclusion:'success'};}
+ const checkProjection=check(f.check);ensure(canonical(check(f.finalCheck))===canonical(checkProjection),'Required check drifted.');
+ ensure(f.commit?.sha===s.checkedMergeSha&&f.commit.tree?.sha===s.checkedTreeSha&&s.checkedTreeSha===s.candidateTreeSha&&f.commit.parents?.length===2&&f.commit.parents[0].sha===local.parents[0]&&f.commit.parents[1].sha===local.parents[1],'Synthetic ancestry differs.');
+ const pr=f.mergedPull;ensure(pr?.number===s.pullRequestNumber&&pr.merged===true&&pr.merge_commit_sha===s.candidateSha&&pr.head?.sha===s.prHeadSha&&sameRepo(pr.head?.repo)&&pr.base?.ref==='main'&&sameRepo(pr.base?.repo),'Merged PR differs.');
+ ensure(Array.isArray(f.rules)&&f.rules.some(v=>v.type==='required_status_checks'&&v.ruleset_id===25416396&&v.parameters?.required_status_checks?.some(c=>c.context===VALIDATION_JOB&&c.integration_id===15368)),'Required protection differs.');
+ const parsed=parseMandatoryValidationLog(f.log);for(const k of ['pullRequestNumber','checkedMergeSha','nodeVersion','nodeTests','pythonTests','originalJobLogSha256'])ensure(parsed[k]===s[k],'Validation log expectation differs.');
+ ensure(f.runs?.total_count===f.runs.workflow_runs?.length&&f.runs.total_count>0&&f.runs.total_count<=100,'Incomplete validation run list.');let selected=0;const ids=new Set();
+ for(const other of f.runs.workflow_runs){ensure(safeNumber(other.id)&&!ids.has(other.id)&&other.workflow_id===s.workflowId&&other.event==='pull_request'&&other.head_sha===s.prHeadSha&&safeNumber(other.run_attempt),'Invalid validation listing.');ids.add(other.id);if(other.id===s.runId){selected++;ensure(canonical(run(other))===canonical(runProjection),'Selected list attempt differs.');continue;}const a=utc(apiTime(other.created_at)),b=utc(apiTime(other.run_started_at)),c=utc(apiTime(other.updated_at));ensure(a<=b&&b<=c&&other.run_attempt===1&&a<utc(runProjection.createdAt)&&a<utc(startedAt)&&b<utc(startedAt)&&c<utc(startedAt),'Superseding or ambiguous validation run.');}ensure(selected===1,'Selected run absent.');
+ const content={version:1,origin:'github-public-api',selector:Object.fromEntries(SELECTOR_KEYS.map(k=>[k,s[k]])),candidateSha:s.candidateSha,candidateTreeSha:s.candidateTreeSha,parents:[...local.parents],checkedMergeSha:s.checkedMergeSha,checkedTreeSha:s.checkedTreeSha,prBaseSha:local.parents[0],checkoutRef:parsed.checkoutRef,pullRequestNumber:parsed.pullRequestNumber,publisherRuntime:local.publisherRuntime,compilerRuntime:local.compilerRuntime,nodeVersion:parsed.nodeVersion,nodeTests:parsed.nodeTests,pythonTests:parsed.pythonTests,originalJobLogSha256:parsed.originalJobLogSha256,workflow:{id:s.workflowId,path:VALIDATION_PATH,sha256:VALIDATION_HASH,state:'active'},run:runProjection,job:{id:s.jobId,name:VALIDATION_JOB,status:'completed',conclusion:'success',startedAt,completedAt,steps},check:checkProjection,rules:{rulesetId:25416396,requiredCheck:VALIDATION_JOB,integrationId:15368}};
+ return {...content,contentDigest:hash(canonical(content)),checkedAt};
+}
+const RECEIPT_KEYS=['version','origin','selector','candidateSha','candidateTreeSha','parents','checkedMergeSha','checkedTreeSha','prBaseSha','checkoutRef','pullRequestNumber','publisherRuntime','compilerRuntime','nodeVersion','nodeTests','pythonTests','originalJobLogSha256','workflow','run','job','check','rules','contentDigest','checkedAt'];
+function validateValidationReceipt(v,record){
+ ensure(exactKeys(v,RECEIPT_KEYS)&&v.version===1&&v.origin==='github-public-api','Missing validation receipt.');const s=validationSelector(v.selector);const {checkedAt,contentDigest,...content}=v;utc(checkedAt);ensure(hash(canonical(content))===contentDigest&&v.candidateSha===record.sourceSha&&v.candidateSha===s.candidateSha&&v.candidateTreeSha===s.candidateTreeSha&&v.checkedMergeSha===s.checkedMergeSha&&v.checkedTreeSha===s.checkedTreeSha&&v.prBaseSha===s.prBaseSha&&canonical(v.parents)===canonical([s.prBaseSha,s.prHeadSha])&&v.checkoutRef===`refs/remotes/pull/${s.pullRequestNumber}/merge`&&v.pullRequestNumber===s.pullRequestNumber,'Validation receipt content differs.');ensure(node22(v.nodeVersion)&&v.nodeVersion===s.nodeVersion&&v.publisherRuntime===v.nodeVersion&&v.compilerRuntime===v.nodeVersion&&record.build.compiler.runtime===v.nodeVersion&&v.nodeTests===s.nodeTests&&v.pythonTests===s.pythonTests&&v.originalJobLogSha256===s.originalJobLogSha256,'Retained validation runtime/results differ.');
+ ensure(exactKeys(v.workflow,['id','path','sha256','state'])&&v.workflow.id===s.workflowId&&v.workflow.path===VALIDATION_PATH&&v.workflow.sha256===VALIDATION_HASH&&v.workflow.state==='active'&&exactKeys(v.run,['id','attempt','createdAt','startedAt','updatedAt'])&&v.run.id===s.runId&&v.run.attempt===s.runAttempt,'Retained workflow/run differs.');for(const k of ['createdAt','startedAt','updatedAt'])utc(v.run[k]);
+ ensure(exactKeys(v.job,['id','name','status','conclusion','startedAt','completedAt','steps'])&&v.job.id===s.jobId&&v.job.name===VALIDATION_JOB&&success(v.job)&&v.job.steps?.length===VALIDATION_STEPS.length,'Retained validation job differs.');let prior=utc(v.job.startedAt);for(const [i,step]of v.job.steps.entries()){ensure(exactKeys(step,['number','name','status','conclusion','startedAt','completedAt'])&&step.name===VALIDATION_STEPS[i]&&step.number===[1,2,3,4,5,6,7,8,9,17,18,19][i]&&success(step)&&prior<=utc(step.startedAt)&&utc(step.startedAt)<=utc(step.completedAt)&&utc(step.completedAt)<=utc(v.job.completedAt),'Retained validation step differs.');prior=utc(step.completedAt);}
+ ensure(canonical(v.check)===canonical({id:s.checkRunId,suiteId:s.checkSuiteId,appId:15368,name:VALIDATION_JOB,status:'completed',conclusion:'success'})&&canonical(v.rules)===canonical({rulesetId:25416396,requiredCheck:VALIDATION_JOB,integrationId:15368}),'Retained check/protection differs.');return v;
+}
+function validateMandatoryRecord(record,{invocation=false,now}={}){
+ const m=record.mandatoryValidation;ensure(exactKeys(m,invocation?['version','plan','invocation']:['version','plan'])&&m.version===1,'Missing mandatory validation record.');const plan=validateValidationReceipt(m.plan,record);if(invocation){const actual=validateValidationReceipt(m.invocation,record);ensure(actual.contentDigest===plan.contentDigest,'Invocation validation changed.');if(now!==undefined)ensure(utc(actual.checkedAt)<=now&&now-utc(actual.checkedAt)<=30000,'Mandatory validation observation expired.');}return m;
+}
+function validationLocal(ctx,compilerRuntime=process.version){const parents=git('show','-s','--format=%P',ctx.sourceSha).split(' ');return {sourceSha:ctx.sourceSha,treeSha:git('rev-parse',`${ctx.sourceSha}^{tree}`),parents,workflowSha256:hash(execFileSync('git',['show',`${ctx.sourceSha}:${VALIDATION_PATH}`],{maxBuffer:1024*1024,stdio:['ignore','pipe','pipe']})),publisherRuntime:process.version,compilerRuntime};}
+// Duplicate keys are rejected before JSON.parse can silently discard them.
+function strictJson(text){let i=0;function space(){while(/\s/.test(text[i]||'')&&i<text.length)i++;}function value(){space();if(text[i]==='{'){i++;const seen=new Set();space();if(text[i]==='}'){i++;return;}while(true){space();ensure(text[i]==='"','Invalid JSON.');const key=string();ensure(!seen.has(key),'Duplicate JSON key.');seen.add(key);space();ensure(text[i++]===':','Invalid JSON.');value();space();const c=text[i++];if(c==='}')return;ensure(c===',','Invalid JSON.');}}else if(text[i]==='['){i++;space();if(text[i]===']'){i++;return;}while(true){value();space();const c=text[i++];if(c===']')return;ensure(c===',','Invalid JSON.');}}else if(text[i]==='"')string();else{const m=/^(?:true|false|null|-?(?:0|[1-9][0-9]*)(?:[.][0-9]+)?(?:[eE][+-]?[0-9]+)?)/.exec(text.slice(i));ensure(m,'Invalid JSON.');i+=m[0].length;}}function string(){const start=i++;while(i<text.length){if(text[i]==='\\'){i+=2;continue;}if(text[i++]==='"')return JSON.parse(text.slice(start,i));}throw Error('Invalid JSON.');}value();space();ensure(i===text.length,'Invalid JSON.');return JSON.parse(text);}
+function nativeGitHubToken(){const token=process.env.GH_TOKEN;ensure(typeof token==='string'&&token.trim().length>0&&!/[\r\n]/.test(token),'Native GitHub token required.');return token;}
+export async function readMandatoryValidation(selector,local,{phase='plan'}={}){
+ try{
+ const token=nativeGitHubToken();ensure(['plan','invocation'].includes(phase),'Invalid validation phase.');
+ const s=validationSelector(selector),origin=`https://api.github.com/repos/${REPOSITORY}/`,deadline=Date.now()+30000,controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);let calls=0;
+ const apiPaths=new Set([`actions/workflows/${s.workflowId}`,`actions/runs/${s.runId}`,`actions/runs/${s.runId}/attempts/${s.runAttempt}`,`actions/runs/${s.runId}/attempts/${s.runAttempt}/jobs?per_page=100`,`check-runs/${s.checkRunId}`,`git/commits/${s.checkedMergeSha}`,`pulls/${s.pullRequestNumber}`,'rules/branches/main',`actions/jobs/${s.jobId}/logs`,`actions/workflows/${s.workflowId}/runs?event=pull_request&head_sha=${s.prHeadSha}&per_page=100`]);
+ async function body(response,max){const chunks=[];let size=0;ensure(response.body&&typeof response.body.getReader==='function','Missing bounded response stream.');const reader=response.body.getReader();try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;ensure(size<=max&&Date.now()<=deadline,'Response limit exceeded.');chunks.push(Buffer.from(value));}}finally{reader.releaseLock();}return new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(Buffer.concat(chunks));}
+ async function get(path,{log=false,download=false}={}){
+ ensure(++calls<=13&&Date.now()<=deadline,'Validation read budget exceeded.');const url=download?path:origin+path;
+ if(!download){const target=new URL(url);ensure(apiPaths.has(path)&&target.origin==='https://api.github.com'&&!target.username&&!target.password&&(!target.port||target.port==='443')&&target.pathname.startsWith(`/repos/${REPOSITORY}/`),'Invalid evidence origin.');}
+ const response=await fetch(url,{method:'GET',redirect:log?'manual':'error',signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer',...(download?{}:{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',Authorization:`Bearer ${token}`}})});ensure(Date.now()<=deadline,'Validation read expired.');
+ if(!download){const remaining=response.headers.get('x-ratelimit-remaining'),end=response.headers.get('x-ratelimit-reset');ensure(/^(?:0|[1-9][0-9]*)$/.test(remaining||'')&&/^[1-9][0-9]*$/.test(end||''),'Missing quota headers.');const needed=(phase==='plan'?31:18)-(calls-1);ensure(Number.isSafeInteger(Number(remaining))&&Number.isSafeInteger(Number(end)*1000)&&Number(remaining)>=needed&&Number(end)*1000>Date.now(),'Insufficient public API reserve.');ensure(!response.headers.get('link'),'Paginated validation response.');}
+ if(log){ensure(response.status===302,'Missing official log redirect.');const location=response.headers.get('location');ensure(typeof location==='string'&&location.length>0&&location.length<=4096&&/^[\x21-\x7e]+$/.test(location)&&!location.includes('\\'),'Invalid log redirect.');const u=new URL(location),host=u.hostname;ensure(u.protocol==='https:'&&location.startsWith('https://')&&!u.username&&!u.password&&(!u.port||u.port==='443')&&!u.hash&&host&&!host.endsWith('.')&&host.length<=253&&host.split('.').every(label=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))&&(host==='results-receiver.actions.githubusercontent.com'||host.endsWith('.blob.core.windows.net'))&&[host,host+':443'].includes(u.host),'Invalid log redirect.');return location;}
+ ensure(response.status===200,'Public validation read failed.');const type=response.headers.get('content-type')||'';ensure(download?/^text\/plain(?:;|$)/i.test(type):/^(?:application\/json|application\/vnd[.]github[+]json)(?:;|$)/i.test(type),'Unexpected validation media.');const text=await body(response,download?4*1024*1024:1024*1024);return download?text:strictJson(text);
+ }
+ try{
+ const workflow=await get(`actions/workflows/${s.workflowId}`),run=await get(`actions/runs/${s.runId}`),attempt=await get(`actions/runs/${s.runId}/attempts/${s.runAttempt}`),jobs=await get(`actions/runs/${s.runId}/attempts/${s.runAttempt}/jobs?per_page=100`);
+ ensure(jobs.total_count===1&&jobs.jobs?.length===1&&jobs.jobs[0].id===s.jobId&&jobs.jobs[0].check_run_url===origin+`check-runs/${s.checkRunId}`,'Unbound validation job.');
+ const check=await get(`check-runs/${s.checkRunId}`),commit=await get(`git/commits/${s.checkedMergeSha}`),mergedPull=await get(`pulls/${s.pullRequestNumber}`),rules=await get('rules/branches/main');const location=await get(`actions/jobs/${s.jobId}/logs`,{log:true}),log=await get(location,{download:true});const runs=await get(`actions/workflows/${s.workflowId}/runs?event=pull_request&head_sha=${s.prHeadSha}&per_page=100`),finalRun=await get(`actions/runs/${s.runId}`),finalCheck=await get(`check-runs/${s.checkRunId}`);
+ const receipt=validateMandatoryValidation(s,{workflow,run,attempt,jobs,check,commit,mergedPull,rules,log,runs,finalRun,finalCheck},local,new Date().toISOString());ensure(Date.now()<=deadline,'Validation read expired.');return receipt;
+ }finally{clearTimeout(timer);controller.abort();}
+ }catch{throw Error('Mandatory public GitHub validation failed.');}
+}
+
 // Hash the actual inner multipart File, never a separate prebuild or a rewritten module.
 const TOOLING_PATHS=new Set(['.github/workflows/publish.yml','docs/release-process.md','docs/releases/README.md','scripts/check-admin-deployment.mjs','scripts/check-catalogue-deployment.mjs','scripts/check-deployment.mjs','scripts/check-security-deployment.mjs','scripts/release-manifest.mjs','tests/deployment-safety.test.mjs','tests/release-cli.test.mjs','tests/release-manifest.test.mjs']);
+// Independently reviewed M/S to corrected PR47 content, including its separate
+// nonshipping print regression. Suffixes and operator lists confer no authority.
+const PRESENTATION_ENTRIES=[
+ ['index.html','615e463834f226d6cf1ebcd03e5531b9c8535f69','618e5002998db47014174393216c913eede6fb01'],
+ ['src/button-system.css','0c5790252e1dc1ffe5f48674efc208cbffd3f6e0','7fad2ba9c9e4d501adbbf18f4de66feb9d5e5cfd'],
+ ['src/consistency.css','2bee9d951e0438db52d304efea6e86d0be9c8a4c','acc40d8da9b2c393f85d06bffea1a4628c109a56'],
+ ['src/designs/collection-picker.css','c80088a6c8b8e6f898b46c706d7617f34e26814a','0f6aa6df61241ed473a102ff7811c61a5371f7e4'],
+ ['tests/contact-print.browser.mjs',null,'116ef654d68b438fc646d4be8563b37b3cab9b59']
+].map(([path,baseBlob,candidateBlob])=>({path,mode:'100644',baseBlob,candidateBlob}));
+const PRESENTATION_PATHS=new Set(PRESENTATION_ENTRIES.map(v=>v.path));
+function validatePresentationInputs(value){
+ ensure(exactKeys(value,['baselineSourceInputDigest','sourceInputDigest','protectedInputDigest','entries'])&&['baselineSourceInputDigest','sourceInputDigest','protectedInputDigest'].every(k=>DIGEST.test(value[k]||''))&&value.baselineSourceInputDigest!==value.sourceInputDigest&&canonical(value.entries)===canonical(PRESENTATION_ENTRIES),'Presentation inputs are not the independently reviewed content.');return value;
+}
+function trackedTree(sha){
+ ensure(SHA.test(sha||''),'Invalid presentation source.');
+ const entries=git('ls-tree','-rz',sha).split('\0').filter(Boolean).map(line=>{const m=/^(100644|100755) blob ([a-f0-9]{40})\t([^\0\r\n]+)$/.exec(line);ensure(m,'Presentation tree contains an unsupported file mode or type.');return {path:m[3],mode:m[1],blob:m[2]};});
+ ensure(entries.length>0&&new Set(entries.map(v=>v.path)).size===entries.length,'Incomplete presentation tree.');return entries;
+}
+export function presentationInputs(baseSha,sourceSha,{archivePath}={}){
+ const before=trackedTree(baseSha),after=trackedTree(sourceSha),prior=new Map(before.map(v=>[v.path,v])),current=new Map(after.map(v=>[v.path,v]));
+ for(const v of PRESENTATION_ENTRIES){const a=prior.get(v.path),b=current.get(v.path);ensure((v.baseBlob===null?!a:a?.mode===v.mode&&a.blob===v.baseBlob)&&b?.mode===v.mode&&b.blob===v.candidateBlob,'Presentation blob or mode differs from the independent review.');}
+ const protectedEntries=entries=>entries.filter(v=>!TOOLING_PATHS.has(v.path)&&!PRESENTATION_PATHS.has(v.path)&&v.path!==archivePath).sort((a,b)=>a.path.localeCompare(b.path,'en'));
+ const protectedBefore=protectedEntries(before),protectedAfter=protectedEntries(after);ensure(canonical(protectedBefore)===canonical(protectedAfter),'Protected presentation inputs changed.');
+ // The sole excluded test must not become a shipping import. All other shipping
+ // source remains protected, including build programs and their input files.
+ const shipping=after.filter(v=>isSourceInput(v.path)&&/[.](mjs|js|jsx|ts|tsx)$/.test(v.path)).map(v=>v.path);
+ if(shipping.length){let referenced;try{referenced=git('grep','-I','-l','-F','contact-print.browser',sourceSha,'--',...shipping);}catch(error){ensure(error.status===1,'Cannot verify nonshipping presentation test.');}ensure(!referenced,'Presentation test is a shipping dependency.');}
+ const inputs=entries=>hash(entries.filter(v=>isSourceInput(v.path)).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0).map(v=>`${v.path}\0${v.blob}`).join('\n'));
+ return validatePresentationInputs({baselineSourceInputDigest:inputs(before),sourceInputDigest:inputs(after),protectedInputDigest:hash(canonical(protectedBefore)),entries:structuredClone(PRESENTATION_ENTRIES)});
+}
 const CONTROL_NAMES=['_headers','_redirects','_routes.json'];
 const UPLOAD_KEYS=['manifest','branch','commit_hash','commit_dirty','_worker.bundle','functions-filepath-routing-config.json','wrangler_config_hash','pages_build_output_dir',...CONTROL_NAMES];
 const exactKeys=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).sort().join('\0')===[...keys].sort().join('\0');
@@ -98,7 +226,7 @@ export function validatePagesUploadEvidence(value,expected){
 }
 // A release archive is a reviewed historical record, not arbitrary JSON whose
 // filename happens to be under docs/. Never infer source provenance from its URL.
-const ARCHIVE_RECORD_KEYS=['schemaVersion','repository','state','required','completed','reasons','planComplete','sourceSha','workflow','observedAt','baseSha','paths','schemas','beforePagesSourceSha','before','components','sourceDigests','schemaSources','build','activationCompatibility','prerequisites','evidence','guards','attempts','pagesUploadEvidence','githubArtifact','finalProtection','finalIdentityReadbacks','archivedRelease','historicalFunctionsDigest','runAttempt','prewriteValidation','completionEvidence'];
+const ARCHIVE_RECORD_KEYS=['schemaVersion','repository','state','required','completed','reasons','planComplete','sourceSha','workflow','observedAt','baseSha','paths','schemas','beforePagesSourceSha','before','components','sourceDigests','schemaSources','build','activationCompatibility','prerequisites','evidence','guards','attempts','pagesUploadEvidence','githubArtifact','finalProtection','finalIdentityReadbacks','archivedRelease','historicalFunctionsDigest','runAttempt','prewriteValidation','completionEvidence','mandatoryValidation'];
 function historicalTime(value){ensure(typeof value==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d{3}Z$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString()===value&&Date.parse(value)<=Date.now()+30000,'Invalid historical observation.');return value;}
 export function validateReleaseArchiveRecord(record,{sourceSha,candidateSha,baseline}={}){
  const summary=validateBaseline(record);ensure(summary.state==='verified'&&record.schemaVersion===2&&record.sourceSha===sourceSha&&sourceSha!==candidateSha,'Archive is not the completed historical baseline.');
@@ -131,14 +259,15 @@ export function validateReleaseArchiveRecord(record,{sourceSha,candidateSha,base
   ensure(exactKeys(completion,['version','prewriteValidationDigest','completedAt','evidence'])&&completion.version===1&&completion.prewriteValidationDigest===record.prewriteValidation.integrityDigest,'Invalid completion evidence shape.');historicalTime(completion.completedAt);
   const checked=completePair({record,evidence:completion.evidence,observed:{pagesSha:sourceSha,versions:Object.fromEntries(COMPONENTS.map(c=>[c,receipts[c].id]))},now:utc(completion.completedAt)});
   ensure(canonical(checked.completionEvidence)===canonical(completion),'Completion evidence contains unknown or altered fields.');
- }else ensure(!('prewriteValidation' in record)&&!('completionEvidence' in record)&&!('runAttempt' in record)&&!('attempts' in record)&&!('build' in record)&&!('activationCompatibility' in record),'Automated records cannot fall back to the historical manual archive path.');
+ }else ensure(!('prewriteValidation' in record)&&!('completionEvidence' in record)&&!('runAttempt' in record)&&!('attempts' in record)&&!('build' in record)&&!('activationCompatibility' in record)&&!('mandatoryValidation' in record),'Automated records cannot fall back to the historical manual archive path.');
  // Reject payload-bearing or secret/provider diagnostic fields anywhere. Other
  // provenance content is accepted only through the exact reviewed archive hash.
  let nodes=0;function bounded(value){ensure(++nodes<=30000,'Archive metadata is too large.');if(Array.isArray(value)){ensure(value.length<=30000,'Archive array is too large.');for(const item of value)bounded(item);}else if(value&&typeof value==='object'){for(const [key,item]of Object.entries(value)){ensure(!/^(?:token|secret|secret_key|password|customer|body|raw|output|stdout|stderr|formdata|bindings|env_vars|diagnostic|diagnostics|providerresponse|providerdiagnostics)$/i.test(key),'Archive contains raw or private payload fields.');bounded(item);}}else if(typeof value==='string')ensure(value.length<=1000&&!value.includes('/blob/'+candidateSha+'/'),'Archive contains unbounded or self-referential metadata.');else ensure(value===null||typeof value==='boolean'||(typeof value==='number'&&Number.isFinite(value)),'Invalid archive metadata.');}bounded(record);
  return {sourceSha,receiptDigest:hash(canonical(receipts))};
 }
-async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline}){
- const extra=paths.filter(p=>!TOOLING_PATHS.has(p));if(extra.length===0){ensure(!proof,'Unexpected archive evidence without an archive change.');return undefined;}
+async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline,presentation}){
+ if(presentation)validatePresentationInputs(presentation);
+ const extra=paths.filter(p=>!TOOLING_PATHS.has(p)&&!(presentation&&PRESENTATION_PATHS.has(p)));if(extra.length===0){ensure(!proof,'Unexpected archive evidence without an archive change.');return undefined;}
  ensure(extra.length===1&&proof&&Object.keys(proof).every(k=>['origin','reviewed','path','sha256','sourceSha','reviewedAgainstSha','receiptDigest'].includes(k))&&proof.origin==='reviewed-complete-release-archive'&&proof.reviewed===true&&proof.path===extra[0]&&/^docs\/releases\/\d{4}-\d\d-\d\d-release-[a-zA-Z0-9_-]{1,64}[.]json$/.test(proof.path)&&DIGEST.test(proof.sha256||'')&&proof.sourceSha===baseSha&&proof.reviewedAgainstSha===sourceSha,'Archive is not an explicitly reviewed historical release record.');
  ensure(git('diff','--name-status',baseSha,sourceSha,'--',proof.path)==='A\t'+proof.path,'An archived record must be a new immutable addition.');
  const entry=git('ls-tree',sourceSha,'--',proof.path),match=/^100644 blob ([a-f0-9]{40})\t(.+)$/.exec(entry);ensure(match&&match[2]===proof.path,'Archive must be a committed regular file.');
@@ -148,14 +277,132 @@ async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline}){
  return {origin:proof.origin,reviewed:true,path:proof.path,sha256:proof.sha256,sourceSha:baseSha,reviewedAgainstSha:sourceSha,receiptDigest:validated.receiptDigest};
 }
 
-export function validateActivationCompatibility(value,expected){
- ensure(value?.basis==='source-input-tooling-only-v1'&&value.reviewedAgainstSha===expected.sourceSha&&value.baselineSha===expected.baseSha&&value.baselineSha===expected.beforePagesSourceSha&&value.historicalFunctionsDigest===null,'Initial activation compatibility is not reviewed source-based evidence.');
- ensure(expected.paths.every(p=>TOOLING_PATHS.has(p)||(expected.archivedRelease?.path===p&&expected.archivedRelease.sourceSha===expected.baseSha&&expected.archivedRelease.reviewedAgainstSha===expected.sourceSha&&DIGEST.test(expected.archivedRelease.receiptDigest||'')))&&expected.sourceInputDigest===expected.baselineSourceInputDigest,'Activation changes application/runtime/build inputs.');
- for(const k of ['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'])ensure(DIGEST.test(expected[k]||'')&&value[k]===expected[k],'Activation source/compiler/config/assets comparison differs.');
- return {basis:value.basis,reviewedAgainstSha:value.reviewedAgainstSha,baselineSha:value.baselineSha,observedAt:freshTime(value.observedAt,expected.now??Date.now()),...Object.fromEntries(['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'].map(k=>[k,value[k]])),historicalFunctionsDigest:null,privateSnapshotGap:'Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'};
+// Fixed data from the independently reviewed retained input/manifest comparison.
+// There is no environment, evidence or command-line eligibility override.
+const ADMIN_MANIFEST_POLICY=Object.freeze({
+ "inputCount": 63,
+ "inputPathsDigest": "452ac699e8cc2eabf5c3abc0b932c5100a05bb9569067a87d25a48c8e4d93df3",
+ "protectedInputDigest": "f21d97dd4142245ad9d1ce41424e96c911e82db622250c1be9607e73db005528",
+ "inputInventoryDigest": "19f1a70961cad4c061964fbfdcd1636756e166ab4abf3d12faaa55cf39ea6cc8",
+ "baselineManifestSha256": "df5b83212280c77865eeb77c616adb262070368132ff8084ad1b4b949fabb329",
+ "manifestSha256": "62c0c0a6323dec4c2801ae0684038c2eb53e109446c8c1c3ecb0b9a0452fbd61",
+ "manifestBytes": 9321,
+ "deltas": [
+  [
+   "admin/preview.html",
+   "file",
+   "assets/preview-DClyXgPw.js",
+   "assets/preview-BO2S5IF5.js"
+  ],
+  [
+   "admin/preview.html",
+   "css",
+   [
+    "assets/preview-Bmgh2UZY.css"
+   ],
+   [
+    "assets/preview-B8oIOMo5.css"
+   ]
+  ],
+  [
+   "src/Checkout.jsx",
+   "file",
+   "assets/Checkout-DujRvOPI.js",
+   "assets/Checkout-yiAHbjDd.js"
+  ],
+  [
+   "src/CollectionReview.jsx",
+   "file",
+   "assets/CollectionReview-DTTUK1U2.js",
+   "assets/CollectionReview-CFlK5LvH.js"
+  ],
+  [
+   "src/Editor.jsx",
+   "file",
+   "assets/Editor-A_tQgYFk.js",
+   "assets/Editor-ClNrCAAT.js"
+  ],
+  [
+   "src/designs/BusinessStudio.jsx",
+   "file",
+   "assets/BusinessStudio-A0vgIenU.js",
+   "assets/BusinessStudio-Crs7nnJN.js"
+  ],
+  [
+   "src/designs/HandyStudio.jsx",
+   "file",
+   "assets/HandyStudio-DC1xw29y.js",
+   "assets/HandyStudio-DQlNggb1.js"
+  ]
+ ]
+});
+const ADMIN_MANIFEST_PATH='dist/admin/.vite/manifest.json',ADMIN_METAFILE='dist/release/private-inputs/admin-metafile.json';
+const ADMIN_INPUT_KEYS=['version','inputCount','inputPathsDigest','protectedInputDigest','inputInventoryDigest','metafileSha256','manifestSha256','manifestBytes','assetsDigest'];
+function validateAdminInputFacts(v){
+ const p=ADMIN_MANIFEST_POLICY;
+ ensure(exactKeys(v,ADMIN_INPUT_KEYS)&&v.version===1&&['inputCount','inputPathsDigest','protectedInputDigest','inputInventoryDigest','manifestSha256','manifestBytes'].every(k=>v[k]===p[k])&&DIGEST.test(v.metafileSha256||'')&&DIGEST.test(v.assetsDigest||''),'Admin generated input facts differ from the fixed review.');return v;
 }
+// Validate paths before reading input bytes. Raw metadata stays outside the
+// runtime aggregate; only its bounded fingerprint travels with the release.
+export async function adminAssetManifestInputs(){
+ const bytes=await readFile(ADMIN_METAFILE);ensure(bytes.length>0&&bytes.length<2*1024*1024,'Invalid Admin compiler metadata size.');
+ const metadata=strictJson(bytes.toString('utf8')),paths=Object.keys(metadata.inputs||{}).sort(),p=ADMIN_MANIFEST_POLICY;
+ ensure(paths.length===p.inputCount&&hash(JSON.stringify(paths))===p.inputPathsDigest&&paths.includes(ADMIN_MANIFEST_PATH),'Admin compiler input path inventory changed.');
+ const inventory=[];
+ for(const path of paths){
+  ensure(path===posix.normalize(path)&&!path.startsWith('/')&&!path.startsWith('../')&&!path.includes('\\')&&!path.includes('\0'),'Unsafe Admin compiler input.');
+  const input=metadata.inputs[path],data=await readFile(path);ensure(input.bytes===data.length&&Array.isArray(input.imports)&&input.imports.every(v=>v.external?v.path==='<runtime>':paths.includes(v.path)),'Unresolved Admin compiler input.');inventory.push([path,hash(data),data.length]);
+ }
+ const outputs=Object.entries(metadata.outputs||{}).filter(([path])=>!path.endsWith('.map'));
+ ensure(outputs.length===1&&resolve(outputs[0][0])===resolve('dist/release/private/admin/worker.js')&&outputs[0][1].entryPoint==='admin/worker.mjs'&&outputs[0][1].bytes===(await stat('dist/release/private/admin/worker.js')).size&&Array.isArray(outputs[0][1].imports)&&outputs[0][1].imports.length===0&&Object.keys(outputs[0][1].inputs||{}).every(path=>paths.includes(path)),'Admin compiler output metadata differs from its actual emitted runtime.');
+ const protectedInputDigest=hash(JSON.stringify(inventory.filter(v=>v[0]!==ADMIN_MANIFEST_PATH))),inputInventoryDigest=hash(JSON.stringify(inventory));
+ const manifestBytes=await readFile(ADMIN_MANIFEST_PATH),text=manifestBytes.toString('utf8'),manifest=strictJson(text),prior=structuredClone(manifest);
+ ensure(hash(manifestBytes)===p.manifestSha256&&manifestBytes.length===p.manifestBytes,'Admin manifest is not the reviewed candidate.');
+ let oldText=text;
+ for(const [entry,field,before,after]of p.deltas){
+  ensure(canonical(manifest[entry]?.[field])===canonical(after),'Admin manifest field changed.');prior[entry][field]=before;
+  const oldValue=JSON.stringify(Array.isArray(before)?before[0]:before),newValue=JSON.stringify(Array.isArray(after)?after[0]:after);
+  ensure(oldText.split(newValue).length===2,'Ambiguous Admin manifest field.');oldText=oldText.replace(newValue,oldValue);
+ }
+ ensure(hash(oldText)===p.baselineManifestSha256&&canonical(strictJson(oldText))===canonical(prior),'Admin manifest changed outside its seven reviewed fields.');
+ const files=new Set();async function walk(dir){for(const name of (await readdir(dir)).sort()){const path=resolve(dir,name);if((await stat(path)).isDirectory())await walk(path);else files.add(relative(resolve('dist/admin'),path).split('\\').join('/'));}}await walk(resolve('dist/admin'));
+ for(const value of Object.values(manifest)){
+  ensure(value&&typeof value==='object'&&!Array.isArray(value),'Invalid Admin manifest entry.');
+  for(const field of ['file','css','assets'])if(Object.hasOwn(value,field)){
+   const references=field==='file'?[value[field]]:value[field];ensure(Array.isArray(references),'Invalid Admin asset references.');
+   for(const path of references)ensure(typeof path==='string'&&path===posix.normalize(path)&&!path.startsWith('/')&&!path.startsWith('../')&&!/[\\:?\0]/.test(path)&&files.has(path),'Admin manifest asset is missing or unsafe.');
+  }
+  for(const field of ['imports','dynamicImports'])if(Object.hasOwn(value,field))ensure(Array.isArray(value[field])&&value[field].every(key=>Object.hasOwn(manifest,key)),'Admin manifest import is unresolved.');
+ }
+ return validateAdminInputFacts({version:1,inputCount:paths.length,inputPathsDigest:hash(JSON.stringify(paths)),protectedInputDigest,inputInventoryDigest,metafileSha256:hash(bytes),manifestSha256:hash(manifestBytes),manifestBytes:manifestBytes.length,assetsDigest:(await bundleDigest('dist/admin')).sha256});
+}
+function validateAdminManifestCompatibility(v,expected){
+ const admin=expected.privateBuild?.admin,rollback=expected.rollback,b=expected.adminManifestBaseline;
+ ensure(exactKeys(v,['basis','baseline','candidate'])&&v.basis==='reviewed-admin-asset-manifest-v1'&&exactKeys(v.baseline,['sourceSha','id','runtimeDigest','configDigest','assetsDigest','manifestSha256']),'Invalid Admin manifest compatibility.');
+ ensure(b&&canonical(v.baseline)===canonical(b)&&b.sourceSha===expected.baseSha&&b.id===expected.before?.admin&&b.id===rollback?.adminId&&b.sourceSha===rollback?.sourceSha&&b.runtimeDigest===rollback?.adminRuntimeDigest&&b.configDigest===rollback?.adminConfigDigest&&b.assetsDigest===rollback?.adminAssetsDigest&&b.manifestSha256===ADMIN_MANIFEST_POLICY.baselineManifestSha256,'Admin baseline manifest provenance differs.');
+ const c=v.candidate;ensure(exactKeys(c,['sourceSha','runtimeDigest','configDigest',...ADMIN_INPUT_KEYS])&&c.sourceSha===expected.sourceSha&&c.runtimeDigest===admin?.runtimeDigest&&c.configDigest===admin?.configDigest&&c.configDigest===b.configDigest&&DIGEST.test(c.runtimeDigest||''),'Admin candidate runtime/config differs.');
+ const facts=Object.fromEntries(ADMIN_INPUT_KEYS.map(k=>[k,c[k]]));validateAdminInputFacts(facts);ensure(canonical(facts)===canonical(admin.assetManifest)&&c.assetsDigest===expected.adminAssetsDigest,'Admin candidate manifest/input/assets binding differs.');return structuredClone(v);
+}
+
+export function validateActivationCompatibility(value,expected){
+ const presentation=value?.basis==='reviewed-public-presentation-v1';
+ ensure((presentation||value?.basis==='source-input-tooling-only-v1')&&value.reviewedAgainstSha===expected.sourceSha&&value.baselineSha===expected.baseSha&&value.baselineSha===expected.beforePagesSourceSha&&value.historicalFunctionsDigest===null,'Activation compatibility is not reviewed source-based evidence.');
+ const archive=p=>expected.archivedRelease?.path===p&&expected.archivedRelease.sourceSha===expected.baseSha&&expected.archivedRelease.reviewedAgainstSha===expected.sourceSha&&DIGEST.test(expected.archivedRelease.receiptDigest||'');
+ if(presentation){
+  ensure(exactKeys(value,['basis','reviewedAgainstSha','baselineSha','observedAt','sourceInputDigest','baselineSourceInputDigest','presentation','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest','historicalFunctionsDigest',...(Object.hasOwn(value,'privateSnapshotGap')?['privateSnapshotGap']:[]),...(Object.hasOwn(value,'adminAssetManifest')?['adminAssetManifest']:[])])&&(!Object.hasOwn(value,'privateSnapshotGap')||value.privateSnapshotGap==='Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'), 'Unexpected presentation compatibility fields.');
+  const facts=validatePresentationInputs(expected.presentation);validatePresentationInputs(value.presentation);
+  ensure(canonical(value.presentation)===canonical(facts)&&value.baselineSourceInputDigest===expected.baselineSourceInputDigest&&facts.baselineSourceInputDigest===expected.baselineSourceInputDigest&&facts.sourceInputDigest===expected.sourceInputDigest,'Presentation source/baseline/protected comparison differs.');
+  ensure(new Set(expected.paths).size===expected.paths.length&&PRESENTATION_ENTRIES.every(v=>expected.paths.includes(v.path))&&expected.paths.every(p=>TOOLING_PATHS.has(p)||PRESENTATION_PATHS.has(p)||archive(p)),'Unreviewed presentation path.');
+  const admin=expected.privateBuild?.admin,rollback=expected.rollback;
+  if(value.adminAssetManifest)validateAdminManifestCompatibility(value.adminAssetManifest,expected);
+  else ensure(DIGEST.test(admin?.runtimeDigest||'')&&DIGEST.test(admin?.configDigest||'')&&admin.runtimeDigest===rollback?.adminRuntimeDigest&&admin.configDigest===rollback?.adminConfigDigest,'Presentation changed the private Admin executable or configuration.');
+ }else ensure(expected.paths.every(p=>TOOLING_PATHS.has(p)||archive(p))&&expected.sourceInputDigest===expected.baselineSourceInputDigest,'Activation changes application/runtime/build inputs.');
+ for(const k of ['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'])ensure(DIGEST.test(expected[k]||'')&&value[k]===expected[k],'Activation source/compiler/config/assets comparison differs.');
+ return {basis:value.basis,reviewedAgainstSha:value.reviewedAgainstSha,baselineSha:value.baselineSha,observedAt:freshTime(value.observedAt,expected.now??Date.now()),...Object.fromEntries(['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'].map(k=>[k,value[k]])),...(presentation?{baselineSourceInputDigest:value.baselineSourceInputDigest,presentation:structuredClone(value.presentation),...(value.adminAssetManifest?{adminAssetManifest:structuredClone(value.adminAssetManifest)}:{})}:{}),historicalFunctionsDigest:null,privateSnapshotGap:'Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'};
+}
+function isSourceInput(path){return /^(src\/|public\/|data\/|server\/|functions\/|admin\/|security\/|catalogue\/|migrations\/|scripts\/|package(-lock)?[.]json$|vite[.]|wrangler.*[.]jsonc$|index[.]html$)/.test(path)&&!TOOLING_PATHS.has(path);}
 function sourceInputs(sha){
- const files=git('ls-tree','-r','--name-only',sha).split('\n').filter(p=>/^(src\/|public\/|data\/|server\/|functions\/|admin\/|security\/|catalogue\/|migrations\/|scripts\/|package(-lock)?[.]json$|vite[.]|wrangler.*[.]jsonc$|index[.]html$)/.test(p)&&!TOOLING_PATHS.has(p));
+ const files=git('ls-tree','-r','--name-only',sha).split('\n').filter(isSourceInput);
  ensure(files.length>0,'Missing source inputs.');return hash(files.sort().map(p=>`${p}\0${git('rev-parse',`${sha}:${p}`)}`).join('\n'));
 }
 const COMPILER_OPTIONS={directory:'dist/client',functionsDirectory:'functions',bundle:true,sourceMaps:false,branch:'main',commitDirty:false,args:{config:'wrangler.jsonc'}};
@@ -189,22 +436,25 @@ async function uploadContext(record){
  const config=JSON.parse(await readFile('wrangler.jsonc','utf8')),assets=await fileInventory('dist/client');const controls=Object.fromEntries(assets.filter(v=>CONTROL_NAMES.includes(v.path)).map(({path,...v})=>[path,v]));
  return {sourceSha:record.sourceSha,runId:record.workflow.runId,sourceInputDigest:record.build.sourceInputDigest,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,buildDigest:record.build.pages.sha256,assetsDigest:record.build.pages.sha256,config,assetInventory:assets,controls};
 }
-export async function officialPagesUpload(expected,{onBeforeInvoke=()=>{},onAcknowledgement=async()=>{}}={}){
+export async function officialPagesUpload(expected,{record,onAcknowledgement=async()=>{}}={}){
  // Disable disk diagnostics before importing Wrangler. Only bounded hashes escape this call.
  process.env.WRANGLER_LOG='none';process.env.WRANGLER_WRITE_LOGS='false';process.env.WRANGLER_SEND_METRICS='false';
  try{
   const {unstable_pages}=await import('wrangler');
+  ensure(record?.sourceSha===expected.sourceSha,'Missing matched publication plan.');validateMandatoryRecord(record);
+  const invocationContext=context({native:true}),invocation=await readMandatoryValidation(record.mandatoryValidation.plan.selector,validationLocal(invocationContext,record.build.compiler.runtime),{phase:'invocation'});
+  const onBeforeInvoke=({invokedAt,mandatoryValidation})=>armPrewrite(record,invocationContext,invokedAt,mandatoryValidation);
   const options={directory:'dist/client',accountId:DESTINATION_ACCOUNT,projectName:PAGES_PROJECT,branch:'main',commitHash:expected.sourceSha,commitDirty:false,functionsDirectory:'functions',bundle:true,sourceMaps:false,args:{config:'wrangler.jsonc'}};
   // The official API exposes invocation, not its internal HTTP POST clock.
   // No await or I/O may separate this synchronous gate from the one invocation.
-  const invokedAt=new Date().toISOString(),gate=onBeforeInvoke({invokedAt});
+  const invokedAt=new Date().toISOString(),gate=onBeforeInvoke({invokedAt,mandatoryValidation:invocation});
   if(gate&&typeof gate.then==='function'){Promise.resolve(gate).catch(()=>{});throw Error('Pre-invoke validation must be synchronous.');}
   const result=await unstable_pages.deploy(options);
   const acknowledgementObservedAt=new Date().toISOString();
   const acknowledgement=capturePagesAcknowledgement(result.deploymentResponse,expected);
   await onAcknowledgement(acknowledgement,{acknowledgementObservedAt});
   return await capturePagesUpload(result,expected);
- }catch{throw Error('Official Pages upload or fingerprint validation failed.');}
+ }catch{if(record?.attempts?.length===1&&!record.attempts[0].invokedAt){record.attempts[0].outcome='not-invoked';record.reasons.push('PREWRITE_REJECTED: No uploader invocation occurred.');}throw Error('Official Pages upload or fingerprint validation failed.');}
 }
 export function validateArtifactHandoff(value,{record,manifestDigest}){
  ensure(value?.origin==='owner-github-run-artifact'&&value.reviewed===true&&value.sourceSha===record.sourceSha&&value.runId===record.workflow.runId&&value.url===record.workflow.url&&value.artifactName===`release-manifest-${record.workflow.runId}`&&value.runStatus==='completed'&&value.conclusion==='success'&&DIGEST.test(manifestDigest||'')&&value.manifestSha256===manifestDigest,'Downloaded GitHub artifact/run integrity is not reviewed.');
@@ -365,18 +615,20 @@ async function privateBuilds(){
  for(const component of ['admin','security','catalogue']){
   const directory=`dist/release/private/${component}`;
   await rm(directory,{recursive:true,force:true});
-  command('npx',['--no-install','wrangler','deploy','--dry-run','--config',`wrangler.${component}.jsonc`,'--outdir',directory]);
-  components[component]={runtimeDigest:(await bundleDigest(directory,{runtimeOnly:true})).sha256,configDigest:hash(await readFile(`wrangler.${component}.jsonc`))};
+  if(component==='admin'){await mkdir(dirname(ADMIN_METAFILE),{recursive:true});await rm(ADMIN_METAFILE,{force:true});}
+  command('npx',['--no-install','wrangler','deploy','--dry-run','--config',`wrangler.${component}.jsonc`,'--outdir',directory,...(component==='admin'?['--metafile',ADMIN_METAFILE]:[])]);
+  components[component]={runtimeDigest:(await bundleDigest(directory,{runtimeOnly:true})).sha256,configDigest:hash(await readFile(`wrangler.${component}.jsonc`)),...(component==='admin'&&hash(await readFile(ADMIN_MANIFEST_PATH))===ADMIN_MANIFEST_POLICY.manifestSha256?{assetManifest:await adminAssetManifestInputs()}:{})};
  }
  await writeFile('dist/release/private-build-manifest.json',JSON.stringify({sourceSha,components},null,2)+'\n');
 }
 async function readJson(path){ensure((await stat(path)).size<2*1024*1024,'Metadata file too large.');return JSON.parse(await readFile(path,'utf8'));}
 async function save(record){await mkdir(dirname(OUTPUT),{recursive:true});await writeFile(OUTPUT,JSON.stringify(record,null,2)+'\n');}
-function context(){
+function context({native=false}={}){
+ if(native)nativeGitHubToken();
  ensure(process.env.GITHUB_REPOSITORY===REPOSITORY&&process.env.GITHUB_REF==='refs/heads/main','Release requires the expected repository main branch.');
  ensure(process.env.GITHUB_EVENT_NAME==='workflow_dispatch','Publication requires explicit manual dispatch.');
  const sourceSha=process.env.REVIEWED_SHA;
- const latest=JSON.parse(command('gh',['api',`repos/${REPOSITORY}/git/ref/heads/main`])).object.sha;
+ const latest=JSON.parse(command('gh',['api','--hostname','github.com',`repos/${REPOSITORY}/git/ref/heads/main`])).object.sha;
  validateRevision({reviewed:sourceSha,event:process.env.GITHUB_SHA,checkout:git('rev-parse','HEAD'),latest});
  ensure(!git('status','--porcelain'),'Release checkout must be clean.');
  ensure(positiveId(process.env.GITHUB_RUN_ID)&&positiveId(process.env.GITHUB_RUN_ATTEMPT),'Actual GitHub run and attempt IDs required.');
@@ -393,8 +645,8 @@ async function schemaSources(){
  return result;
 }
 function inputEvidence(sourceSha){
- const text=process.env.RELEASE_EVIDENCE_JSON||'';ensure(text.length>0&&text.length<100000,'Explicit sanitized evidence input is required.');
- const value=JSON.parse(text);ensure(value&&typeof value==='object'&&!Array.isArray(value)&&value.sourceSha===sourceSha,'Evidence was reviewed for a different source.');ensure(!('prewriteValidation' in value)&&!('completionEvidence' in value),'Runner phase evidence cannot be caller supplied.');return value;
+ const text=process.env.RELEASE_EVIDENCE_JSON||'';ensure(text.length>0&&Buffer.byteLength(text)<100000,'Explicit sanitized evidence input is required.');
+ const value=strictJson(text);ensure(value&&typeof value==='object'&&!Array.isArray(value)&&value.sourceSha===sourceSha,'Evidence was reviewed for a different source.');ensure(Object.keys(value).every(k=>['sourceSha','baseline','mandatoryValidation','guards','receipts','schema','staged','activationCompatibility','archivedRelease','githubArtifact'].includes(k)),'Unknown evidence input.');return value;
 }
 async function observePages(request=createRequest()){
  const response=await request(`accounts/${DESTINATION_ACCOUNT}/pages/projects/${PAGES_PROJECT}`);
@@ -417,9 +669,9 @@ export async function observeAcknowledgedPages(request,{id,sourceSha,beforeId,be
 function prerequisiteInput(record,evidence=record.evidence){return {required:record.required,sourceSha:record.sourceSha,before:record.before,sourceDigests:record.sourceDigests,beforePagesSourceSha:record.beforePagesSourceSha,privateBuild:record.build.private,schemaSources:record.schemaSources,evidence};}
 const positiveId=value=>typeof value==='string'&&/^[1-9][0-9]{0,19}$/.test(value);
 function utc(value){ensure(typeof value==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d{3}Z$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString()===value,'Invalid phase clock.');return Date.parse(value);}
-function compatibilityInput(record){return {sourceSha:record.sourceSha,baseSha:record.baseSha,beforePagesSourceSha:record.beforePagesSourceSha,paths:record.paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:record.build.sourceInputDigest,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256};}
-function authorizationSnapshot(record){
- return Object.fromEntries(['sourceSha','repository','workflow','runAttempt','planComplete','baseSha','beforePagesSourceSha','before','required','schemas','paths','archivedRelease','sourceDigests','schemaSources','build','activationCompatibility','evidence'].map(k=>[k,record[k]]));
+function compatibilityInput(record){return {sourceSha:record.sourceSha,baseSha:record.baseSha,beforePagesSourceSha:record.beforePagesSourceSha,paths:record.paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:record.build.baselineSourceInputDigest??record.build.sourceInputDigest,presentation:record.build.presentation,before:record.before,adminManifestBaseline:record.build.adminManifestBaseline,privateBuild:record.build.private,rollback:record.evidence?.staged?.rollback,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256};}
+function authorizationSnapshot(record,version=record.prewriteValidation?.version??2){
+ return Object.fromEntries([...(version===2?['mandatoryValidation']:[]),'sourceSha','repository','workflow','runAttempt','planComplete','baseSha','beforePagesSourceSha','before','required','schemas','paths','archivedRelease','sourceDigests','schemaSources','build','activationCompatibility','evidence'].map(k=>[k,record[k]]));
 }
 function validateOriginalAt(record,now){
  const prerequisites=validatePrerequisites({...prerequisiteInput(record),now});
@@ -428,22 +680,23 @@ function validateOriginalAt(record,now){
 }
 // Only the coordinator callback can arm a pending intent. Hashes bind content;
 // reviewed runner source and genuine owner artifact retrieval supply authority.
-function armPrewrite(record,ctx,invokedAt){
+function armPrewrite(record,ctx,invokedAt,invocation){
  const attempt=record.attempts?.[0];
  ensure(record.planComplete===true&&record.state==='planned'&&record.reasons.length===0&&record.attempts?.length===1&&attempt.component==='pages'&&attempt.outcome==='unconfirmed'&&!attempt.invokedAt&&!attempt.acknowledgement&&!record.prewriteValidation&&!record.pagesUploadEvidence,'Prewrite intent is not new.');
  ensure(ctx.sourceSha===record.sourceSha&&ctx.workflow.runId===record.workflow.runId&&ctx.runAttempt===record.runAttempt&&record.repository===REPOSITORY,'Prewrite run/source changed.');
- const now=utc(invokedAt);ensure(utc(attempt.startedAt)<=now,'Prewrite clock reversed.');validateOriginalAt(record,now);
- const stamp={version:1,repository:REPOSITORY,sourceSha:record.sourceSha,runId:record.workflow.runId,runAttempt:record.runAttempt,coordinatorAttempt:1,checkedAt:invokedAt,invokedAt,snapshotDigest:hash(canonical(authorizationSnapshot(record)))};
+ record.mandatoryValidation.invocation=invocation;const now=utc(invokedAt);validateMandatoryRecord(record,{invocation:true,now});ensure(utc(attempt.startedAt)<=now,'Prewrite clock reversed.');validateOriginalAt(record,now);
+ const stamp={version:2,repository:REPOSITORY,sourceSha:record.sourceSha,runId:record.workflow.runId,runAttempt:record.runAttempt,coordinatorAttempt:1,checkedAt:invokedAt,invokedAt,snapshotDigest:hash(canonical(authorizationSnapshot(record)))};
  record.prewriteValidation={...stamp,integrityDigest:hash(canonical(stamp))};attempt.invokedAt=invokedAt;attempt.prewriteValidationDigest=record.prewriteValidation.integrityDigest;
 }
 export function validatePrewriteAuthorization(record,context){
  const stamp=record.prewriteValidation,attempt=record.attempts?.[0];
- ensure(exactKeys(stamp,['version','repository','sourceSha','runId','runAttempt','coordinatorAttempt','checkedAt','invokedAt','snapshotDigest','integrityDigest'])&&stamp.version===1&&stamp.repository===REPOSITORY&&stamp.sourceSha===record.sourceSha&&stamp.runId===record.workflow?.runId&&stamp.runAttempt===record.runAttempt&&positiveId(stamp.runAttempt)&&stamp.coordinatorAttempt===1,'Missing source/run-bound prewrite stamp.');
+ ensure(exactKeys(stamp,['version','repository','sourceSha','runId','runAttempt','coordinatorAttempt','checkedAt','invokedAt','snapshotDigest','integrityDigest'])&&[1,2].includes(stamp.version)&&stamp.repository===REPOSITORY&&stamp.sourceSha===record.sourceSha&&stamp.runId===record.workflow?.runId&&stamp.runAttempt===record.runAttempt&&positiveId(stamp.runAttempt)&&stamp.coordinatorAttempt===1,'Missing source/run-bound prewrite stamp.');
  ensure(context?.repository===REPOSITORY&&context.sourceSha===record.sourceSha&&context.runId===stamp.runId&&context.runAttempt===stamp.runAttempt,'Prewrite authority belongs to another run attempt.');
  const {integrityDigest,...fields}=stamp;
- ensure(DIGEST.test(integrityDigest||'')&&hash(canonical(fields))===integrityDigest&&hash(canonical(authorizationSnapshot(record)))===stamp.snapshotDigest,'Prewrite snapshot integrity differs.');
+ ensure(DIGEST.test(integrityDigest||'')&&hash(canonical(fields))===integrityDigest&&hash(canonical(authorizationSnapshot(record,stamp.version)))===stamp.snapshotDigest,'Prewrite snapshot integrity differs.');
  ensure(record.planComplete===true&&record.attempts?.length===1&&attempt.component==='pages'&&attempt.invokedAt===stamp.invokedAt&&attempt.prewriteValidationDigest===integrityDigest,'Prewrite attempt link differs.');
  ensure(Object.keys(attempt).every(k=>['component','startedAt','outcome','invokedAt','prewriteValidationDigest','acknowledgementObservedAt','acknowledgement','protection'].includes(k))&&['unconfirmed','observed'].includes(attempt.outcome),'Unexpected attempt metadata.');
+ if(stamp.version===2)validateMandatoryRecord(record,{invocation:true,now:utc(stamp.invokedAt)});else ensure(!('mandatoryValidation' in record),'Legacy stamp cannot carry matched validation.');
  const invoked=utc(stamp.invokedAt),received=utc(attempt.acknowledgementObservedAt),now=context.now??Date.now();
  ensure(stamp.checkedAt===stamp.invokedAt&&utc(attempt.startedAt)<=invoked&&invoked<=received&&received<=now+30000,'Prewrite runner clocks are reversed or in the future.');
  const proof=validatePagesUploadEvidence(record.pagesUploadEvidence,{sourceSha:record.sourceSha,runId:stamp.runId,sourceInputDigest:record.build.sourceInputDigest,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,buildDigest:record.build.pages.sha256,assetsDigest:record.build.pages.sha256});
@@ -461,22 +714,27 @@ async function plan(){
  let record={schemaVersion:2,repository:REPOSITORY,state:'blocked',required:[],completed:{},reasons:[],planComplete:false};let phase='CONTEXT';
  try{
   ensure(process.env.PUBLISH_ADMIN!=='true','GitHub publication is Pages-only.');
-  const ctx=context();record={...record,...ctx};
+  const ctx=context({native:true});record={...record,...ctx};
+  phase='MANDATORY_VALIDATION';const evidence=inputEvidence(ctx.sourceSha);record.mandatoryValidation={version:1,plan:await readMandatoryValidation(evidence.mandatoryValidation,validationLocal(ctx))};
   phase='GUARDS';command(process.execPath,['scripts/check-deployment.mjs','before']);
-  phase='BASELINE';const evidence=inputEvidence(ctx.sourceSha),previous=validateBaseline(evidence.baseline),baseSha=previous.baseSha;
+  phase='BASELINE';const previous=validateBaseline(evidence.baseline),baseSha=previous.baseSha;
+  if(evidence.activationCompatibility?.basis==='reviewed-public-presentation-v1')ensure(previous.schemaVersion===2&&previous.state==='verified','Presentation release needs a genuinely completed reviewed baseline.');
   ensure(evidence.baseline.reviewed===true&&typeof evidence.baseline.evidenceUrl==='string'&&new RegExp('^https://github[.]com/'+REPOSITORY+'/(?:actions/runs/[0-9]+|blob/[a-f0-9]{40}/docs/releases/[a-zA-Z0-9_.-]+[.]json)$').test(evidence.baseline.evidenceUrl),'Baseline needs an explicitly reviewed immutable evidence reference.');
   phase='SCOPE';ensure(git('merge-base',baseSha,ctx.sourceSha)===baseSha,'Baseline must be an ancestor of reviewed main.');
   const paths=git('diff','--name-only',baseSha,ctx.sourceSha).split('\n').filter(Boolean),dep=dependencies(ctx.sourceSha),prior=dependencies(baseSha);
   const classification=classifyChanges(paths,Object.fromEntries(['security','catalogue'].map(c=>[c,[...new Set([...dep[c],...prior[c]])]])));
-  phase='ARCHIVE';record.archivedRelease=await releaseArchive(evidence.archivedRelease,{paths,sourceSha:ctx.sourceSha,baseSha,baseline:evidence.baseline});
+  const presentation=paths.some(p=>PRESENTATION_PATHS.has(p))?presentationInputs(baseSha,ctx.sourceSha,{archivePath:evidence.archivedRelease?.path}):undefined;
+  phase='ARCHIVE';record.archivedRelease=await releaseArchive(evidence.archivedRelease,{paths,sourceSha:ctx.sourceSha,baseSha,baseline:evidence.baseline,presentation});
   phase='VERSIONS';const pages=await observePages();
   record={...record,baseSha,paths,required:classification.components,schemas:classification.schemas,beforePagesSourceSha:pages.sourceSha,before:{pages:pages.pages,...Object.fromEntries(['admin','security','catalogue'].filter(c=>ID.test(evidence.guards?.[c]?.id||'')).map(c=>[c,evidence.guards[c].id]))},components:{},sourceDigests:Object.fromEntries(COMPONENTS.map(c=>[c,fingerprint(ctx.sourceSha,c)])),schemaSources:await schemaSources()};
   phase='BUILD';let comparison={components:{}};
   try{comparison=await readJson('dist/release/private-build-manifest.json');ensure(comparison.sourceSha===ctx.sourceSha,'Comparison build source differs.');
-   for(const c of Object.keys(comparison.components)){ensure(['admin','security','catalogue'].includes(c),'Unknown comparison component.');ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===comparison.components[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===comparison.components[c].configDigest,'Comparison bytes/config changed.');}
+   for(const c of Object.keys(comparison.components)){ensure(['admin','security','catalogue'].includes(c),'Unknown comparison component.');ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===comparison.components[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===comparison.components[c].configDigest,'Comparison bytes/config changed.');if(comparison.components[c].assetManifest)ensure(c==='admin'&&canonical(await adminAssetManifestInputs())===canonical(comparison.components[c].assetManifest),'Admin compiler input evidence changed.');}
   }catch{comparison={components:{}};ensure(!record.required.some(c=>['admin','security','catalogue'].includes(c)),'Required private comparison build missing or changed.');}
-  record.build={schemaVersion:2,sourceSha:ctx.sourceSha,sourceInputDigest:sourceInputs(ctx.sourceSha),compiler:await compilerConfig(),ssr:await bundleDigest('dist/ssr'),private:comparison.components,pages:await bundleDigest('dist/client'),admin:await bundleDigest('dist/admin')};
-  phase='ACTIVATION_COMPATIBILITY';record.activationCompatibility=validateActivationCompatibility(evidence.activationCompatibility,{sourceSha:ctx.sourceSha,baseSha,beforePagesSourceSha:pages.sourceSha,paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:sourceInputs(baseSha),compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256});
+  record.build={schemaVersion:2,sourceSha:ctx.sourceSha,sourceInputDigest:sourceInputs(ctx.sourceSha),...(presentation?{baselineSourceInputDigest:presentation.baselineSourceInputDigest,presentation}:{}),compiler:await compilerConfig(),ssr:await bundleDigest('dist/ssr'),private:comparison.components,pages:await bundleDigest('dist/client'),admin:await bundleDigest('dist/admin')};
+  phase='MANDATORY_VALIDATION';validateMandatoryRecord(record);
+  if(evidence.activationCompatibility?.adminAssetManifest){const receipt=evidence.baseline.components?.admin?.receipt;ensure(receipt?.sourceSha===baseSha&&DIGEST.test(receipt.assetsDigest||''),'Genuine baseline Admin asset receipt missing.');record.build.adminManifestBaseline={sourceSha:receipt.sourceSha,id:receipt.id,runtimeDigest:receipt.runtimeDigest,configDigest:receipt.configDigest,assetsDigest:receipt.assetsDigest,manifestSha256:ADMIN_MANIFEST_POLICY.baselineManifestSha256};}
+  phase='ACTIVATION_COMPATIBILITY';record.activationCompatibility=validateActivationCompatibility(evidence.activationCompatibility,{...compatibilityInput(record),baselineSourceInputDigest:sourceInputs(baseSha),rollback:evidence.staged?.rollback});
   await writeFile('dist/release/build-manifest.json',JSON.stringify(record.build,null,2)+'\n');
   phase='PREREQUISITES';record.prerequisites=validatePrerequisites(prerequisiteInput(record,evidence));
   record.evidence=sanitizedEvidence(ctx.sourceSha,record.prerequisites);
@@ -523,13 +781,13 @@ async function publish(component){
  ensure(component==='pages','Only Pages publication is permitted; Admin uses the unchanged private helper.');
  const record=await readJson(OUTPUT);let attempted=false,failure;
  try{
-  const ctx=context();ensure(ctx.sourceSha===record.sourceSha&&record.planComplete===true&&record.state==='planned','No current complete publication plan.');
-  validatePrerequisites(prerequisiteInput(record));
+  const ctx=context({native:true});ensure(ctx.sourceSha===record.sourceSha&&record.planComplete===true&&record.state==='planned','No current complete publication plan.');
+  validateMandatoryRecord(record);validatePrerequisites(prerequisiteInput(record));
   ensure((await observePages()).pages===record.before.pages,'Pages deployment drifted; re-plan.');
   await verifyBuild(record);
   command(process.execPath,['scripts/check-deployment.mjs','before']);
   record.attempts??=[];record.attempts.push({component,startedAt:new Date().toISOString(),outcome:'unconfirmed'});await save(record);attempted=true;
-  record.pagesUploadEvidence=await officialPagesUpload(await uploadContext(record),{onBeforeInvoke:({invokedAt})=>{try{armPrewrite(record,ctx,invokedAt);}catch{record.attempts[0].outcome='not-invoked';record.reasons.push('PREWRITE_REJECTED: No uploader invocation occurred.');throw Error('Prewrite rejected.');}},onAcknowledgement:async (acknowledgement,{acknowledgementObservedAt})=>{const attempt=record.attempts[0];ensure(!attempt.acknowledgement&&!attempt.acknowledgementObservedAt,'Acknowledgement already captured.');attempt.acknowledgement=acknowledgement;attempt.acknowledgementObservedAt=acknowledgementObservedAt;await save(record);}});
+  record.pagesUploadEvidence=await officialPagesUpload(await uploadContext(record),{record,onAcknowledgement:async (acknowledgement,{acknowledgementObservedAt})=>{const attempt=record.attempts[0];ensure(!attempt.acknowledgement&&!attempt.acknowledgementObservedAt,'Acknowledgement already captured.');attempt.acknowledgement=acknowledgement;attempt.acknowledgementObservedAt=acknowledgementObservedAt;await save(record);}});
   await save(record);
   validatePrewriteAuthorization(record,runAuthorizationContext(ctx));
   await verifyBuild(record,{afterWrite:true});
@@ -546,7 +804,7 @@ async function publish(component){
 async function finish(){
  const record=await readJson(OUTPUT);let failure;
  try{
-  const ctx=context();ensure(record.planComplete===true&&ctx.sourceSha===record.sourceSha,'Source or plan changed.');
+  const ctx=context();ensure(record.planComplete===true&&ctx.sourceSha===record.sourceSha&&record.prewriteValidation?.version===2,'Source, matched validation or plan changed.');
   validatePagesUploadEvidence(record.pagesUploadEvidence,{...await uploadContext(record),id:record.completed.pages?.id});
   validatePrewriteAuthorization(record,runAuthorizationContext(ctx));
   await verifyBuild(record,{afterWrite:true});
@@ -581,17 +839,20 @@ export function completePair({record,evidence,observed,now=Date.now()}){
  return {components,completed:Object.fromEntries(COMPONENTS.map(c=>[c,{id:observed.versions[c]}])),prerequisites,completionEvidence:{version:1,prewriteValidationDigest:record.prewriteValidation.integrityDigest,completedAt:new Date(now).toISOString(),evidence:current}};
 }
 async function verifyBuild(record,{local=false,afterWrite=false}={}){
- await releaseArchive(record.archivedRelease,{paths:record.paths,sourceSha:record.sourceSha,baseSha:record.baseSha});
+ const presentation=record.build.presentation?presentationInputs(record.baseSha,record.sourceSha,{archivePath:record.archivedRelease?.path}):undefined;
+ await releaseArchive(record.archivedRelease,{paths:record.paths,sourceSha:record.sourceSha,baseSha:record.baseSha,presentation});
  ensure(!git('status','--porcelain'),'Release source changed after planning.');
  const configDigest=hash(await readFile('wrangler.jsonc')),lockfileDigest=hash(await readFile('package-lock.json'));
  validateCompilerEvidence(record.build.compiler,{configDigest,lockfileDigest});
  // Local Node24/platform bytes are different provenance. Actual runtime/assets
  // parity is checked below; never relabel the retained GitHub compiler as local.
  ensure(sourceInputs(record.sourceSha)===record.build.sourceInputDigest&&(local||(await compilerConfig()).compilerConfigDigest===record.build.compiler.compilerConfigDigest)&&(await bundleDigest('dist/ssr')).sha256===record.build.ssr.sha256,'Source/compiler/SSR inputs changed.');
- ensure(sourceInputs(record.baseSha)===record.build.sourceInputDigest,'Baseline runtime/build inputs differ.');
+ if(presentation)ensure(record.activationCompatibility?.basis==='reviewed-public-presentation-v1'&&canonical(presentation)===canonical(record.build.presentation)&&presentation.baselineSourceInputDigest===record.build.baselineSourceInputDigest&&presentation.sourceInputDigest===record.build.sourceInputDigest,'Presentation baseline/protected inputs differ.');
+ else ensure(record.activationCompatibility?.basis!=='reviewed-public-presentation-v1'&&sourceInputs(record.baseSha)===record.build.sourceInputDigest,'Baseline runtime/build inputs differ.');
  if(!afterWrite)validateActivationCompatibility(record.activationCompatibility,compatibilityInput(record));
  ensure((await bundleDigest('dist/client')).sha256===record.build.pages.sha256&&(await bundleDigest('dist/admin')).sha256===record.build.admin.sha256,'Client output changed after planning.');
  for(const c of Object.keys(record.build.private)){
+  if(record.build.private[c].assetManifest){const facts=await adminAssetManifestInputs(),retained=record.build.private[c].assetManifest,keys=ADMIN_INPUT_KEYS.filter(k=>!local||k!=='metafileSha256');ensure(c==='admin'&&keys.every(k=>facts[k]===retained[k]),'Admin candidate compiler input/manifest/assets changed.');}
   ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===record.build.private[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===record.build.private[c].configDigest,'Private comparison bytes/config changed after planning.');
  }
 }
@@ -600,7 +861,7 @@ async function finishLocal(){
  const record=await readJson(OUTPUT);let failure,completionInput;
  const request=createRequest({CLOUDFLARE_ACCOUNT_ID:DESTINATION_ACCOUNT,CUSTOMVIBE_MIGRATION_SOCKET:process.env.CUSTOMVIBE_MIGRATION_SOCKET});
  try{
-  const ctx=context();ensure(ctx.sourceSha===record.sourceSha&&record.planComplete===true,'Local source does not match the exact workflow source.');
+  const ctx=context();ensure(ctx.sourceSha===record.sourceSha&&record.planComplete===true&&record.prewriteValidation?.version===2,'Local source does not match the exact matched workflow source.');
   ensure(record.reasons.length===0&&record.attempts?.length===1&&record.attempts[0].outcome==='observed','An upload remains failed or unconfirmed.');
   const observed=await observeVersions(request);ensure(observed.pagesSha===record.sourceSha&&observed.versions.pages===record.completed.pages?.id,'Pages drifted since its receipt.');
   const evidence=inputEvidence(record.sourceSha);

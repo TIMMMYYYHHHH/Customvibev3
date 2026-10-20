@@ -99,3 +99,8 @@
 
 .collection-picker-summary .button.action:hover:not(:disabled){background:var(--cv-action-hover)!important}
 .artwork-style-options input:not(:checked)+.artwork-style-card:hover,.collection-picker.collection-picker .collection-choice>button:not([aria-pressed=true]):hover{background:var(--cv-secondary-hover)}
+
+@media (forced-colors:active) {
+ .collection-picker.collection-picker .collection-choice>button{border:3px solid ButtonText}
+ .collection-picker.collection-picker .collection-choice>button[aria-pressed=true]{background:ButtonFace;color:ButtonText;border-color:Highlight;border-style:double}
+}

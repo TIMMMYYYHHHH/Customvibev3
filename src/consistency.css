@@ -380,3 +380,30 @@ body:has(.one-studio) .purchase-progress{width:min(1400px,94%);max-width:none}
 }
 
 .policy-page section{scroll-margin-top:100px}.policy-page .policy-links{display:flex;flex-wrap:wrap;gap:8px 24px;list-style:none;padding:0;margin:18px 0 28px}.policy-page .policy-links a{display:inline-block;padding:8px 0;text-underline-offset:4px;overflow-wrap:anywhere}.policy-page section p+p{margin-top:16px}
+
+/* This guidance is only rendered when scripting is disabled. */
+.javascript-guidance{width:min(1400px,calc(100% - 40px));margin:calc(var(--site-header-height,57px) + 24px) auto 24px;font:400 16px/1.6 'DM Sans Variable',sans-serif;color:#291438}
+.javascript-guidance p{margin:0}
+.javascript-guidance a{color:#ae2e5b;text-underline-offset:4px;overflow-wrap:anywhere}
+.javascript-guidance a:focus-visible{outline:3px solid #291438;outline-offset:4px}
+body:has(.javascript-guidance) #root{padding-top:0}
+
+/* Ordinary website printing only. Artwork masters use separate renderers. */
+@media print{
+ @page{size:A4;margin:12mm}
+ #root{padding-top:0}
+ .unified-header,.global-skip,.purchase-progress,.studio-sections,
+ #root .button,#root .text-button,.collection-choice,.collection-picker-basket,
+ .studio-add,.studio-adjust,.studio-canvas>p,.studio-discount,
+ .studio-copies .stepper button,.studio-choice-row button[aria-pressed=false],
+ .design-quantity button,.artwork-select-label,.collection-picker-summary>h3,.form-security,
+ .locker-location-search,.locker-map,.locker-official-link,
+ .thread-brand:not(.contact-page) .contact-section,.contact-form .action,.unified-footer{display:none!important}
+ .shop-shell .studio-review-bar,.shop-shell .delivery-summary{position:static;box-shadow:none}
+ .shop-shell .delivery-flow-page .checkout-grid{display:block}
+ .shop-shell .delivery-summary{break-before:page;break-inside:avoid}
+ .shop-shell .delivery-summary .checkout-thumbs{max-height:none;overflow:visible}
+ .collection-picker-art{max-height:none;overflow:visible}
+ .design-gallery figure,.studio-stage,.studio-inspector,.delivery-item,.locker-preference,.request-explainer{break-inside:avoid}
+ h1,h2,h3,h4,legend{break-after:avoid}
+}
