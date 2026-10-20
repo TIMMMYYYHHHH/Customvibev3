@@ -33,11 +33,13 @@ const RealDate=Date;global.__clockShift=Number(process.env.CLOCK_SHIFT_MS||0);gl
 const sha=process.env.FIXTURE_SOURCE_SHA||'${sha}',old=process.env.FIXTURE_BASE_SHA||'${old}',id=process.env.FIXTURE_BEFORE_ID||'${id}',next=process.env.FIXTURE_NEXT_ID||'${next}';
 cp.execFileSync=(program,args)=>{
  if(program==='git'){
+  if(args[0]==='-C')args=args.slice(2);
   if(process.env.PRESENTATION_GIT&&(args[0]==='ls-tree'||args[0]==='grep'||(args[0]==='show'&&!args.includes('--format=%P')&&!String(args.at(-1)).endsWith(':.github/workflows/validate.yml'))||(args[0]==='rev-parse'&&String(args.at(-1)).includes(':')))){const mapped=args.map(v=>String(v).replaceAll(sha,process.env.PRESENTATION_SOURCE).replaceAll(old,process.env.PRESENTATION_BASE));return originalExec('git',mapped,{cwd:process.env.PRESENTATION_GIT,encoding:'utf8',stdio:['ignore','pipe','pipe']});}
   if(args[0]==='status')return '';
   if(args[0]==='diff'&&args[1]==='--name-status')return (process.env.ARCHIVE_STATUS||'A')+'\\t'+args.at(-1);
   if(args[0]==='diff')return process.env.CHANGED_PATH||'docs/release-process.md';
-  if(args[0]==='merge-base')return old;
+  if(args[0]==='merge-base')return args[1]===args[2]?args[1]:old;
+  if(args[0]==='ls-tree'&&args[1]!=='-r'&&args.at(-1)==='docs/dependency-maintenance.md'&&process.env.RECOVERY_DOC_BEFORE)return '100644 blob '+(args[1]===old?process.env.RECOVERY_DOC_BEFORE:process.env.RECOVERY_DOC_AFTER)+'\\t'+args.at(-1);
   if(args[0]==='ls-tree'&&args[1]!=='-r'){const file=args.at(-1),bytes=fs.readFileSync(file),blob=require('node:crypto').createHash('sha1').update(Buffer.concat([Buffer.from('blob '+bytes.length+'\\0'),bytes])).digest('hex');return (process.env.ARCHIVE_MODE||'100644')+' blob '+(process.env.ARCHIVE_BLOB||blob)+'\\t'+file;}
   if(args[0]==='show'&&args.includes('--format=%P'))return old+' '+(process.env.FIXTURE_PR_HEAD_SHA||'e'.repeat(40));
   if(args[0]==='show'&&String(args.at(-1)).endsWith(':.github/workflows/validate.yml'))return fs.readFileSync('validate.yml');
@@ -46,7 +48,7 @@ cp.execFileSync=(program,args)=>{
   if(args[0]==='ls-tree')return 'security/index.mjs\\ncatalogue/index.mjs\\nserver/proof-api.mjs';
   return sha;
  }
- if(program==='gh'){if(process.env.AMBIENT_GH_HOST_PROBE==='true'&&!(args.includes('--hostname')&&args[args.indexOf('--hostname')+1]==='github.com'))throw Error('PRIVATE_AMBIENT_HOST_SENTINEL');fs.appendFileSync('context-calls.log','current-main\\n');if(process.env.FAIL_CONTEXT==='true')throw Error('${marker}');return JSON.stringify({object:{sha:process.env.DRIFT==='true'?old:sha}});}
+ if(program==='gh'){if(args.at(-1).includes('/actions/runs?'))return JSON.stringify({total_count:0,workflow_runs:[]});if(process.env.AMBIENT_GH_HOST_PROBE==='true'&&!(args.includes('--hostname')&&args[args.indexOf('--hostname')+1]==='github.com'))throw Error('PRIVATE_AMBIENT_HOST_SENTINEL');fs.appendFileSync('context-calls.log','current-main\\n');if(process.env.FAIL_CONTEXT==='true')throw Error('${marker}');return JSON.stringify({object:{sha:process.env.DRIFT==='true'?old:sha}});}
  if(program==='npx'){
   fs.appendFileSync('provider-calls.log',args.join(' ')+'\\n');
   if(process.env.UPLOAD_RESULT==='success'){fs.writeFileSync('uploaded','yes');return 'synthetic acknowledgement';}
@@ -59,7 +61,7 @@ cp.execFileSync=(program,args)=>{
  throw Error('Unexpected process');
 };
 
-const fsp=require('node:fs/promises'),realWrite=fsp.writeFile;fsp.writeFile=async(path,data,...rest)=>{const out=await realWrite(path,data,...rest);if(String(path).endsWith('release-manifest.json')&&process.env.INTENT_DELAY_MS){const r=JSON.parse(String(data));if(r.attempts?.length===1&&!r.attempts[0].invokedAt)global.__clockShift+=Number(process.env.INTENT_DELAY_MS);}return out;};
+const fsp=require('node:fs/promises'),realRead=fsp.readFile,realWrite=fsp.writeFile;fsp.readFile=async(path,...rest)=>{const value=await realRead(path,...rest);if(String(path)==='dist/release/release-manifest.json'&&process.env.RECOVERY_FINAL_READ_DELAY_MS)global.__clockShift+=Number(process.env.RECOVERY_FINAL_READ_DELAY_MS);return value;};fsp.writeFile=async(path,data,...rest)=>{const out=await realWrite(path,data,...rest);if(String(path).endsWith('release-manifest.json')&&process.env.INTENT_DELAY_MS){const r=JSON.parse(String(data));if(r.attempts?.length===1&&!r.attempts[0].invokedAt)global.__clockShift+=Number(process.env.INTENT_DELAY_MS);}return out;};
 const fakeApi=\`
 import fs from 'node:fs';
 global.__clockShift+=Number(process.env.IMPORT_DELAY_MS||0);
@@ -213,6 +215,7 @@ async function completionFixture(t,{allFour=false,presentation=false,planOnly=fa
  source=source.slice(0,a)+`
  if(program===process.execPath){
   fs.appendFileSync('guard-calls.log',args.join(' ')+'\\n');
+  if(process.env.FAIL_GUARD_INVOCATION==='true')throw Error('synthetic guard invocation failure');
   if(process.env.RACE_COMPONENT&&!fs.existsSync('race-on'))fs.writeFileSync('race-on',process.env.RACE_COMPONENT);
   if(process.env.FAIL_FINAL_IDENTITY)fs.writeFileSync('final-readback','yes');
   fs.appendFileSync('guard-bindings.log',JSON.stringify({script:args[0],expected:Object.fromEntries(Object.entries(options.env||{}).filter(([k])=>k.startsWith('EXPECTED_')))})+'\\n');
@@ -840,4 +843,49 @@ test('private-builds requests the Admin metafile outside the runtime tree and ca
  assert.deepEqual(Object.keys(record.components),['admin','security','catalogue']);
  const calls=(await readFile(join(f.dir,'compiler-calls.log'),'utf8')).trim().split('\n').map(JSON.parse);assert.equal(calls.length,3);assert.equal(calls.filter(v=>v.includes('--metafile')).length,1);
  assert.deepEqual((await readdir(join(f.dir,'dist/release/private/admin'))).sort(),['worker.js']);
+});
+
+const canonicalRecoveryJson=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
+const recoveryHash=value=>createHash('sha256').update(value).digest('hex');
+async function recoveryFixture(t){
+ const hash=recoveryHash,canonical=canonicalRecoveryJson;
+ const f=await completionFixture(t,{allFour:true}),original=await readFile(f.path),originalRecord=JSON.parse(original);
+ const failedResult=await f.local({FAIL_GUARD_INVOCATION:'true'});assert.equal(failedResult.status,1);assert.deepEqual(failedResult.record.reasons,['FINAL_GUARD_FAILED: One or more local component protections failed.']);
+ const failed=await readFile(f.path),admin=Buffer.from(JSON.stringify(f.finalEvidence.receipts.admin)),zip=Buffer.from('synthetic original immutable ZIP');
+ for(const [name,bytes]of [['original.json',original],['failed.json',failed],['admin.json',admin],['original.zip',zip]])await writeFile(join(f.dir,name),bytes);
+ const policy={sourceSha:sha,original:{bytes:original.length,sha256:hash(original),canonicalSha256:hash(canonical(originalRecord))},failed:{bytes:failed.length,sha256:hash(failed),canonicalSha256:hash(canonical(failedResult.record))},admin:{bytes:admin.length,sha256:hash(admin),canonicalSha256:hash(canonical(f.finalEvidence.receipts.admin))},zipSha256:hash(zip),artifactCanonicalSha256:hash(canonical({...f.finalEvidence.githubArtifact,zipSha256:hash(zip)})),stampVersion:2,leasePath:join(f.dir,'synthetic-recovery.lease'),nodeRuntime:process.version,nodeSha256:hash(await readFile(process.execPath)),compilerRoot:'coordinator/node_modules',installedInputs:await (await import(pathToFileURL(f.cli))).installedInputDigest(join(f.dir,'coordinator/node_modules')),docChanges:[]};
+ let text=await readFile(f.cli,'utf8');const start='const PAIRED_RECOVERY_POLICY=Object.freeze(',end='\n});';assert.equal(text.split(start).length,2);const a=text.indexOf(start)+start.length,b=text.indexOf(end,a)+2;assert.ok(b>a);text=text.slice(0,a)+JSON.stringify(policy,null,2)+text.slice(b);await writeFile(f.cli,text);
+ const artifact={...f.finalEvidence.githubArtifact,zipSha256:hash(zip)},input={version:1,originalPath:join(f.dir,'original.json'),failedPath:join(f.dir,'failed.json'),adminReceiptPath:join(f.dir,'admin.json'),zipPath:join(f.dir,'original.zip'),artifact,evidence:f.finalEvidence,supportStartedAt:new Date().toISOString(),verifier:{reviewed:true,revision:sha,tree:'d9ebd59f26e2fea7ef82e5e2831cb66851a5ae1a',changes:[]}};
+ const out=join(f.dir,'new-recovery.json');await writeFile(join(f.dir,'recovery-input.json'),JSON.stringify(input));
+ await writeFile(join(f.dir,'validate-recovery.mjs'),`import {readFile} from 'node:fs/promises';import {validateBaseline,validateReleaseArchiveRecord} from ${JSON.stringify(pathToFileURL(f.cli).href)};const r=JSON.parse(await readFile('validation-recovery.json','utf8'));validateBaseline(r);validateReleaseArchiveRecord(r,{sourceSha:${JSON.stringify(sha)},candidateSha:'c'.repeat(40)});`);
+ return {...f,input,out,original,failed,async validate(record){await writeFile(join(f.dir,'validation-recovery.json'),JSON.stringify(record));execFileSync(process.execPath,['--require',join(f.dir,'preload.cjs'),join(f.dir,'validate-recovery.mjs')],{cwd:f.dir,env:process.env,stdio:['ignore','pipe','pipe']});},async recover(extra={},output=out){return f.run(['recover-local',join(f.dir,'recovery-input.json'),output],{GITHUB_ACTIONS:'false',GH_TOKEN:'',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',...extra});}};
+}
+test('canonical recovery is a new exclusive entry with acknowledged history, fresh closure and unchanged sticky failure',async t=>{
+ const f=await recoveryFixture(t),uploadsBefore=await readFile(join(f.dir,'provider-calls.log'),'utf8'),result=await f.recover();assert.equal(result.status,0,result.stderr);const recovered=JSON.parse(await readFile(f.out));
+ assert.equal(recovered.kind,'paired-release-recovery-v1');assert.equal(recovered.state,'verified');assert.equal(recovered.sourceSha,sha);assert.equal(recovered.recovery.failed.value.state,'partial');assert.deepEqual(recovered.recovery.failed.value.reasons,['FINAL_GUARD_FAILED: One or more local component protections failed.']);assert.equal(recovered.components.admin.receipt.id,next);assert.equal(recovered.recovery.providerMutations,0);assert.deepEqual(await readFile(f.path),f.failed);assert.deepEqual(await readFile(join(f.dir,'original.json')),f.original);assert.equal(result.uploads,uploadsBefore);
+ await f.validate(recovered);
+ const before=await readFile(f.out);const repeated=await f.recover();assert.equal(repeated.status,1);assert.deepEqual(await readFile(f.out),before);assert.deepEqual(await readFile(f.path),f.failed);
+ for(const mutate of [v=>v.recovery.failed.value.reasons=[],v=>v.recovery.artifact.conclusion='failure',v=>v.recovery.evidence.schema.content.ddlReviewed=false,v=>v.finalProtection.checks[0].observedId=id,v=>v.recovery.checkedAt=new Date(Date.parse(v.recovery.conservativeCutoff)+1).toISOString(),v=>v.recovery.original.value.sourceSha=old,v=>v.recovery.admin.value.assetsDigest='d'.repeat(64),v=>v.recovery.verifier.changes=[{path:'docs/unreviewed.md',before:{mode:'100644',blob:old},after:{mode:'100644',blob:sha}}],v=>v.recovery.original.value.providerDiagnostics='PRIVATE_UNARCHIVABLE_SENTINEL']){const changed=structuredClone(recovered);mutate(changed);await assert.rejects(()=>f.validate(changed));}
+});
+
+test('canonical recovery rejects current drift, stale schema, changed rollback and a clock crossing during the final read',async t=>{
+ const f=await recoveryFixture(t),uploadsBefore=await readFile(join(f.dir,'provider-calls.log'),'utf8');
+ const cases=[{env:{DRIFT:'true'}},{env:{RACE_COMPONENT:'security'}},{env:{RECOVERY_FINAL_READ_DELAY_MS:'600001'}},{mutate:v=>v.evidence.schema.content.ddlReviewed=false},{mutate:v=>v.evidence.staged.rollback.pagesBuildDigest='d'.repeat(64)},{mutate:v=>v.supportStartedAt=new Date(Date.now()-600001).toISOString()},{mutate:v=>v.artifact.runAttempt='2'}];
+ for(const [i,c]of cases.entries()){await rm(join(f.dir,'race-on'),{force:true});const input=structuredClone(f.input);if(c.mutate)c.mutate(input);await writeFile(join(f.dir,'recovery-input.json'),JSON.stringify(input));const output=join(f.dir,'rejected-'+i+'.json'),result=await f.recover(c.env||{},output);assert.equal(result.status,1,'case '+i+' must reject');assert.equal(JSON.parse(await readFile(output)).state,'blocked');assert.equal(result.uploads,uploadsBefore);assert.deepEqual(await readFile(f.path),f.failed);assert.doesNotMatch(result.stdout+result.stderr,/PRIVATE_/);}
+});
+
+test('future CLI archive consumption binds the recovered pair and exact document Git tuple',async t=>{
+ const f=await recoveryFixture(t);assert.equal((await f.recover()).status,0);const recovered=JSON.parse(await readFile(f.out));
+ const a=await archiveFixture(t),path='docs/dependency-maintenance.md',blob=text=>createHash('sha1').update('blob '+Buffer.byteLength(text)+'\0'+text).digest('hex'),doc={path,before:{mode:'100644',blob:blob('old approved document')},after:{mode:'100644',blob:blob('new approved document')}};
+ let source=await readFile(f.cli,'utf8');const token='"docChanges": []';assert.equal(source.split(token).length,2);source=source.replace(token,'"docChanges": '+JSON.stringify([doc]));await writeFile(a.cli,source);
+ const bytes=JSON.stringify(recovered);await writeFile(join(a.dir,a.archivePath),bytes);a.evidence.baseline={...recovered,reviewed:true,evidenceUrl:a.evidence.baseline.evidenceUrl};a.evidence.archivedRelease.sha256=recoveryHash(bytes);
+ const env={CHANGED_PATH:a.archivePath+'\n'+path,RECOVERY_DOC_BEFORE:doc.before.blob,RECOVERY_DOC_AFTER:doc.after.blob};
+ const accepted=await a.runArchive(['plan'],env);assert.equal(accepted.status,0,accepted.record.reasons.join('\n'));assert.deepEqual(accepted.record.archivedRelease.recoveryDocChanges,[doc]);
+ for(const patch of [{RECOVERY_DOC_AFTER:old},{RECOVERY_DOC_BEFORE:sha},{ARCHIVE_MODE:'120000'},{CHANGED_PATH:a.archivePath+'\ndocs/arbitrary.md'}]){const rejected=await a.runArchive(['plan'],{...env,...patch});assert.equal(rejected.status,1);assert.equal(rejected.uploads,'');}
+});
+
+test('canonical recovery rejects coordinated Admin URL and actual GitHub handoff substitutions',async t=>{
+ const f=await recoveryFixture(t);assert.equal((await f.recover()).status,0);const original=JSON.parse(await readFile(f.out));
+ const cases=[['Admin URL',v=>{const url='https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/99999';v.recovery.evidence.receipts.admin.evidenceUrl=url;v.components.admin.receipt.evidenceUrl=url;}],['artifact ID',v=>v.recovery.artifact.artifactId='99999'],['job ID',v=>v.recovery.artifact.jobId='99999'],['publishing step bounds',v=>{v.recovery.artifact.publishStep.startedAt=new Date(Date.parse(v.recovery.artifact.publishStep.startedAt)-1000).toISOString();v.recovery.artifact.publishStep.completedAt=new Date(Date.parse(v.recovery.artifact.publishStep.completedAt)+1000).toISOString();}]];
+ for(const [name,mutate]of cases)await t.test(name,async()=>{const changed=structuredClone(original);mutate(changed);await assert.rejects(()=>f.validate(changed));});
 });
