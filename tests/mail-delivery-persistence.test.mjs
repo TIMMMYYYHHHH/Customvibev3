@@ -79,9 +79,9 @@ test('uncertain commit never returns applied and later exact replay observes the
  const env=artworkEnv();await initial(env);const batch=env.DB.batch;env.DB.batch=async statements=>{await batch(statements);throw Error('Synthetic lost commit acknowledgement')};assert.equal((await call(env,'mail-delivery/observe',event())).status,503);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,1);env.DB.batch=batch;assert.equal((await(await call(env,'mail-delivery/observe',event())).json()).disposition,'duplicate');
 });
 // Exercise the real released public sender against the additive migrated backend.
-import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
-import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {build} from 'esbuild';
@@ -89,8 +89,14 @@ import {submissions as currentSender} from '../server/submissions.mjs';
 import {defaultContent} from '../src/content/model.mjs';
 import {tile} from './helpers/artwork.mjs';
 let releasedSenderPromise;
+// Exact source-only snapshot from db23134b8f3336c8b0f33223b9e7dab3e4bed7ba:
+// server/submissions.mjs, Git blob 71f31019483d82976ca5ca4136fca827d4f0f3f6,
+// 11735 bytes, SHA256 d991a42a3f2454b55237a8296e9efb2159cb8dc71cce9b6be24929c2758b9b34.
+// No credentials or customer records. The fixture bytes and released logic are
+// unchanged. Resolve its original relative imports from server/ as before;
+// only this test loader replaces git-show, so shallow CI needs no old objects.
 async function releasedSender(){
- if(!releasedSenderPromise)releasedSenderPromise=(async()=>{const source=execFileSync('git',['show','db23134b8f3336c8b0f33223b9e7dab3e4bed7ba:server/submissions.mjs'],{encoding:'utf8'});const bundled=await build({stdin:{contents:source,resolveDir:process.cwd()+'/server',sourcefile:'released-submissions.mjs'},bundle:true,platform:'node',format:'cjs',write:false});const directory=mkdtempSync(join(tmpdir(),'tech03-released-recovery-'));test.after(()=>rmSync(directory,{recursive:true,force:true}));const path=join(directory,'released.cjs');writeFileSync(path,bundled.outputFiles[0].text);return createRequire(import.meta.url)(path).submissions})();
+ if(!releasedSenderPromise)releasedSenderPromise=(async()=>{const bytes=readFileSync(new URL('./fixtures/released-submissions-db231.mjs',import.meta.url));assert.equal(bytes.length,11735,'Released sender fixture length');assert.equal(createHash('sha256').update(bytes).digest('hex'),'d991a42a3f2454b55237a8296e9efb2159cb8dc71cce9b6be24929c2758b9b34','Released sender fixture identity');const bundled=await build({stdin:{contents:bytes.toString('utf8'),resolveDir:process.cwd()+'/server',sourcefile:'released-submissions.mjs'},bundle:true,platform:'node',format:'cjs',write:false});const directory=mkdtempSync(join(tmpdir(),'tech03-released-recovery-'));test.after(()=>rmSync(directory,{recursive:true,force:true}));const path=join(directory,'released.cjs');writeFileSync(path,bundled.outputFiles[0].text);return createRequire(import.meta.url)(path).submissions})();
  return releasedSenderPromise;
 }
 async function recoveryFixture({partial=false,current=false}={}){
