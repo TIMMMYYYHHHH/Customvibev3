@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "account": "4f57d4e924674cb87b33d4c884745cf6",
+  "component": "security",
+  "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+  "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+  "sourceDigest": "f690eaefe2357c184e5fe29a7eb2d7e0938a79b3861b7be34dd8a7815fa0f95c",
+  "runtimeDigest": "96bc461147c9283f1973b065e3a0917f36cb35ae55ceb39f89009d88e411f365",
+  "configDigest": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936",
+  "origin": "guarded-upload",
+  "observedAt": "2026-10-20T23:31:08.366Z"
+}
