@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "kind": "manual-upload-provenance",
+  "status": "recorded-upload-facts",
+  "baselineSourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+  "components": {
+    "admin": {
+      "account": "4f57d4e924674cb87b33d4c884745cf6",
+      "component": "admin",
+      "sourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+      "versionId": "da3bd3f4-e4f3-4ac3-b0cf-f097a6c94686",
+      "deploymentId": "436c5cd4-f647-4b94-8e92-c4b91838999b",
+      "acknowledgedAt": "2026-10-20T00:25:49.836Z",
+      "sourceEvidenceSha256": "2b543ef148de59afe6bb56a5f95cb9ffa6e18b61822f3f0c1705b7aedaf7d7a1",
+      "acknowledgementEvidenceSha256": "d635007f3734f85576f14340359cedb0a595df9d402da11e7e1da64019ce8461",
+      "artifactSha256": "e1d0caa27a2b500d6917af56317cff543278d60ed7f7ffd4a141a32a81f7bb37",
+      "artifactBytes": 273372,
+      "configSha256": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0",
+      "assetsSha256": "9a2341ed5742be6befa82c776b7b818a3134bd092e5b8d9a4597270c771963cf"
+    },
+    "security": {
+      "account": "4f57d4e924674cb87b33d4c884745cf6",
+      "component": "security",
+      "sourceSha": "56bfa322eb50f67e4ad23c321f58c4fb98af44c5",
+      "versionId": "2609be51-fb7f-45f4-8133-50217b513d51",
+      "deploymentId": "3ce85761-ef31-46fc-b203-ca708012e1d9",
+      "acknowledgedAt": "2026-10-19T21:38:11.091537Z",
+      "sourceEvidenceSha256": "14acf939cab42b4458e50230ccc173e8136b1ff52b3cae20bc19db97b48763a9",
+      "acknowledgementEvidenceSha256": "14acf939cab42b4458e50230ccc173e8136b1ff52b3cae20bc19db97b48763a9",
+      "artifactSha256": "60bde679ff9bdd18d7ac319e1b6151915b457c39452252774846e44f7420eca8",
+      "artifactBytes": 72108,
+      "configSha256": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936",
+      "assetsSha256": null
+    },
+    "catalogue": {
+      "account": "4f57d4e924674cb87b33d4c884745cf6",
+      "component": "catalogue",
+      "sourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+      "versionId": "ca076596-23f8-4f89-a860-ca36e5d1acba",
+      "deploymentId": "31739c24-f55e-4a2f-ba8c-96f6bfdcae34",
+      "acknowledgedAt": "2026-10-20T07:49:34.472871Z",
+      "sourceEvidenceSha256": "48c1777086e004a1c9cd2f3ae404692e47acbd6ced306ffa5a1cac3e64efd568",
+      "acknowledgementEvidenceSha256": "e911a48a9af1720b9d1a439504a6b93dcb9aa4fa1900c2dba0881f205120347c",
+      "artifactSha256": "8434acf78531bf43a62dacb465afaf97687321965e2ddb0cd0ef87d595cb64fb",
+      "artifactBytes": 156556,
+      "configSha256": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+      "assetsSha256": null
+    }
+  }
+}
