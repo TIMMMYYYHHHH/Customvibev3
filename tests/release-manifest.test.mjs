@@ -145,7 +145,7 @@ test('workflow pins source and keeps current permission and Pages-only publicati
  const {readFile}=await import('node:fs/promises');const workflow=await readFile(new URL('../.github/workflows/publish.yml',import.meta.url),'utf8');
  assert.match(workflow,/ref: \$\{\{ github.sha \}\}/);assert.match(workflow,/permissions:\n  contents: read\nconcurrency:/);
  assert.doesNotMatch(workflow,/actions: read|publish admin|check-admin-deployment|check-security-deployment|check-catalogue-deployment|d1 execute|d1 migrations/);
- assert.match(workflow,/CV_CHECK_BUILT_NOTICES: '1'/);assert.match(workflow,/check-dependency-notices.mjs --outputs --bundles/);
+ const validation=await readFile(new URL('../.github/workflows/validate.yml',import.meta.url));assert.equal(hash(validation),'1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389');assert.match(validation.toString(),/CV_CHECK_BUILT_NOTICES: '1'/);assert.match(workflow,/check-dependency-notices.mjs --outputs --bundles/);
  assert.match(workflow,/group: customvibe-production/);assert.match(workflow,/if: always\(\) && steps.release_plan.outcome == 'success'/);
 });
 
@@ -285,7 +285,7 @@ function mandatoryFixture(){
  const names=['Set up job',checkout,setup,'Install locked dependencies','Build storefront and server-rendered pages','Build admin and storefront preview','Verify shipped third-party notices','Run local fixture tests','Run Python security-helper fixtures','Post '+setup,'Post '+checkout,'Complete job'];
  const steps=[{"name":"Set up job","status":"completed","conclusion":"success","number":1,"started_at":"2026-10-20T10:01:42Z","completed_at":"2026-10-20T10:01:43Z"},{"name":"Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262","status":"completed","conclusion":"success","number":2,"started_at":"2026-10-20T10:01:43Z","completed_at":"2026-10-20T10:01:48Z"},{"name":"Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020","status":"completed","conclusion":"success","number":3,"started_at":"2026-10-20T10:01:48Z","completed_at":"2026-10-20T10:01:49Z"},{"name":"Install locked dependencies","status":"completed","conclusion":"success","number":4,"started_at":"2026-10-20T10:01:49Z","completed_at":"2026-10-20T10:01:56Z"},{"name":"Build storefront and server-rendered pages","status":"completed","conclusion":"success","number":5,"started_at":"2026-10-20T10:01:56Z","completed_at":"2026-10-20T10:02:09Z"},{"name":"Build admin and storefront preview","status":"completed","conclusion":"success","number":6,"started_at":"2026-10-20T10:02:09Z","completed_at":"2026-10-20T10:02:15Z"},{"name":"Verify shipped third-party notices","status":"completed","conclusion":"success","number":7,"started_at":"2026-10-20T10:02:15Z","completed_at":"2026-10-20T10:02:24Z"},{"name":"Run local fixture tests","status":"completed","conclusion":"success","number":8,"started_at":"2026-10-20T10:02:24Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Run Python security-helper fixtures","status":"completed","conclusion":"success","number":9,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020","status":"completed","conclusion":"success","number":17,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262","status":"completed","conclusion":"success","number":18,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Complete job","status":"completed","conclusion":"success","number":19,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"}];
  const run={id:39404961304,run_attempt:1,workflow_id:389570831,path:'.github/workflows/validate.yml',name:'Validate proposed CustomVibe changes',event:'pull_request',head_sha:head,repository:repo,head_repository:repo,pull_requests:[],status:'completed',conclusion:'success',check_suite_id:987,created_at:'2026-10-20T10:01:39Z',run_started_at:'2026-10-20T10:01:42Z',updated_at:'2026-10-20T10:09:38Z',html_url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304'};
- const job={id:118568540207,run_id:run.id,run_attempt:1,head_sha:head,name:'Node 22 build and fixture tests',status:'completed',conclusion:'success',started_at:'2026-10-20T10:01:42Z',completed_at:'2026-10-20T10:09:38Z',steps,check_run_url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/check-runs/118568540207'};
+ const job={id:118568540207,run_id:run.id,run_attempt:1,head_sha:head,name:'Node 22 build and fixture tests',status:'completed',conclusion:'success',started_at:'2026-10-20T10:01:42Z',completed_at:'2026-10-20T10:09:38Z',steps,url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/jobs/118568540207',run_url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304',html_url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304/job/118568540207',check_run_url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/check-runs/118568540207'};
  const log=['##[group]Operating System','Ubuntu','##[endgroup]','##[group]'+checkout,'##[endgroup]','##[group]Fetching the repository','[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +'+merge+':refs/remotes/pull/45/merge','##[endgroup]','##[group]Checking out the ref','[command]/usr/bin/git checkout --progress --force refs/remotes/pull/45/merge','##[endgroup]','[command]/usr/bin/git log -1 --format=%H',merge,'##[group]'+setup,'##[endgroup]','node: v22.23.3','##[group]Run npm ci','##[endgroup]','##[group]Run npm test','##[endgroup]','# tests 566','# suites 0','# pass 566','# fail 0','# cancelled 0','# skipped 0','# todo 0','# duration_ms 1','##[group]Run python3 -B -m unittest discover tests/python','##[endgroup]','.......','----------------------------------------------------------------------','Ran 7 tests in 0.001s','','OK','##[group]Post job cleanup.','##[endgroup]'].join('\n');
  const selector={version:1,origin:'owner-selected-github-validation',reviewed:true,repository:repo.full_name,repositoryId:repo.id,candidateSha:candidate,candidateTreeSha:tree,pullRequestNumber:45,prHeadSha:head,prBaseSha:base,checkedMergeSha:merge,checkedTreeSha:tree,workflowId:run.workflow_id,workflowPath:run.path,workflowSha256:'1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389',runId:run.id,runAttempt:1,jobId:job.id,checkRunId:job.id,checkSuiteId:987,url:run.html_url,nodeVersion:'v22.23.3',nodeTests:566,pythonTests:7,originalJobLogSha256:hash(log),ownerProofSha256:'d'.repeat(64)};
  const check={id:job.id,name:job.name,status:'completed',conclusion:'success',head_sha:head,app:{id:15368},check_suite:{id:987},started_at:job.started_at,completed_at:job.completed_at};
@@ -304,4 +304,47 @@ test('mandatory validation rejects independent ancestry, outcome, runtime, chron
 test('retained premerge associations authenticate their abbreviated same-repository identities',async()=>{
  const {validateMandatoryValidation}=await import('../scripts/release-manifest.mjs'),f=mandatoryFixture(),repo={id:1269416306,name:'Customvibev3',url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3'};
  const association={number:45,head:{sha:f.selector.prHeadSha,repo},base:{ref:'main',sha:f.selector.prBaseSha,repo}};for(const r of [f.facts.run,f.facts.attempt,f.facts.finalRun,f.facts.runs.workflow_runs[0]])r.pull_requests=[structuredClone(association)];assert.equal(validateMandatoryValidation(f.selector,f.facts,f.local,f.checkedAt).pullRequestNumber,45);f.facts.run.pull_requests[0].head.repo.id=1;assert.throws(()=>validateMandatoryValidation(f.selector,f.facts,f.local,f.checkedAt));
+});
+
+
+test('mandatory log parser rejects misplaced checkout commands and malformed canonical summaries independently of selector hashes',async()=>{
+ const {parseMandatoryValidationLog}=await import('../scripts/release-manifest.mjs');
+ const original=mandatoryFixture().facts.log;
+ const selection='[command]/usr/bin/git checkout --progress --force refs/remotes/pull/45/merge';
+ const cases=[
+  original.replace(selection+'\n','').replace('##[group]Fetching the repository',selection+'\n##[group]Fetching the repository'),
+  original.replace('# duration_ms 1','# duration_ms 1.2.3'),
+  original.replace('Ran 7 tests in 0.001s','Ran 7 tests in .s'),
+  original.replace('##[group]Operating System\nUbuntu\n##[endgroup]','Ubuntu'),
+  original.replace('##[group]Fetching the repository','##[group]Unrelated test output'),
+  original.replace('##[group]Checking out the ref','##[group]Unrelated test output'),
+  original.replace('# pass 566','# pass 565'),
+  original.replace('\nOK','\nOK (skipped=1)'),
+ ];
+ assert.equal(parseMandatoryValidationLog(original).nodeTests,566);
+ for(const log of cases)assert.throws(()=>parseMandatoryValidationLog(log));
+});
+
+
+test('same-head run policy inspects complete chronology rather than only count or green status',async()=>{
+ const {validateMandatoryValidation}=await import('../scripts/release-manifest.mjs');
+ const original=mandatoryFixture(),older={...structuredClone(original.facts.run),id:39404960000,created_at:'2026-10-20T10:00:00Z',run_started_at:'2026-10-20T10:01:00Z',updated_at:'2026-10-20T10:01:30Z',pull_requests:[]};
+ function withRun(other){const f=mandatoryFixture();f.facts.runs.workflow_runs.push(other);f.facts.runs.total_count=2;return f;}
+ const good=withRun(older);assert.equal(validateMandatoryValidation(good.selector,good.facts,good.local,good.checkedAt).run.id,39404961304);
+ const alternatives=[
+  {...older,created_at:'2026-10-20T10:01:39Z',run_started_at:'2026-10-20T10:01:40Z',updated_at:'2026-10-20T10:01:41Z'},
+  {...older,run_attempt:2}, {...older,run_started_at:null}, {...older,updated_at:'2026-10-20T10:01:42Z'}, {...older,updated_at:'2026-10-20T10:00:59Z'},
+  ...['failure','cancelled',null].map(conclusion=>({...older,created_at:'2026-10-20T10:10:00Z',run_started_at:'2026-10-20T10:10:01Z',updated_at:'2026-10-20T10:10:02Z',conclusion,status:conclusion?'completed':'queued'})),
+ ];
+ for(const other of alternatives){const f=withRun(other);assert.throws(()=>validateMandatoryValidation(f.selector,f.facts,f.local,f.checkedAt));}
+});
+test('mandatory validation independently rejects remaining identity, source, step and outcome mismatches',async()=>{
+ const {validateMandatoryValidation}=await import('../scripts/release-manifest.mjs');
+ const mutations=[f=>f.selector.repositoryId=1,f=>f.selector.workflowSha256='e'.repeat(64),f=>f.local.sourceSha='e'.repeat(40),f=>f.local.workflowSha256='e'.repeat(64),f=>f.local.parents.push('e'.repeat(40)),f=>f.facts.run.repository.id=1,f=>f.facts.run.repository.full_name='other/repo',f=>f.facts.run.head_repository.id=1,f=>f.facts.workflow.path='other.yml',f=>f.facts.workflow.state='disabled_manually',f=>f.facts.run.workflow_id=1,f=>f.facts.run.path='other.yml',f=>f.facts.run.id=1,f=>f.facts.run.check_suite_id=1,f=>f.facts.jobs.jobs[0].run_attempt=2,f=>f.facts.jobs.jobs[0].head_sha='e'.repeat(40),f=>f.facts.jobs.jobs[0].check_run_url='https://api.github.com/repos/other/repo/check-runs/1',f=>f.facts.jobs.jobs[0].steps[4].number=10,f=>f.facts.jobs.jobs[0].steps[4].started_at='2026-10-20T10:01:00Z',f=>f.facts.jobs.jobs[0].steps[4].conclusion='neutral',f=>f.facts.check.head_sha='e'.repeat(40),f=>f.facts.commit.parents.pop(),f=>f.facts.commit.parents[0].sha='e'.repeat(40),f=>f.facts.mergedPull.head.repo.private=true,f=>f.facts.mergedPull.base.repo.id=1,f=>f.facts.rules[0].parameters.required_status_checks[0].integration_id=1];
+ for(const mutate of mutations){const f=mandatoryFixture();mutate(f);assert.throws(()=>validateMandatoryValidation(f.selector,f.facts,f.local,f.checkedAt));}
+});
+
+test('official job URLs must independently bind exact repository run and selected job',async()=>{
+ const {validateMandatoryValidation}=await import('../scripts/release-manifest.mjs');
+ for(const [key,value]of [['url','https://api.github.com/repos/other/repo/actions/jobs/118568540207'],['run_url','https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/runs/1'],['html_url','https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304/job/1']]){const f=mandatoryFixture();f.facts.jobs.jobs[0][key]=value;assert.throws(()=>validateMandatoryValidation(f.selector,f.facts,f.local,f.checkedAt));}
 });

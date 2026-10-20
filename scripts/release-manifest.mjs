@@ -14,7 +14,7 @@ const ensure=(condition,message)=>{if(!condition)throw Error(message);};
 const hash=value=>createHash('sha256').update(value).digest('hex');
 function command(program,args,{env=process.env}={}){return execFileSync(program,args,{env,encoding:'utf8',maxBuffer:16*1024*1024,stdio:['ignore','pipe','pipe']}).trim();}
 function git(...args){return command('git',args);}
-// Only public, fixed-origin read evidence can authorize current publication.
+// Official fixed-origin evidence under the existing native token authorizes publication.
 const VALIDATION_PATH='.github/workflows/validate.yml',VALIDATION_HASH='1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389';
 const VALIDATION_JOB='Node 22 build and fixture tests',VALIDATION_NAME='Validate proposed CustomVibe changes';
 const CHECKOUT='Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262',SETUP_NODE='Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020';
@@ -35,20 +35,21 @@ function sameRepo(r){return r?.full_name===REPOSITORY&&r.id===1269416306&&r.priv
 function sameIdentityRepo(r){return r?.id===1269416306&&r.name==='Customvibev3'&&r.url===`https://api.github.com/repos/${REPOSITORY}`;}
 export function parseMandatoryValidationLog(log){
  ensure(typeof log==='string'&&Buffer.byteLength(log)<=4*1024*1024&&!log.includes('\ufffd'),'Invalid validation log.');
- // The API job-log format has timestamped lines. Retained gh view output also
- // has job/step tab prefixes; remove only that documented display wrapper.
- const lines=log.split(/\r?\n/).map(l=>l.replace(/^[^\t\r\n]+\t[^\t\r\n]+\t/,'').replace(/^\ufeff?(?:\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d+Z) /,'').replace(/\x1b\[[0-9;]*m/g,''));
+ // Parse actual API bytes; display-format projections belong only in local tests.
+ const lines=log.split(/\r?\n/).map(l=>l.replace(/^\ufeff?(?:\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d+Z) /,'').replace(/\x1b\[[0-9;]*m/g,''));
  const once=value=>{const found=lines.map((l,i)=>l===value?i:-1).filter(i=>i>=0);ensure(found.length===1,'Ambiguous validation log boundary.');return found[0];};
  const checkout=once('##[group]'+CHECKOUT),setup=once('##[group]'+SETUP_NODE),install=once('##[group]Run npm ci'),node=once('##[group]Run npm test'),python=once('##[group]Run python3 -B -m unittest discover tests/python');
- ensure(checkout<setup&&setup<install&&install<node&&node<python&&lines.slice(0,checkout).includes('Ubuntu'),'Validation log platform/step order differs.');
+ const os=once('##[group]Operating System'),osEnd=lines.indexOf('##[endgroup]',os);
+ ensure(os<osEnd&&osEnd<checkout&&lines.slice(os+1,osEnd).includes('Ubuntu')&&checkout<setup&&setup<install&&install<node&&node<python,'Validation log platform/step order differs.');
  const c=lines.slice(checkout,setup),fetch=c.filter(l=>/^\[command\]\/usr\/bin\/git -c protocol[.]version=2 fetch /.test(l));
  ensure(fetch.length===1,'Missing pinned checkout fetch.');const selected=/^\[command\]\/usr\/bin\/git -c protocol[.]version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin \+([a-f0-9]{40}):refs\/remotes\/pull\/([1-9][0-9]*)\/merge$/.exec(fetch[0]);ensure(selected,'Wrong checkout merge ref.');
- const ref=`refs/remotes/pull/${selected[2]}/merge`;ensure(c.filter(l=>l==='[command]/usr/bin/git checkout --progress --force '+ref).length===1,'Wrong checkout selection.');
- const logIndex=c.indexOf('[command]/usr/bin/git log -1 --format=%H');ensure(logIndex>=0&&c.filter(l=>l==='[command]/usr/bin/git log -1 --format=%H').length===1&&c[logIndex+1]===selected[1],'Wrong checked synthetic source.');
+ const ref=`refs/remotes/pull/${selected[2]}/merge`,select='[command]/usr/bin/git checkout --progress --force '+ref;ensure(safeNumber(Number(selected[2]))&&c.filter(l=>l===select).length===1,'Wrong checkout selection.');
+ const fetching=once('##[group]Fetching the repository')-checkout,selecting=once('##[group]Checking out the ref')-checkout;ensure(0<fetching&&fetching<c.indexOf(fetch[0])&&c.indexOf(fetch[0])<selecting&&selecting<c.indexOf(select),'Checkout order differs.');
+ const logIndex=c.indexOf('[command]/usr/bin/git log -1 --format=%H');ensure(logIndex>c.indexOf(select)&&c.filter(l=>l==='[command]/usr/bin/git log -1 --format=%H').length===1&&c[logIndex+1]===selected[1],'Wrong checked synthetic source.');
  const versions=lines.slice(setup,install).filter(l=>l.startsWith('node: '));ensure(versions.length===1&&node22(versions[0].slice(6)),'Missing exact tested runtime.');
  const n=lines.slice(node,python),summaries=n.map((l,i)=>/^# tests /.test(l)?i:-1).filter(i=>i>=0);ensure(summaries.length===1,'Missing or duplicate Node footer.');
- const tail=n.slice(summaries[0]);const m=/^# tests ([1-9][0-9]*)\n# suites (?:0|[1-9][0-9]*)\n# pass ([1-9][0-9]*)\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms [0-9.]+\s*$/.exec(tail.join('\n'));ensure(m&&m[1]===m[2],'Incomplete or skipped Node tests.');
- const p=lines.slice(python),pythonSummaries=p.filter(l=>/^Ran /.test(l));ensure(pythonSummaries.length===1,'Missing or duplicate Python footer.');const pm=/^Ran ([1-9][0-9]*) tests? in [0-9.]+s$/.exec(pythonSummaries[0]);const pi=p.indexOf(pythonSummaries[0]);ensure(pm&&p[pi+1]===''&&p[pi+2]==='OK'&&p.filter(l=>l==='OK').length===1,'Incomplete or skipped Python tests.');
+ const tail=n.slice(summaries[0]);const m=/^# tests ([1-9][0-9]*)\n# suites (?:0|[1-9][0-9]*)\n# pass ([1-9][0-9]*)\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms [0-9]+(?:[.][0-9]+)?\s*$/.exec(tail.join('\n'));ensure(m&&m[1]===m[2]&&safeNumber(Number(m[1])),'Incomplete or skipped Node tests.');
+ const p=lines.slice(python),pythonSummaries=p.filter(l=>/^Ran /.test(l));ensure(pythonSummaries.length===1,'Missing or duplicate Python footer.');const pm=/^Ran ([1-9][0-9]*) tests? in [0-9]+(?:[.][0-9]+)?s$/.exec(pythonSummaries[0]);const pi=p.indexOf(pythonSummaries[0]);ensure(pm&&safeNumber(Number(pm[1]))&&p[pi+1]===''&&p[pi+2]==='OK'&&p.filter(l=>l==='OK').length===1,'Incomplete or skipped Python tests.');
  ensure(!p.slice(pi+3).some(l=>/^(?:Ran |OK|FAILED|# tests |# skipped )/.test(l)),'Conflicting log suffix.');
  return {checkoutRef:ref,pullRequestNumber:Number(selected[2]),checkedMergeSha:selected[1],nodeVersion:versions[0].slice(6),nodeTests:Number(m[1]),pythonTests:Number(pm[1]),originalJobLogSha256:hash(log)};
 }
@@ -59,7 +60,7 @@ export function validateMandatoryValidation(selector,facts,local,checkedAt){
  ensure(f.workflow?.id===s.workflowId&&f.workflow.path===VALIDATION_PATH&&f.workflow.state==='active','Workflow differs.');
  function run(v){ensure(v?.id===s.runId&&v.run_attempt===s.runAttempt&&v.workflow_id===s.workflowId&&v.path===VALIDATION_PATH&&v.name===VALIDATION_NAME&&v.event==='pull_request'&&v.head_sha===s.prHeadSha&&sameRepo(v.repository)&&sameRepo(v.head_repository)&&v.check_suite_id===s.checkSuiteId&&v.html_url===s.url&&success(v),'Validation run differs.');ensure(Array.isArray(v.pull_requests)&&v.pull_requests.length<=1,'Ambiguous PR association.');for(const pr of v.pull_requests)ensure(pr.number===s.pullRequestNumber&&pr.head?.sha===s.prHeadSha&&sameIdentityRepo(pr.head?.repo)&&pr.base?.ref==='main'&&sameIdentityRepo(pr.base?.repo),'Contradictory PR association.');return {id:v.id,attempt:v.run_attempt,createdAt:apiTime(v.created_at),startedAt:apiTime(v.run_started_at),updatedAt:apiTime(v.updated_at)};}
  const runProjection=run(r);ensure(utc(runProjection.createdAt)<=utc(runProjection.startedAt)&&utc(runProjection.startedAt)<=utc(runProjection.updatedAt),'Reversed validation run.');for(const v of [f.attempt,f.finalRun])ensure(canonical(run(v))===canonical(runProjection),'Latest attempt drifted.');
- ensure(f.jobs.total_count===1&&f.jobs.jobs.length===1&&j.id===s.jobId&&j.run_id===s.runId&&j.run_attempt===s.runAttempt&&j.head_sha===s.prHeadSha&&j.name===VALIDATION_JOB&&success(j)&&j.check_run_url===`https://api.github.com/repos/${REPOSITORY}/check-runs/${s.checkRunId}`,'Validation job differs.');
+ ensure(f.jobs.total_count===1&&f.jobs.jobs.length===1&&j.id===s.jobId&&j.run_id===s.runId&&j.run_attempt===s.runAttempt&&j.head_sha===s.prHeadSha&&j.name===VALIDATION_JOB&&success(j)&&j.url===`https://api.github.com/repos/${REPOSITORY}/actions/jobs/${s.jobId}`&&j.run_url===`https://api.github.com/repos/${REPOSITORY}/actions/runs/${s.runId}`&&j.html_url===`https://github.com/${REPOSITORY}/actions/runs/${s.runId}/job/${s.jobId}`&&j.check_run_url===`https://api.github.com/repos/${REPOSITORY}/check-runs/${s.checkRunId}`,'Validation job differs.');
  const startedAt=apiTime(j.started_at),completedAt=apiTime(j.completed_at);ensure(utc(startedAt)<=utc(completedAt)&&utc(runProjection.createdAt)<=utc(startedAt)&&utc(completedAt)<=utc(runProjection.updatedAt),'Validation job clock differs.');
  ensure(j.steps?.length===VALIDATION_STEPS.length,'Unknown validation steps.');let last=utc(startedAt);
  const steps=j.steps.map((v,i)=>{ensure(v.name===VALIDATION_STEPS[i]&&v.number===[1,2,3,4,5,6,7,8,9,17,18,19][i]&&success(v),'Unsuccessful validation step.');const a=apiTime(v.started_at),b=apiTime(v.completed_at);ensure(last<=utc(a)&&utc(a)<=utc(b)&&utc(b)<=utc(completedAt),'Validation step clock differs.');last=utc(b);return {number:v.number,name:v.name,status:'completed',conclusion:'success',startedAt:a,completedAt:b};});
@@ -87,23 +88,27 @@ function validateMandatoryRecord(record,{invocation=false,now}={}){
 function validationLocal(ctx,compilerRuntime=process.version){const parents=git('show','-s','--format=%P',ctx.sourceSha).split(' ');return {sourceSha:ctx.sourceSha,treeSha:git('rev-parse',`${ctx.sourceSha}^{tree}`),parents,workflowSha256:hash(execFileSync('git',['show',`${ctx.sourceSha}:${VALIDATION_PATH}`],{maxBuffer:1024*1024,stdio:['ignore','pipe','pipe']})),publisherRuntime:process.version,compilerRuntime};}
 // Duplicate keys are rejected before JSON.parse can silently discard them.
 function strictJson(text){let i=0;function space(){while(/\s/.test(text[i]||'')&&i<text.length)i++;}function value(){space();if(text[i]==='{'){i++;const seen=new Set();space();if(text[i]==='}'){i++;return;}while(true){space();ensure(text[i]==='"','Invalid JSON.');const key=string();ensure(!seen.has(key),'Duplicate JSON key.');seen.add(key);space();ensure(text[i++]===':','Invalid JSON.');value();space();const c=text[i++];if(c==='}')return;ensure(c===',','Invalid JSON.');}}else if(text[i]==='['){i++;space();if(text[i]===']'){i++;return;}while(true){value();space();const c=text[i++];if(c===']')return;ensure(c===',','Invalid JSON.');}}else if(text[i]==='"')string();else{const m=/^(?:true|false|null|-?(?:0|[1-9][0-9]*)(?:[.][0-9]+)?(?:[eE][+-]?[0-9]+)?)/.exec(text.slice(i));ensure(m,'Invalid JSON.');i+=m[0].length;}}function string(){const start=i++;while(i<text.length){if(text[i]==='\\'){i+=2;continue;}if(text[i++]==='"')return JSON.parse(text.slice(start,i));}throw Error('Invalid JSON.');}value();space();ensure(i===text.length,'Invalid JSON.');return JSON.parse(text);}
+function nativeGitHubToken(){const token=process.env.GH_TOKEN;ensure(typeof token==='string'&&token.trim().length>0&&!/[\r\n]/.test(token),'Native GitHub token required.');return token;}
 export async function readMandatoryValidation(selector,local,{phase='plan'}={}){
  try{
- const s=validationSelector(selector),origin=`https://api.github.com/repos/${REPOSITORY}/`,deadline=Date.now()+30000,controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);let calls=0,reset;
- async function body(response,max){const chunks=[];let size=0;ensure(response.body&&typeof response.body.getReader==='function','Missing bounded response stream.');const reader=response.body.getReader();try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;ensure(size<=max&&Date.now()<=deadline,'Response limit exceeded.');chunks.push(Buffer.from(value));}}finally{reader.releaseLock();}return new TextDecoder('utf-8',{fatal:true}).decode(Buffer.concat(chunks));}
+ const token=nativeGitHubToken();ensure(['plan','invocation'].includes(phase),'Invalid validation phase.');
+ const s=validationSelector(selector),origin=`https://api.github.com/repos/${REPOSITORY}/`,deadline=Date.now()+30000,controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);let calls=0;
+ const apiPaths=new Set([`actions/workflows/${s.workflowId}`,`actions/runs/${s.runId}`,`actions/runs/${s.runId}/attempts/${s.runAttempt}`,`actions/runs/${s.runId}/attempts/${s.runAttempt}/jobs?per_page=100`,`check-runs/${s.checkRunId}`,`git/commits/${s.checkedMergeSha}`,`pulls/${s.pullRequestNumber}`,'rules/branches/main',`actions/jobs/${s.jobId}/logs`,`actions/workflows/${s.workflowId}/runs?event=pull_request&head_sha=${s.prHeadSha}&per_page=100`]);
+ async function body(response,max){const chunks=[];let size=0;ensure(response.body&&typeof response.body.getReader==='function','Missing bounded response stream.');const reader=response.body.getReader();try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;ensure(size<=max&&Date.now()<=deadline,'Response limit exceeded.');chunks.push(Buffer.from(value));}}finally{reader.releaseLock();}return new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(Buffer.concat(chunks));}
  async function get(path,{log=false,download=false}={}){
  ensure(++calls<=13&&Date.now()<=deadline,'Validation read budget exceeded.');const url=download?path:origin+path;
- const response=await fetch(url,{method:'GET',redirect:log?'manual':'error',signal:controller.signal,...(download?{}:{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}})});ensure(Date.now()<=deadline,'Validation read expired.');
- if(!download){const remaining=response.headers.get('x-ratelimit-remaining'),end=response.headers.get('x-ratelimit-reset');ensure(/^(?:0|[1-9][0-9]*)$/.test(remaining||'')&&/^[1-9][0-9]*$/.test(end||''),'Missing quota headers.');const needed=(phase==='plan'?31:18)-(calls-1);ensure(Number(remaining)>=needed&&Number(end)*1000>Date.now()&&(!reset||reset===end),'Insufficient public API reserve.');reset=end;ensure(!response.headers.get('link'),'Paginated validation response.');}
- if(log){ensure(response.status===302,'Missing official log redirect.');const location=response.headers.get('location'),u=new URL(location);ensure(u.protocol==='https:'&&!u.username&&!u.password&&(!u.port||u.port==='443')&&u.hostname!=='api.github.com'&&u.hostname!=='github.com','Invalid log redirect.');return location;}
+ if(!download){const target=new URL(url);ensure(apiPaths.has(path)&&target.origin==='https://api.github.com'&&!target.username&&!target.password&&(!target.port||target.port==='443')&&target.pathname.startsWith(`/repos/${REPOSITORY}/`),'Invalid evidence origin.');}
+ const response=await fetch(url,{method:'GET',redirect:log?'manual':'error',signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer',...(download?{}:{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',Authorization:`Bearer ${token}`}})});ensure(Date.now()<=deadline,'Validation read expired.');
+ if(!download){const remaining=response.headers.get('x-ratelimit-remaining'),end=response.headers.get('x-ratelimit-reset');ensure(/^(?:0|[1-9][0-9]*)$/.test(remaining||'')&&/^[1-9][0-9]*$/.test(end||''),'Missing quota headers.');const needed=(phase==='plan'?31:18)-(calls-1);ensure(Number.isSafeInteger(Number(remaining))&&Number.isSafeInteger(Number(end)*1000)&&Number(remaining)>=needed&&Number(end)*1000>Date.now(),'Insufficient public API reserve.');ensure(!response.headers.get('link'),'Paginated validation response.');}
+ if(log){ensure(response.status===302,'Missing official log redirect.');const location=response.headers.get('location');ensure(typeof location==='string'&&location.length>0&&location.length<=4096&&/^[\x21-\x7e]+$/.test(location)&&!location.includes('\\'),'Invalid log redirect.');const u=new URL(location),host=u.hostname;ensure(u.protocol==='https:'&&location.startsWith('https://')&&!u.username&&!u.password&&(!u.port||u.port==='443')&&!u.hash&&host&&!host.endsWith('.')&&host.length<=253&&host.split('.').every(label=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))&&(host==='results-receiver.actions.githubusercontent.com'||host.endsWith('.blob.core.windows.net'))&&[host,host+':443'].includes(u.host),'Invalid log redirect.');return location;}
  ensure(response.status===200,'Public validation read failed.');const type=response.headers.get('content-type')||'';ensure(download?/^text\/plain(?:;|$)/i.test(type):/^(?:application\/json|application\/vnd[.]github[+]json)(?:;|$)/i.test(type),'Unexpected validation media.');const text=await body(response,download?4*1024*1024:1024*1024);return download?text:strictJson(text);
  }
  try{
  const workflow=await get(`actions/workflows/${s.workflowId}`),run=await get(`actions/runs/${s.runId}`),attempt=await get(`actions/runs/${s.runId}/attempts/${s.runAttempt}`),jobs=await get(`actions/runs/${s.runId}/attempts/${s.runAttempt}/jobs?per_page=100`);
  ensure(jobs.total_count===1&&jobs.jobs?.length===1&&jobs.jobs[0].id===s.jobId&&jobs.jobs[0].check_run_url===origin+`check-runs/${s.checkRunId}`,'Unbound validation job.');
  const check=await get(`check-runs/${s.checkRunId}`),commit=await get(`git/commits/${s.checkedMergeSha}`),mergedPull=await get(`pulls/${s.pullRequestNumber}`),rules=await get('rules/branches/main');const location=await get(`actions/jobs/${s.jobId}/logs`,{log:true}),log=await get(location,{download:true});const runs=await get(`actions/workflows/${s.workflowId}/runs?event=pull_request&head_sha=${s.prHeadSha}&per_page=100`),finalRun=await get(`actions/runs/${s.runId}`),finalCheck=await get(`check-runs/${s.checkRunId}`);
- return validateMandatoryValidation(s,{workflow,run,attempt,jobs,check,commit,mergedPull,rules,log,runs,finalRun,finalCheck},local,new Date().toISOString());
- }finally{clearTimeout(timer);}
+ const receipt=validateMandatoryValidation(s,{workflow,run,attempt,jobs,check,commit,mergedPull,rules,log,runs,finalRun,finalCheck},local,new Date().toISOString());ensure(Date.now()<=deadline,'Validation read expired.');return receipt;
+ }finally{clearTimeout(timer);controller.abort();}
  }catch{throw Error('Mandatory public GitHub validation failed.');}
 }
 
@@ -288,7 +293,7 @@ export async function officialPagesUpload(expected,{record,onAcknowledgement=asy
  try{
   const {unstable_pages}=await import('wrangler');
   ensure(record?.sourceSha===expected.sourceSha,'Missing matched publication plan.');validateMandatoryRecord(record);
-  const invocationContext=context(),invocation=await readMandatoryValidation(record.mandatoryValidation.plan.selector,validationLocal(invocationContext,record.build.compiler.runtime),{phase:'invocation'});
+  const invocationContext=context({native:true}),invocation=await readMandatoryValidation(record.mandatoryValidation.plan.selector,validationLocal(invocationContext,record.build.compiler.runtime),{phase:'invocation'});
   const onBeforeInvoke=({invokedAt,mandatoryValidation})=>armPrewrite(record,invocationContext,invokedAt,mandatoryValidation);
   const options={directory:'dist/client',accountId:DESTINATION_ACCOUNT,projectName:PAGES_PROJECT,branch:'main',commitHash:expected.sourceSha,commitDirty:false,functionsDirectory:'functions',bundle:true,sourceMaps:false,args:{config:'wrangler.jsonc'}};
   // The official API exposes invocation, not its internal HTTP POST clock.
@@ -468,11 +473,12 @@ async function privateBuilds(){
 }
 async function readJson(path){ensure((await stat(path)).size<2*1024*1024,'Metadata file too large.');return JSON.parse(await readFile(path,'utf8'));}
 async function save(record){await mkdir(dirname(OUTPUT),{recursive:true});await writeFile(OUTPUT,JSON.stringify(record,null,2)+'\n');}
-function context(){
+function context({native=false}={}){
+ if(native)nativeGitHubToken();
  ensure(process.env.GITHUB_REPOSITORY===REPOSITORY&&process.env.GITHUB_REF==='refs/heads/main','Release requires the expected repository main branch.');
  ensure(process.env.GITHUB_EVENT_NAME==='workflow_dispatch','Publication requires explicit manual dispatch.');
  const sourceSha=process.env.REVIEWED_SHA;
- const latest=JSON.parse(command('gh',['api',`repos/${REPOSITORY}/git/ref/heads/main`])).object.sha;
+ const latest=JSON.parse(command('gh',['api','--hostname','github.com',`repos/${REPOSITORY}/git/ref/heads/main`])).object.sha;
  validateRevision({reviewed:sourceSha,event:process.env.GITHUB_SHA,checkout:git('rev-parse','HEAD'),latest});
  ensure(!git('status','--porcelain'),'Release checkout must be clean.');
  ensure(positiveId(process.env.GITHUB_RUN_ID)&&positiveId(process.env.GITHUB_RUN_ATTEMPT),'Actual GitHub run and attempt IDs required.');
@@ -489,8 +495,8 @@ async function schemaSources(){
  return result;
 }
 function inputEvidence(sourceSha){
- const text=process.env.RELEASE_EVIDENCE_JSON||'';ensure(text.length>0&&text.length<100000,'Explicit sanitized evidence input is required.');
- const value=strictJson(text);ensure(value&&typeof value==='object'&&!Array.isArray(value)&&value.sourceSha===sourceSha,'Evidence was reviewed for a different source.');ensure(!('prewriteValidation' in value)&&!('completionEvidence' in value),'Runner phase evidence cannot be caller supplied.');return value;
+ const text=process.env.RELEASE_EVIDENCE_JSON||'';ensure(text.length>0&&Buffer.byteLength(text)<100000,'Explicit sanitized evidence input is required.');
+ const value=strictJson(text);ensure(value&&typeof value==='object'&&!Array.isArray(value)&&value.sourceSha===sourceSha,'Evidence was reviewed for a different source.');ensure(Object.keys(value).every(k=>['sourceSha','baseline','mandatoryValidation','guards','receipts','schema','staged','activationCompatibility','archivedRelease','githubArtifact'].includes(k)),'Unknown evidence input.');return value;
 }
 async function observePages(request=createRequest()){
  const response=await request(`accounts/${DESTINATION_ACCOUNT}/pages/projects/${PAGES_PROJECT}`);
@@ -558,7 +564,7 @@ async function plan(){
  let record={schemaVersion:2,repository:REPOSITORY,state:'blocked',required:[],completed:{},reasons:[],planComplete:false};let phase='CONTEXT';
  try{
   ensure(process.env.PUBLISH_ADMIN!=='true','GitHub publication is Pages-only.');
-  const ctx=context();record={...record,...ctx};
+  const ctx=context({native:true});record={...record,...ctx};
   phase='MANDATORY_VALIDATION';const evidence=inputEvidence(ctx.sourceSha);record.mandatoryValidation={version:1,plan:await readMandatoryValidation(evidence.mandatoryValidation,validationLocal(ctx))};
   phase='GUARDS';command(process.execPath,['scripts/check-deployment.mjs','before']);
   phase='BASELINE';const previous=validateBaseline(evidence.baseline),baseSha=previous.baseSha;
@@ -622,7 +628,7 @@ async function publish(component){
  ensure(component==='pages','Only Pages publication is permitted; Admin uses the unchanged private helper.');
  const record=await readJson(OUTPUT);let attempted=false,failure;
  try{
-  const ctx=context();ensure(ctx.sourceSha===record.sourceSha&&record.planComplete===true&&record.state==='planned','No current complete publication plan.');
+  const ctx=context({native:true});ensure(ctx.sourceSha===record.sourceSha&&record.planComplete===true&&record.state==='planned','No current complete publication plan.');
   validateMandatoryRecord(record);validatePrerequisites(prerequisiteInput(record));
   ensure((await observePages()).pages===record.before.pages,'Pages deployment drifted; re-plan.');
   await verifyBuild(record);
