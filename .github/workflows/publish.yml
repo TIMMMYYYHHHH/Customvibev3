@@ -1,13 +1,19 @@
 name: Publish protected CustomVibe site
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
+      reviewed_sha:
+        description: Exact reviewed 40-character main commit, still current main
+        type: string
+        required: true
       publish_admin:
-        description: Also publish the existing business admin Worker
+        description: Keep off, Admin uses the existing private helper
         type: boolean
         default: false
+      release_evidence_json:
+        description: Explicit reviewed sanitized baseline and fresh prerequisite snapshots
+        type: string
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -18,9 +24,16 @@ jobs:
     if: github.repository == 'TIMMMYYYHHHH/Customvibev3' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+      EXPECTED_RELEASE_SHA: ${{ github.sha }}
+      CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
+      WRANGLER_SEND_METRICS: 'false'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
@@ -33,31 +46,35 @@ jobs:
       - run: npm test
         env:
           CV_CHECK_BUILT_NOTICES: '1'
-      - name: Verify destination before publishing
-        id: verify_destination
-        run: node scripts/check-deployment.mjs before
+      - name: Build comparison closures without credentials or publication
+        run: node scripts/release-manifest.mjs private-builds
+      - name: Verify explicit reviewed release evidence and Pages destination
+        id: release_plan
+        run: node scripts/release-manifest.mjs plan
         env:
-          CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
+          GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-      - name: Publish to protected Pages project
-        run: npx --no-install wrangler pages deploy dist/client --project-name customvibe-business --branch main
+          PUBLISH_ADMIN: ${{ inputs.publish_admin }}
+          RELEASE_EVIDENCE_JSON: ${{ inputs.release_evidence_json }}
+      - name: Publish protected Pages from the reviewed build
+        id: publish_pages
+        run: node scripts/release-manifest.mjs publish pages
         env:
-          CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
+          GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-          WRANGLER_SEND_METRICS: 'false'
-      - name: Publish existing business admin Worker when requested
-        if: github.event_name == 'workflow_dispatch' && inputs.publish_admin
-        run: |
-          node scripts/check-admin-deployment.mjs
-          npx --no-install wrangler deploy --config wrangler.admin.jsonc
-          node scripts/check-admin-deployment.mjs
+      - name: Observe Pages protection and preserve partial paired status
+        if: always() && steps.release_plan.outcome == 'success'
+        run: node scripts/release-manifest.mjs finish
         env:
-          CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
+          GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-          WRANGLER_SEND_METRICS: 'false'
-      - name: Verify protection after publishing
-        if: always() && steps.verify_destination.outcome == 'success'
-        run: node scripts/check-deployment.mjs after
-        env:
-          CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
+      - name: Preserve complete or incomplete release evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-manifest-${{ github.run_id }}
+          path: |
+            dist/release/build-manifest.json
+            dist/release/release-manifest.json
+          if-no-files-found: warn
+          retention-days: 90
