@@ -1,0 +1,12 @@
+{
+  "account": "4f57d4e924674cb87b33d4c884745cf6",
+  "component": "admin",
+  "id": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+  "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+  "sourceDigest": "49ac675eed0b9bb54476f3955b63777aecc967eeaa5fe2a32b91ed5298a9a6ec",
+  "runtimeDigest": "21ea968f234862c8187de255193aa8f375193d4d9421ca6306a9e205810ddcf0",
+  "configDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0",
+  "assetsDigest": "d43ca05022d72dca85bb2c70a7515039a75c8c11017172e22dd30e9c953387ff",
+  "origin": "guarded-upload",
+  "observedAt": "2026-10-20T23:51:36.294Z"
+}
