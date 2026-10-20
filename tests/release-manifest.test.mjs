@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {classifyChanges,validateRevision,validateReceipt,validateLedger,releaseState,rollbackPlan,assertUnchanged,validateBaseline} from '../scripts/release-manifest.mjs';
 const sha='a'.repeat(40), old='b'.repeat(40), digest='c'.repeat(64), id='12345678-1234-1234-1234-123456789abc';
 const receipt={account:'4f57d4e924674cb87b33d4c884745cf6',component:'security',id,sourceSha:sha,sourceDigest:digest,origin:'guarded-upload',evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123',observedAt:'2026-10-19T00:00:00.000Z'};
@@ -106,12 +107,25 @@ test('guarded receipt rejects numeric and future times and retains full asset cl
  assert.equal(validateReceipt({...receipt,assetsDigest:digest},{component:'security',id,sourceDigest:digest}).assetsDigest,digest);
 });
 
+const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
+const hash=value=>createHash('sha256').update(value).digest('hex');
+function sealAuthorization(record){
+ const snapshot=Object.fromEntries(['sourceSha','repository','workflow','runAttempt','planComplete','baseSha','beforePagesSourceSha','before','required','schemas','paths','archivedRelease','sourceDigests','schemaSources','build','activationCompatibility','evidence'].map(k=>[k,record[k]]));
+ const stamp={version:1,repository:record.repository,sourceSha:record.sourceSha,runId:record.workflow.runId,runAttempt:record.runAttempt,coordinatorAttempt:1,checkedAt:fresh,invokedAt:fresh,snapshotDigest:hash(canonical(snapshot))};
+ record.prewriteValidation={...stamp,integrityDigest:hash(canonical(stamp))};
+ Object.assign(record.attempts[0],{component:'pages',startedAt:fresh,invokedAt:fresh,prewriteValidationDigest:record.prewriteValidation.integrityDigest,acknowledgementObservedAt:fresh,acknowledgement:structuredClone(record.pagesUploadEvidence.acknowledgement)});
+}
 async function completeFixture(){
  const f=prerequisiteFixture(['pages','admin']);const newer='87654321-1234-1234-1234-123456789abc';
- const record={schemaVersion:2,sourceSha:sha,required:['pages','admin'],planComplete:true,before:f.before,beforePagesSourceSha:old,sourceDigests:f.sourceDigests,build:{sourceSha:sha,private:f.privateBuild,pages:{sha256:digest},admin:{sha256:digest}},schemaSources:f.schemaSources,evidence:{staged:f.evidence.staged},reasons:[],attempts:[{outcome:'observed'}],completed:{pages:{id:newer}},components:{pages:{receipt:{...receipt,component:'pages',id:newer,buildDigest:digest}}}};
+ const record={schemaVersion:2,sourceSha:sha,required:['pages','admin'],planComplete:true,before:f.before,beforePagesSourceSha:old,sourceDigests:f.sourceDigests,build:{sourceSha:sha,private:f.privateBuild,pages:{sha256:digest},admin:{sha256:digest}},schemaSources:f.schemaSources,evidence:structuredClone(f.evidence),reasons:[],attempts:[{outcome:'observed'}],completed:{pages:{id:newer}},components:{pages:{receipt:{...receipt,component:'pages',id:newer,buildDigest:digest,observedAt:fresh}}}};
+ delete record.evidence.observedAt;delete record.evidence.receipts.admin;
+ for(const v of Object.values(record.evidence.schema))v.remoteChecksumEvidence='source checksums only; remote ledger has no checksums';
  const observed={pagesSha:sha,versions:{...f.before,pages:newer,admin:newer}};
  f.evidence.guards.admin.id=newer;f.evidence.receipts.admin.id=newer;
  const upload=await uploadFixture();upload.deploymentResponse.id=newer;record.workflow={runId:'123',url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123'};record.build.sourceInputDigest=digest;record.build.compiler={compilerConfigDigest:digest,configDigest:digest};record.pagesUploadEvidence=await (await import('../scripts/release-manifest.mjs')).capturePagesUpload(upload,upload.expected);
+ record.repository='TIMMMYYYHHHH/Customvibev3';record.runAttempt='1';record.workflow.event='workflow_dispatch';record.baseSha=old;record.schemas=[];record.paths=['scripts/release-manifest.mjs'];
+ record.activationCompatibility={basis:'source-input-tooling-only-v1',reviewedAgainstSha:sha,baselineSha:old,observedAt:fresh,sourceInputDigest:digest,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,historicalFunctionsDigest:null};
+ record.githubArtifact={runId:'123',runAttempt:'1'};sealAuthorization(record);
  return {record,evidence:f.evidence,observed,now};
 }
 test('local full evidence keeps real private source and binds paired Admin to current complete closure',async()=>{
@@ -137,7 +151,7 @@ test('workflow pins source and keeps current permission and Pages-only publicati
 
 test('proved Pages-only changes can retain an unchanged Admin original source with full real closure',async()=>{
  const release=await import('../scripts/release-manifest.mjs');const f=await completeFixture();
- f.record.required=['pages'];delete f.record.evidence.staged;
+ f.record.required=['pages'];delete f.record.evidence.staged;sealAuthorization(f.record);
  f.observed.versions.admin=id;f.evidence.guards.admin.id=id;f.evidence.receipts.admin.id=id;
  f.evidence.receipts.admin.sourceSha=old;f.evidence.receipts.admin.sourceDigest='1'.repeat(64);
  const value=release.completePair(f);assert.equal(value.components.admin.receipt.sourceSha,old);assert.equal(value.prerequisites.complete,true);
@@ -212,4 +226,53 @@ test('installed compiler inputs exclude generated Vite caches but detect actual 
  for(const cache of ['.vite','.vite-temp']){await fs.mkdir(join(directory,cache));await fs.writeFile(join(directory,cache,'generated.js'),'generated output');}
  await fs.mkdir(join(directory,'.mf'));await fs.writeFile(join(directory,'.mf/cf.json'),'generated request metadata');
  assert.deepEqual(await installedInputDigest(directory),before);await fs.writeFile(join(directory,'.mf/actual-compiler.js'),'must remain hashed');assert.notEqual((await installedInputDigest(directory)).sha256,before.sha256);await fs.rm(join(directory,'.mf/actual-compiler.js'));await fs.writeFile(join(directory,'vendor/compiler.js'),'changed actual dependency');assert.notEqual((await installedInputDigest(directory)).sha256,before.sha256);
+});
+
+
+test('historical authorization binds immutable all-four facts while fresh completion uses a separate current review',async()=>{
+ const {completePair,validatePrewriteAuthorization}=await import('../scripts/release-manifest.mjs');const f=await completeFixture();
+ f.record.required=['pages','admin','security','catalogue'];sealAuthorization(f.record);
+ const original=structuredClone(f.record),later=now+1200000;
+ for(const v of [...Object.values(f.evidence.guards),...Object.values(f.evidence.schema),f.evidence.staged])v.observedAt=new Date(later-1000).toISOString();
+ const done=completePair({...f,now:later});assert.equal(done.prerequisites.complete,true);
+ assert.deepEqual(f.record,original);assert.equal(done.completionEvidence.completedAt,new Date(later).toISOString());assert.notEqual(done.completionEvidence.evidence.staged.observedAt,original.evidence.staged.observedAt);
+ assert.deepEqual(done.completionEvidence.evidence.staged.rollback,original.evidence.staged.rollback);
+ assert.equal(validatePrewriteAuthorization(f.record,{repository:f.record.repository,sourceSha:sha,runId:'123',runAttempt:'1',now:later}).prewriteValidationDigest,f.record.prewriteValidation.integrityDigest);
+});
+test('prewrite rejects missing, borrowed, tampered and cross-attempt authority including corrected self-hashes',async()=>{
+ const {validatePrewriteAuthorization}=await import('../scripts/release-manifest.mjs');
+ for(const mutate of [r=>delete r.prewriteValidation,r=>r.prewriteValidation.extra='PRIVATE_SENTINEL',r=>r.prewriteValidation.runAttempt='2',r=>r.prewriteValidation.sourceSha=old,r=>r.before.catalogue='87654321-1234-1234-1234-123456789abc',r=>r.build.pages.sha256='d'.repeat(64),r=>r.evidence.schema.content.applied=[],r=>r.evidence.receipts.security.sourceSha=old,r=>r.required=['pages'],r=>r.evidence.staged.rollback.adminConfigDigest='1'.repeat(64),r=>r.attempts[0].prewriteValidationDigest='e'.repeat(64),r=>r.attempts[0].acknowledgement.id=id,r=>r.attempts[0].invokedAt='2026-10-20T01:01:00.000Z',r=>r.attempts[0].acknowledgementObservedAt='2026-10-20T00:58:00.000Z']){
+  const f=await completeFixture();mutate(f.record);assert.throws(()=>validatePrewriteAuthorization(f.record,{repository:f.record.repository,sourceSha:sha,runId:'123',runAttempt:'1',now}));
+ }
+ const f=await completeFixture();assert.throws(()=>validatePrewriteAuthorization(f.record,{repository:f.record.repository,sourceSha:sha,runId:'123',runAttempt:'2',now}));
+ const r=f.record;r.evidence.staged.observedAt='2026-10-20T00:48:00.000Z';sealAuthorization(r);assert.throws(()=>validatePrewriteAuthorization(r,{repository:r.repository,sourceSha:sha,runId:'123',runAttempt:'1',now}));
+});
+test('current completion cannot reuse old guards or replace original rollback even after valid historical write',async()=>{
+ const {completePair}=await import('../scripts/release-manifest.mjs');const f=await completeFixture();assert.throws(()=>completePair({...f,now:now+1200000}));
+ for(const v of [...Object.values(f.evidence.guards),...Object.values(f.evidence.schema),f.evidence.staged])v.observedAt=new Date(now+1199000).toISOString();
+ f.evidence.staged.rollback.pagesBuildDigest='d'.repeat(64);assert.throws(()=>completePair({...f,now:now+1200000}),/rollback/);
+});
+test('provider skew never extends the 600-second authorization age and reversed/future clocks reject',async()=>{
+ const {validatePrewriteAuthorization}=await import('../scripts/release-manifest.mjs');
+ for(const change of ['provider-old','provider-future','runner-future','receipt-reversed','expired-by-one']){
+  const f=await completeFixture(),r=f.record;
+  if(change==='expired-by-one'){
+   for(const v of [...Object.values(r.evidence.guards),...Object.values(r.evidence.schema),r.evidence.staged,r.activationCompatibility])v.observedAt='2026-10-20T00:49:00.000Z';
+   r.pagesUploadEvidence.acknowledgement.createdAt='2026-10-20T00:59:00.001Z';
+  }else if(change==='provider-old')r.pagesUploadEvidence.acknowledgement.createdAt='2026-10-20T00:58:29.999Z';
+  else if(change==='provider-future')r.pagesUploadEvidence.acknowledgement.createdAt='2026-10-20T00:59:30.001Z';
+  else if(change==='runner-future')r.attempts[0].acknowledgementObservedAt='2026-10-20T01:00:30.001Z';
+  else r.components.pages.receipt.observedAt='2026-10-20T00:58:59.999Z';
+  const {integrityDigest,...proof}=r.pagesUploadEvidence;r.pagesUploadEvidence.integrityDigest=hash(canonical(proof));
+  sealAuthorization(r);
+  if(change==='runner-future')r.attempts[0].acknowledgementObservedAt='2026-10-20T01:00:30.001Z';
+  assert.throws(()=>validatePrewriteAuthorization(r,{repository:r.repository,sourceSha:sha,runId:'123',runAttempt:'1',now}));
+ }
+});
+test('genuine committed manual M remains byte exact with null Functions and original backend sources',async()=>{
+ const {readFile}=await import('node:fs/promises'),{validateReleaseArchiveRecord}=await import('../scripts/release-manifest.mjs');
+ const bytes=await readFile(new URL('../docs/releases/2026-10-20-release-M.json',import.meta.url)),r=JSON.parse(bytes);
+ assert.equal(hash(bytes),'56439148a9b85d9b8d410dfc7222ad55e05ed06febefe2c14e050df425d795b2');
+ assert.equal(validateReleaseArchiveRecord(r,{sourceSha:r.sourceSha,candidateSha:sha,baseline:r}).sourceSha,r.sourceSha);
+ assert.equal(r.pagesUploadEvidence,null);assert.equal(r.historicalFunctionsDigest,null);assert.equal(r.components.security.receipt.sourceSha,'56bfa322eb50f67e4ad23c321f58c4fb98af44c5');
 });
