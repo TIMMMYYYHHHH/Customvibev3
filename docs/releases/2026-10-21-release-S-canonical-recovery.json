@@ -1,0 +1,4600 @@
+{
+  "schemaVersion": 2,
+  "repository": "TIMMMYYYHHHH/Customvibev3",
+  "state": "verified",
+  "required": [
+    "pages",
+    "admin",
+    "security",
+    "catalogue"
+  ],
+  "completed": {
+    "pages": {
+      "id": "3aeae548-a1a7-4f31-8609-087c86f1eb8e"
+    },
+    "admin": {
+      "id": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e"
+    },
+    "security": {
+      "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c"
+    },
+    "catalogue": {
+      "id": "92f3472a-3153-447d-a8be-c79db9498407"
+    }
+  },
+  "reasons": [],
+  "planComplete": true,
+  "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+  "runAttempt": "1",
+  "workflow": {
+    "runId": "39516512467",
+    "url": "https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39516512467",
+    "event": "workflow_dispatch"
+  },
+  "observedAt": "2026-10-20T23:56:38.941Z",
+  "mandatoryValidation": {
+    "version": 1,
+    "plan": {
+      "version": 1,
+      "origin": "github-public-api",
+      "selector": {
+        "version": 1,
+        "origin": "owner-selected-github-validation",
+        "reviewed": true,
+        "repository": "TIMMMYYYHHHH/Customvibev3",
+        "repositoryId": 1269416306,
+        "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "candidateTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+        "pullRequestNumber": 49,
+        "prHeadSha": "1202b54a9fbfefe028ddeb7423d81c8c8728ed61",
+        "prBaseSha": "750fda86ae893086ced64f92bfb6d5dcd4d637ca",
+        "checkedMergeSha": "33b5ded012752032a2a2e5b4311c1981555617e4",
+        "checkedTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+        "workflowId": 389570831,
+        "workflowPath": ".github/workflows/validate.yml",
+        "workflowSha256": "1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389",
+        "runId": 39512481272,
+        "runAttempt": 1,
+        "jobId": 118936633964,
+        "checkRunId": 118936633964,
+        "checkSuiteId": 107078497298,
+        "url": "https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39512481272",
+        "nodeVersion": "v22.23.3",
+        "nodeTests": 715,
+        "pythonTests": 7,
+        "originalJobLogSha256": "82ceaa3d4abb29f723babfd0b229be89dee82414c1c0125ad68f0f7de4ecf4cc",
+        "ownerProofSha256": "a24c47010e1e510dac44229862cd40de3a9b7aa899244be25c87ffcee46c0b44"
+      },
+      "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+      "candidateTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+      "parents": [
+        "750fda86ae893086ced64f92bfb6d5dcd4d637ca",
+        "1202b54a9fbfefe028ddeb7423d81c8c8728ed61"
+      ],
+      "checkedMergeSha": "33b5ded012752032a2a2e5b4311c1981555617e4",
+      "checkedTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+      "prBaseSha": "750fda86ae893086ced64f92bfb6d5dcd4d637ca",
+      "checkoutRef": "refs/remotes/pull/49/merge",
+      "pullRequestNumber": 49,
+      "publisherRuntime": "v22.23.3",
+      "compilerRuntime": "v22.23.3",
+      "nodeVersion": "v22.23.3",
+      "nodeTests": 715,
+      "pythonTests": 7,
+      "originalJobLogSha256": "82ceaa3d4abb29f723babfd0b229be89dee82414c1c0125ad68f0f7de4ecf4cc",
+      "workflow": {
+        "id": 389570831,
+        "path": ".github/workflows/validate.yml",
+        "sha256": "1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389",
+        "state": "active"
+      },
+      "run": {
+        "id": 39512481272,
+        "attempt": 1,
+        "createdAt": "2026-10-20T23:03:54.000Z",
+        "startedAt": "2026-10-20T23:03:54.000Z",
+        "updatedAt": "2026-10-20T23:08:00.000Z"
+      },
+      "job": {
+        "id": 118936633964,
+        "name": "Node 22 build and fixture tests",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-20T23:03:57.000Z",
+        "completedAt": "2026-10-20T23:07:59.000Z",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:03:58.000Z",
+            "completedAt": "2026-10-20T23:03:59.000Z"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:03:59.000Z",
+            "completedAt": "2026-10-20T23:04:03.000Z"
+          },
+          {
+            "number": 3,
+            "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:03.000Z",
+            "completedAt": "2026-10-20T23:04:04.000Z"
+          },
+          {
+            "number": 4,
+            "name": "Install locked dependencies",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:04.000Z",
+            "completedAt": "2026-10-20T23:04:12.000Z"
+          },
+          {
+            "number": 5,
+            "name": "Build storefront and server-rendered pages",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:12.000Z",
+            "completedAt": "2026-10-20T23:04:23.000Z"
+          },
+          {
+            "number": 6,
+            "name": "Build admin and storefront preview",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:23.000Z",
+            "completedAt": "2026-10-20T23:04:29.000Z"
+          },
+          {
+            "number": 7,
+            "name": "Verify shipped third-party notices",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:29.000Z",
+            "completedAt": "2026-10-20T23:04:39.000Z"
+          },
+          {
+            "number": 8,
+            "name": "Run local fixture tests",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:39.000Z",
+            "completedAt": "2026-10-20T23:07:55.000Z"
+          },
+          {
+            "number": 9,
+            "name": "Run Python security-helper fixtures",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:55.000Z",
+            "completedAt": "2026-10-20T23:07:55.000Z"
+          },
+          {
+            "number": 17,
+            "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:55.000Z",
+            "completedAt": "2026-10-20T23:07:56.000Z"
+          },
+          {
+            "number": 18,
+            "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:56.000Z",
+            "completedAt": "2026-10-20T23:07:56.000Z"
+          },
+          {
+            "number": 19,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:56.000Z",
+            "completedAt": "2026-10-20T23:07:56.000Z"
+          }
+        ]
+      },
+      "check": {
+        "id": 118936633964,
+        "suiteId": 107078497298,
+        "appId": 15368,
+        "name": "Node 22 build and fixture tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "rules": {
+        "rulesetId": 25416396,
+        "requiredCheck": "Node 22 build and fixture tests",
+        "integrationId": 15368
+      },
+      "contentDigest": "ea677d5a631386355de8aebd0a4d7495f2e8272d99c63b232f379513210a79e3",
+      "checkedAt": "2026-10-20T23:41:04.557Z"
+    },
+    "invocation": {
+      "version": 1,
+      "origin": "github-public-api",
+      "selector": {
+        "version": 1,
+        "origin": "owner-selected-github-validation",
+        "reviewed": true,
+        "repository": "TIMMMYYYHHHH/Customvibev3",
+        "repositoryId": 1269416306,
+        "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "candidateTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+        "pullRequestNumber": 49,
+        "prHeadSha": "1202b54a9fbfefe028ddeb7423d81c8c8728ed61",
+        "prBaseSha": "750fda86ae893086ced64f92bfb6d5dcd4d637ca",
+        "checkedMergeSha": "33b5ded012752032a2a2e5b4311c1981555617e4",
+        "checkedTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+        "workflowId": 389570831,
+        "workflowPath": ".github/workflows/validate.yml",
+        "workflowSha256": "1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389",
+        "runId": 39512481272,
+        "runAttempt": 1,
+        "jobId": 118936633964,
+        "checkRunId": 118936633964,
+        "checkSuiteId": 107078497298,
+        "url": "https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39512481272",
+        "nodeVersion": "v22.23.3",
+        "nodeTests": 715,
+        "pythonTests": 7,
+        "originalJobLogSha256": "82ceaa3d4abb29f723babfd0b229be89dee82414c1c0125ad68f0f7de4ecf4cc",
+        "ownerProofSha256": "a24c47010e1e510dac44229862cd40de3a9b7aa899244be25c87ffcee46c0b44"
+      },
+      "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+      "candidateTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+      "parents": [
+        "750fda86ae893086ced64f92bfb6d5dcd4d637ca",
+        "1202b54a9fbfefe028ddeb7423d81c8c8728ed61"
+      ],
+      "checkedMergeSha": "33b5ded012752032a2a2e5b4311c1981555617e4",
+      "checkedTreeSha": "accf96b4dd94b58f6f3c9a2954c49ebe75bae101",
+      "prBaseSha": "750fda86ae893086ced64f92bfb6d5dcd4d637ca",
+      "checkoutRef": "refs/remotes/pull/49/merge",
+      "pullRequestNumber": 49,
+      "publisherRuntime": "v22.23.3",
+      "compilerRuntime": "v22.23.3",
+      "nodeVersion": "v22.23.3",
+      "nodeTests": 715,
+      "pythonTests": 7,
+      "originalJobLogSha256": "82ceaa3d4abb29f723babfd0b229be89dee82414c1c0125ad68f0f7de4ecf4cc",
+      "workflow": {
+        "id": 389570831,
+        "path": ".github/workflows/validate.yml",
+        "sha256": "1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389",
+        "state": "active"
+      },
+      "run": {
+        "id": 39512481272,
+        "attempt": 1,
+        "createdAt": "2026-10-20T23:03:54.000Z",
+        "startedAt": "2026-10-20T23:03:54.000Z",
+        "updatedAt": "2026-10-20T23:08:00.000Z"
+      },
+      "job": {
+        "id": 118936633964,
+        "name": "Node 22 build and fixture tests",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-20T23:03:57.000Z",
+        "completedAt": "2026-10-20T23:07:59.000Z",
+        "steps": [
+          {
+            "number": 1,
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:03:58.000Z",
+            "completedAt": "2026-10-20T23:03:59.000Z"
+          },
+          {
+            "number": 2,
+            "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:03:59.000Z",
+            "completedAt": "2026-10-20T23:04:03.000Z"
+          },
+          {
+            "number": 3,
+            "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:03.000Z",
+            "completedAt": "2026-10-20T23:04:04.000Z"
+          },
+          {
+            "number": 4,
+            "name": "Install locked dependencies",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:04.000Z",
+            "completedAt": "2026-10-20T23:04:12.000Z"
+          },
+          {
+            "number": 5,
+            "name": "Build storefront and server-rendered pages",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:12.000Z",
+            "completedAt": "2026-10-20T23:04:23.000Z"
+          },
+          {
+            "number": 6,
+            "name": "Build admin and storefront preview",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:23.000Z",
+            "completedAt": "2026-10-20T23:04:29.000Z"
+          },
+          {
+            "number": 7,
+            "name": "Verify shipped third-party notices",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:29.000Z",
+            "completedAt": "2026-10-20T23:04:39.000Z"
+          },
+          {
+            "number": 8,
+            "name": "Run local fixture tests",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:04:39.000Z",
+            "completedAt": "2026-10-20T23:07:55.000Z"
+          },
+          {
+            "number": 9,
+            "name": "Run Python security-helper fixtures",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:55.000Z",
+            "completedAt": "2026-10-20T23:07:55.000Z"
+          },
+          {
+            "number": 17,
+            "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:55.000Z",
+            "completedAt": "2026-10-20T23:07:56.000Z"
+          },
+          {
+            "number": 18,
+            "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:56.000Z",
+            "completedAt": "2026-10-20T23:07:56.000Z"
+          },
+          {
+            "number": 19,
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "startedAt": "2026-10-20T23:07:56.000Z",
+            "completedAt": "2026-10-20T23:07:56.000Z"
+          }
+        ]
+      },
+      "check": {
+        "id": 118936633964,
+        "suiteId": 107078497298,
+        "appId": 15368,
+        "name": "Node 22 build and fixture tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "rules": {
+        "rulesetId": 25416396,
+        "requiredCheck": "Node 22 build and fixture tests",
+        "integrationId": 15368
+      },
+      "contentDigest": "ea677d5a631386355de8aebd0a4d7495f2e8272d99c63b232f379513210a79e3",
+      "checkedAt": "2026-10-20T23:41:48.252Z"
+    }
+  },
+  "archivedRelease": {
+    "recoveryDocChanges": [
+      {
+        "path": "docs/dependency-maintenance.md",
+        "before": {
+          "mode": "100644",
+          "blob": "edd3924c040c9ad534dc506004a69608f1dbbcc2"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "65b03d43ddd58dfdd95a97c80ee93cdf3a6ac460"
+        }
+      }
+    ],
+    "origin": "reviewed-complete-release-archive",
+    "reviewed": true,
+    "path": "docs/releases/2026-10-20-release-T-canonical-recovery.json",
+    "sha256": "5ffa589528503e0661c5815266190e22442252b5bb61fd74c39ede1091290cf5",
+    "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+    "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "receiptDigest": "cca92993afd03e856253183b61db1129523310d65e217d7ca95a69327bec049f"
+  },
+  "baseSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+  "paths": [
+    "admin/OrderDetail.jsx",
+    "admin/mail-delivery.mjs",
+    "admin/order-mail.mjs",
+    "catalogue/index.mjs",
+    "docs/availability-runbook.md",
+    "docs/dependency-maintenance.md",
+    "docs/email-delivery-reconciliation.md",
+    "docs/email-delivery-webhook-runbook.md",
+    "docs/mail-delivery-admin.md",
+    "docs/mail-delivery-backend.md",
+    "docs/mail-delivery-integration.md",
+    "docs/release-process.md",
+    "docs/releases/2026-10-20-release-T-canonical-recovery.json",
+    "docs/releases/README.md",
+    "docs/superpowers/plans/2026-10-20-mail-delivery-backend.md",
+    "functions/_middleware.js",
+    "migrations/security/0012_mail_delivery.sql",
+    "package-lock.json",
+    "package.json",
+    "scripts/release-manifest.mjs",
+    "security/index.mjs",
+    "security/mail-delivery.mjs",
+    "security/orders.mjs",
+    "security/submissions.mjs",
+    "server/mail-delivery.mjs",
+    "server/mail-recipient.mjs",
+    "server/mail-webhook.mjs",
+    "server/submissions.mjs",
+    "tests/availability-diagnostics.test.mjs",
+    "tests/fixtures/mail-delivery-admin.html",
+    "tests/fixtures/mail-delivery-admin.jsx",
+    "tests/fixtures/mail-delivery-integrated-worker.mjs",
+    "tests/fixtures/mail-delivery-security-worker.mjs",
+    "tests/fixtures/mail-webhook-worker.mjs",
+    "tests/fixtures/released-submissions-db231.mjs",
+    "tests/mail-delivery-admin.browser.mjs",
+    "tests/mail-delivery-admin.test.mjs",
+    "tests/mail-delivery-integration.test.mjs",
+    "tests/mail-delivery-persistence.test.mjs",
+    "tests/mail-delivery-projection.test.mjs",
+    "tests/mail-delivery.test.mjs",
+    "tests/mail-receipts.test.mjs",
+    "tests/mail-recipient.test.mjs",
+    "tests/mail-webhook.test.mjs",
+    "tests/manual-update-attempts.browser.mjs",
+    "tests/release-cli.test.mjs",
+    "tests/release-manifest.test.mjs"
+  ],
+  "schemas": [
+    "security"
+  ],
+  "beforePagesSourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+  "before": {
+    "pages": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+    "admin": "ddea75c2-294e-4906-92eb-80370470392b",
+    "security": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+    "catalogue": "92f3472a-3153-447d-a8be-c79db9498407"
+  },
+  "components": {
+    "pages": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "pages",
+        "id": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+        "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "sourceDigest": "f8e7338e26a0329ec420906fd04e75050c7ce41c52f8922a14ae4d87fcdb1f5a",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39516512467",
+        "observedAt": "2026-10-20T23:42:16.366Z",
+        "buildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960"
+      }
+    },
+    "admin": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "admin",
+        "id": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+        "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "sourceDigest": "49ac675eed0b9bb54476f3955b63777aecc967eeaa5fe2a32b91ed5298a9a6ec",
+        "runtimeDigest": "21ea968f234862c8187de255193aa8f375193d4d9421ca6306a9e205810ddcf0",
+        "configDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/1957ce59b1b695edba65f38b1f3aea21a14e05a2/docs/releases/2026-10-21-release-S-admin-upload-receipt.json",
+        "observedAt": "2026-10-20T23:51:36.294Z",
+        "assetsDigest": "d43ca05022d72dca85bb2c70a7515039a75c8c11017172e22dd30e9c953387ff"
+      }
+    },
+    "security": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "security",
+        "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+        "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "sourceDigest": "f690eaefe2357c184e5fe29a7eb2d7e0938a79b3861b7be34dd8a7815fa0f95c",
+        "runtimeDigest": "96bc461147c9283f1973b065e3a0917f36cb35ae55ceb39f89009d88e411f365",
+        "configDigest": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/e2772da6258014a4124f8c166be225fbdf0f596c/docs/releases/2026-10-21-release-S-security-upload-receipt.json",
+        "observedAt": "2026-10-20T23:31:08.366Z"
+      }
+    },
+    "catalogue": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "catalogue",
+        "id": "92f3472a-3153-447d-a8be-c79db9498407",
+        "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+        "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
+        "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+        "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json",
+        "observedAt": "2026-10-20T20:49:33.383Z"
+      }
+    }
+  },
+  "sourceDigests": {
+    "pages": "f8e7338e26a0329ec420906fd04e75050c7ce41c52f8922a14ae4d87fcdb1f5a",
+    "admin": "49ac675eed0b9bb54476f3955b63777aecc967eeaa5fe2a32b91ed5298a9a6ec",
+    "security": "f690eaefe2357c184e5fe29a7eb2d7e0938a79b3861b7be34dd8a7815fa0f95c",
+    "catalogue": "4ca387237052c31c101ce7d7109468fcfa583acb4805655783c739b53670ee98"
+  },
+  "schemaSources": {
+    "security": {
+      "databaseId": "25fb2dda-2ce9-4f8c-b49d-e6480218a5cf",
+      "source": [
+        {
+          "name": "0001.sql",
+          "sha256": "4011e125f787d8f58499e84ae4f1b071d9081ee035b39ad341bcb8f74dccf78b"
+        },
+        {
+          "name": "0002_submissions.sql",
+          "sha256": "54b13c0b4d76b7a85fb988f06fefa7086087f6e6d16d4a0d2b1c40da196f4e18"
+        },
+        {
+          "name": "0003_contact_delivery.sql",
+          "sha256": "66275b2720c156e9583b82c0f5a96abf2d6154d4ed3cef53bb6017b16f1d5f35"
+        },
+        {
+          "name": "0004_artwork.sql",
+          "sha256": "ec6b4d32ba12cbf9767a116bc5ec7a505bbe3d6842b460d04e7fd3168f52640a"
+        },
+        {
+          "name": "0005_orders.sql",
+          "sha256": "1b41efbe004562b519fdb52a39dfae7656e0c3ab4275202ee5f112c9e24e640c"
+        },
+        {
+          "name": "0006_fourteen_day_retention.sql",
+          "sha256": "9a0b380edd89105f5b03ae68ce3eb24f9de557265a58f3cb0ca7d6d3b32ca03a"
+        },
+        {
+          "name": "0007_order_proofs.sql",
+          "sha256": "35f013d981e2b29a87c6df3574e2d0394526c3796de3edb6ae5a4f6a86ef5377"
+        },
+        {
+          "name": "0008_order_history_retention.sql",
+          "sha256": "3b20d51796e631392ddf7fd88c428b66a0047528bbc1655170ff1c5281f8430f"
+        },
+        {
+          "name": "0009_map_cache.sql",
+          "sha256": "18672a080ff44ffa03afdbd0c355bde662e4117bf1dae8666c04ba36dc1a15ff"
+        },
+        {
+          "name": "0010_manual_update_attempts.sql",
+          "sha256": "be5b978325f8c5f907d44a6a162bf19a9a3bd52acedee4c07ecda2910bac7ca9"
+        },
+        {
+          "name": "0011_mail_receipt_metadata.sql",
+          "sha256": "3bb294480e0528a26517e440572a22396750a5dfbc8e3e4f16063a1f9d33fa17"
+        },
+        {
+          "name": "0012_mail_delivery.sql",
+          "sha256": "f06881d75c0634b61f83e87f1b6fb8e22ec8c80fc3ec226c158c4dd36019d5bc"
+        }
+      ]
+    },
+    "content": {
+      "databaseId": "8883d934-89f5-4da0-97a1-f7624d008a33",
+      "source": [
+        {
+          "name": "0001.sql",
+          "sha256": "fda85abaf488bfd9e7299f7d8b9c9b751a0b9161e49772b85db26f0f17349b43"
+        }
+      ]
+    }
+  },
+  "build": {
+    "schemaVersion": 2,
+    "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "sourceInputDigest": "23a6c9f62f2f8501abfb51f86148ea4d8e61fbb3c7b455ca07c1a69f7e043b56",
+    "baselineSourceInputDigest": "7d50128c3a31978b302a11f61e0e31172776942ef93585b49226f4a22c3517f1",
+    "inactiveDelivery": {
+      "baselineSourceInputDigest": "7d50128c3a31978b302a11f61e0e31172776942ef93585b49226f4a22c3517f1",
+      "sourceInputDigest": "23a6c9f62f2f8501abfb51f86148ea4d8e61fbb3c7b455ca07c1a69f7e043b56",
+      "protectedInputDigest": "eb231843c7751457a5327fbca3c8ebf75f6a5ee048edf59c9e1e274597cd3c21",
+      "entries": [
+        {
+          "path": "admin/OrderDetail.jsx",
+          "mode": "100644",
+          "baseBlob": "e32dbd29063eac11735ab609992ad12ce6a43d0d",
+          "candidateBlob": "f5cc54589b1d7c19b1afc4e8213d4f48f0e156b9"
+        },
+        {
+          "path": "admin/mail-delivery.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "e896e6f1cd2179d50aeb91ed79e3393d5a244107"
+        },
+        {
+          "path": "admin/order-mail.mjs",
+          "mode": "100644",
+          "baseBlob": "0453367797108b8604dd65d627fc14b9ca1e0733",
+          "candidateBlob": "5cb91e5e6cda53a4630bbb4fb7e7520751c8380f"
+        },
+        {
+          "path": "catalogue/index.mjs",
+          "mode": "100644",
+          "baseBlob": "94b30c5ce4a017794603f16dc81355732222a01d",
+          "candidateBlob": "6245cddfa869ef242a8efcd3f98aba052574fa8b"
+        },
+        {
+          "path": "docs/availability-runbook.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "3f63cef2476e0ec23d1f8ce20ecf472bc1254c24"
+        },
+        {
+          "path": "docs/email-delivery-reconciliation.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "ed443124cec3c47a9ed472a86f5e6b857b59306c"
+        },
+        {
+          "path": "docs/email-delivery-webhook-runbook.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "63ad486aa69f2b4aa9e5f43e7b0653bfc88c4039"
+        },
+        {
+          "path": "docs/mail-delivery-admin.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "82803f9bf0b6be99e826e997de0d3d51ab8cc001"
+        },
+        {
+          "path": "docs/mail-delivery-backend.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "8a76a45278de60add620dbb06654f7fec88f4cb1"
+        },
+        {
+          "path": "docs/mail-delivery-integration.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "c16d0b5d44e82863c0e0ec6e3079a2d19e599b72"
+        },
+        {
+          "path": "docs/superpowers/plans/2026-10-20-mail-delivery-backend.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "5a461bd9fb9584bc37a86bed288addb1b093aa6f"
+        },
+        {
+          "path": "functions/_middleware.js",
+          "mode": "100644",
+          "baseBlob": "b7a97720ebe3012844ece8643490bcf5711fc4ac",
+          "candidateBlob": "ad95491d57d93d8fdec396360eb643da458b49e0"
+        },
+        {
+          "path": "migrations/security/0012_mail_delivery.sql",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "f4138cab01adad6c3e7bb196863909e13692da4b"
+        },
+        {
+          "path": "package-lock.json",
+          "mode": "100644",
+          "baseBlob": "ad10111804d934e9be4f8cc14b73ed38ec889d64",
+          "candidateBlob": "a115eb6c16355d095940c5f182ad3cdb7ffc5819"
+        },
+        {
+          "path": "package.json",
+          "mode": "100644",
+          "baseBlob": "08ecb4193c223add3d5a7a1e75b36f1d413047b3",
+          "candidateBlob": "3457bec703f083c7b998a9b76fe1b688308942ae"
+        },
+        {
+          "path": "security/index.mjs",
+          "mode": "100644",
+          "baseBlob": "f3f3c53f054e26792d56f0d8011b9a93fd1fe385",
+          "candidateBlob": "b2003638d9e8c823ece59187b86167ce1885498d"
+        },
+        {
+          "path": "security/mail-delivery.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "97a4252bd92d34e96eaa47ec4d3bc285dcd147fc"
+        },
+        {
+          "path": "security/orders.mjs",
+          "mode": "100644",
+          "baseBlob": "9607e2bef272c63dcd0c6c065b82f2c6e6d36f7e",
+          "candidateBlob": "7d9b17e33e32c74b8185419de681996b07ddafb9"
+        },
+        {
+          "path": "security/submissions.mjs",
+          "mode": "100644",
+          "baseBlob": "b6e5e44ca42d40e3f642757ebd7f3169bdb8fb9e",
+          "candidateBlob": "29cedc24188d500c0b8cc21b479a62c3119bfc64"
+        },
+        {
+          "path": "server/mail-delivery.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "292de5de954b76e517d9006d11c9eec1da41993a"
+        },
+        {
+          "path": "server/mail-recipient.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "fd6bfed565fcc96c9117b553fa54bce236bebe5b"
+        },
+        {
+          "path": "server/mail-webhook.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "acad4b67dd1452aae3a4e5ef08df528357837186"
+        },
+        {
+          "path": "server/submissions.mjs",
+          "mode": "100644",
+          "baseBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6",
+          "candidateBlob": "64a219f7e60b9d89e765d000f878e61dd50f48f8"
+        },
+        {
+          "path": "tests/availability-diagnostics.test.mjs",
+          "mode": "100644",
+          "baseBlob": "34ab771d9c37f67ac84240dc30fcb0ddf98252cb",
+          "candidateBlob": "06776cc9cac4fd9a0a3fbf2c5b89a85661752da7"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-admin.html",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "57d4f6d67b326c689d5bddc91109a629f4d09ef4"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-admin.jsx",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "032445240f114a08325145988ffdd131898f4904"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-integrated-worker.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "fbb5fc178bea37f22a96ef6b856109cd4a14bb14"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-security-worker.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "75d6f2027fb43fbe74e117c648df29c70ad20056"
+        },
+        {
+          "path": "tests/fixtures/mail-webhook-worker.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "1e0a28a2c79fd62d5c8416d5303f709ca0891690"
+        },
+        {
+          "path": "tests/fixtures/released-submissions-db231.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6"
+        },
+        {
+          "path": "tests/mail-delivery-admin.browser.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "9a0b23fa6ab42dcbc51fc97b56e8d0e4e041dcdb"
+        },
+        {
+          "path": "tests/mail-delivery-admin.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "9f9eeb7699b423e8f559295e8e752cf16d3cc192"
+        },
+        {
+          "path": "tests/mail-delivery-integration.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "f710fb962b636cdb02eb1e19edbe9adfc1bb3ca9"
+        },
+        {
+          "path": "tests/mail-delivery-persistence.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "e1f1765f659a2cbab724d3e1ef0c7709bad99a14"
+        },
+        {
+          "path": "tests/mail-delivery-projection.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "b874011a599c3dd2a1674ac6660a8b9d8a278c43"
+        },
+        {
+          "path": "tests/mail-delivery.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "888ee819c8c0628599d32ad7385fb6ded793b8ef"
+        },
+        {
+          "path": "tests/mail-receipts.test.mjs",
+          "mode": "100644",
+          "baseBlob": "1776c31af72340831d6eae36ed7ec551c5840f25",
+          "candidateBlob": "1acb4ebec7e9dec0116485cd2ddece006f5db0e1"
+        },
+        {
+          "path": "tests/mail-recipient.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "f3ee10cade864a23f766786582992e932dcc25a3"
+        },
+        {
+          "path": "tests/mail-webhook.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "2e77ae99eef6ad8f60548354abd12568084a2a59"
+        },
+        {
+          "path": "tests/manual-update-attempts.browser.mjs",
+          "mode": "100644",
+          "baseBlob": "b115a8cbc7e81a8b63ce6dfa51c3da9805866974",
+          "candidateBlob": "ca1ce9004e19f95d563556a57de036cca54e5aab"
+        }
+      ]
+    },
+    "deliveryBaseline": {
+      "archiveSha256": "5ffa589528503e0661c5815266190e22442252b5bb61fd74c39ede1091290cf5",
+      "receiptDigest": "cca92993afd03e856253183b61db1129523310d65e217d7ca95a69327bec049f",
+      "rollback": {
+        "pagesId": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+        "adminId": "ddea75c2-294e-4906-92eb-80370470392b",
+        "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+        "pagesBuildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+        "adminAssetsDigest": "8c59382c355df19fd803437544bc5b0188b060b892814d90655a1efac1fcfecc",
+        "adminRuntimeDigest": "632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74",
+        "adminConfigDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0"
+      }
+    },
+    "inactiveIngress": {
+      "id": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+      "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+      "observedAt": "2026-10-20T23:41:31.551Z",
+      "production": "absent",
+      "preview": "absent",
+      "canonical": "absent"
+    },
+    "compiler": {
+      "wranglerVersion": "4.150.0",
+      "runtime": "v22.23.3",
+      "files": [
+        {
+          "name": "node",
+          "sha256": "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48",
+          "bytes": 124827920
+        },
+        {
+          "name": "wrangler-package",
+          "sha256": "1a9a7c8dad4ee0da671285e0c22ac3106293ec9b0a1f248d722c734b58a14e98",
+          "bytes": 6863
+        },
+        {
+          "name": "wrangler-api",
+          "sha256": "71da1f9bcf69a9f56c4ff4f68e71315365d03db8ea11207577b47a8e1a0a1064",
+          "bytes": 15030322
+        },
+        {
+          "name": "wrangler-esbuild-api",
+          "sha256": "61ec0ba144ff93f4bf0e96ad6fab6f430ede0aa13e27ace8063ed63ba416b3cd",
+          "bytes": 97463
+        },
+        {
+          "name": "wrangler-esbuild-package",
+          "sha256": "9d0bc453f4e791553c4cc2298ba023b409241fd9801e494741666eb0f6051490",
+          "bytes": 3980
+        },
+        {
+          "name": "wrangler-esbuild-binary",
+          "sha256": "e1698a3d5c6c0798fee4fd3b5cc816651f460c63d390a7a26ea4beb0b1884100",
+          "bytes": 11427952
+        },
+        {
+          "name": "vite-esbuild-api",
+          "sha256": "0d1241812c443111d39475dfc66836003e9ef8b87e54d990dd67df29d20010e1",
+          "bytes": 88706
+        },
+        {
+          "name": "vite-esbuild-binary",
+          "sha256": "bab29b2ca7a9e89b67cf720b77b2d743f9f31f5cf0d5bd74ee8c8de30ced7014",
+          "bytes": 10358936
+        },
+        {
+          "name": "vite",
+          "sha256": "56670eb334999629af2b374fa5108f74b1961a59b7b023c03960d9068ef9e7cd",
+          "bytes": 6677
+        },
+        {
+          "name": "react-plugin",
+          "sha256": "a546fe8477e2583339a034e32008e15a9f8cccfd6d293b32a4e3629e7ae73cd5",
+          "bytes": 13452
+        }
+      ],
+      "dependencyInputs": {
+        "sha256": "d2672b44548100e7df5ad664dedb0316d8658bce409cc2ff776dd374e8b0d387",
+        "fileCount": 13786,
+        "bytes": 626256859
+      },
+      "lockfileDigest": "0197fdc17d83f64db466b9e34a0f152ff821c08ba511c657fb4507561f106267",
+      "configDigest": "84f413baed6dcc09f82a27b9c3540e5ec8f1461ba5ecccf6122fb2f334d46da9",
+      "options": {
+        "directory": "dist/client",
+        "functionsDirectory": "functions",
+        "bundle": true,
+        "sourceMaps": false,
+        "branch": "main",
+        "commitDirty": false,
+        "args": {
+          "config": "wrangler.jsonc"
+        }
+      },
+      "compilerConfigDigest": "1bc0aec0bd650f5c0b0344a333bf1a741a276b1b1b3e34c5ff0a86adddf14f96"
+    },
+    "ssr": {
+      "sha256": "0be41fd80e62ffee336ad56588efbc7dbd8a9678903dd963b377020dcf8744ae",
+      "fileCount": 471
+    },
+    "private": {
+      "admin": {
+        "runtimeDigest": "21ea968f234862c8187de255193aa8f375193d4d9421ca6306a9e205810ddcf0",
+        "configDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0"
+      },
+      "security": {
+        "runtimeDigest": "96bc461147c9283f1973b065e3a0917f36cb35ae55ceb39f89009d88e411f365",
+        "configDigest": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936"
+      },
+      "catalogue": {
+        "inputClosure": {
+          "version": 1,
+          "inputCount": 52,
+          "inputPathsDigest": "157cdb15f5d1c6f385d1039da3613d64cf28917682e313aafc90bea3c6ecd853",
+          "inputInventoryDigest": "05330406124d45da8cf2154c7d4a1ac7c2b9832684988d943913f50a463ce674",
+          "importGraphDigest": "33992702b6d366eeeb443f4200be451d7a98ed7aca74386b5b4aca2968a0e09e",
+          "metafileSha256": "fcd76a5c189aada8983fa4104b4f09bb6449f259721e043caccf349863d36fb5"
+        },
+        "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+        "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17"
+      }
+    },
+    "pages": {
+      "sha256": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+      "fileCount": 520
+    },
+    "admin": {
+      "sha256": "d43ca05022d72dca85bb2c70a7515039a75c8c11017172e22dd30e9c953387ff",
+      "fileCount": 512
+    }
+  },
+  "activationCompatibility": {
+    "basis": "reviewed-inactive-delivery-v1",
+    "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "baselineSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+    "observedAt": "2026-10-20T23:37:20.936Z",
+    "sourceInputDigest": "23a6c9f62f2f8501abfb51f86148ea4d8e61fbb3c7b455ca07c1a69f7e043b56",
+    "compilerConfigDigest": "1bc0aec0bd650f5c0b0344a333bf1a741a276b1b1b3e34c5ff0a86adddf14f96",
+    "configDigest": "84f413baed6dcc09f82a27b9c3540e5ec8f1461ba5ecccf6122fb2f334d46da9",
+    "pagesBuildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+    "adminAssetsDigest": "d43ca05022d72dca85bb2c70a7515039a75c8c11017172e22dd30e9c953387ff",
+    "baselineSourceInputDigest": "7d50128c3a31978b302a11f61e0e31172776942ef93585b49226f4a22c3517f1",
+    "inactiveDelivery": {
+      "baselineSourceInputDigest": "7d50128c3a31978b302a11f61e0e31172776942ef93585b49226f4a22c3517f1",
+      "sourceInputDigest": "23a6c9f62f2f8501abfb51f86148ea4d8e61fbb3c7b455ca07c1a69f7e043b56",
+      "protectedInputDigest": "eb231843c7751457a5327fbca3c8ebf75f6a5ee048edf59c9e1e274597cd3c21",
+      "entries": [
+        {
+          "path": "admin/OrderDetail.jsx",
+          "mode": "100644",
+          "baseBlob": "e32dbd29063eac11735ab609992ad12ce6a43d0d",
+          "candidateBlob": "f5cc54589b1d7c19b1afc4e8213d4f48f0e156b9"
+        },
+        {
+          "path": "admin/mail-delivery.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "e896e6f1cd2179d50aeb91ed79e3393d5a244107"
+        },
+        {
+          "path": "admin/order-mail.mjs",
+          "mode": "100644",
+          "baseBlob": "0453367797108b8604dd65d627fc14b9ca1e0733",
+          "candidateBlob": "5cb91e5e6cda53a4630bbb4fb7e7520751c8380f"
+        },
+        {
+          "path": "catalogue/index.mjs",
+          "mode": "100644",
+          "baseBlob": "94b30c5ce4a017794603f16dc81355732222a01d",
+          "candidateBlob": "6245cddfa869ef242a8efcd3f98aba052574fa8b"
+        },
+        {
+          "path": "docs/availability-runbook.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "3f63cef2476e0ec23d1f8ce20ecf472bc1254c24"
+        },
+        {
+          "path": "docs/email-delivery-reconciliation.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "ed443124cec3c47a9ed472a86f5e6b857b59306c"
+        },
+        {
+          "path": "docs/email-delivery-webhook-runbook.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "63ad486aa69f2b4aa9e5f43e7b0653bfc88c4039"
+        },
+        {
+          "path": "docs/mail-delivery-admin.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "82803f9bf0b6be99e826e997de0d3d51ab8cc001"
+        },
+        {
+          "path": "docs/mail-delivery-backend.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "8a76a45278de60add620dbb06654f7fec88f4cb1"
+        },
+        {
+          "path": "docs/mail-delivery-integration.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "c16d0b5d44e82863c0e0ec6e3079a2d19e599b72"
+        },
+        {
+          "path": "docs/superpowers/plans/2026-10-20-mail-delivery-backend.md",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "5a461bd9fb9584bc37a86bed288addb1b093aa6f"
+        },
+        {
+          "path": "functions/_middleware.js",
+          "mode": "100644",
+          "baseBlob": "b7a97720ebe3012844ece8643490bcf5711fc4ac",
+          "candidateBlob": "ad95491d57d93d8fdec396360eb643da458b49e0"
+        },
+        {
+          "path": "migrations/security/0012_mail_delivery.sql",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "f4138cab01adad6c3e7bb196863909e13692da4b"
+        },
+        {
+          "path": "package-lock.json",
+          "mode": "100644",
+          "baseBlob": "ad10111804d934e9be4f8cc14b73ed38ec889d64",
+          "candidateBlob": "a115eb6c16355d095940c5f182ad3cdb7ffc5819"
+        },
+        {
+          "path": "package.json",
+          "mode": "100644",
+          "baseBlob": "08ecb4193c223add3d5a7a1e75b36f1d413047b3",
+          "candidateBlob": "3457bec703f083c7b998a9b76fe1b688308942ae"
+        },
+        {
+          "path": "security/index.mjs",
+          "mode": "100644",
+          "baseBlob": "f3f3c53f054e26792d56f0d8011b9a93fd1fe385",
+          "candidateBlob": "b2003638d9e8c823ece59187b86167ce1885498d"
+        },
+        {
+          "path": "security/mail-delivery.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "97a4252bd92d34e96eaa47ec4d3bc285dcd147fc"
+        },
+        {
+          "path": "security/orders.mjs",
+          "mode": "100644",
+          "baseBlob": "9607e2bef272c63dcd0c6c065b82f2c6e6d36f7e",
+          "candidateBlob": "7d9b17e33e32c74b8185419de681996b07ddafb9"
+        },
+        {
+          "path": "security/submissions.mjs",
+          "mode": "100644",
+          "baseBlob": "b6e5e44ca42d40e3f642757ebd7f3169bdb8fb9e",
+          "candidateBlob": "29cedc24188d500c0b8cc21b479a62c3119bfc64"
+        },
+        {
+          "path": "server/mail-delivery.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "292de5de954b76e517d9006d11c9eec1da41993a"
+        },
+        {
+          "path": "server/mail-recipient.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "fd6bfed565fcc96c9117b553fa54bce236bebe5b"
+        },
+        {
+          "path": "server/mail-webhook.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "acad4b67dd1452aae3a4e5ef08df528357837186"
+        },
+        {
+          "path": "server/submissions.mjs",
+          "mode": "100644",
+          "baseBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6",
+          "candidateBlob": "64a219f7e60b9d89e765d000f878e61dd50f48f8"
+        },
+        {
+          "path": "tests/availability-diagnostics.test.mjs",
+          "mode": "100644",
+          "baseBlob": "34ab771d9c37f67ac84240dc30fcb0ddf98252cb",
+          "candidateBlob": "06776cc9cac4fd9a0a3fbf2c5b89a85661752da7"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-admin.html",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "57d4f6d67b326c689d5bddc91109a629f4d09ef4"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-admin.jsx",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "032445240f114a08325145988ffdd131898f4904"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-integrated-worker.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "fbb5fc178bea37f22a96ef6b856109cd4a14bb14"
+        },
+        {
+          "path": "tests/fixtures/mail-delivery-security-worker.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "75d6f2027fb43fbe74e117c648df29c70ad20056"
+        },
+        {
+          "path": "tests/fixtures/mail-webhook-worker.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "1e0a28a2c79fd62d5c8416d5303f709ca0891690"
+        },
+        {
+          "path": "tests/fixtures/released-submissions-db231.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6"
+        },
+        {
+          "path": "tests/mail-delivery-admin.browser.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "9a0b23fa6ab42dcbc51fc97b56e8d0e4e041dcdb"
+        },
+        {
+          "path": "tests/mail-delivery-admin.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "9f9eeb7699b423e8f559295e8e752cf16d3cc192"
+        },
+        {
+          "path": "tests/mail-delivery-integration.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "f710fb962b636cdb02eb1e19edbe9adfc1bb3ca9"
+        },
+        {
+          "path": "tests/mail-delivery-persistence.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "e1f1765f659a2cbab724d3e1ef0c7709bad99a14"
+        },
+        {
+          "path": "tests/mail-delivery-projection.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "b874011a599c3dd2a1674ac6660a8b9d8a278c43"
+        },
+        {
+          "path": "tests/mail-delivery.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "888ee819c8c0628599d32ad7385fb6ded793b8ef"
+        },
+        {
+          "path": "tests/mail-receipts.test.mjs",
+          "mode": "100644",
+          "baseBlob": "1776c31af72340831d6eae36ed7ec551c5840f25",
+          "candidateBlob": "1acb4ebec7e9dec0116485cd2ddece006f5db0e1"
+        },
+        {
+          "path": "tests/mail-recipient.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "f3ee10cade864a23f766786582992e932dcc25a3"
+        },
+        {
+          "path": "tests/mail-webhook.test.mjs",
+          "mode": "100644",
+          "baseBlob": null,
+          "candidateBlob": "2e77ae99eef6ad8f60548354abd12568084a2a59"
+        },
+        {
+          "path": "tests/manual-update-attempts.browser.mjs",
+          "mode": "100644",
+          "baseBlob": "b115a8cbc7e81a8b63ce6dfa51c3da9805866974",
+          "candidateBlob": "ca1ce9004e19f95d563556a57de036cca54e5aab"
+        }
+      ]
+    },
+    "historicalFunctionsDigest": null,
+    "privateSnapshotGap": "Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed."
+  },
+  "prerequisites": {
+    "components": {
+      "admin": {
+        "status": "verified",
+        "guard": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "admin",
+          "id": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+          "origin": "private-helper-get",
+          "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:51:34.453Z",
+          "protection": "passed"
+        }
+      },
+      "security": {
+        "status": "verified",
+        "guard": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "security",
+          "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+          "origin": "private-helper-get",
+          "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:51:37.171Z",
+          "protection": "passed"
+        },
+        "receipt": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "security",
+          "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+          "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "sourceDigest": "f690eaefe2357c184e5fe29a7eb2d7e0938a79b3861b7be34dd8a7815fa0f95c",
+          "runtimeDigest": "96bc461147c9283f1973b065e3a0917f36cb35ae55ceb39f89009d88e411f365",
+          "configDigest": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936",
+          "origin": "guarded-upload",
+          "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/e2772da6258014a4124f8c166be225fbdf0f596c/docs/releases/2026-10-21-release-S-security-upload-receipt.json",
+          "observedAt": "2026-10-20T23:31:08.366Z"
+        }
+      },
+      "catalogue": {
+        "status": "verified",
+        "guard": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "catalogue",
+          "id": "92f3472a-3153-447d-a8be-c79db9498407",
+          "origin": "private-helper-get",
+          "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:51:40.073Z",
+          "protection": "passed"
+        },
+        "receipt": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "catalogue",
+          "id": "92f3472a-3153-447d-a8be-c79db9498407",
+          "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+          "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
+          "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+          "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+          "origin": "guarded-upload",
+          "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json",
+          "observedAt": "2026-10-20T20:49:33.383Z"
+        }
+      }
+    },
+    "schema": {
+      "security": {
+        "status": "verified",
+        "evidence": {
+          "origin": "console-metadata",
+          "databaseId": "25fb2dda-2ce9-4f8c-b49d-e6480218a5cf",
+          "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:49:18.142Z",
+          "sourceFiles": [
+            {
+              "name": "0001.sql",
+              "sha256": "4011e125f787d8f58499e84ae4f1b071d9081ee035b39ad341bcb8f74dccf78b"
+            },
+            {
+              "name": "0002_submissions.sql",
+              "sha256": "54b13c0b4d76b7a85fb988f06fefa7086087f6e6d16d4a0d2b1c40da196f4e18"
+            },
+            {
+              "name": "0003_contact_delivery.sql",
+              "sha256": "66275b2720c156e9583b82c0f5a96abf2d6154d4ed3cef53bb6017b16f1d5f35"
+            },
+            {
+              "name": "0004_artwork.sql",
+              "sha256": "ec6b4d32ba12cbf9767a116bc5ec7a505bbe3d6842b460d04e7fd3168f52640a"
+            },
+            {
+              "name": "0005_orders.sql",
+              "sha256": "1b41efbe004562b519fdb52a39dfae7656e0c3ab4275202ee5f112c9e24e640c"
+            },
+            {
+              "name": "0006_fourteen_day_retention.sql",
+              "sha256": "9a0b380edd89105f5b03ae68ce3eb24f9de557265a58f3cb0ca7d6d3b32ca03a"
+            },
+            {
+              "name": "0007_order_proofs.sql",
+              "sha256": "35f013d981e2b29a87c6df3574e2d0394526c3796de3edb6ae5a4f6a86ef5377"
+            },
+            {
+              "name": "0008_order_history_retention.sql",
+              "sha256": "3b20d51796e631392ddf7fd88c428b66a0047528bbc1655170ff1c5281f8430f"
+            },
+            {
+              "name": "0009_map_cache.sql",
+              "sha256": "18672a080ff44ffa03afdbd0c355bde662e4117bf1dae8666c04ba36dc1a15ff"
+            },
+            {
+              "name": "0010_manual_update_attempts.sql",
+              "sha256": "be5b978325f8c5f907d44a6a162bf19a9a3bd52acedee4c07ecda2910bac7ca9"
+            },
+            {
+              "name": "0011_mail_receipt_metadata.sql",
+              "sha256": "3bb294480e0528a26517e440572a22396750a5dfbc8e3e4f16063a1f9d33fa17"
+            },
+            {
+              "name": "0012_mail_delivery.sql",
+              "sha256": "f06881d75c0634b61f83e87f1b6fb8e22ec8c80fc3ec226c158c4dd36019d5bc"
+            }
+          ],
+          "applied": [
+            "0001.sql",
+            "0002_submissions.sql",
+            "0003_contact_delivery.sql",
+            "0004_artwork.sql",
+            "0005_orders.sql",
+            "0006_fourteen_day_retention.sql",
+            "0007_order_proofs.sql",
+            "0008_order_history_retention.sql",
+            "0009_map_cache.sql",
+            "0010_manual_update_attempts.sql",
+            "0011_mail_receipt_metadata.sql",
+            "0012_mail_delivery.sql"
+          ],
+          "objectsDigest": "afe684c75d0871a987af8abb8074e6e86a0b7295bb5ba535c4f257eb40a64095",
+          "ddlReviewed": true,
+          "remoteChecksumEvidence": "source checksums only; remote ledger has no checksums"
+        }
+      },
+      "content": {
+        "status": "verified",
+        "evidence": {
+          "origin": "console-metadata",
+          "databaseId": "8883d934-89f5-4da0-97a1-f7624d008a33",
+          "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:49:25.832Z",
+          "sourceFiles": [
+            {
+              "name": "0001.sql",
+              "sha256": "fda85abaf488bfd9e7299f7d8b9c9b751a0b9161e49772b85db26f0f17349b43"
+            }
+          ],
+          "applied": [
+            "0001.sql"
+          ],
+          "objectsDigest": "d52fbc544304b4ca6feace147879d01fd07806f48331a3fb042989bddc90aa83",
+          "ddlReviewed": true,
+          "remoteChecksumEvidence": "source checksums only; remote ledger has no checksums"
+        }
+      }
+    },
+    "staged": {
+      "status": "verified",
+      "evidence": {
+        "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "observedAt": "2026-10-20T23:49:16.861Z",
+        "clientPairCompatibleWithSchema": true,
+        "rollback": {
+          "pagesId": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+          "adminId": "ddea75c2-294e-4906-92eb-80370470392b",
+          "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+          "pagesBuildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+          "adminAssetsDigest": "8c59382c355df19fd803437544bc5b0188b060b892814d90655a1efac1fcfecc",
+          "adminRuntimeDigest": "632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74",
+          "adminConfigDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0"
+        }
+      }
+    },
+    "complete": true
+  },
+  "evidence": {
+    "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "guards": {
+      "admin": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "admin",
+        "id": "ddea75c2-294e-4906-92eb-80370470392b",
+        "origin": "private-helper-get",
+        "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "observedAt": "2026-10-20T23:37:23.582Z",
+        "protection": "passed"
+      },
+      "security": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "security",
+        "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+        "origin": "private-helper-get",
+        "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "observedAt": "2026-10-20T23:37:26.690Z",
+        "protection": "passed"
+      },
+      "catalogue": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "catalogue",
+        "id": "92f3472a-3153-447d-a8be-c79db9498407",
+        "origin": "private-helper-get",
+        "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "observedAt": "2026-10-20T23:37:29.661Z",
+        "protection": "passed"
+      }
+    },
+    "receipts": {
+      "security": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "security",
+        "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+        "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "sourceDigest": "f690eaefe2357c184e5fe29a7eb2d7e0938a79b3861b7be34dd8a7815fa0f95c",
+        "runtimeDigest": "96bc461147c9283f1973b065e3a0917f36cb35ae55ceb39f89009d88e411f365",
+        "configDigest": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/e2772da6258014a4124f8c166be225fbdf0f596c/docs/releases/2026-10-21-release-S-security-upload-receipt.json",
+        "observedAt": "2026-10-20T23:31:08.366Z"
+      },
+      "catalogue": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "catalogue",
+        "id": "92f3472a-3153-447d-a8be-c79db9498407",
+        "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+        "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
+        "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+        "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json",
+        "observedAt": "2026-10-20T20:49:33.383Z"
+      }
+    },
+    "schema": {
+      "security": {
+        "origin": "console-metadata",
+        "databaseId": "25fb2dda-2ce9-4f8c-b49d-e6480218a5cf",
+        "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "observedAt": "2026-10-20T23:38:02.747Z",
+        "sourceFiles": [
+          {
+            "name": "0001.sql",
+            "sha256": "4011e125f787d8f58499e84ae4f1b071d9081ee035b39ad341bcb8f74dccf78b"
+          },
+          {
+            "name": "0002_submissions.sql",
+            "sha256": "54b13c0b4d76b7a85fb988f06fefa7086087f6e6d16d4a0d2b1c40da196f4e18"
+          },
+          {
+            "name": "0003_contact_delivery.sql",
+            "sha256": "66275b2720c156e9583b82c0f5a96abf2d6154d4ed3cef53bb6017b16f1d5f35"
+          },
+          {
+            "name": "0004_artwork.sql",
+            "sha256": "ec6b4d32ba12cbf9767a116bc5ec7a505bbe3d6842b460d04e7fd3168f52640a"
+          },
+          {
+            "name": "0005_orders.sql",
+            "sha256": "1b41efbe004562b519fdb52a39dfae7656e0c3ab4275202ee5f112c9e24e640c"
+          },
+          {
+            "name": "0006_fourteen_day_retention.sql",
+            "sha256": "9a0b380edd89105f5b03ae68ce3eb24f9de557265a58f3cb0ca7d6d3b32ca03a"
+          },
+          {
+            "name": "0007_order_proofs.sql",
+            "sha256": "35f013d981e2b29a87c6df3574e2d0394526c3796de3edb6ae5a4f6a86ef5377"
+          },
+          {
+            "name": "0008_order_history_retention.sql",
+            "sha256": "3b20d51796e631392ddf7fd88c428b66a0047528bbc1655170ff1c5281f8430f"
+          },
+          {
+            "name": "0009_map_cache.sql",
+            "sha256": "18672a080ff44ffa03afdbd0c355bde662e4117bf1dae8666c04ba36dc1a15ff"
+          },
+          {
+            "name": "0010_manual_update_attempts.sql",
+            "sha256": "be5b978325f8c5f907d44a6a162bf19a9a3bd52acedee4c07ecda2910bac7ca9"
+          },
+          {
+            "name": "0011_mail_receipt_metadata.sql",
+            "sha256": "3bb294480e0528a26517e440572a22396750a5dfbc8e3e4f16063a1f9d33fa17"
+          },
+          {
+            "name": "0012_mail_delivery.sql",
+            "sha256": "f06881d75c0634b61f83e87f1b6fb8e22ec8c80fc3ec226c158c4dd36019d5bc"
+          }
+        ],
+        "applied": [
+          "0001.sql",
+          "0002_submissions.sql",
+          "0003_contact_delivery.sql",
+          "0004_artwork.sql",
+          "0005_orders.sql",
+          "0006_fourteen_day_retention.sql",
+          "0007_order_proofs.sql",
+          "0008_order_history_retention.sql",
+          "0009_map_cache.sql",
+          "0010_manual_update_attempts.sql",
+          "0011_mail_receipt_metadata.sql",
+          "0012_mail_delivery.sql"
+        ],
+        "objectsDigest": "afe684c75d0871a987af8abb8074e6e86a0b7295bb5ba535c4f257eb40a64095",
+        "ddlReviewed": true,
+        "remoteChecksumEvidence": "source checksums only; remote ledger has no checksums"
+      },
+      "content": {
+        "origin": "console-metadata",
+        "databaseId": "8883d934-89f5-4da0-97a1-f7624d008a33",
+        "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "observedAt": "2026-10-20T23:38:07.939Z",
+        "sourceFiles": [
+          {
+            "name": "0001.sql",
+            "sha256": "fda85abaf488bfd9e7299f7d8b9c9b751a0b9161e49772b85db26f0f17349b43"
+          }
+        ],
+        "applied": [
+          "0001.sql"
+        ],
+        "objectsDigest": "d52fbc544304b4ca6feace147879d01fd07806f48331a3fb042989bddc90aa83",
+        "ddlReviewed": true,
+        "remoteChecksumEvidence": "source checksums only; remote ledger has no checksums"
+      }
+    },
+    "staged": {
+      "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+      "observedAt": "2026-10-20T23:37:20.936Z",
+      "clientPairCompatibleWithSchema": true,
+      "rollback": {
+        "pagesId": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+        "adminId": "ddea75c2-294e-4906-92eb-80370470392b",
+        "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+        "pagesBuildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+        "adminAssetsDigest": "8c59382c355df19fd803437544bc5b0188b060b892814d90655a1efac1fcfecc",
+        "adminRuntimeDigest": "632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74",
+        "adminConfigDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0"
+      }
+    }
+  },
+  "guards": {
+    "publication": "paired versions observed",
+    "privateObservation": "reviewed fresh snapshots; live helper completion required",
+    "payments": "disabled; application acceptance separate",
+    "customerEmails": "manual only; application acceptance separate",
+    "protection": "passed"
+  },
+  "attempts": [
+    {
+      "component": "pages",
+      "startedAt": "2026-10-20T23:41:44.766Z",
+      "outcome": "observed",
+      "invokedAt": "2026-10-20T23:41:48.260Z",
+      "prewriteValidationDigest": "ec0f59a11ad5e4b42036ff177de5d22a5cb3620c29d1e842d9eacee321aa55c2",
+      "acknowledgement": {
+        "id": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+        "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "environment": "production",
+        "createdAt": "2026-10-20T23:41:52.189Z"
+      },
+      "acknowledgementObservedAt": "2026-10-20T23:41:53.051Z",
+      "protection": {
+        "status": "passed",
+        "observedAt": "2026-10-20T23:42:17.222Z",
+        "expectedSourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "checks": [
+          {
+            "component": "pages",
+            "status": "passed",
+            "expectedId": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+            "protectionObservedAt": "2026-10-20T23:42:16.986Z",
+            "observedId": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+            "observedSourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+            "inactiveIngress": {
+              "id": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+              "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+              "observedAt": "2026-10-20T23:42:17.221Z",
+              "production": "absent",
+              "preview": "absent",
+              "canonical": "absent"
+            },
+            "identityStatus": "passed",
+            "identityObservedAt": "2026-10-20T23:42:17.222Z"
+          }
+        ]
+      }
+    }
+  ],
+  "prewriteValidation": {
+    "version": 2,
+    "repository": "TIMMMYYYHHHH/Customvibev3",
+    "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "runId": "39516512467",
+    "runAttempt": "1",
+    "coordinatorAttempt": 1,
+    "checkedAt": "2026-10-20T23:41:48.260Z",
+    "invokedAt": "2026-10-20T23:41:48.260Z",
+    "snapshotDigest": "88465886710430b756b4b4613d26284389fa9e0c19bc13a39c676788696be457",
+    "integrityDigest": "ec0f59a11ad5e4b42036ff177de5d22a5cb3620c29d1e842d9eacee321aa55c2"
+  },
+  "pagesUploadEvidence": {
+    "pagesUploadEvidenceVersion": 1,
+    "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "runId": "39516512467",
+    "sourceInputDigest": "23a6c9f62f2f8501abfb51f86148ea4d8e61fbb3c7b455ca07c1a69f7e043b56",
+    "compilerConfigDigest": "1bc0aec0bd650f5c0b0344a333bf1a741a276b1b1b3e34c5ff0a86adddf14f96",
+    "configDigest": "84f413baed6dcc09f82a27b9c3540e5ec8f1461ba5ecccf6122fb2f334d46da9",
+    "buildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+    "assetsDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+    "uploadedBundleDigest": "bb53f7421f535c14906be0532f9c9fe55665cc454aee6942bae4dbacea636569",
+    "uploadedBundleBytes": 2342549,
+    "uploadedModuleInventory": [
+      {
+        "name": "functionsWorker-0.9305293613847319.js",
+        "type": "application/javascript+module",
+        "sha256": "f68050bfcfc089d5472608038dc58f3afe5323aa29dee9bc8f4f95c963b57262",
+        "bytes": 2341459
+      }
+    ],
+    "metadataDigest": "3b01b66e1d4e4df0fcc8cf47950c1a7a06f86f5da66bf958c4a7c83b33a29e13",
+    "controlInventory": {
+      "_headers": {
+        "sha256": "603e977b8e4b84c65ea4d5385ae9d4cf9aa5069799250ce8e7a50bd275bbe2f9",
+        "bytes": 149
+      },
+      "_redirects": {
+        "sha256": "2f9850f705a90c52744969e5426131f21366e929bd72e184404401e5ef3d5c36",
+        "bytes": 335
+      },
+      "_routes.json": {
+        "sha256": "6a5235a7db8c26c17606b7f16516509989e8b2c8307280cc53c30e03e63d4a6a",
+        "bytes": 44
+      },
+      "functions-filepath-routing-config.json": {
+        "sha256": "8fc2129c34aea459d5e000d7d13f814ab83a6e7f551fa7a3f24288315a310b78",
+        "bytes": 184
+      }
+    },
+    "assetManifestDigest": "7e64b205d88009a17a2b5adf209b90f0019aec835ce1f9948248ca9191953dbe",
+    "assetInventory": [
+      {
+        "path": "_headers",
+        "sha256": "603e977b8e4b84c65ea4d5385ae9d4cf9aa5069799250ce8e7a50bd275bbe2f9",
+        "bytes": 149
+      },
+      {
+        "path": "_redirects",
+        "sha256": "2f9850f705a90c52744969e5426131f21366e929bd72e184404401e5ef3d5c36",
+        "bytes": 335
+      },
+      {
+        "path": "_routes.json",
+        "sha256": "6a5235a7db8c26c17606b7f16516509989e8b2c8307280cc53c30e03e63d4a6a",
+        "bytes": 44
+      },
+      {
+        "path": ".vite/manifest.json",
+        "sha256": "6346a5e8b0c4c72c2c3ae63b460d5533d22727a1c26667f1186e00150344225b",
+        "bytes": 4938
+      },
+      {
+        "path": ".well-known/security.txt",
+        "sha256": "13fd69454e2e97406aba227456eafa2f48c9aa602268053e8fa77d0671a386db",
+        "bytes": 157
+      },
+      {
+        "path": "404.html",
+        "sha256": "2694905cef1bc0ddeb612d7f3090fb3d87872364c5ff14efee9d1bb78d4d9c27",
+        "bytes": 9050
+      },
+      {
+        "path": "assets/brand-icon.png",
+        "sha256": "bebeb47dc14c5958c49496d8c98a0e2b0d7460824a47f7220b2c2a1e0d02c48a",
+        "bytes": 1209870
+      },
+      {
+        "path": "assets/business-games/01-plumber.webp",
+        "sha256": "73a8e1932812b32867381713bb9a9386aafe58f37ccaceaba2e25c1ef0e2b652",
+        "bytes": 130414
+      },
+      {
+        "path": "assets/business-games/02-salon.svg",
+        "sha256": "6b4ad1d01afba69877e0b470eb7df008decba13a80a6e0b3ea99d1571a5abf28",
+        "bytes": 397087
+      },
+      {
+        "path": "assets/business-games/02-salon.webp",
+        "sha256": "5dd44e9cefa3eda40b506c5bd70a03972f51225dafa57d0303c18215df79cc6b",
+        "bytes": 296624
+      },
+      {
+        "path": "assets/business-games/03-cafe.svg",
+        "sha256": "d14a10aa1a764a4260673400eff8a96d0dd6e223c2ff73b6066ee901da02dfc9",
+        "bytes": 316840
+      },
+      {
+        "path": "assets/business-games/03-cafe.webp",
+        "sha256": "aa280e564ddee4a5a4e80ac3e6375167e9a6a6d99d239db16e9b86c042ddebd5",
+        "bytes": 236472
+      },
+      {
+        "path": "assets/business-games/04-wifi.svg",
+        "sha256": "e47155cdae10c96d2ca01e7aceed9bf05cfc40110523fe3da78113eb51f98a01",
+        "bytes": 288813
+      },
+      {
+        "path": "assets/business-games/04-wifi.webp",
+        "sha256": "1d1931729dd4e47669327705f1003abb89f066c528171ea08f4addb5e7f3b78c",
+        "bytes": 215434
+      },
+      {
+        "path": "assets/business-games/05-review.svg",
+        "sha256": "3cf28152c57c3d1ac19bb483c5ad3718c67e2e10c46da09e89b8bcf3e39e2144",
+        "bytes": 222061
+      },
+      {
+        "path": "assets/business-games/05-review.webp",
+        "sha256": "1fd54305d2fe8970d4c50ee79b1feaeb72d53bedd36dc140cc94bf9ce65e36d8",
+        "bytes": 165354
+      },
+      {
+        "path": "assets/business-games/06-bakery.webp",
+        "sha256": "502a11617be4b42e86d6a01aadf3de4475e6299a27dfed966913810b13a4a544",
+        "bytes": 290466
+      },
+      {
+        "path": "assets/business-games/07-hours.webp",
+        "sha256": "85601886526e5bc41da144cbbc532b8fd0e1a93053f0ced2b0a64ca71e8cb38e",
+        "bytes": 258398
+      },
+      {
+        "path": "assets/business-games/08-offer.webp",
+        "sha256": "a16c7bf566ebd2ba8fe5f28f3ea8d3953581666a21ed3373ce6be762575ef4ea",
+        "bytes": 271886
+      },
+      {
+        "path": "assets/business-games/09-groomer.webp",
+        "sha256": "2b9071c91ca924d5c6a02149f12ba780abdcdd59e69d29a47a64c7b6b511694b",
+        "bytes": 151032
+      },
+      {
+        "path": "assets/business-games/game-o.png",
+        "sha256": "6f243b67dcc76f0310ee4907848d32254d2aedd92afddcf039990738e54cfe3f",
+        "bytes": 1934509
+      },
+      {
+        "path": "assets/business-games/game-x.png",
+        "sha256": "515d836e9e763c37fbfdd0a6634d7768e820e2592992b51d854caf4fc9153f4f",
+        "bytes": 2132696
+      },
+      {
+        "path": "assets/business-render-CE8d4soC.js",
+        "sha256": "2c449b4602962959caeade7fa33e7506891d4fc6c10b284946e8673d072e23eb",
+        "bytes": 1708
+      },
+      {
+        "path": "assets/business/v1/01-plumber.png",
+        "sha256": "30e3ec97ac449b99201e62bce4667826163ec0db39d3c18b4a06378c105df0e0",
+        "bytes": 1606267
+      },
+      {
+        "path": "assets/business/v1/02-salon.png",
+        "sha256": "5876821c4a0408d3ef94529f3b50ecaae16e875b2df038648a060522b92e62bf",
+        "bytes": 2564275
+      },
+      {
+        "path": "assets/business/v1/03-cafe.png",
+        "sha256": "c5ee729283c7b9e98ac4fa297e42582118dffa4e20cfa70da7716902aea15627",
+        "bytes": 2046012
+      },
+      {
+        "path": "assets/business/v1/04-wifi.png",
+        "sha256": "b80a73cf4e84a24816a0f590a10978ee682f0ccb7f423f1698d5db8c092e2fcf",
+        "bytes": 2118568
+      },
+      {
+        "path": "assets/business/v1/05-review.png",
+        "sha256": "99e9da3df1cabdad3c56323533b2fe097c2276b3e74ee2606370e921e73c5799",
+        "bytes": 1932897
+      },
+      {
+        "path": "assets/business/v1/06-bakery.png",
+        "sha256": "db034c81fa85c0f970b5d5ad42f3cd01a44ecf159e1a56fafd4da144f1d6c4e1",
+        "bytes": 2101718
+      },
+      {
+        "path": "assets/business/v1/07-hours.png",
+        "sha256": "2f7c3493b20962cd85b4d8c10265843fdd48a81753cac87fb232c2146693f34d",
+        "bytes": 2199333
+      },
+      {
+        "path": "assets/business/v1/08-offer.png",
+        "sha256": "1034d8294f674c44741fe8f3840a823115487ce77e447b97172d68f5d7ff77b4",
+        "bytes": 2149437
+      },
+      {
+        "path": "assets/business/v1/09-groomer.png",
+        "sha256": "73fbdecc7dddf09da4998ec4a1428e31548b5169e754b511703f24b31ea4ebd8",
+        "bytes": 1867653
+      },
+      {
+        "path": "assets/BusinessStudio-CiCEi1Dy.js",
+        "sha256": "42aed9f73e25d6f65baf445fe775259f5e00542c47d82cbb1e9742e02d171bbf",
+        "bytes": 7506
+      },
+      {
+        "path": "assets/Checkout-LLBJ-blg.css",
+        "sha256": "dc63ec56d429d84fecba72d0245bb07fc5ee8dde98be3f70127e8ac1bc4ec6de",
+        "bytes": 22567
+      },
+      {
+        "path": "assets/Checkout-ZN3IhHxS.js",
+        "sha256": "56c83b4130d4237b12302b4e338a64bc2743facdb57f45ae2232090be43d4123",
+        "bytes": 34518
+      },
+      {
+        "path": "assets/CollectionPrice-CzXwEe4a.js",
+        "sha256": "3897a1b795aaccff40303c360d57d3c03be74fcf7f1dbb6e957092dd6b5394b5",
+        "bytes": 2641
+      },
+      {
+        "path": "assets/CollectionReview-CcImSNPW.js",
+        "sha256": "e9f909bd007bbddc6e689b7e09cb6261d1d43b4bb10d8371e197270cfd719011",
+        "bytes": 6959
+      },
+      {
+        "path": "assets/collections/colour-club.webp",
+        "sha256": "73009d976775b3772289d2ac00f797964eb182701753f0aab1a935dfdc26264c",
+        "bytes": 132470
+      },
+      {
+        "path": "assets/collections/first-words.webp",
+        "sha256": "de7a83754b12fdff57440ca4f408e29045a1d1ee064c29413b4923d10bea8fa2",
+        "bytes": 152336
+      },
+      {
+        "path": "assets/collections/little-reminders.webp",
+        "sha256": "bb08a2877ff4613628288b3acb25774d0cbc87b371a2ee6921bb91264b03cb6e",
+        "bytes": 169010
+      },
+      {
+        "path": "assets/collections/little-thank-yous.webp",
+        "sha256": "7b1d0727a5ddad6e201b902d44f78077e22ccc15a594cf32374090544d65585e",
+        "bytes": 147954
+      },
+      {
+        "path": "assets/cutouts/01-restaurant-square.webp",
+        "sha256": "b71d17e3d2be4a89836ee43246d30b7c94ca444594c4f622751a29598e229ed9",
+        "bytes": 231032
+      },
+      {
+        "path": "assets/cutouts/02-wedding-square.webp",
+        "sha256": "88fbf69f57c97892a280aa79e764a79467a4cdc9a1ab294cfb8cf761e71f43d2",
+        "bytes": 133676
+      },
+      {
+        "path": "assets/cutouts/03-beach-square.webp",
+        "sha256": "ac68dafc3d463bab25b0bd119122416ac015027b5477d2fb36fd4191cc067e22",
+        "bytes": 274672
+      },
+      {
+        "path": "assets/cutouts/04-pink-group-square.webp",
+        "sha256": "5af277f1225573a0e289976aa9b18eaa565f9a3bbbb860c0b11e3d74a96d14ef",
+        "bytes": 179908
+      },
+      {
+        "path": "assets/cutouts/05-sunglasses-square.webp",
+        "sha256": "a93bfddf9ce78f290c96a8c9abb8371569db08af786c13b47ef581e7de797bc1",
+        "bytes": 183090
+      },
+      {
+        "path": "assets/cutouts/alphabet-pack-glossy.webp",
+        "sha256": "f36e00a7a3045e67f990142d2c87a593890ab5c661113d1e19f8e254753a71f6",
+        "bytes": 126238
+      },
+      {
+        "path": "assets/cutouts/counting-pack-glossy.webp",
+        "sha256": "205c1aa4e19880379f1d6ea084c4d407d16b6a3d9c74c5422b1b9a580f66fbab",
+        "bytes": 110492
+      },
+      {
+        "path": "assets/cutouts/display/01-restaurant-square-320.webp",
+        "sha256": "60102ac34779354c258d300c16836e7c5bef573ac7402d604b1503bba5fdfa85",
+        "bytes": 37954
+      },
+      {
+        "path": "assets/cutouts/display/01-restaurant-square-640.webp",
+        "sha256": "2cc39c714946b1f6b7de7046fb747cdc453a355f182a5cdaea5f1ed49e9fab7a",
+        "bytes": 116114
+      },
+      {
+        "path": "assets/cutouts/display/02-wedding-square-320.webp",
+        "sha256": "60e6c2609812d82b78ce1a8eef8d15f698d5f685f7e0a1f025482698f9de6c89",
+        "bytes": 22798
+      },
+      {
+        "path": "assets/cutouts/display/02-wedding-square-640.webp",
+        "sha256": "3290cf2b65ca8a241a73273248d289017e16623cb7d7e338b4b15bbba11495c8",
+        "bytes": 62882
+      },
+      {
+        "path": "assets/cutouts/display/03-beach-square-320.webp",
+        "sha256": "0e09508040c501035d6afea9eb2cda96f6ee8cb8ba9e00361ee946d20ce4ca49",
+        "bytes": 41796
+      },
+      {
+        "path": "assets/cutouts/display/03-beach-square-640.webp",
+        "sha256": "62efca1671e2331f4d32a5e3b9ff67fb9cc822b8139bdc797b92a076769e46a2",
+        "bytes": 134092
+      },
+      {
+        "path": "assets/cutouts/display/04-pink-group-square-320.webp",
+        "sha256": "bcf7cdecd49190264e1fd34a81537a6c56740dbbf46c4d705c23594bfa02c463",
+        "bytes": 28360
+      },
+      {
+        "path": "assets/cutouts/display/04-pink-group-square-640.webp",
+        "sha256": "ed957ae40d088d82a7a52848effcc27adcae487c7eddae0420a1062ee35440db",
+        "bytes": 84798
+      },
+      {
+        "path": "assets/cutouts/display/05-sunglasses-square-320.webp",
+        "sha256": "7f472339f6b54d27e321df63ebc19daa0554c81f63d2f714f60fad0e40cde8e9",
+        "bytes": 29014
+      },
+      {
+        "path": "assets/cutouts/display/05-sunglasses-square-640.webp",
+        "sha256": "6639cd9bdfa33a967976a0436b3f69710f51e90078868883624000fe0f7fc59f",
+        "bytes": 85968
+      },
+      {
+        "path": "assets/cutouts/display/manifest.json",
+        "sha256": "68ad965e057f741cf016b663434d1c2ed05be1a6d42039b157f4220d1d6a902f",
+        "bytes": 3688
+      },
+      {
+        "path": "assets/cutouts/hero-real-magnets-tray.webp",
+        "sha256": "e0b84c27e3f1ba54f6c5802dd8516ded86e8c5565790d79d4d7d00048711d2bc",
+        "bytes": 234240
+      },
+      {
+        "path": "assets/dm-sans-latin-ext-wght-normal-BOFOeGcA.woff2",
+        "sha256": "a5d38fe99f930275684999b462c7123faa063d9e44e73b4b241723d884aa0f49",
+        "bytes": 18228
+      },
+      {
+        "path": "assets/dm-sans-latin-wght-normal-Xz1IZZA0.woff2",
+        "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543",
+        "bytes": 36932
+      },
+      {
+        "path": "assets/Editor-CRUjgrHZ.js",
+        "sha256": "748eb66d5ea9fc4442dad059245f2806abd6ae71331be66dc9e5c9b446de277d",
+        "bytes": 30098
+      },
+      {
+        "path": "assets/fonts-B3ybgDO4.js",
+        "sha256": "a671dca781430ab673da884e5a49136ce4a703b214a8086210124149cf63da3d",
+        "bytes": 132624
+      },
+      {
+        "path": "assets/fonts/PatrickHand-OFL.txt",
+        "sha256": "377f4f9c19e935228552478eb68cc2ed82910988a60ba60e2ac73b09f32d02d1",
+        "bytes": 4376
+      },
+      {
+        "path": "assets/fonts/PatrickHand-Regular.ttf",
+        "sha256": "0f173b3e6cb6d1af25babf7f0057c5ac4ee11f9992b0469bb817e967ef4ad0fc",
+        "bytes": 214772
+      },
+      {
+        "path": "assets/fredoka-hebrew-wght-normal-DdnsCkLr.woff2",
+        "sha256": "ab46fdbead875af9c6e967705a149f398554e9bb0f2f50c19d13b54ea4fa3195",
+        "bytes": 8852
+      },
+      {
+        "path": "assets/fredoka-latin-ext-wght-normal-CYrqKuxd.woff2",
+        "sha256": "18a1723c878c0d8acc2e45a108fd62fbb976e408337804afa2908982fac13e2a",
+        "bytes": 4576
+      },
+      {
+        "path": "assets/fredoka-latin-wght-normal-DM6njrJ3.woff2",
+        "sha256": "99d6c78e043710d4f83ed90716779798b7b04eb690f73e0ad0e8f32d1f0e98c2",
+        "bytes": 29732
+      },
+      {
+        "path": "assets/handy-font-dccRU57I.js",
+        "sha256": "b684a226c93409e23ca6a0ec8f0ab171b8386fec95b8de101a7b705f39b83202",
+        "bytes": 286675
+      },
+      {
+        "path": "assets/handy-render-DdC9nM8A.js",
+        "sha256": "b694b9ea7c4716dc49d50c5f0f967db5612d9af0ad61d79cd229461532438e81",
+        "bytes": 997
+      },
+      {
+        "path": "assets/handy/v1/01-emergency.png",
+        "sha256": "2564f2e9942c4c33bc71d4a34d6d292887f4b88bdb518c0d12e3f2d12b2f0626",
+        "bytes": 2875101
+      },
+      {
+        "path": "assets/handy/v1/02-bin-day.png",
+        "sha256": "694eb54b75aa79188f727f8d0f1424db64bd712bd5204cf185c0cd3b7d40d041",
+        "bytes": 1911271
+      },
+      {
+        "path": "assets/handy/v1/03-meals.png",
+        "sha256": "d38f136d711bdfa77ea48bdb48daf77f05378009a3a14f6a8e69684451838d05",
+        "bytes": 2516753
+      },
+      {
+        "path": "assets/handy/v1/04-shopping.png",
+        "sha256": "ac17699149e38a06b2e37176abad1bdf511cf739334c7f765390dfd9447b19cc",
+        "bytes": 2608554
+      },
+      {
+        "path": "assets/handy/v1/05-pet-care.png",
+        "sha256": "4e748475558295115528ac7e2992c88b0b94cdc1f87887e1296b99f74e0ffe64",
+        "bytes": 2317727
+      },
+      {
+        "path": "assets/handy/v1/06-plant-care.png",
+        "sha256": "a802e238ba474cd4b2c14204763cd5939257be169e637fd1d571cd618f4ca006",
+        "bytes": 2933765
+      },
+      {
+        "path": "assets/handy/v1/07-family-week.png",
+        "sha256": "90c7e9d77e94443890d91fea88b352148c09e4705d4afa2ad6639fa07384ec4c",
+        "bytes": 2682106
+      },
+      {
+        "path": "assets/handy/v1/08-home-helpers.png",
+        "sha256": "0af2e23550ba940072ea1d4b45b55faa1a9ac7bf6c1e8dfb7f8b3b8d4437a1d3",
+        "bytes": 2520469
+      },
+      {
+        "path": "assets/handy/v1/09-door-check.png",
+        "sha256": "8f71653b307c8bd9a9e9bc8660d3e1e7c9b45e6da42230de80c39f75785292ce",
+        "bytes": 1697782
+      },
+      {
+        "path": "assets/handy/v1/previews/01-emergency.jpg",
+        "sha256": "3cef38d7199e37f50de9cc92f8435c2bb7916ce4c220c17fe16d415d5a7a2dd4",
+        "bytes": 61833
+      },
+      {
+        "path": "assets/handy/v1/previews/02-bin-day.jpg",
+        "sha256": "010f39271bb546556a100c8d7b1d470c355f1a0352daf489921676f79819e711",
+        "bytes": 63472
+      },
+      {
+        "path": "assets/handy/v1/previews/03-meals.jpg",
+        "sha256": "1d373b805f1ed8d30ea9064774e81616e1b067e7002a590ae4f0715135abd4f7",
+        "bytes": 73734
+      },
+      {
+        "path": "assets/handy/v1/previews/04-shopping.jpg",
+        "sha256": "1969ba3ca9c22f5a2d471211118319fa7cc0acadc610cef06d962e145006bc03",
+        "bytes": 63461
+      },
+      {
+        "path": "assets/handy/v1/previews/05-pet-care.jpg",
+        "sha256": "2068070f4cfb8b6418617ca57ce30e9fb260afaa927410a46c94d115434480cb",
+        "bytes": 70650
+      },
+      {
+        "path": "assets/handy/v1/previews/06-plant-care.jpg",
+        "sha256": "4c8fc6995fe6a18c6c6831f20a351d4d7c1f8fd5c87eb21ab16f887e7dec5684",
+        "bytes": 69908
+      },
+      {
+        "path": "assets/handy/v1/previews/07-family-week.jpg",
+        "sha256": "042d54d5bc4cd36e86ee3a02791f043589513ab59005dfe14a5e7b632862788b",
+        "bytes": 76971
+      },
+      {
+        "path": "assets/handy/v1/previews/08-home-helpers.jpg",
+        "sha256": "2988ad7f5328c25722dd93e823738091f2c1e22e82ec359d76e781bf040b4195",
+        "bytes": 64999
+      },
+      {
+        "path": "assets/handy/v1/previews/09-door-check.jpg",
+        "sha256": "7788e66e78374823d53c02895da3fd5da29f72b181a12332c8e76cb0b420724c",
+        "bytes": 57726
+      },
+      {
+        "path": "assets/HandyStudio-DXfZ_2uC.js",
+        "sha256": "434db0d31882d5593cd35eae018d427d982da7cc49821138b2b5a9ea651fb583",
+        "bytes": 4562
+      },
+      {
+        "path": "assets/leaflet-src-UnqkEbmn.js",
+        "sha256": "b7532ac56a61282fa5909b384d39ff7fe36a1d70f29f16947f5a39f14921ce6e",
+        "bytes": 150052
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/01-a.png",
+        "sha256": "130e85609fd1252a9f86afd0112b877c3f25c38e0b56eaed0460c4263a433df3",
+        "bytes": 244842
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/02-b.png",
+        "sha256": "cba07216882d92caafbd26cf5c92545a7b342ab42e46e302fb47a5a0fb8eb16d",
+        "bytes": 258066
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/03-c.png",
+        "sha256": "237948c1292c11244a0282e77468c6aa7424bc0338f34789b826fcf28db874d7",
+        "bytes": 267572
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/04-d.png",
+        "sha256": "1ba795ec94b3826f3809a4be0f157fdb896734fe9091b654743f7a2c9a05cd8a",
+        "bytes": 259261
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/05-e.png",
+        "sha256": "fbeba69ddd1ba38bac473b2e8a1029bfda4f3e7133701bbc979d6d11274caec8",
+        "bytes": 263391
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/06-f.png",
+        "sha256": "658d1a3276bda202dc02a4a40408266320a2b21f392669de9e3e7b7cccc3fa06",
+        "bytes": 260440
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/07-g.png",
+        "sha256": "194e174ab247f38e45359e02a2d5943b12a45cee442f6353e22e46d90d58a132",
+        "bytes": 265453
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/08-h.png",
+        "sha256": "7b66854cd9c21e897fd7c02560058dceeffcfeea4adb7dcd956ec51bd8048872",
+        "bytes": 253989
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/09-i.png",
+        "sha256": "4d5ccce96ed4dbeb29d60576b6af1fa0a4f85da36b15cf76421b0a5a5caedec2",
+        "bytes": 247833
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/10-j.png",
+        "sha256": "b0840b52b8654de55f46efa6ca199e761056ca5b2a88d521b35ce35fb18bc5f1",
+        "bytes": 256360
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/11-k.png",
+        "sha256": "2bd2d426ea2d12b6c148472372cabffe5917a3971049982aef3add2a13c9d169",
+        "bytes": 274075
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/12-l.png",
+        "sha256": "a7b718436d4012cd40eeeb531e09cffae86b354a3369f01c5cc907c44adaf7d4",
+        "bytes": 277672
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/13-m.png",
+        "sha256": "9a53c24b7e0fbe337470fb3ced2d536c1cdd5a3707a9b5a9bb036070d9101d9d",
+        "bytes": 272617
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/14-n.png",
+        "sha256": "1301e01464e48c54f9f22a0cf8614849f544f1e4f65cb065011d0092b573c991",
+        "bytes": 273879
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/15-o.png",
+        "sha256": "9c1c1374c0ab88c3e3d8693d534cf2fecb283bfc6c4fc50ea9f0c4ef9516385a",
+        "bytes": 267007
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/16-p.png",
+        "sha256": "a83c1697066fb98ccee92b7b6c5b747d3c334ff42c2cdbd8dc3e0deda0ff764a",
+        "bytes": 266686
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/17-q.png",
+        "sha256": "afe05af088b31fc4559c93c6cf5b971dba94722dd0c519b08e5dd39e5e811153",
+        "bytes": 271010
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/18-r.png",
+        "sha256": "45befe99f1275fd63d309f53a1e7801f633e6992be0695b5f94ebce528c0615f",
+        "bytes": 254784
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/19-s.png",
+        "sha256": "633c0ddbae99c802ab35dacdfa1dfb2e9f710aa065e0c111c60a96994316fa08",
+        "bytes": 260732
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/20-t.png",
+        "sha256": "3d12c8b4d3a615a079bab22d369929498f9dc95d2767e42e12831271c12651a9",
+        "bytes": 259720
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/21-u.png",
+        "sha256": "8ed06c366b8dab9fd7bab00b44ff95cd2df7434d6b922ddefcd93528e1c34aec",
+        "bytes": 265137
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/22-v.png",
+        "sha256": "6fe1d2befcf04d3d299839dd359e5d4e5fe1bb9ba743d48541470e98bacdd76e",
+        "bytes": 280683
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/23-w.png",
+        "sha256": "59fdfade237b9973a7a576c889be5d9d349366b50023b8ef71e93503acf43880",
+        "bytes": 261257
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/24-x.png",
+        "sha256": "fa241c378dbb90fa2c2cd8f24d05d672055ec4c2821dff72b41f996a4e2574d6",
+        "bytes": 263553
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/25-y.png",
+        "sha256": "4295ca3531dbe32b5152077e944085019cecc1c5ae27f9ee915874da6e18dbf5",
+        "bytes": 262148
+      },
+      {
+        "path": "assets/magnet-artwork/clay/alphabet/26-z.png",
+        "sha256": "47dde14a0fd3e7ef8f9505575afe4f245b389800a12ba39568e1975277cf9d4b",
+        "bytes": 264973
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/01-green.png",
+        "sha256": "147cef62d1b02716b8ac9b9d6811febcd66d47c7477f85676b21515f28423331",
+        "bytes": 257958
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/02-blue.png",
+        "sha256": "2c13832bc315a8cc87ed7faad562ee70f0a1e019347630f597e9148799fc4449",
+        "bytes": 265941
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/03-pink.png",
+        "sha256": "468fc77fbf29371e8117ae1826b3eb96a231b9d9732a2cd065c508da2e024534",
+        "bytes": 258405
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/04-orange.png",
+        "sha256": "489013b6aee4722ef5c13f8eff4c97f8c3e2a769c379db3aef1e7a796523d1d2",
+        "bytes": 258281
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/05-red.png",
+        "sha256": "b3c57122d43cdf4332cf819ba17150c186019f50184b8452c32b19b7859f93f9",
+        "bytes": 248227
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/06-yellow.png",
+        "sha256": "51b8e2bfe8c6f97ce33820660c41308710398608644a4b976377b6777f593e15",
+        "bytes": 242726
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/07-purple.png",
+        "sha256": "03292da5cdb9b82f8ecd0de490a504eeb38aa2c0d51fac44b6011bdeaa80799d",
+        "bytes": 271511
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/08-brown.png",
+        "sha256": "1fd5edd7296eced61599edda630115066d445d96d37d046c86a9c14bc2e78555",
+        "bytes": 272990
+      },
+      {
+        "path": "assets/magnet-artwork/clay/colours/09-black.png",
+        "sha256": "0adbfcfc059aff00a8baef1189c13f4f7892ec7248d45e92f0417133c52965c4",
+        "bytes": 264592
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/01-1.png",
+        "sha256": "9883161382ee4707413a3bab680c330f13c78cf5493fe1a5de9bb4b9cab82e03",
+        "bytes": 242963
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/02-2.png",
+        "sha256": "48f3184147f3f91228c418e308f0d7517dd75caad2b53277a2a2bf5cf6a043ed",
+        "bytes": 258167
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/03-3.png",
+        "sha256": "4463ca7ef022597aafb0982c0e66a9860926883611110416d930e0f654ec982a",
+        "bytes": 270545
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/04-4.png",
+        "sha256": "0a6d38e87488746ae8a8cc7f143ae5898dc1807eddabb300d46caebd23a63d93",
+        "bytes": 240489
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/05-5.png",
+        "sha256": "c6978fc298095f15f75b2411c915c3699540d888e36087098c8b920d2e9e95af",
+        "bytes": 233880
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/06-6.png",
+        "sha256": "f83f1b15110224eb7324e7de64b954fbae406789b2a89615139fe2a242e84ef7",
+        "bytes": 251480
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/07-7.png",
+        "sha256": "65632e95b529f71fcf116761c4dd586be360bb5573f1abdf26880133ee16b51d",
+        "bytes": 268631
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/08-8.png",
+        "sha256": "1b6502f5807bcd724267b2dd9b8722cd06257eb31fedb94155be8cf7d0e3ec9d",
+        "bytes": 274635
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/09-9.png",
+        "sha256": "d5ea97b51da1e52e4d3d02db09a17e8d37ad5d90aa4c417f0f715eea4a76eb04",
+        "bytes": 247482
+      },
+      {
+        "path": "assets/magnet-artwork/clay/counting/10-10.png",
+        "sha256": "4a5947695d6ac791a5e07abada0cf45bfc77cea582ff8c196363fe701561f280",
+        "bytes": 2403410
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/01-you-ve-got-this.png",
+        "sha256": "56530435d9acdbcc02a7322784e120526028b4aba03f13338219edf319441d91",
+        "bytes": 269727
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/02-one-thing-at-a-time.png",
+        "sha256": "a2dbbbda660e15e536c0efc18cedcdbb305c443e5b73f0b204ab73ec5c43fdf1",
+        "bytes": 280235
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/03-good-things-ahead.png",
+        "sha256": "861369340576c710b1cef2b052ff9f72c05d07551dea347d2296d00b934a5db6",
+        "bytes": 284193
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/04-make-room-for-joy.png",
+        "sha256": "5cd17877df7891c4f96da9f1146210526b7a40e57af5096a1cce3e9791caa986",
+        "bytes": 270580
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/05-small-steps-count.png",
+        "sha256": "d88dd9ebc82f6eb7489453d9b8e550effb46c9395d9fa5fb6a153ac7ec98ace5",
+        "bytes": 265964
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/06-keep-going.png",
+        "sha256": "d6294f17e556ad5223c77c8182669b22f46039fedd410a89755879df4ae44f86",
+        "bytes": 267386
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/07-you-are-enough.png",
+        "sha256": "94b5714d25422535295077aedb306ff8cfc12e1dc77455139ece428941e1aef4",
+        "bytes": 291274
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/08-breathe-and-begin.png",
+        "sha256": "eff92ad57228ea0d8c17645ae07dc8ea04c4282257296104519203d463b2986b",
+        "bytes": 272951
+      },
+      {
+        "path": "assets/magnet-artwork/clay/reminders/09-choose-kindness.png",
+        "sha256": "2f7c816a4d3ea484bc30533bc043a652303d5d8bc042d03b263cd1f14f691489",
+        "bytes": 278741
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/01-thank-you.png",
+        "sha256": "25b1d1216932d1612e138b3fc388ebce776d22b5a0a18b5b38c70b575cae91eb",
+        "bytes": 266563
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/02-my-favourite-human.png",
+        "sha256": "fb65a276dfccaf89f578d9b9cf11edb06cd841863400921d6da84f99f7908ce6",
+        "bytes": 278709
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/03-you-are-loved.png",
+        "sha256": "82f62c69d603f52f3cdc1aafc161c4bb781d9368310cae2a3fff1cef06ddcdc0",
+        "bytes": 284579
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/04-best-day-ever.png",
+        "sha256": "54f958b31dde81affb2420021c3c9b338a27008fbe3c2b5dabeb384003181fb6",
+        "bytes": 284067
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/05-you-make-me-smile.png",
+        "sha256": "2005b78befa51bb3f763cdfeac749648e7f410f8165bfc9691ebc141729f3a8c",
+        "bytes": 272527
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/06-so-glad-you-re-here.png",
+        "sha256": "c92fde404401e4ccfc88582b40b549bd0e979192366d45cedb52c9c3e060b98d",
+        "bytes": 286651
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/07-made-of-kindness.png",
+        "sha256": "14c76a6b54a5127a995ae648ea4332a6e4c811771c5d732dd032546edfd76134",
+        "bytes": 281792
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/08-a-little-joy-for-you.png",
+        "sha256": "860bf723587e6c0356454357cecde95acd5e89fd0a32a7aaecc7cc156b251c11",
+        "bytes": 264058
+      },
+      {
+        "path": "assets/magnet-artwork/clay/thanks/09-you-re-a-star.png",
+        "sha256": "0adbfb771aa70fc0798417109ac83c3b2aa7402cfa06b77cd9859e6706adda16",
+        "bytes": 263283
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/01-apple.png",
+        "sha256": "fe9e9dec0becb11d08850f69000e3ffc1a1d35923ba2fd4f2435a183f1206dac",
+        "bytes": 260259
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/02-tree.png",
+        "sha256": "e42faa8e0a1ca3a42dd38eaf58e8c32ba79c6ff6008908c68480c3c02de0469b",
+        "bytes": 262410
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/03-sun.png",
+        "sha256": "9f4a6dab75675933fb397ebf6f39ff6f66ad17488581413e679da2e09cb777e8",
+        "bytes": 263707
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/04-cat.png",
+        "sha256": "df1d48561c446120057dc0f49cad113b608d95bd46f803fcefdbd2db9228e2a3",
+        "bytes": 254709
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/05-dog.png",
+        "sha256": "31163c9f0beb18e69a9a0dd030784c33b1a6491005898230affc946a0403844b",
+        "bytes": 270352
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/06-ball.png",
+        "sha256": "bdc33af2e5471fb89f034fede1f70820c832d5929e0f0e01f1562fd5d5e2fdd7",
+        "bytes": 255025
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/07-house.png",
+        "sha256": "dc6dd257bdd6c445a87564b7b8a7cbc7d440cecffd503867ff666e29e06894c8",
+        "bytes": 271042
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/08-flower.png",
+        "sha256": "4c1e2297ccfcb0abbcedcc4e6f0008f1efb41273c51d9a83e646df08c43ef502",
+        "bytes": 247589
+      },
+      {
+        "path": "assets/magnet-artwork/clay/words/09-car.png",
+        "sha256": "a1b91c34505d495070ca3bcb743b1e9fee23cfed06b72628c313eb170eb52059",
+        "bytes": 259945
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/01-a.png",
+        "sha256": "ad589fe76aba9443fc079bc49e52c4edec8dfd073079c9e40d2de12f6c7036e5",
+        "bytes": 273669
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/02-b.png",
+        "sha256": "ed22cf7c6979229467aaa24bff6ede81c992deb80a510fd3c0883c4166f0eed7",
+        "bytes": 300957
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/03-c.png",
+        "sha256": "f92c4a59fafc4ff6ff706b51dd482e5b72a5eeeda6f08885ba1fd01e36dae066",
+        "bytes": 281858
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/04-d.png",
+        "sha256": "00f5eca1f6f0dd127610a68cb514b68db7b75f39b63cf55230fd1b6726ac0b95",
+        "bytes": 311656
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/05-e.png",
+        "sha256": "f8da74e515e660098e92ed755697d964e9f549d523bdd33b4f03be57fe7567d2",
+        "bytes": 286528
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/06-f.png",
+        "sha256": "34762afadc66b517c70a0f16b5179da3c6e5830420cbb6fa0be8666dd51c81ee",
+        "bytes": 288275
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/07-g.png",
+        "sha256": "a3530d22e201ae0ef0f4e0a6ddd6b997e958b0c8daae936cf92374579439ffa1",
+        "bytes": 293985
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/08-h.png",
+        "sha256": "a87058093436a30de21da388927ad9a2d08e0d6b0e45bdf6b7e311cd0fcf83cc",
+        "bytes": 298758
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/09-i.png",
+        "sha256": "d2c035d8f62e695af101c5eebb5d0328274609fbd412a3a43b4489ec8ba72dbe",
+        "bytes": 301389
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/10-j.png",
+        "sha256": "31178cd59fca9d4155c844116eb03f7588af5c9b816f90e4ed921d3e6e7619b5",
+        "bytes": 278503
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/11-k.png",
+        "sha256": "710981dde51e6ae95b89e2ded9bbb7726f5e3b8265a55acec6af6a6f136c9c57",
+        "bytes": 312026
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/12-l.png",
+        "sha256": "4a816c5edb132d8a91f3f4c568b807746ed671800916d64664263e9ee7ab9bde",
+        "bytes": 286385
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/13-m.png",
+        "sha256": "045fabe2bd51b7b6e1257a22f7c0a06a1b3abd321dfc9f0ed325564d8ebf8fa6",
+        "bytes": 303592
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/14-n.png",
+        "sha256": "960725395e826ee6fb5218a9b7e8f5162ec5e219e2fbfa28a1d63ee66c13984d",
+        "bytes": 302740
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/15-o.png",
+        "sha256": "3bacd6be54fd0dd232f91ae45cdff42e232358a9295323acd85141a30e6b569b",
+        "bytes": 294615
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/16-p.png",
+        "sha256": "fd9f9987c6c53d1e82b6ebe7bbf01e5ddda6c8ff5bbcb060f1b5576af7352b6e",
+        "bytes": 297396
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/17-q.png",
+        "sha256": "1293da3de37ae7d0e65f252e2c73e1688928274e1e9621e3133b69d8b753b95c",
+        "bytes": 298395
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/18-r.png",
+        "sha256": "92711bd03e665699649ee17832d6bbf7fa357e2ed07ff2836975f1d57e2c02ab",
+        "bytes": 296959
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/19-s.png",
+        "sha256": "912f9503fd11e761b8ae7ea8437a6f2513cc81585e6231b8955f8d4f882ac2ce",
+        "bytes": 308792
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/20-t.png",
+        "sha256": "001981593a3ce8db924c0d7567cc27b3977121e96b42c28857aa63f267a7716c",
+        "bytes": 289077
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/21-u.png",
+        "sha256": "f5293eb55fa18a633c5585c97230a5dd460baf180c0f42d36782c13f3d5535b8",
+        "bytes": 270925
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/22-v.png",
+        "sha256": "dd6648708e9b8d147bd687562e775e5a6b03b61cd489894c47b207790ccaeca4",
+        "bytes": 309675
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/23-w.png",
+        "sha256": "0c6d64b4f0f2acc9c91595708a7f0b5ef8349486b4d9edee0abb6c095d84d25e",
+        "bytes": 302384
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/24-x.png",
+        "sha256": "7be5a24eb2b9befa702df23c8c3ec7924d86e9a5b16e7d200c2796ed61827fcf",
+        "bytes": 313618
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/25-y.png",
+        "sha256": "3d922a966db670466f48eab00599ca4ce14af76ad4a539c48fad0cc44b936a03",
+        "bytes": 295471
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/alphabet/26-z.png",
+        "sha256": "3f9d935d19afd569fa83f12008c5f1f281f9b03e5cd4363664703dcddb2c156c",
+        "bytes": 295588
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/01-green.png",
+        "sha256": "539af27a1745e6ddbdc85de48b98b1bce986c0320307b66ab680dfc919f07b86",
+        "bytes": 292824
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/02-blue.png",
+        "sha256": "3ae22dfd60a90d1a7f0ffcde76afda3c09e5ddf4e3eec103d37c472fb21cf76b",
+        "bytes": 288590
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/03-pink.png",
+        "sha256": "5062810bafbc418d74aa20635c94d5812e620636bdd3c399961a3bbaa3661184",
+        "bytes": 268907
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/04-orange.png",
+        "sha256": "a3cc72306d23c68bc661f1feaa75cf0708e328a1843add62f54038a725049b5d",
+        "bytes": 242620
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/05-red.png",
+        "sha256": "cc9440a54b8dc773a0e159c06a340f0ec96b664f4673d58099a966f722d1edf3",
+        "bytes": 260465
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/06-yellow.png",
+        "sha256": "f067baf67f529fdfd1a4595ff93274d70677e71a12cb147e84008c0ddad49f14",
+        "bytes": 232999
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/07-purple.png",
+        "sha256": "56d881eab45e7b9aaee2a413564627db41a9989c4113c09f7d7171e28667aec0",
+        "bytes": 311850
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/08-brown.png",
+        "sha256": "adf1c4992f95555f7e243c3b42b1d8e273b37214f171d679026ecdf148b67a98",
+        "bytes": 298025
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/colours/09-black.png",
+        "sha256": "1fb8548b99ad4c5a6ce7202c2ded39e7a1b4615551fe1d03d421f5b575a739cf",
+        "bytes": 276286
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/01-1.png",
+        "sha256": "6d7389fa9e525d2e707fd4c1d38fec8ed35940f30de2106a5562a083b3711cc6",
+        "bytes": 304365
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/02-2.png",
+        "sha256": "17df0e0efceec03312df16038a9f884af2510dca84466465031eefc79c1e7330",
+        "bytes": 294960
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/03-3.png",
+        "sha256": "4e8ff2ce01dcf335ef23f5e4db54d0c8f0591a5d6c9c5ddd57dbaa663e202d8f",
+        "bytes": 291662
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/04-4.png",
+        "sha256": "e978a1797c167b9f07754e5754dab784243828e858d1361aae31193b89c58ae1",
+        "bytes": 300514
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/05-5.png",
+        "sha256": "3e36e7993c674bdfa214daf5469ccf032d9afa7c4dc5f351f740e14c51aa7dee",
+        "bytes": 290530
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/06-6.png",
+        "sha256": "f0d45115df93d7137160ef0779e703657f6c53140214ec33ed4a23f266e09e9b",
+        "bytes": 304339
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/07-7.png",
+        "sha256": "5428097336b26e450137b4efc0d7792c4182974a9a17ee267aa2760f7a3e2535",
+        "bytes": 293645
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/08-8.png",
+        "sha256": "ff33e477efe4dbb7bea9c759ab443462ae439b6858a8b16ec16ae019f58f05be",
+        "bytes": 279265
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/09-9.png",
+        "sha256": "c3cb3ee4ab0fdfb8dcca889d1126fbc61dc69843153790cf3d55175dcaced462",
+        "bytes": 297845
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/counting/10-10.png",
+        "sha256": "29d042d80d24de1bda27499f1355bf90a9bc47fe5591e7763c926ac4947aaa44",
+        "bytes": 2381904
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/01-you-ve-got-this.png",
+        "sha256": "4613d70a9708a9d28ff7d1efdeec41351d73cab45ce7862c3af9f924b9a096a9",
+        "bytes": 295592
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/02-one-thing-at-a-time.png",
+        "sha256": "829652d0df29502150af28d0d853e5acc262907ba3fd6aa64a00755077117b0c",
+        "bytes": 275160
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/03-good-things-ahead.png",
+        "sha256": "9dc22c75cddb15a23e6380c4dc63ae7c3bada72ed4d26dc4a426ad36014ce688",
+        "bytes": 284001
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/04-make-room-for-joy.png",
+        "sha256": "a70d101c8b5473673869b7ffd62d2105563b2c75df5d892e3fa0763041a6c1c0",
+        "bytes": 304007
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/05-small-steps-count.png",
+        "sha256": "d1bc2fe1348e77d3adf90f454d70982ad76aaefaf5630fdd0c863d928641635e",
+        "bytes": 289864
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/06-keep-going.png",
+        "sha256": "d4c6dcb97afc5e1cdfd5ddc799f62dd22f902526df854809394e5dd68983fa04",
+        "bytes": 304729
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/07-you-are-enough.png",
+        "sha256": "b25c7c1c70a85acaf623e76b5350287232e41db2159e158d1dd27b9e4911904c",
+        "bytes": 286316
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/08-breathe-and-begin.png",
+        "sha256": "5e814f2778fa35428a8c5f74b6c66c6ced3a2e84a00c1d5c3a65f59ee6a9ec4b",
+        "bytes": 301053
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/reminders/09-choose-kindness.png",
+        "sha256": "aebbb96e6661e392a172c7790f7269f34175e0e94a43fc41bf81cc763b5a7259",
+        "bytes": 280702
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/01-thank-you.png",
+        "sha256": "56534f2948247a00f9579e165f6787fb3b4b3e2ddd78fc8bf50e1ec8ab2bc944",
+        "bytes": 301837
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/02-my-favourite-human.png",
+        "sha256": "531603e08b3fbded48d64ca74298818cd10d4b1cd996b896c953ad50813f3df1",
+        "bytes": 305805
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/03-you-are-loved.png",
+        "sha256": "3e4462a362c757b5f3ae7e019d0e64410976e5db69010fac95c8c597c1808a23",
+        "bytes": 312780
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/04-best-day-ever.png",
+        "sha256": "6cb99917a5983e4135493bb17982590c9a0342032363bcd570cfe6c94e546d3a",
+        "bytes": 298189
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/05-you-make-me-smile.png",
+        "sha256": "f48e9ca997047df6202f7bd33d3b6d16b1b05f9e0971d5fc47d10cd4ade08940",
+        "bytes": 272745
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/06-so-glad-you-re-here.png",
+        "sha256": "30148e56626b1beebe77fdc6b2d5be8af2fc0012cb1647b491ec4de8a89227ca",
+        "bytes": 300720
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/07-made-of-kindness.png",
+        "sha256": "d2ede1a80570b48540a75c3a7e6868ffaced0ce1f4ce5e123033d5a8486d9ab5",
+        "bytes": 309433
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/08-a-little-joy-for-you.png",
+        "sha256": "46f0bf4099299806a458570fe38201c4710040eaed8cb9a623edd99dbae99a3b",
+        "bytes": 291901
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/thanks/09-you-re-a-star.png",
+        "sha256": "8e6aa9fb967ca3cf4b5d42b5f835cd3df636cfe16536bc09d13ad3d14cdfbcfd",
+        "bytes": 291506
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/01-apple.png",
+        "sha256": "8f3ee8e6bfcf621ec0d9a71ba70c274a627792b03893a4096914278b94ac3386",
+        "bytes": 299238
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/02-tree.png",
+        "sha256": "3816d44bf4243c58e7a51817d2fb031a2ef6976bdcbb391f8104711daba597ad",
+        "bytes": 310369
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/03-sun.png",
+        "sha256": "a4101f497258e9f5fbae4736648769bfefe84c3f2a8f25c85020b60c7b64b535",
+        "bytes": 256577
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/04-cat.png",
+        "sha256": "fabd852ff50e7a78d4719b187f1d778ecb955a33d73047a26969eea4b2396d9e",
+        "bytes": 276394
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/05-dog.png",
+        "sha256": "b2c80b08e8c4a58db71eb38b468cd614a9e3054cdb87a52b15fc90aab792f809",
+        "bytes": 316623
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/06-ball.png",
+        "sha256": "ef46795886dff9c881f3fb935d42cef141c426dac04a64965b54f85254a6b9ed",
+        "bytes": 279153
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/07-house.png",
+        "sha256": "c8a21c222063c7bbb2edd7981dee5e46c93c1e703ec949fcac707c0d81312d88",
+        "bytes": 296265
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/08-flower.png",
+        "sha256": "4e90212a608ae535459f4b0be8e295c762f99dc80e0348c790aeb2c8fed0065f",
+        "bytes": 269779
+      },
+      {
+        "path": "assets/magnet-artwork/gouache/words/09-car.png",
+        "sha256": "77abb4b3aad5fe0395aae3ee25c343520555f5e87c3162f5b6688c657f38381e",
+        "bytes": 290517
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/01-a.png",
+        "sha256": "13fff5d05709d6e751cae4dd6b31b250757b6a8c8bde2af5bf6b6028e1482bd2",
+        "bytes": 313326
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/02-b.png",
+        "sha256": "0cfc6cbf2106dcfe047ec1990827f05c702719a416927541352aa931b5cecf6f",
+        "bytes": 334620
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/03-c.png",
+        "sha256": "450f18926e80934fb1b24082dbd4fe41bb725e07527114d7974c04017c08fa35",
+        "bytes": 327136
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/04-d.png",
+        "sha256": "2ba0e31c5c3a292f1602fb70eb1cc850af63875261af0b6cfd9114cd3f657114",
+        "bytes": 332227
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/05-e.png",
+        "sha256": "cdcf28b9498c1cb97b1a2c015cab1e924fcf3973995c8c78be7b0c3d6dbb66c2",
+        "bytes": 329696
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/06-f.png",
+        "sha256": "135040f91cf1640b2f21be0d081163d6f2bce0e742649b0a54623d2c86ffd798",
+        "bytes": 331542
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/07-g.png",
+        "sha256": "fc9a0fd0e9c0fb0f3b47e57b3351a0280e4d253fbf253f9f07d716cc2ba9757a",
+        "bytes": 322792
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/08-h.png",
+        "sha256": "1a0c0b7c9164876449778b77f1a067ca6a3aa51fe5778281f744a763594b8421",
+        "bytes": 321634
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/09-i.png",
+        "sha256": "31afd8a69d938d29181f345f245551bb30b6f1084daefdce7379417ddfc7b365",
+        "bytes": 316655
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/10-j.png",
+        "sha256": "c1a3b0ee1976a2ece966bec0a707601156f2674a9620d0d76d26e19745fe4db1",
+        "bytes": 321198
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/11-k.png",
+        "sha256": "4e502daf2ac25be2cfb5059a165156c0442c76f20a8ee11449ae4a8c1c096ec9",
+        "bytes": 334171
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/12-l.png",
+        "sha256": "2b29ccda8dce337ef15ad9384eeb309773dfdc1dff893304eaa1564286db3357",
+        "bytes": 328293
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/13-m.png",
+        "sha256": "f53ae4247e503f5b23c6f5e451ff63dafee56f73bfeacfd366f6390083938690",
+        "bytes": 328779
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/14-n.png",
+        "sha256": "9335f7306f08c85fda95f5cd34aee539ceca3fcb5ed998de66d10096291ee135",
+        "bytes": 337986
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/15-o.png",
+        "sha256": "b5203f542ef4452a82dcc890ed2ebe739d026d0f0e2b3add01f559c510b6fef0",
+        "bytes": 315150
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/16-p.png",
+        "sha256": "be18213593935c43079ce9c9862e986dfaf227b8506cfe7d2302a4443b1c94b7",
+        "bytes": 316999
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/17-q.png",
+        "sha256": "e5b144f9ca2715a2667db6b9d47403f1fe620ca54d96f657d04cd14bfe30a392",
+        "bytes": 322419
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/18-r.png",
+        "sha256": "ff4672da3b46b613be30663d59dac518869fd0cc12a4be45b330a9dac6853497",
+        "bytes": 319710
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/19-s.png",
+        "sha256": "b41625bc6ddf07c7470fe8447b21b0e906fc3437e4b2c2b2040f105df40ef561",
+        "bytes": 318375
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/20-t.png",
+        "sha256": "665bb75d8f070e504db440555a5accb1a393e39efb09b03124efddac618601be",
+        "bytes": 313107
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/21-u.png",
+        "sha256": "925c8c4c8f421c0fe57928ad0e5b00f9631572cda8f946d84a452d3ffebfe05e",
+        "bytes": 314793
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/22-v.png",
+        "sha256": "f6607e7ced2556d830d77a8553144e60a2d729ae01abe34a3b83f7a116bddf8f",
+        "bytes": 331851
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/23-w.png",
+        "sha256": "c4e16bde275b7c60a2457d7ce07cd4cfd3987edf54fb4b3b5adb0d71a8655f9d",
+        "bytes": 325081
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/24-x.png",
+        "sha256": "876d92d8c813162d33e737525dadd3d737cf889c0958a2e5b17e3d81a5909841",
+        "bytes": 303784
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/25-y.png",
+        "sha256": "9619aae70834b1f57965f31f208ffef5556a25d07c25a4764b5b9420f1bc23bb",
+        "bytes": 314356
+      },
+      {
+        "path": "assets/magnet-artwork/paper/alphabet/26-z.png",
+        "sha256": "1ab564fbb1500a850d95b9407b26bc096e21f107a85c7906923bdd3479ff9f71",
+        "bytes": 314623
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/01-green.png",
+        "sha256": "efd4b0e00d5fc89a821019fdb0102bf9de9a5434d37472773c50867fb93c6db6",
+        "bytes": 312887
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/02-blue.png",
+        "sha256": "e91510f3d76600edfd8785fdb0081eba0bd291866e5ad280363fc23e85036171",
+        "bytes": 321072
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/03-pink.png",
+        "sha256": "8757f2f7187868b7f75bb88705ef3b9d2450d449cf9db3289eb0486ba9d8cbe5",
+        "bytes": 311420
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/04-orange.png",
+        "sha256": "75674fe8b930f8d2e7d13e2ca2d0876a645e37eb264e364655ce383d6bf62f59",
+        "bytes": 293530
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/05-red.png",
+        "sha256": "8e163e40baa0446d2b08b68652d0533772e632aaf7fffcd2733c556023ed9f3c",
+        "bytes": 295898
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/06-yellow.png",
+        "sha256": "a6fbcdc9ec978053801e29a8b864ab1daa01afb5a571b29daa3ccfccf7bfc856",
+        "bytes": 296621
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/07-purple.png",
+        "sha256": "9d7ce209eda24ece2947ce795f9f6956de7f1a17dc6bd0f8a6fb4fec43b9c40b",
+        "bytes": 325839
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/08-brown.png",
+        "sha256": "229dc99520deb42983b914dec7d409893528dc2ae5f04a708e49f2c127ed29ab",
+        "bytes": 331706
+      },
+      {
+        "path": "assets/magnet-artwork/paper/colours/09-black.png",
+        "sha256": "948441683a929a872012133304d8c081e31a06bc73acb9d882f02b844d71f852",
+        "bytes": 314121
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/01-1.png",
+        "sha256": "01895496cd9da18fb6cd2e1de3bf8874d4f9372bba5cba5f1f3dd81cf7c59563",
+        "bytes": 305110
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/02-2.png",
+        "sha256": "a8f1e0436557fef52ef3cd90b333d4c4305bf89c1a3076c9af4c441e8aec0e96",
+        "bytes": 303806
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/03-3.png",
+        "sha256": "f912842552182926c4c5b446d0afa58674c10302466cdc5a290aa1d214d1127a",
+        "bytes": 311644
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/04-4.png",
+        "sha256": "db2f80d17669050e5f5832117c53cbc71775173b41c7c8afa08a07a8da1180b2",
+        "bytes": 266650
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/05-5.png",
+        "sha256": "aab1f047356efee2ecc4386a74ca75b3257b3d54c58bd106960a575723197a29",
+        "bytes": 266399
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/06-6.png",
+        "sha256": "e300098dda9d004298bcc10d43cc25dcdb6153e092400840b30c3886d6cf5070",
+        "bytes": 273474
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/07-7.png",
+        "sha256": "e9faeab2d64b456e9b73a9e94805bcea809c112e2c6618d1cf775edb100cab6f",
+        "bytes": 312737
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/08-8.png",
+        "sha256": "b2295a11944f22a7633eb4abd789191f8a6cd16c0cd9592701ca2450c7385d24",
+        "bytes": 292722
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/09-9.png",
+        "sha256": "43229eb7e61b735c1f265fe5664a608ed793fe0bc57d1f0729636a96d4c5cd68",
+        "bytes": 310891
+      },
+      {
+        "path": "assets/magnet-artwork/paper/counting/10-10.png",
+        "sha256": "49754d930fb2f79563f5ce0d97f40644f5d06a42b57ee22e83bc4930c9ab4513",
+        "bytes": 2846756
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/01-you-ve-got-this.png",
+        "sha256": "03115f9275b9db4d02f8f4d3e5ae9aede823c4d4eb1c905f18106383ce847274",
+        "bytes": 316197
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/02-one-thing-at-a-time.png",
+        "sha256": "7347c9bd5aedf2094dbf2f5d719839685b22d490f660af3df604668db0286ef9",
+        "bytes": 301150
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/03-good-things-ahead.png",
+        "sha256": "84b5189e23e490b841b70fdad75581d41f24b20834cf9ac99f0374f978b925f0",
+        "bytes": 314478
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/04-make-room-for-joy.png",
+        "sha256": "08a1df86ba80351974f37984d31f0b33c20edc6ef1438451ab337f190a4aae3d",
+        "bytes": 321454
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/05-small-steps-count.png",
+        "sha256": "cf8bb507317e1200a73056b2ba02fbd38b301eeed2a9855bf98f749c3041806e",
+        "bytes": 306219
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/06-keep-going.png",
+        "sha256": "e0f21bd78e5310664aaca57e925575e2aa2216e1e79037af553062c1aab3625e",
+        "bytes": 323340
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/07-you-are-enough.png",
+        "sha256": "ad5be21f5238904587e4ce26e37518b2b476608506c43e10807c8854e432eaf6",
+        "bytes": 331619
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/08-breathe-and-begin.png",
+        "sha256": "2f4481be32a1f52cf2283beda26ab4c301dbc3ed13accb991c909c655330d3d6",
+        "bytes": 295258
+      },
+      {
+        "path": "assets/magnet-artwork/paper/reminders/09-choose-kindness.png",
+        "sha256": "7f425d79521ea665f86b14231cc76b0e3d6e23563c995a7ba0401209ca242802",
+        "bytes": 337479
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/01-thank-you.png",
+        "sha256": "74e93626ed20a528893bf87a38e375a7de7bfa3f72ffde6af857933cc3ba7208",
+        "bytes": 327439
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/02-my-favourite-human.png",
+        "sha256": "3cde8183be8623b62f81e454c1fa8c23f6b74bf2bd3875ac20d76b195ed7272c",
+        "bytes": 333505
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/03-you-are-loved.png",
+        "sha256": "ea6462d97af3f71adb3d48e6fe73680abb3b803beade0acd771f82afe358f3cf",
+        "bytes": 328804
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/04-best-day-ever.png",
+        "sha256": "38179f916726c7ae716daca12ee8407243d7f42cda973e7b7272455ff7d5a567",
+        "bytes": 341877
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/05-you-make-me-smile.png",
+        "sha256": "825936c683038f252fcf65e767e804b6492e443c2e0111d78f75d29f9a262af7",
+        "bytes": 308818
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/06-so-glad-you-re-here.png",
+        "sha256": "2de4083b454bd1ed58c33236633ded1424e4ad93d70a8af29524025fffd4b610",
+        "bytes": 336949
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/07-made-of-kindness.png",
+        "sha256": "89404b8bc395f57c0c5c671a40f94c4ca306ecd31480bf95709e1805ec9e940c",
+        "bytes": 332959
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/08-a-little-joy-for-you.png",
+        "sha256": "806d0270173a2b89d4d332b32a8abb382a8f88e5a2347cf2a6dd61564db7caf5",
+        "bytes": 333127
+      },
+      {
+        "path": "assets/magnet-artwork/paper/thanks/09-you-re-a-star.png",
+        "sha256": "ab40e37870decfb3929ca91233693446f4e726cfe173b0e970380c8e9fb9b078",
+        "bytes": 328709
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/01-apple.png",
+        "sha256": "82ed1da40caef087863a577fe600506ca4e533119a7cd13a1e2f9378bcc21ab6",
+        "bytes": 320924
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/02-tree.png",
+        "sha256": "a9f39d3ea51968bc2616113742a06e37435bc3e499548b77ad1a1234d9bb98fe",
+        "bytes": 337447
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/03-sun.png",
+        "sha256": "65471531b3ccc2493250ad64a63c476aecb7bb289d375d160e24f0ee56577a8b",
+        "bytes": 313348
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/04-cat.png",
+        "sha256": "cbc1b1645d754d8a271373e766d8e1b960b3679dca58e595cc9cf5f1c28ce8fa",
+        "bytes": 321966
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/05-dog.png",
+        "sha256": "9e899c8e7878629ebbb5bff1407c566d645a75204a94af09521f77e1a61ae0b5",
+        "bytes": 336252
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/06-ball.png",
+        "sha256": "a3dd8cde8146e64be643e36c42c8ac8dbc8910048d18cc6fcec40644854de8d6",
+        "bytes": 319926
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/07-house.png",
+        "sha256": "cef5a19f5468d243223a5aa0c32f082974cc1b84b73addbdc513e56a486e8351",
+        "bytes": 325273
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/08-flower.png",
+        "sha256": "81de0e982cbd59cdde7c5ba56cd4a8dd48ad6466a083db37590c28af750e3c56",
+        "bytes": 314212
+      },
+      {
+        "path": "assets/magnet-artwork/paper/words/09-car.png",
+        "sha256": "93ad5f37149900d43832e60554071a6356188c462b0bc93783bde4084a67ab0c",
+        "bytes": 317593
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/01-a.png",
+        "sha256": "54fef89f87e4d5b66115798918125391b76377293676a0f7684addcadff2583f",
+        "bytes": 293436
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/02-b.png",
+        "sha256": "696405ebd4331bf3d03070ed651260f39b4d3619704b056c6f8b8a12936c730d",
+        "bytes": 322716
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/03-c.png",
+        "sha256": "90d196ee6fdf9ced3ca97823b9e056e7eb08d10d600644de646046e351f90a56",
+        "bytes": 307472
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/04-d.png",
+        "sha256": "81812f4d3535c890b54b08c86e872dbe5c669c940a1c438eea0f6e68064ff3d3",
+        "bytes": 315220
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/05-e.png",
+        "sha256": "6b242e376984e481fe29da04b48b17d40ddf3d9aa78753b9a8d9111b8d86ba5d",
+        "bytes": 337672
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/06-f.png",
+        "sha256": "7c9a2e7e7be83fd07ff2221efa7125918404f80e375dc3a18bd24441f61c474e",
+        "bytes": 317830
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/07-g.png",
+        "sha256": "a2ecad2d410d069271635233b5f878c37e1c3d4bd45b1dc38cf815557dee8097",
+        "bytes": 318760
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/08-h.png",
+        "sha256": "129a9dce2bd32a58b74801b8836833718b1b141ac344681501b4d301667a0081",
+        "bytes": 329414
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/09-i.png",
+        "sha256": "70da8d0ee5d81da6b413d3028ac4067454f8ef2ff1d7eb8b1650fa2d086c5c97",
+        "bytes": 263623
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/10-j.png",
+        "sha256": "60ab12d194850af8929105652356dcf7bf533eec82cf665879d3d54b7286f55d",
+        "bytes": 313895
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/11-k.png",
+        "sha256": "f159b26bdd8cf0a507db9243bdabc27c66b1bb9c82c61a0b88b47a284e354995",
+        "bytes": 346281
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/12-l.png",
+        "sha256": "0d5096f1320f73dad93139b55d2ae93da40809ba4599389ec3c07718c62937d1",
+        "bytes": 328351
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/13-m.png",
+        "sha256": "e77c7686dcc52e7b3a89e575ebb9f10ade39b1323a7b7e891937830b460bd266",
+        "bytes": 334604
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/14-n.png",
+        "sha256": "ec1ec944fc8438d263e094090221f74c48853bb39b9f4292306c902e58651310",
+        "bytes": 339735
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/15-o.png",
+        "sha256": "c37b1d9abca1dc7549abedd8fc7b6e2658f384a39a4cd7209aa2b6c87129040d",
+        "bytes": 327371
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/16-p.png",
+        "sha256": "e347d490c55d6bbb4fec7fcbe87aa71250a4264fa5b6e77acc00abcbb8d23778",
+        "bytes": 308820
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/17-q.png",
+        "sha256": "b4a330470f933612a07d78e2d9469727ba6e5a316e2c634331ea6c9555783efd",
+        "bytes": 311006
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/18-r.png",
+        "sha256": "27d8452d0306ac32bf6fbaac7d80e2bb44b8059be198dcf7ec22b8c77bd915a2",
+        "bytes": 329534
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/19-s.png",
+        "sha256": "ea72d74813d98e78c2cc6716be71abb5e89002c2a3d772575dbd6f231c5b67c6",
+        "bytes": 296431
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/20-t.png",
+        "sha256": "6fc657a1e012065042f41e3a819bcc571e33c349defc6dc79914a5e5147e1bd2",
+        "bytes": 316045
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/21-u.png",
+        "sha256": "76b00bd941877fcba61c60c0f22e447ad1dbc347962bdbe060046b20dee3bc8e",
+        "bytes": 306455
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/22-v.png",
+        "sha256": "f5568649d9e231eeaeed7541466e3c45575c0e897fa06a22c0c7980e2f504d16",
+        "bytes": 324278
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/23-w.png",
+        "sha256": "5311d03b7e62d81f73e747c8c86ba7ae8494d9144436922387f2c254fc020654",
+        "bytes": 323336
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/24-x.png",
+        "sha256": "300ed225a153966ad8ada0f4d458564c35f51f08148d022514a939fb43cf3822",
+        "bytes": 321566
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/25-y.png",
+        "sha256": "00280378479a3d12adb7670cc9343532a0e0d546e3b6803072549a0789335f26",
+        "bytes": 293211
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/alphabet/26-z.png",
+        "sha256": "61059a8e32cdea7e11aed38877d042d280303f73f6134a82254a4a363fe08b4e",
+        "bytes": 320526
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/01-green.png",
+        "sha256": "272c6bde44891073c7256ac06ea5561f15e7ca4d67fa45fa4c1b75e680f7d64f",
+        "bytes": 313540
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/02-blue.png",
+        "sha256": "2b4978d4553e58fe3d7180cf0d82135fb2d7282c13e53a4138b33d315de1f075",
+        "bytes": 302329
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/03-pink.png",
+        "sha256": "ae0923e13e0102c0d191cf2f21660b929f86d29af9bd827f33dc3b8ca556442d",
+        "bytes": 285253
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/04-orange.png",
+        "sha256": "8c1455909242c8e99d612604ecf133bf8742e364f567656fa26ee34245fdcd94",
+        "bytes": 264918
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/05-red.png",
+        "sha256": "38ebe195a55b27b4a55163176d91caf9b48ac0b0175f8d1990e2266e048a2d96",
+        "bytes": 258198
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/06-yellow.png",
+        "sha256": "7f2e1538e6f2bd72fcd9e775d6aee494af2ec40ff11f356ad8144d1387fb871d",
+        "bytes": 253892
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/07-purple.png",
+        "sha256": "ad66ad56cd9df68391da4222547f6edf6e594a9a97ce517504d5fd4758156721",
+        "bytes": 315747
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/08-brown.png",
+        "sha256": "4832c0d295b6a2907e0c6f3e4504b5326b475523f19920b9dd292e6b84b41cdc",
+        "bytes": 329765
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/colours/09-black.png",
+        "sha256": "b65745cbb71e1278583a0f518cb8399f336407c937666cc6c7517fdb8d151339",
+        "bytes": 311042
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/01-1.png",
+        "sha256": "bea70f73e515aecffedb828f4124b232d118c861cacb7cc07a30c055a8d87779",
+        "bytes": 276779
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/02-2.png",
+        "sha256": "11350f9fbb4787402056e7c7ea63bf81591e9035aab90dd540fbc7f3b63e6a4f",
+        "bytes": 295531
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/03-3.png",
+        "sha256": "ce3dca42b2191849f632fed7ed8903cbb5f04b15e1020495703dbd8c66edaee4",
+        "bytes": 288396
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/04-4.png",
+        "sha256": "a41f47a0869778a53f23d4abeb533d29b0ad56e2b5a795d59c91db445bcc2431",
+        "bytes": 273214
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/05-5.png",
+        "sha256": "403ef98773d71254aeee82f9e5681f86900168446e177ae4ea00a7edfd83cac9",
+        "bytes": 249506
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/06-6.png",
+        "sha256": "92c79e9361508e9d77d9ed2a7c992eff8001828367a0b9c80ba4482766b83df5",
+        "bytes": 276071
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/07-7.png",
+        "sha256": "a65015205be7bffc511d4afe02d223893ec748f2561010a185cc0473014a549b",
+        "bytes": 303958
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/08-8.png",
+        "sha256": "76c9b8c7b2de6ce13032c463e7dc6aa9a88c3b182d7df28b644201214ac7b873",
+        "bytes": 290922
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/09-9.png",
+        "sha256": "1c8ae699084773c05734ee8e9af1edb5b3dd51fcf058f6cd7ef49978c01a87a6",
+        "bytes": 283959
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/counting/10-10.png",
+        "sha256": "3b165b874b45bf550b84fb82880628644cda4a3f6c661de7f9334c71adf253c0",
+        "bytes": 2662137
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/01-you-ve-got-this.png",
+        "sha256": "abd765669d0a2fa28ea985ba9e35b346ffbeb16d560c7623f4122d2580a2102c",
+        "bytes": 316024
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/02-one-thing-at-a-time.png",
+        "sha256": "f067c323a157fdf950b4bf2629c2cf67c1bebaf4114eee97ff4072f4d275bfc3",
+        "bytes": 297231
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/03-good-things-ahead.png",
+        "sha256": "db44fc63c54cc765f9196dfcc2c9507e3c1da27a03ea85ea4210f08c3a927da5",
+        "bytes": 322237
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/04-make-room-for-joy.png",
+        "sha256": "7ce799a604adec42e44587747f5aa96c3617b922803bef8b349a4b37bd38767d",
+        "bytes": 326039
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/05-small-steps-count.png",
+        "sha256": "34a6a9114ce383ab44e8f1dd05197547ca27fe3eee9cc2adb79ef69b8356a81c",
+        "bytes": 322579
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/06-keep-going.png",
+        "sha256": "746862a0fd3ef9db44107215ab27c79357d4cae780a89dd9b182c148fc64d3b4",
+        "bytes": 345743
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/07-you-are-enough.png",
+        "sha256": "18a4607acaec80e4008fe99671f38cb294d13dc30908a1f735f4a7e837efdd1d",
+        "bytes": 317830
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/08-breathe-and-begin.png",
+        "sha256": "948d1b58eebad45dcd971e3dbeb169716a48df7da785d748568f26329bbedfb9",
+        "bytes": 308971
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/reminders/09-choose-kindness.png",
+        "sha256": "2d61d090c74b7b24d97e299fed5fa0826e07a37f020d0f7164dbf737b6c0e12d",
+        "bytes": 318591
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/01-thank-you.png",
+        "sha256": "fa538a1e4ba85593e0a33cbf432857335c6d92f2331639dcc499b4f677fb0559",
+        "bytes": 311094
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/02-my-favourite-human.png",
+        "sha256": "cfdf8e6f92fb2a48ff5a8579c27a202ec99a11064071e90f105d5804e636fd4e",
+        "bytes": 307502
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/03-you-are-loved.png",
+        "sha256": "52b727a6aa0f6c4c41df76f3ddd3332e1d24dc7ac6cf470f7afe857a1ff7f17d",
+        "bytes": 314799
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/04-best-day-ever.png",
+        "sha256": "e31c7fefbd945f2f6b5ada9c0001e4341b6f5f0b0540fc7d13165a7233f05b8c",
+        "bytes": 338542
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/05-you-make-me-smile.png",
+        "sha256": "06f980fb355f930d50cf0b09c8dc9393e23e7a27ee7ae0d49f0b52d1bfd48293",
+        "bytes": 318642
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/06-so-glad-you-re-here.png",
+        "sha256": "31cfd5c1bde4571813f69a7e5083ffad0b123c427f8ebde9b6579641d8c86bf1",
+        "bytes": 329008
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/07-made-of-kindness.png",
+        "sha256": "12d9ff25e54efcd27cf33781316ebdfab98a9afa30c13f1ca1df35981da1da76",
+        "bytes": 316299
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/08-a-little-joy-for-you.png",
+        "sha256": "79b2f5231224bad454ab151e982f099eb6616800d814f234843df829ce3b236c",
+        "bytes": 320864
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/thanks/09-you-re-a-star.png",
+        "sha256": "40d60791ab0a9662c87517965dadef43d87f6ebb25b1f344e9fdfd6f94b47129",
+        "bytes": 303146
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/01-apple.png",
+        "sha256": "902c987950ee66c7a1c92a20f344408e8ca1e090b755c2c8c063a2203c2b49a1",
+        "bytes": 320975
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/02-tree.png",
+        "sha256": "5fb917946f327b627ce8b9a8d16bc47bf5ee98f4b9fab52d04f4e38b2cc02362",
+        "bytes": 345102
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/03-sun.png",
+        "sha256": "4e3641303c3c50cb31eb10b34678a6794967144306c3dc8874a8d26fab366b64",
+        "bytes": 292136
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/04-cat.png",
+        "sha256": "90415e5186d9aa5af535d0a1a83082748b3ff9c2a407c76ba1f053fdb7fb8560",
+        "bytes": 313791
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/05-dog.png",
+        "sha256": "7d818778585cca0227ab9424e67236e0635a0cb0fdfb6c4b0cf6828e4a43d36a",
+        "bytes": 321092
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/06-ball.png",
+        "sha256": "eef2c1a3ad651a27a511092f9025c6e5aea159c6e33e6f175b930c6e183ecc22",
+        "bytes": 317460
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/07-house.png",
+        "sha256": "2244f2e39434d63637b28bcfb2d90794afc71c48b6a3f7dd39d9916a25e424b4",
+        "bytes": 342731
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/08-flower.png",
+        "sha256": "f246339f9fce5abdde1705d52158324b1e007311c5b232ebb48354ecfb237a72",
+        "bytes": 308174
+      },
+      {
+        "path": "assets/magnet-artwork/pencil/words/09-car.png",
+        "sha256": "e8d66e37e37fa3d2a4ef33b02df85aad279fa0026e74e59cf09497c141e2fecb",
+        "bytes": 315555
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/01-a.png",
+        "sha256": "a128b76815a5cd98db6d8932d744c3d6d9949fd657d668db50f7b390b755732c",
+        "bytes": 308504
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/02-b.png",
+        "sha256": "36a718831e8596427696a7726d1839a9ef96797f3e711fc2e654455fa894ca04",
+        "bytes": 321794
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/03-c.png",
+        "sha256": "e0598a0720d12f0268ef79a8f56271d6aafdb454af7fa5a78864e7ad17fe1e50",
+        "bytes": 312108
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/04-d.png",
+        "sha256": "0a62dd9f19c67c53f0177ddbc74255c6c855bb9fd1f5dcad6316df96fe2b7055",
+        "bytes": 319467
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/05-e.png",
+        "sha256": "d24f682f0ca04529685534fa51e602feead121b78e7a1cd37d26a9deef3722a6",
+        "bytes": 325028
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/06-f.png",
+        "sha256": "f59cc57f7dbab9d403f388dad43d10bdce555fbb662892c6c1bb2ae26b6d60f9",
+        "bytes": 318440
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/07-g.png",
+        "sha256": "66d6bda74653e0d463274943e006751ef54361770f31f3fa5490220d88c56b1b",
+        "bytes": 323860
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/08-h.png",
+        "sha256": "e6d2dda45fc7d130aba5e2afe22f17d1c928ffc83e2cb68409dbfe80719cb5f5",
+        "bytes": 330525
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/09-i.png",
+        "sha256": "978c913d96b5a715244d93eb73207963183f8eca0c7422047ab44403fb2d37c2",
+        "bytes": 308371
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/10-j.png",
+        "sha256": "42fc203b2d95b17c8cab9dd6de17743b34c0225e4633e814894fe02e2e6527d6",
+        "bytes": 311168
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/11-k.png",
+        "sha256": "3f90d84d090cc5505bc7014d1d9855a6cfdeb979bf382e1d03ee3ff284ba261d",
+        "bytes": 334614
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/12-l.png",
+        "sha256": "9211aacffb122805fd6ffe2de7eb7f18ff2afdcd1f811fb52f6dd288834e0b87",
+        "bytes": 320068
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/13-m.png",
+        "sha256": "beebac2192f84ee0f2b52cce381dd5cbe2276f8ad210a7ccc007910e2bb9baa6",
+        "bytes": 326525
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/14-n.png",
+        "sha256": "5b1ff8c4888f5a70235c4453d355475c74e659fd1675d5a3bdff470a26b00635",
+        "bytes": 348644
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/15-o.png",
+        "sha256": "766315e361ec70cc8ee80c114a6601326ba0c0625a7b899fb1d215400896edc2",
+        "bytes": 329334
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/16-p.png",
+        "sha256": "3fccfc4e8ff98156b754c210f9fd601305df5baebc93397f46d2905114f463bc",
+        "bytes": 292147
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/17-q.png",
+        "sha256": "c30af0c7d71d653f082063cb0265765224b24cc419c4559b1eac23d9921f3014",
+        "bytes": 330249
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/18-r.png",
+        "sha256": "1f4de587671163d0d2aec68ed1dd86879de25e56db90b133ad180a7ba3b9c447",
+        "bytes": 321409
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/19-s.png",
+        "sha256": "2815f28f01484d3d060a42bf0542f3049ec4e0b2c398f70c95db30e25fd8f107",
+        "bytes": 301930
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/20-t.png",
+        "sha256": "fd396a5b9255cf44fcd0ef3ddad0ac7eec004f80a70f6a63ae19fba545cb2176",
+        "bytes": 325054
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/21-u.png",
+        "sha256": "819c5f36a234bdca4b8d7499bf603810bfeefb9aafc401009568f6f595dccd14",
+        "bytes": 318968
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/22-v.png",
+        "sha256": "edc6fc1767f2e08b4a24654da0b80a0a0f519c18feeb789e73defad8c9f32b85",
+        "bytes": 338727
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/23-w.png",
+        "sha256": "8e5aed9947aef0daa1458d9cdb42028069664aa0ef8eaf60e6d94750ed2d163d",
+        "bytes": 323950
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/24-x.png",
+        "sha256": "b807b440e09f87ac2d4e29aba81f6a961a2e048e49ad25257589789cdf1a780b",
+        "bytes": 326312
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/25-y.png",
+        "sha256": "600355a451fbd8b81465ec7c706281ef952c35378b1b5c74fd7dbcbaac472a87",
+        "bytes": 318900
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/alphabet/26-z.png",
+        "sha256": "c053a493c79f2e0f0d4299d7ac7888da9b6547542491365b3caf7c8049f040f5",
+        "bytes": 335646
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/01-green.png",
+        "sha256": "a305069cb5b1e678e7dee8005a55f230455f0a302bb0fa2a13bd5b56e3acdc81",
+        "bytes": 321730
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/02-blue.png",
+        "sha256": "d40440bc074d7770f09140892178837436faa7cb47662daa17c161db5e4283d9",
+        "bytes": 299380
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/03-pink.png",
+        "sha256": "d87e260a81af8530ebfec3efaa933e5bf9aa65684ffdcf2975ab12bab874454f",
+        "bytes": 297918
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/04-orange.png",
+        "sha256": "57fd6062c8a018a1cdeac1f32549cd6d7558686adc9de97f7378fcd49d3d55e0",
+        "bytes": 289443
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/05-red.png",
+        "sha256": "9111c3f66001333b016360f32144a22f1bb913742dc259a748661a5ef75eb807",
+        "bytes": 283897
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/06-yellow.png",
+        "sha256": "c2e864b2f82d6cc13323706570df3660d067de22a10280169117e34ee8db8002",
+        "bytes": 283352
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/07-purple.png",
+        "sha256": "fc01bc2cc3678cd02e145c251ac46279a909ea39abcc2249e90713f2da131c49",
+        "bytes": 321805
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/08-brown.png",
+        "sha256": "5d423f84c3534b30d0e40dd6c158aa85b7e243ec5688dfa9c62af4d424230555",
+        "bytes": 324651
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/colours/09-black.png",
+        "sha256": "06b1d809103bfb46796e4f81398cf3719f509ccba660a301bb677bbdf0958c4e",
+        "bytes": 310192
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/01-1.png",
+        "sha256": "9d05fa20aa9f9c316a13a6e89410f132a743601ba584936c36fce8edc9c7958a",
+        "bytes": 265388
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/02-2.png",
+        "sha256": "13d2ff748c30313876a6f1502a60d2bcf883014633778eefa0b1e7c735991bf8",
+        "bytes": 297767
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/03-3.png",
+        "sha256": "70f298d4ecbfc3cf618092cf26cb6cb66745bf0b0d4a2d513cc7a2be9eb33efc",
+        "bytes": 295937
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/04-4.png",
+        "sha256": "5292eb12110f6217654d6b26a87f7c459f65c9f29dcdc3bf6f615fbb3877d2a6",
+        "bytes": 266479
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/05-5.png",
+        "sha256": "ee73b1a95180d9714dbbeb5b0fbf54b628d549b82824bfda168994aa1f94cd21",
+        "bytes": 227921
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/06-6.png",
+        "sha256": "1b80b3959985817023de2042524e7658488c83ddfe62183b333dee4cf87d00ae",
+        "bytes": 261762
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/07-7.png",
+        "sha256": "0d2e05824de90333949e980f271df856dedcbe9b021adb5ecf4c5adc6373adcc",
+        "bytes": 293837
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/08-8.png",
+        "sha256": "f82df7999906cf352ee4b9832f788f2fa7d9839b601abc11b03925a4c291061b",
+        "bytes": 284178
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/09-9.png",
+        "sha256": "19b305d9eaeb1be6630a974c71725a9a3b8120c29349ae9078762d601ae85ec2",
+        "bytes": 280463
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/counting/10-10.png",
+        "sha256": "82157e4df6c95dcf9d8651b953b10e271ae7d3311688ec7276a7f8331c9cda46",
+        "bytes": 2488507
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/01-you-ve-got-this.png",
+        "sha256": "c9237008d3349e17ffdabb6f80bd673fa2ef26df04e92d0b5fd4bd9b1d27153d",
+        "bytes": 318457
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/02-one-thing-at-a-time.png",
+        "sha256": "4b29875b03e3e55989e2eca3e6adfbd4f34a2c701ab9103b97f6078793140218",
+        "bytes": 306285
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/03-good-things-ahead.png",
+        "sha256": "942443f8610746a9ff75182a70fcdcf682d97626545aad8aeedb25aab6bbfbb3",
+        "bytes": 318098
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/04-make-room-for-joy.png",
+        "sha256": "6a5e036d683a3e4872c628b2c800d2201b5fd16e8f825d39b7ca20a9d189297b",
+        "bytes": 330212
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/05-small-steps-count.png",
+        "sha256": "619d525c6f0142d07651f5d8b83e5927d806fd1e5ef633adb4ff2d0e04a0557f",
+        "bytes": 304517
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/06-keep-going.png",
+        "sha256": "1105c02d08f661017e83b9492f049e05e4ceb44c2a658be16ecd2f07809d15da",
+        "bytes": 319761
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/07-you-are-enough.png",
+        "sha256": "116db3471da264492f680124b1af92e8d5088aab4f5832122413d04d3b56b267",
+        "bytes": 329080
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/08-breathe-and-begin.png",
+        "sha256": "a3223b5db8778f2ff32d47aa0452c6f62e3802c9d32c687d9c74d5410475b441",
+        "bytes": 308652
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/reminders/09-choose-kindness.png",
+        "sha256": "61339dce4d4f2fe515ecc8bdaae88c17edf9eb743232ad15b7d0d8792e5f9472",
+        "bytes": 322540
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/01-thank-you.png",
+        "sha256": "e77f55de0e9bf3a4d4ecf2f2a20d382f3d0a4fa869530a4871fe4ca69232a708",
+        "bytes": 318606
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/02-my-favourite-human.png",
+        "sha256": "c91df7ba7496ec99dbc9a4c85b15d76c471f3e7feb0bee3f0d3c60959bfe6f2a",
+        "bytes": 319894
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/03-you-are-loved.png",
+        "sha256": "d99b40b4f433fc77030a03e5e024c16f4cdf6acc47cade2b9d64c8fcc356ba21",
+        "bytes": 312759
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/04-best-day-ever.png",
+        "sha256": "bae777c60d3db85d694cd6e7da7179bedf164b0f3538d77ad8f682c8fbf50eed",
+        "bytes": 332630
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/05-you-make-me-smile.png",
+        "sha256": "5e4533fd52b234c53ac5ceacae97fd60ce46e6c4544cdbd91e613d5da67b203c",
+        "bytes": 317475
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/06-so-glad-you-re-here.png",
+        "sha256": "707dfcf8e65deb7eb2c66bf20b7919c2cf87d2a50de5dec376496f16f117b1f2",
+        "bytes": 329153
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/07-made-of-kindness.png",
+        "sha256": "02b4a906726fd664fe5b914a3c67e52e813ae258ae1db91e203b7d5253042df8",
+        "bytes": 313213
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/08-a-little-joy-for-you.png",
+        "sha256": "e5dbd5057215d79aae76c0ce6f3173c10b4d60ec15f2c1743f9e8927f1f12fa9",
+        "bytes": 315992
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/thanks/09-you-re-a-star.png",
+        "sha256": "011e20049ea5e5567a3e509ec17babeb9fececcdc943fefaf69e979a3036011c",
+        "bytes": 302541
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/01-apple.png",
+        "sha256": "f1795f9a6174d8ed9a5958d262725f0b4ba2a2fd022057b0bd256ec3c26c66be",
+        "bytes": 314786
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/02-tree.png",
+        "sha256": "7084500c05f28465c77748b32bd570d7aa89b483faa82c83055a108c39038b36",
+        "bytes": 335161
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/03-sun.png",
+        "sha256": "7d98d786ac7495721b722858d01f12dd9a26165ccbe9f2378e38316218108d77",
+        "bytes": 284980
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/04-cat.png",
+        "sha256": "72c238cae01cd5e591469d343a29f416162bce3af5b656dde4a64c0861b0ebd5",
+        "bytes": 315176
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/05-dog.png",
+        "sha256": "29eec96bc14ef32927bfbf9168974e04aeaf3bd66b2b2f1e19afb84b2230933b",
+        "bytes": 321154
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/06-ball.png",
+        "sha256": "3220743f629027023a939f65677dc434a7168952f92b2677bb61b171b2a99b13",
+        "bytes": 305469
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/07-house.png",
+        "sha256": "b54d788843d1263e27cfcf2a75b7da18c407749ce01e967058002bb631d3e0b2",
+        "bytes": 334761
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/08-flower.png",
+        "sha256": "8b6c059fd426b429840ef9899dee5e15bbcef2e407a508f6b1470e2e6a5a0edf",
+        "bytes": 320553
+      },
+      {
+        "path": "assets/magnet-artwork/watercolour/words/09-car.png",
+        "sha256": "bcbc49c31743a1f594fbe78b658e9b72a5f9f85e5bf2e33d480c1a65e508d3b7",
+        "bytes": 295232
+      },
+      {
+        "path": "assets/main-CZTs3FLH.js",
+        "sha256": "93be3a6e0d933acb0bc93d8ee0cad0ce7b1b5dbaced78ede9f9ce26b2a6ca3b6",
+        "bytes": 470622
+      },
+      {
+        "path": "assets/main-NZdXSGMe.css",
+        "sha256": "0eda636348c33be68b4059e637492ab0760ff21d6744aab8c4b0789876789dfb",
+        "bytes": 232892
+      },
+      {
+        "path": "assets/OrderGuidance-1B6PId1M.js",
+        "sha256": "d7ca5f245b91d191e40c0920a426bd98ef1ae3e6e634ba75fdec131f1d3ce237",
+        "bytes": 2310
+      },
+      {
+        "path": "assets/OrderNotes-C4Zzawrt.js",
+        "sha256": "858c5b31fa8a42f8b7a54c33d7d8ac3b063fd7974aa5be999f6f8c51f5c7dbd0",
+        "bytes": 1190
+      },
+      {
+        "path": "assets/sample-coast.webp",
+        "sha256": "42c95f2330bdbf2559d4f8ad28cb10cd087adbe4e8a3b63856f5c8f25963f185",
+        "bytes": 441426
+      },
+      {
+        "path": "assets/seasons/christmas/santa-rig-base.webp",
+        "sha256": "4c8e6723d5daa567942b6b675b79af267b72a40d7c36c479557a429bf7a01646",
+        "bytes": 1059532
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/admin-thumbnail.jpg",
+        "sha256": "ad43e84cbe8fed1c0a29be2bb8254c79b61f6a95710524717b77dc4013482498",
+        "bytes": 104730
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/cameo-provenance.json",
+        "sha256": "8fcfc99fb6058714a08256bfd8c3a306f22ad315c473bc1d5efafc80086a125a",
+        "bytes": 3468
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/hero-provenance.json",
+        "sha256": "e8362d77d4af320689d71064bd61d1b67a2a6834f433a20c157851c91b17ce6d",
+        "bytes": 2179
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/hero-tree.webp",
+        "sha256": "d10e31bbd0c685fea65baaa0940e55a7c38d94b3eb43f88bfb6ca5af2368d38a",
+        "bytes": 2282512
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/night-backdrop.webp",
+        "sha256": "ab5dc2b391c64d5368beccca5395b36f59e9400adc90239a32144085c5c2a6a9",
+        "bytes": 1287866
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/peek-side.webp",
+        "sha256": "d839a5fc292f7bca22aea568e2424809be585f17c372002794e40281183659eb",
+        "bytes": 920578
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/peek-snow.webp",
+        "sha256": "8065fee797b5d1e55ece3d1d3c1a4b032442cf4c7fa6395385ab2a1a97e4748b",
+        "bytes": 1283960
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/scene-provenance.json",
+        "sha256": "a81ff2001786b192315fa16e7561a0a081d9b374c1db05cfd54263f6ecb26532",
+        "bytes": 2494
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/snow-divider-soft-v2.webp",
+        "sha256": "9248543673c02d82f14b4ed70f162c9c7e1ce44040239b40e892f58dec435c85",
+        "bytes": 162952
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/snow-divider.webp",
+        "sha256": "af4ed19d02ca649144feb332dfd535afc939fa4f2a6ae388b3e74770f349bac2",
+        "bytes": 621768
+      },
+      {
+        "path": "assets/seasons/christmas/santa-world/snow-soft-v2-provenance.json",
+        "sha256": "0a447ec74ea56a5f1915832ea42570cea1e5843b095f2b8a2f711c7d6155ae17",
+        "bytes": 1332
+      },
+      {
+        "path": "assets/TierNudge-BMcJxEtc.js",
+        "sha256": "98bb04dba9ffb5c944cad33f2b1a398e62c46704eebe43e2a71bddeb05d69495",
+        "bytes": 6423
+      },
+      {
+        "path": "basket.html",
+        "sha256": "adc639251019a65b72d40e7dfef8c854418b9657c572064de3093048e699e180",
+        "bytes": 10429
+      },
+      {
+        "path": "checkout.html",
+        "sha256": "d77c6a5e373d144f963f77459c52485fbb727c6e9b99fe86e157c4bea4312496",
+        "bytes": 10073
+      },
+      {
+        "path": "collections.html",
+        "sha256": "66eee9d1069ad76822224fd2a2e9de645454968a967a85bd4c113a00eb7d66e8",
+        "bytes": 44588
+      },
+      {
+        "path": "coming-soon/dm-sans.woff2",
+        "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543",
+        "bytes": 36932
+      },
+      {
+        "path": "coming-soon/fredoka.woff2",
+        "sha256": "99d6c78e043710d4f83ed90716779798b7b04eb690f73e0ad0e8f32d1f0e98c2",
+        "bytes": 29732
+      },
+      {
+        "path": "coming-soon/login.js",
+        "sha256": "433d290aaf186238cce0a3aa204395764849232c80248cef4d092a07be72073d",
+        "bytes": 542
+      },
+      {
+        "path": "coming-soon/logo.png",
+        "sha256": "990002403e9a1965cad9a2c103f680537624cc5b3f9a7529ef58515673d36c30",
+        "bytes": 20064
+      },
+      {
+        "path": "coming-soon/original-beach.webp",
+        "sha256": "ac68dafc3d463bab25b0bd119122416ac015027b5477d2fb36fd4191cc067e22",
+        "bytes": 274672
+      },
+      {
+        "path": "coming-soon/original-sunglasses.webp",
+        "sha256": "a93bfddf9ce78f290c96a8c9abb8371569db08af786c13b47ef581e7de797bc1",
+        "bytes": 183090
+      },
+      {
+        "path": "coming-soon/original-together.webp",
+        "sha256": "5af277f1225573a0e289976aa9b18eaa565f9a3bbbb860c0b11e3d74a96d14ef",
+        "bytes": 179908
+      },
+      {
+        "path": "coming-soon/original-wedding.webp",
+        "sha256": "88fbf69f57c97892a280aa79e764a79467a4cdc9a1ab294cfb8cf761e71f43d2",
+        "bytes": 133676
+      },
+      {
+        "path": "coming-soon/puzzle-logo-v1.png",
+        "sha256": "df225bfb4d63f050fd7a2975cc89c316d7660561c2e8a489c10e2f3dd5d03ebe",
+        "bytes": 95950
+      },
+      {
+        "path": "coming-soon/puzzle-logo-v2.png",
+        "sha256": "4dd69858800f4a755315d6ecf63b037afe0b3dd86b3c88f537a88a4aa1aac909",
+        "bytes": 95058
+      },
+      {
+        "path": "coming-soon/scene-desktop-v3.webp",
+        "sha256": "adb0be682b09fd2053d690ffdb3567da421e383b124477dbb50ddc699bd66989",
+        "bytes": 177240
+      },
+      {
+        "path": "coming-soon/scene-mobile-v3.webp",
+        "sha256": "002b8a17068578cfd096076275e54f5f93b66994fa6f819a11fc4016cefa8948",
+        "bytes": 205248
+      },
+      {
+        "path": "coming-soon/styles.css",
+        "sha256": "1e51101860021b9f635d2fcc5b7b7d042d5ea70fb6e9053933dcc283eb87929c",
+        "bytes": 6403
+      },
+      {
+        "path": "coming-soon/wordmark-v1.png",
+        "sha256": "144e91229ad1186d53dfa9956342814924b111d1a69d459b590fa0b3689fffd6",
+        "bytes": 146066
+      },
+      {
+        "path": "contact.html",
+        "sha256": "bc9489bf7d434c0a93da9897b57ac71e2d74b71fd2e77a268aff7b6960d22be0",
+        "bytes": 9217
+      },
+      {
+        "path": "content.json",
+        "sha256": "bfb36bf9d012a37d2730ac374e22ae5681becb3f4dea88065a658551eb81db44",
+        "bytes": 6523
+      },
+      {
+        "path": "directions.html",
+        "sha256": "9bc2fee222e5165b989d927cc1e050414927b266d970dab8f8c6a1738eefbac3",
+        "bytes": 116
+      },
+      {
+        "path": "favicon.png",
+        "sha256": "408c3db16d148f3385a8d94eb0f8513e86af14bba62abcf7e40f5f4c9ba40635",
+        "bytes": 1825
+      },
+      {
+        "path": "help.html",
+        "sha256": "6eba2068d169dba8a3a38ca7ffc637c9b87700aa6aeb2321a595a02885d71845",
+        "bytes": 23295
+      },
+      {
+        "path": "icon-180.png",
+        "sha256": "d286a1021571dd8df2a55890ab515d4496f88f6a58e957a212855e6d6365f3a3",
+        "bytes": 18527
+      },
+      {
+        "path": "icon-192.png",
+        "sha256": "990002403e9a1965cad9a2c103f680537624cc5b3f9a7529ef58515673d36c30",
+        "bytes": 20064
+      },
+      {
+        "path": "icon-32.png",
+        "sha256": "a701ac6c47efe878393e5ca11a945bee495d33d6a9e3dfd632095de39534e925",
+        "bytes": 1608
+      },
+      {
+        "path": "icon-512.png",
+        "sha256": "41c70f31ecb8e0029f27f491b8554f54d42617e258866648895e1bcc0416789c",
+        "bytes": 108263
+      },
+      {
+        "path": "index.html",
+        "sha256": "55cb7efac1053f0fb63107c36c405b4ee2710c0bc1dc738f08d4308740cb8bd6",
+        "bytes": 36172
+      },
+      {
+        "path": "og-image.jpg",
+        "sha256": "3c0df338ffa5744b3e8203b66247c593d346e5638a1dd2d0c302197ac1270443",
+        "bytes": 103371
+      },
+      {
+        "path": "privacy.html",
+        "sha256": "3d6bdb49564a6b5b6ce9d4aba9b404d47039a11ecf48fa64ee62b883ca4a8344",
+        "bytes": 21445
+      },
+      {
+        "path": "products/alphabet.html",
+        "sha256": "01aa45522ae3e83d396cdab033b2927c24e7085dfe8539d8fe1be7454f6ed8a7",
+        "bytes": 17908
+      },
+      {
+        "path": "products/business.html",
+        "sha256": "15b28127ea8e26e07e426cf75e45a36d9707233235ddd642fe8c0470d3061af2",
+        "bytes": 11924
+      },
+      {
+        "path": "products/colours.html",
+        "sha256": "9c9fee444e4a59a8476e4737cd50e875221fe914b71c4227c819078affeae40f",
+        "bytes": 14560
+      },
+      {
+        "path": "products/counting.html",
+        "sha256": "521a6070602c0ed6f42e17fc1b01d8e74fe9a213327681564d92252ae0c61bc8",
+        "bytes": 14711
+      },
+      {
+        "path": "products/information.html",
+        "sha256": "b56f551d325afd114be12a4952df4f5a387641223b24b2b5682bb6c36039e412",
+        "bytes": 22229
+      },
+      {
+        "path": "products/noughts-crosses.html",
+        "sha256": "25a7d70c61f5b4000b25c0da6b381ed3cd05a303a7623d0137eb9ad6b699eb86",
+        "bytes": 11691
+      },
+      {
+        "path": "products/photos.html",
+        "sha256": "1bb9cabee2530f7065c9167a6d233c14b090ea034d736ca6ec9120d3574f4b84",
+        "bytes": 11255
+      },
+      {
+        "path": "products/puzzle.html",
+        "sha256": "ef02e8b2c794c3d9206e834d1cab1f7b914cbcbe3d486c0747efa838f42491f5",
+        "bytes": 9790
+      },
+      {
+        "path": "products/reminders.html",
+        "sha256": "c9e3e4b4b6410ac7d6a2fb3bdb3027e615f531c3743431611baf6bccaf5e2027",
+        "bytes": 14949
+      },
+      {
+        "path": "products/thanks.html",
+        "sha256": "36c7c38faa1a87b5e5eb80f312c58f95b494ba81b194ae3672ff77e8c6ce2385",
+        "bytes": 14937
+      },
+      {
+        "path": "products/words.html",
+        "sha256": "15764da2fecc2e4f6b3bee5090d61d1fb2ff0e88fd2294564460896f5d7efe19",
+        "bytes": 14450
+      },
+      {
+        "path": "proof.html",
+        "sha256": "e8925d10f22e1161167dc975eadae7f161df1be7347f40e076a2e3fd0a87a369",
+        "bytes": 7226
+      },
+      {
+        "path": "puzzle.html",
+        "sha256": "f62cc3b94ed7e65932d22f8fb905311615152876e517b336717411e218e275cb",
+        "bytes": 17676
+      },
+      {
+        "path": "returns.html",
+        "sha256": "e7c512cb3880779bfa9a8eab25da45d243382a8488e20b7c7f9345a5a8d8bc8e",
+        "bytes": 10913
+      },
+      {
+        "path": "shipping.html",
+        "sha256": "dc37243589dbf09c13752ebd24298badaeb349202c8622c87b44ee034ecc2d72",
+        "bytes": 10829
+      },
+      {
+        "path": "site.webmanifest",
+        "sha256": "3dbdfe1c6de891f25aff07c793abfb6e1b59819d625050d394e9c7fcad41c494",
+        "bytes": 269
+      },
+      {
+        "path": "sitemap.xml",
+        "sha256": "183a61e0575852b16239e0f8456eccd331be6d0b5bfb4aa78df93e6204cd41c0",
+        "bytes": 1411
+      },
+      {
+        "path": "studio.html",
+        "sha256": "6fb94366a5f9f2f2ab0ce7ab79a3a5774c53a697ee6bc4dcb59bfcd3ae1f2357",
+        "bytes": 18004
+      },
+      {
+        "path": "studio/business.html",
+        "sha256": "b89a2bfacf1bc0f9431f51166bbad34e9922a3a6d733742bd1136f8dcc06ce48",
+        "bytes": 23268
+      },
+      {
+        "path": "studio/handy.html",
+        "sha256": "a627ac65ee7e958125bec2f877955919779895e45dfc2aafa7db2d9314d9d435",
+        "bytes": 23362
+      },
+      {
+        "path": "terms.html",
+        "sha256": "2cceb5092becc88d89a78fa591bda4e6c192d0a4654b72b8ffb24de55d44f784",
+        "bytes": 12720
+      },
+      {
+        "path": "third-party-notices.txt",
+        "sha256": "42f7f2ec731e7fb62cea05ab30644a607b8095b43a79338c4df46fa825063ea4",
+        "bytes": 27957
+      }
+    ],
+    "acknowledgement": {
+      "id": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+      "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+      "environment": "production",
+      "createdAt": "2026-10-20T23:41:52.189Z"
+    },
+    "integrityDigest": "5affbe81607437f130d93f3d9fd355bfc79c6847e7c4931a2e56c39177f1b9da"
+  },
+  "finalProtection": {
+    "status": "passed",
+    "observedAt": "2026-10-20T23:56:38.928Z",
+    "expectedSourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "checks": [
+      {
+        "component": "pages",
+        "status": "passed",
+        "expectedId": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+        "protectionObservedAt": "2026-10-20T23:56:28.664Z",
+        "observedId": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+        "observedSourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "inactiveIngress": {
+          "id": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+          "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:56:35.930Z",
+          "production": "absent",
+          "preview": "absent",
+          "canonical": "absent"
+        },
+        "identityStatus": "passed",
+        "identityObservedAt": "2026-10-20T23:56:35.931Z"
+      },
+      {
+        "component": "admin",
+        "status": "passed",
+        "expectedId": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+        "protectionObservedAt": "2026-10-20T23:56:30.854Z",
+        "observedId": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+        "identityStatus": "passed",
+        "identityObservedAt": "2026-10-20T23:56:36.867Z"
+      },
+      {
+        "component": "security",
+        "status": "passed",
+        "expectedId": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+        "protectionObservedAt": "2026-10-20T23:56:32.990Z",
+        "observedId": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+        "identityStatus": "passed",
+        "identityObservedAt": "2026-10-20T23:56:37.898Z"
+      },
+      {
+        "component": "catalogue",
+        "status": "passed",
+        "expectedId": "92f3472a-3153-447d-a8be-c79db9498407",
+        "protectionObservedAt": "2026-10-20T23:56:34.887Z",
+        "observedId": "92f3472a-3153-447d-a8be-c79db9498407",
+        "identityStatus": "passed",
+        "identityObservedAt": "2026-10-20T23:56:38.928Z"
+      }
+    ]
+  },
+  "githubArtifact": {
+    "origin": "owner-github-run-artifact",
+    "reviewed": true,
+    "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+    "runId": "39516512467",
+    "url": "https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39516512467",
+    "artifactName": "release-manifest-39516512467",
+    "runStatus": "completed",
+    "conclusion": "success",
+    "manifestSha256": "279b66e501b9330e2c42b2a71e2fca2dc2509cd2b5f275c53da2d5a2749343bb",
+    "runAttempt": "1",
+    "artifactId": "12308143269",
+    "jobId": "118949855103",
+    "zipSha256": "3ae9d18c1f91e12fcf9ef405e297321b292ad7d0c9f36715527c4531ffbeca29",
+    "publishStep": {
+      "name": "Publish protected Pages from the reviewed build",
+      "number": 10,
+      "startedAt": "2026-10-20T23:41:30.000Z",
+      "completedAt": "2026-10-20T23:42:17.000Z"
+    }
+  },
+  "finalIdentityReadbacks": [
+    {
+      "component": "pages",
+      "expectedId": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+      "observedId": "3aeae548-a1a7-4f31-8609-087c86f1eb8e",
+      "observedSourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T23:56:35.931Z"
+    },
+    {
+      "component": "admin",
+      "expectedId": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+      "observedId": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T23:56:36.867Z"
+    },
+    {
+      "component": "security",
+      "expectedId": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+      "observedId": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T23:56:37.898Z"
+    },
+    {
+      "component": "catalogue",
+      "expectedId": "92f3472a-3153-447d-a8be-c79db9498407",
+      "observedId": "92f3472a-3153-447d-a8be-c79db9498407",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T23:56:38.928Z"
+    }
+  ],
+  "completionEvidence": {
+    "version": 1,
+    "prewriteValidationDigest": "ec0f59a11ad5e4b42036ff177de5d22a5cb3620c29d1e842d9eacee321aa55c2",
+    "completedAt": "2026-10-20T23:56:38.929Z",
+    "evidence": {
+      "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+      "guards": {
+        "admin": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "admin",
+          "id": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+          "origin": "private-helper-get",
+          "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:51:34.453Z",
+          "protection": "passed"
+        },
+        "security": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "security",
+          "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+          "origin": "private-helper-get",
+          "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:51:37.171Z",
+          "protection": "passed"
+        },
+        "catalogue": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "catalogue",
+          "id": "92f3472a-3153-447d-a8be-c79db9498407",
+          "origin": "private-helper-get",
+          "candidateSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:51:40.073Z",
+          "protection": "passed"
+        }
+      },
+      "receipts": {
+        "security": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "security",
+          "id": "0282f25b-f7e7-4bf4-87b4-77ab52e8517c",
+          "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "sourceDigest": "f690eaefe2357c184e5fe29a7eb2d7e0938a79b3861b7be34dd8a7815fa0f95c",
+          "runtimeDigest": "96bc461147c9283f1973b065e3a0917f36cb35ae55ceb39f89009d88e411f365",
+          "configDigest": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936",
+          "origin": "guarded-upload",
+          "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/e2772da6258014a4124f8c166be225fbdf0f596c/docs/releases/2026-10-21-release-S-security-upload-receipt.json",
+          "observedAt": "2026-10-20T23:31:08.366Z"
+        },
+        "catalogue": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "catalogue",
+          "id": "92f3472a-3153-447d-a8be-c79db9498407",
+          "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+          "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
+          "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+          "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+          "origin": "guarded-upload",
+          "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json",
+          "observedAt": "2026-10-20T20:49:33.383Z"
+        },
+        "admin": {
+          "account": "4f57d4e924674cb87b33d4c884745cf6",
+          "component": "admin",
+          "id": "7d4f0d9d-ea8b-4e10-a0c3-a4ffe8cc409e",
+          "sourceSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "sourceDigest": "49ac675eed0b9bb54476f3955b63777aecc967eeaa5fe2a32b91ed5298a9a6ec",
+          "runtimeDigest": "21ea968f234862c8187de255193aa8f375193d4d9421ca6306a9e205810ddcf0",
+          "configDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0",
+          "origin": "guarded-upload",
+          "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/1957ce59b1b695edba65f38b1f3aea21a14e05a2/docs/releases/2026-10-21-release-S-admin-upload-receipt.json",
+          "observedAt": "2026-10-20T23:51:36.294Z",
+          "assetsDigest": "d43ca05022d72dca85bb2c70a7515039a75c8c11017172e22dd30e9c953387ff"
+        }
+      },
+      "schema": {
+        "security": {
+          "origin": "console-metadata",
+          "databaseId": "25fb2dda-2ce9-4f8c-b49d-e6480218a5cf",
+          "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:49:18.142Z",
+          "sourceFiles": [
+            {
+              "name": "0001.sql",
+              "sha256": "4011e125f787d8f58499e84ae4f1b071d9081ee035b39ad341bcb8f74dccf78b"
+            },
+            {
+              "name": "0002_submissions.sql",
+              "sha256": "54b13c0b4d76b7a85fb988f06fefa7086087f6e6d16d4a0d2b1c40da196f4e18"
+            },
+            {
+              "name": "0003_contact_delivery.sql",
+              "sha256": "66275b2720c156e9583b82c0f5a96abf2d6154d4ed3cef53bb6017b16f1d5f35"
+            },
+            {
+              "name": "0004_artwork.sql",
+              "sha256": "ec6b4d32ba12cbf9767a116bc5ec7a505bbe3d6842b460d04e7fd3168f52640a"
+            },
+            {
+              "name": "0005_orders.sql",
+              "sha256": "1b41efbe004562b519fdb52a39dfae7656e0c3ab4275202ee5f112c9e24e640c"
+            },
+            {
+              "name": "0006_fourteen_day_retention.sql",
+              "sha256": "9a0b380edd89105f5b03ae68ce3eb24f9de557265a58f3cb0ca7d6d3b32ca03a"
+            },
+            {
+              "name": "0007_order_proofs.sql",
+              "sha256": "35f013d981e2b29a87c6df3574e2d0394526c3796de3edb6ae5a4f6a86ef5377"
+            },
+            {
+              "name": "0008_order_history_retention.sql",
+              "sha256": "3b20d51796e631392ddf7fd88c428b66a0047528bbc1655170ff1c5281f8430f"
+            },
+            {
+              "name": "0009_map_cache.sql",
+              "sha256": "18672a080ff44ffa03afdbd0c355bde662e4117bf1dae8666c04ba36dc1a15ff"
+            },
+            {
+              "name": "0010_manual_update_attempts.sql",
+              "sha256": "be5b978325f8c5f907d44a6a162bf19a9a3bd52acedee4c07ecda2910bac7ca9"
+            },
+            {
+              "name": "0011_mail_receipt_metadata.sql",
+              "sha256": "3bb294480e0528a26517e440572a22396750a5dfbc8e3e4f16063a1f9d33fa17"
+            },
+            {
+              "name": "0012_mail_delivery.sql",
+              "sha256": "f06881d75c0634b61f83e87f1b6fb8e22ec8c80fc3ec226c158c4dd36019d5bc"
+            }
+          ],
+          "applied": [
+            "0001.sql",
+            "0002_submissions.sql",
+            "0003_contact_delivery.sql",
+            "0004_artwork.sql",
+            "0005_orders.sql",
+            "0006_fourteen_day_retention.sql",
+            "0007_order_proofs.sql",
+            "0008_order_history_retention.sql",
+            "0009_map_cache.sql",
+            "0010_manual_update_attempts.sql",
+            "0011_mail_receipt_metadata.sql",
+            "0012_mail_delivery.sql"
+          ],
+          "objectsDigest": "afe684c75d0871a987af8abb8074e6e86a0b7295bb5ba535c4f257eb40a64095",
+          "ddlReviewed": true,
+          "remoteChecksumEvidence": "source checksums only; remote ledger has no checksums"
+        },
+        "content": {
+          "origin": "console-metadata",
+          "databaseId": "8883d934-89f5-4da0-97a1-f7624d008a33",
+          "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+          "observedAt": "2026-10-20T23:49:25.832Z",
+          "sourceFiles": [
+            {
+              "name": "0001.sql",
+              "sha256": "fda85abaf488bfd9e7299f7d8b9c9b751a0b9161e49772b85db26f0f17349b43"
+            }
+          ],
+          "applied": [
+            "0001.sql"
+          ],
+          "objectsDigest": "d52fbc544304b4ca6feace147879d01fd07806f48331a3fb042989bddc90aa83",
+          "ddlReviewed": true,
+          "remoteChecksumEvidence": "source checksums only; remote ledger has no checksums"
+        }
+      },
+      "staged": {
+        "reviewedAgainstSha": "4282dcfe46d2750d8349965bb3c910bbc157d2c0",
+        "observedAt": "2026-10-20T23:49:16.861Z",
+        "clientPairCompatibleWithSchema": true,
+        "rollback": {
+          "pagesId": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+          "adminId": "ddea75c2-294e-4906-92eb-80370470392b",
+          "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+          "pagesBuildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+          "adminAssetsDigest": "8c59382c355df19fd803437544bc5b0188b060b892814d90655a1efac1fcfecc",
+          "adminRuntimeDigest": "632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74",
+          "adminConfigDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0"
+        }
+      }
+    }
+  }
+}
