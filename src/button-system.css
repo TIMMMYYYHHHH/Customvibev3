@@ -66,3 +66,9 @@
 .shop-shell :is(.button,.studio-add):focus-visible,
 .storefront :is(.action,.catalog-explore):focus-visible,
 .unified-header .site-create:focus-visible {outline:3px solid var(--cv-selected);outline-offset:3px}
+
+@media (forced-colors:active) {
+ .shop-shell .studio-choice-row button{border:3px solid ButtonText}
+ .shop-shell .studio-choice-row button[aria-pressed=true],
+ .shop-shell .has-photo .studio-choice-row button[aria-pressed=true]{background:ButtonFace;color:ButtonText;border-color:Highlight;border-style:double}
+}
