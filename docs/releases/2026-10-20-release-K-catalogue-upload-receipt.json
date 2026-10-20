@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "account": "4f57d4e924674cb87b33d4c884745cf6",
+  "component": "catalogue",
+  "id": "92f3472a-3153-447d-a8be-c79db9498407",
+  "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
+  "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+  "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+  "origin": "guarded-upload",
+  "observedAt": "2026-10-20T20:49:33.383Z"
+}
