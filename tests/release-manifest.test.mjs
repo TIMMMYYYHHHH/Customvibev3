@@ -393,3 +393,302 @@ test('recovery archive admits only the exact approved dependency document tuple 
  assert.equal(validateActivationCompatibility(v,e).sourceInputDigest,digest);
  for(const change of [x=>x.archivedRelease.recoveryDocChanges[0].after.blob=old,x=>x.archivedRelease.recoveryDocChanges[0].after.mode='100755',x=>x.archivedRelease.recoveryDocChanges[0].path='docs/arbitrary.md',x=>delete x.archivedRelease.recoveryDocChanges,x=>x.sourceInputDigest='d'.repeat(64)]){const altered=structuredClone(e);change(altered);assert.throws(()=>validateActivationCompatibility(v,altered));}
 });
+
+test('inactive Delivery observations require explicit project and canonical production/preview ingress off',async()=>{
+ const {inactiveDeliveryIngress}=await import('../scripts/release-manifest.mjs');
+ const project={deployment_configs:{production:{env_vars:{}},preview:{env_vars:{MAIL_EVENTS_ENABLED:{type:'plain_text',value:'false'}}}},canonical_deployment:{id,environment:'production',env_vars:{},deployment_trigger:{metadata:{commit_hash:sha}}}};
+ const observedAt=new Date().toISOString();
+ assert.deepEqual(inactiveDeliveryIngress(project,{id,sourceSha:sha,observedAt}),{id,sourceSha:sha,observedAt,production:'absent',preview:'false',canonical:'absent'});
+ for(const scope of ['production','preview','canonical'])for(const flag of [{type:'plain_text',value:'true'},{type:'secret_text'},{value:'false'},null]){
+  const v=structuredClone(project),env=scope==='canonical'?v.canonical_deployment.env_vars:v.deployment_configs[scope].env_vars;env.MAIL_EVENTS_ENABLED=flag;
+  assert.throws(()=>inactiveDeliveryIngress(v,{id,sourceSha:sha,observedAt}));
+ }
+ for(const mutate of [v=>delete v.deployment_configs.preview,v=>delete v.canonical_deployment.env_vars,v=>v.canonical_deployment.environment='preview',v=>v.canonical_deployment.id='87654321-1234-1234-1234-123456789abc']){const v=structuredClone(project);mutate(v);assert.throws(()=>inactiveDeliveryIngress(v,{id,sourceSha:sha,observedAt}));}
+});
+
+const reviewedDeliveryFixture={
+ "baselineSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+ "archivePath": "docs/releases/2026-10-20-release-T-canonical-recovery.json",
+ "archiveBlob": "15c23602955057ea1cef544901642526b969da1f",
+ "baseline": {
+  "archiveSha256": "5ffa589528503e0661c5815266190e22442252b5bb61fd74c39ede1091290cf5",
+  "receiptDigest": "cca92993afd03e856253183b61db1129523310d65e217d7ca95a69327bec049f",
+  "rollback": {
+   "pagesId": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+   "adminId": "ddea75c2-294e-4906-92eb-80370470392b",
+   "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+   "pagesBuildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+   "adminAssetsDigest": "8c59382c355df19fd803437544bc5b0188b060b892814d90655a1efac1fcfecc",
+   "adminRuntimeDigest": "632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74",
+   "adminConfigDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0"
+  }
+ },
+ "catalogue": {
+  "id": "92f3472a-3153-447d-a8be-c79db9498407",
+  "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a1ac2c60cb3930087adfd5018f373",
+  "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+  "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+  "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json"
+ },
+ "catalogueInputs": {
+  "inputCount": 52,
+  "inputPathsDigest": "157cdb15f5d1c6f385d1039da3613d64cf28917682e313aafc90bea3c6ecd853",
+  "inputInventoryDigest": "05330406124d45da8cf2154c7d4a1ac7c2b9832684988d943913f50a463ce674",
+  "importGraphDigest": "33992702b6d366eeeb443f4200be451d7a98ed7aca74386b5b4aca2968a0e09e"
+ },
+ "entries": [
+  {
+   "path": "admin/OrderDetail.jsx",
+   "mode": "100644",
+   "baseBlob": "e32dbd29063eac11735ab609992ad12ce6a43d0d",
+   "candidateBlob": "f5cc54589b1d7c19b1afc4e8213d4f48f0e156b9"
+  },
+  {
+   "path": "admin/mail-delivery.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "e896e6f1cd2179d50aeb91ed79e3393d5a244107"
+  },
+  {
+   "path": "admin/order-mail.mjs",
+   "mode": "100644",
+   "baseBlob": "0453367797108b8604dd65d627fc14b9ca1e0733",
+   "candidateBlob": "5cb91e5e6cda53a4630bbb4fb7e7520751c8380f"
+  },
+  {
+   "path": "catalogue/index.mjs",
+   "mode": "100644",
+   "baseBlob": "94b30c5ce4a017794603f16dc81355732222a01d",
+   "candidateBlob": "6245cddfa869ef242a8efcd3f98aba052574fa8b"
+  },
+  {
+   "path": "docs/availability-runbook.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "3f63cef2476e0ec23d1f8ce20ecf472bc1254c24"
+  },
+  {
+   "path": "docs/email-delivery-reconciliation.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "ed443124cec3c47a9ed472a86f5e6b857b59306c"
+  },
+  {
+   "path": "docs/email-delivery-webhook-runbook.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "63ad486aa69f2b4aa9e5f43e7b0653bfc88c4039"
+  },
+  {
+   "path": "docs/mail-delivery-admin.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "82803f9bf0b6be99e826e997de0d3d51ab8cc001"
+  },
+  {
+   "path": "docs/mail-delivery-backend.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "8a76a45278de60add620dbb06654f7fec88f4cb1"
+  },
+  {
+   "path": "docs/mail-delivery-integration.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "c16d0b5d44e82863c0e0ec6e3079a2d19e599b72"
+  },
+  {
+   "path": "docs/superpowers/plans/2026-10-20-mail-delivery-backend.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "5a461bd9fb9584bc37a86bed288addb1b093aa6f"
+  },
+  {
+   "path": "functions/_middleware.js",
+   "mode": "100644",
+   "baseBlob": "b7a97720ebe3012844ece8643490bcf5711fc4ac",
+   "candidateBlob": "ad95491d57d93d8fdec396360eb643da458b49e0"
+  },
+  {
+   "path": "migrations/security/0012_mail_delivery.sql",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "f4138cab01adad6c3e7bb196863909e13692da4b"
+  },
+  {
+   "path": "package-lock.json",
+   "mode": "100644",
+   "baseBlob": "ad10111804d934e9be4f8cc14b73ed38ec889d64",
+   "candidateBlob": "a115eb6c16355d095940c5f182ad3cdb7ffc5819"
+  },
+  {
+   "path": "package.json",
+   "mode": "100644",
+   "baseBlob": "08ecb4193c223add3d5a7a1e75b36f1d413047b3",
+   "candidateBlob": "3457bec703f083c7b998a9b76fe1b688308942ae"
+  },
+  {
+   "path": "security/index.mjs",
+   "mode": "100644",
+   "baseBlob": "f3f3c53f054e26792d56f0d8011b9a93fd1fe385",
+   "candidateBlob": "b2003638d9e8c823ece59187b86167ce1885498d"
+  },
+  {
+   "path": "security/mail-delivery.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "97a4252bd92d34e96eaa47ec4d3bc285dcd147fc"
+  },
+  {
+   "path": "security/orders.mjs",
+   "mode": "100644",
+   "baseBlob": "9607e2bef272c63dcd0c6c065b82f2c6e6d36f7e",
+   "candidateBlob": "7d9b17e33e32c74b8185419de681996b07ddafb9"
+  },
+  {
+   "path": "security/submissions.mjs",
+   "mode": "100644",
+   "baseBlob": "b6e5e44ca42d40e3f642757ebd7f3169bdb8fb9e",
+   "candidateBlob": "29cedc24188d500c0b8cc21b479a62c3119bfc64"
+  },
+  {
+   "path": "server/mail-delivery.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "292de5de954b76e517d9006d11c9eec1da41993a"
+  },
+  {
+   "path": "server/mail-recipient.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "fd6bfed565fcc96c9117b553fa54bce236bebe5b"
+  },
+  {
+   "path": "server/mail-webhook.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "acad4b67dd1452aae3a4e5ef08df528357837186"
+  },
+  {
+   "path": "server/submissions.mjs",
+   "mode": "100644",
+   "baseBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6",
+   "candidateBlob": "64a219f7e60b9d89e765d000f878e61dd50f48f8"
+  },
+  {
+   "path": "tests/availability-diagnostics.test.mjs",
+   "mode": "100644",
+   "baseBlob": "34ab771d9c37f67ac84240dc30fcb0ddf98252cb",
+   "candidateBlob": "06776cc9cac4fd9a0a3fbf2c5b89a85661752da7"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-admin.html",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "57d4f6d67b326c689d5bddc91109a629f4d09ef4"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-admin.jsx",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "032445240f114a08325145988ffdd131898f4904"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-integrated-worker.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "fbb5fc178bea37f22a96ef6b856109cd4a14bb14"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-security-worker.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "75d6f2027fb43fbe74e117c648df29c70ad20056"
+  },
+  {
+   "path": "tests/fixtures/mail-webhook-worker.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "1e0a28a2c79fd62d5c8416d5303f709ca0891690"
+  },
+  {
+   "path": "tests/fixtures/released-submissions-db231.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6"
+  },
+  {
+   "path": "tests/mail-delivery-admin.browser.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "9a0b23fa6ab42dcbc51fc97b56e8d0e4e041dcdb"
+  },
+  {
+   "path": "tests/mail-delivery-admin.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "9f9eeb7699b423e8f559295e8e752cf16d3cc192"
+  },
+  {
+   "path": "tests/mail-delivery-integration.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "f710fb962b636cdb02eb1e19edbe9adfc1bb3ca9"
+  },
+  {
+   "path": "tests/mail-delivery-persistence.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "e1f1765f659a2cbab724d3e1ef0c7709bad99a14"
+  },
+  {
+   "path": "tests/mail-delivery-projection.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "b874011a599c3dd2a1674ac6660a8b9d8a278c43"
+  },
+  {
+   "path": "tests/mail-delivery.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "888ee819c8c0628599d32ad7385fb6ded793b8ef"
+  },
+  {
+   "path": "tests/mail-receipts.test.mjs",
+   "mode": "100644",
+   "baseBlob": "1776c31af72340831d6eae36ed7ec551c5840f25",
+   "candidateBlob": "1acb4ebec7e9dec0116485cd2ddece006f5db0e1"
+  },
+  {
+   "path": "tests/mail-recipient.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "f3ee10cade864a23f766786582992e932dcc25a3"
+  },
+  {
+   "path": "tests/mail-webhook.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "2e77ae99eef6ad8f60548354abd12568084a2a59"
+  },
+  {
+   "path": "tests/manual-update-attempts.browser.mjs",
+   "mode": "100644",
+   "baseBlob": "b115a8cbc7e81a8b63ce6dfa51c3da9805866974",
+   "candidateBlob": "ca1ce9004e19f95d563556a57de036cca54e5aab"
+  }
+ ]
+};
+function inactiveDeliveryCompatibilityFixture(){
+ const p=structuredClone(reviewedDeliveryFixture),candidate='c'.repeat(40),source='d'.repeat(64),baseline='e'.repeat(64),facts={baselineSourceInputDigest:baseline,sourceInputDigest:source,protectedInputDigest:'f'.repeat(64),entries:p.entries},observedAt=new Date().toISOString();
+ const expected={sourceSha:candidate,baseSha:p.baselineSha,beforePagesSourceSha:p.baselineSha,paths:[...p.entries.map(v=>v.path),p.archivePath,'docs/dependency-maintenance.md'],archivedRelease:{path:p.archivePath,sha256:p.baseline.archiveSha256,sourceSha:p.baselineSha,reviewedAgainstSha:candidate,receiptDigest:p.baseline.receiptDigest,recoveryDocChanges:[{path:'docs/dependency-maintenance.md',before:{mode:'100644',blob:'edd3924c040c9ad534dc506004a69608f1dbbcc2'},after:{mode:'100644',blob:'65b03d43ddd58dfdd95a97c80ee93cdf3a6ac460'}}]},sourceInputDigest:source,baselineSourceInputDigest:baseline,inactiveDelivery:facts,deliveryBaseline:p.baseline,before:{pages:p.baseline.rollback.pagesId,admin:p.baseline.rollback.adminId},rollback:p.baseline.rollback,inactiveIngress:{id:p.baseline.rollback.pagesId,sourceSha:p.baselineSha,observedAt,production:'absent',preview:'false',canonical:'absent'},evidence:{receipts:{security:{sourceSha:candidate,sourceDigest:digest},catalogue:p.catalogue},staged:{rollback:p.baseline.rollback}},sourceDigests:{security:digest},privateBuild:{catalogue:{runtimeDigest:p.catalogue.runtimeDigest,configDigest:p.catalogue.configDigest,inputClosure:{version:1,...p.catalogueInputs,metafileSha256:digest}}},compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest};
+ const value={basis:'reviewed-inactive-delivery-v1',reviewedAgainstSha:candidate,baselineSha:p.baselineSha,observedAt,sourceInputDigest:source,baselineSourceInputDigest:baseline,inactiveDelivery:facts,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,historicalFunctionsDigest:null};return {value,expected};
+}
+test('inactive Delivery binds fixed forty tuples, genuine T rollback and mixed actual candidate Security/K Catalogue closure',async()=>{
+ const {validateActivationCompatibility,inactiveDeliveryBaseline}=await import('../scripts/release-manifest.mjs');const {value,expected}=inactiveDeliveryCompatibilityFixture();
+ assert.equal(value.inactiveDelivery.entries.length,40);assert.equal(validateActivationCompatibility(value,expected).basis,'reviewed-inactive-delivery-v1');assert.notEqual(value.sourceInputDigest,value.baselineSourceInputDigest);
+ for(const mutate of [v=>v.extra=true,v=>v.inactiveDelivery.entries[0].candidateBlob=old,v=>v.inactiveDelivery.entries[0].mode='100755',v=>v.inactiveDelivery.entries.pop(),v=>v.baselineSourceInputDigest=v.sourceInputDigest,v=>v.inactiveDelivery.protectedInputDigest=digest,v=>v.adminAssetManifest={}]){const v=structuredClone(value);mutate(v);assert.throws(()=>validateActivationCompatibility(v,expected));}
+ for(const mutate of [v=>v.paths.push('server/foreign.mjs'),v=>v.deliveryBaseline.rollback.pagesBuildDigest=digest,v=>v.before.admin=id,v=>v.archivedRelease.sha256=digest,v=>v.archivedRelease.receiptDigest=digest,v=>delete v.archivedRelease.recoveryDocChanges,v=>v.evidence.receipts.security.sourceSha=old,v=>v.evidence.receipts.security.sourceDigest='f'.repeat(64),v=>v.evidence.receipts.catalogue.sourceSha=v.sourceSha,v=>v.evidence.receipts.catalogue.evidenceUrl='https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/1',v=>v.privateBuild.catalogue.runtimeDigest=digest,v=>v.privateBuild.catalogue.configDigest=digest,v=>delete v.privateBuild.catalogue.inputClosure,v=>v.privateBuild.catalogue.inputClosure.importGraphDigest=digest,v=>v.privateBuild.catalogue.inputClosure.inputInventoryDigest=digest,v=>v.privateBuild.catalogue.inputClosure.extra=true,v=>v.inactiveIngress.production='true',v=>v.inactiveIngress.preview='unknown',v=>v.inactiveIngress.id=id,v=>v.inactiveIngress.observedAt=new Date(Date.now()-31000).toISOString()]){const e=structuredClone(expected);mutate(e);assert.throws(()=>validateActivationCompatibility(value,e));}
+ assert.throws(()=>inactiveDeliveryBaseline({schemaVersion:1,state:'partial',sourceSha:reviewedDeliveryFixture.baselineSha}));
+});

@@ -1,0 +1,132 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {artworkEnv} from './helpers/artwork.mjs';
+import security from '../security/index.mjs';
+let externalCalls=0;const originalFetch=globalThis.fetch;test.before(()=>{globalThis.fetch=async()=>{externalCalls++;throw Error('External fetch forbidden')}});test.after(()=>{globalThis.fetch=originalFetch;assert.equal(externalCalls,0)});
+const call=(env,path,body)=>security.fetch(new Request('https://internal/'+path,{method:'POST',body:JSON.stringify(body)}),env);
+const time=()=>Math.floor(Date.now()/1000);
+const digest='d'.repeat(64),binding={recipientCount:1,recipientDigest:digest};
+async function initial(env,purpose='owner'){const id=crypto.randomUUID().replaceAll('-','')+'a'.repeat(32);await call(env,'submissions/reserve',{id,fingerprint:'b'.repeat(64),key:'c'.repeat(64),kind:'order',createdAt:time()});await call(env,'submissions/mark',{id,stage:purpose==='owner'?'owner_sent':'receipt_sent',providerMessageId:'provider-'+purpose,recipientBinding:binding});return id;}
+const event=(id='event-1',type='email.delivered')=>({providerMessageId:'provider-owner',source:'webhook',type,eventId:id,occurredAt:time(),checkedAt:time(),...binding});
+test('future initial acceptance initializes exact binding but accepted replay cannot fabricate one',async()=>{
+ const env=artworkEnv(),id=await initial(env);const row=env.sql.prepare('SELECT * FROM mail_delivery_state').get();assert.equal(row.provider_id,'provider-owner');assert.equal(row.reference,id);assert.equal(row.recipient_digest,digest);assert.equal(row.expires_at,env.sql.prepare('SELECT expires FROM submissions').get().expires);
+ env.sql.prepare('DELETE FROM mail_delivery_state').run();await call(env,'submissions/mark',{id,stage:'owner_sent',providerMessageId:'provider-owner',recipientBinding:binding});assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);
+});
+test('authenticated projection records recipient-server outcome privately and exact replay is idempotent',async()=>{
+ const env=artworkEnv();await initial(env);let r=await call(env,'mail-delivery/observe',event());assert.equal(r.status,200);assert.equal((await r.json()).disposition,'applied');assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,1);const before=env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot;assert.equal(JSON.parse(before).state,'delivered');r=await call(env,'mail-delivery/observe',event());assert.equal((await r.json()).disposition,'duplicate');assert.equal(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot,before);
+});
+test('wrong recipient and globally duplicated provider identity cannot mutate outcomes',async()=>{
+ const env=artworkEnv();await initial(env);let r=await call(env,'mail-delivery/observe',{...event(),recipientDigest:'e'.repeat(64)});assert.equal((await r.json()).disposition,'ignored');assert.equal(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot,null);env.sql.prepare('UPDATE submissions SET receipt_sent=1,receipt_provider_id=owner_provider_id,receipt_accepted_at=owner_accepted_at').run();r=await call(env,'mail-delivery/observe',event());assert.equal((await r.json()).disposition,'ignored');assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,0);
+});
+import {sendOrderUpdate} from '../admin/order-mail.mjs';
+async function order(env){const id=crypto.randomUUID(),snapshot={contact:{name:'Synthetic',email:'customer@example.com',phone:'1234567'},locker:{name:'Fictional',area:'Durban'},items:[{kind:'photo',name:'Photo',qty:1,files:[]}],magnetQty:1,subtotalCents:4000,paymentStatus:'unpaid'};assert.equal((await call(env,'orders/create',{id,fingerprint:'b'.repeat(64),snapshot})).status,200);return {id,snapshot};}
+test('future manual acceptance captures binding and private detail excludes correlation and digest',async()=>{
+ const env={...artworkEnv(),ADMIN_SEND_ENABLED:'true',RESEND_API_KEY:'synthetic'};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};const {id}=await order(env);assert.equal((await sendOrderUpdate(env,id,0,async()=>Response.json({id:'manual-provider'}))).status,200);const stored=env.sql.prepare("SELECT * FROM mail_delivery_state WHERE purpose='manual-update'").get();assert.ok(stored);assert.equal(stored.reference,id);const detail=await(await call(env,'orders/detail',{id})).json();assert.equal(detail.mailDelivery[0].state,'unconfirmed');assert.doesNotMatch(JSON.stringify(detail.mailDelivery),/manual-provider|recipient|observations|reference/);
+});
+test('forward link requires exact current source fingerprint and is immutable with no backfill',async()=>{
+ const env=artworkEnv(),source='f'.repeat(64);await call(env,'submissions/reserve',{id:source,key:'c'.repeat(64),fingerprint:'b'.repeat(64),kind:'order',createdAt:time()});const {id,snapshot}=await order(env);const body={id,snapshot,fingerprint:'b'.repeat(64),submissionId:source};assert.equal((await call(env,'orders/create',body)).status,200);assert.equal(env.sql.prepare('SELECT order_id FROM submissions').get().order_id,id);const id2=crypto.randomUUID();assert.equal((await call(env,'orders/create',{...body,id:id2})).status,409);assert.equal(env.sql.prepare('SELECT count(*) n FROM orders').get().n,1);
+});
+test('distinct concurrent events merge while weak outcomes never regress and conflicting terminals require review',async()=>{
+ const env=artworkEnv();await initial(env);const rs=await Promise.all([call(env,'mail-delivery/observe',event('delivered','email.delivered')),call(env,'mail-delivery/observe',event('delayed','email.delivery_delayed'))]);assert.ok(rs.every(r=>r.status===200));let state=JSON.parse(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot);assert.equal(state.state,'delivered');assert.equal(state.observations.length,2);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,2);await call(env,'mail-delivery/observe',event('complaint','email.complained'));state=JSON.parse(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot);assert.equal(state.state,'delivered');assert.equal(state.complaint,true);await call(env,'mail-delivery/observe',event('bounce','email.bounced'));state=JSON.parse(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot);assert.equal(state.state,'needs-review');
+});
+test('same event identity conflict retains first claim and a persistent review flag',async()=>{
+ const env=artworkEnv();await initial(env);await call(env,'mail-delivery/observe',event());await call(env,'mail-delivery/observe',event('event-1','email.bounced'));const s=JSON.parse(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot);assert.equal(s.eventIdConflict,true);assert.equal(s.state,'needs-review');assert.equal(env.sql.prepare('SELECT type FROM mail_delivery_events').get().type,'email.delivered');assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,1);
+});
+test('atomic claim failure rolls back snapshot and revision and returns unavailable',async()=>{
+ const env=artworkEnv();await initial(env);env.sql.exec("CREATE TRIGGER synthetic_claim_failure BEFORE INSERT ON mail_delivery_events BEGIN SELECT RAISE(ABORT,'synthetic'); END");const before=env.sql.prepare('SELECT * FROM mail_delivery_state').get();const response=await call(env,'mail-delivery/observe',event());assert.equal(response.status,503);assert.deepEqual(env.sql.prepare('SELECT * FROM mail_delivery_state').get(),before);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,0);
+});
+test('final database clock guard rolls back both snapshot and claim when expiry crosses after CAS',async()=>{
+ const env=artworkEnv();await initial(env);const real=env.sql.prepare('SELECT expires_at FROM mail_delivery_state').get().expires_at;let clock=time(),calls=0;env.sql.function('unixepoch',()=>clock);const batch=env.DB.batch;env.DB.batch=statements=>batch(statements.map((s,i)=>i===statements.length-1?{all:async()=>{clock=real;calls++;return s.all()}}:s));const response=await call(env,'mail-delivery/observe',event());assert.equal(calls,1);assert.equal(response.status,503);assert.equal(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot,null);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,0);
+});
+test('source scrub between read and CAS cannot resurrect evidence and cleanup deletes claims',async()=>{
+ const env=artworkEnv();await initial(env);await call(env,'mail-delivery/observe',event());env.sql.prepare('UPDATE submissions SET owner_provider_id=NULL,owner_accepted_at=NULL').run();assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,0);const response=await call(env,'mail-delivery/observe',event());assert.equal((await response.json()).disposition,'ignored');
+});
+test('capacity is bounded across snapshot and global event claims',async()=>{
+ const env=artworkEnv();await initial(env);for(let i=0;i<67;i++)assert.equal((await call(env,'mail-delivery/observe',event('event-'+i,'email.sent'))).status,200);const s=JSON.parse(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot);assert.equal(s.observations.length,64);assert.equal(s.capacityReached,true);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,64);
+});
+test('expired manual caller keeps normal accepted history without new bindings',async()=>{
+ const env={...artworkEnv(),ADMIN_SEND_ENABLED:'true',RESEND_API_KEY:'synthetic'};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};const {id}=await order(env);env.sql.prepare('UPDATE orders SET artwork_expires=?').run(time());assert.equal((await sendOrderUpdate(env,id,0,async()=>Response.json({id:'late-manual'}))).status,200);const a=env.sql.prepare('SELECT * FROM order_update_attempts').get();assert.equal(a.state,'accepted');assert.equal(a.provider_message_id,null);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);
+});
+test('initial acceptance binding rolls back together if SQL expiry passes between source mark and binding',async()=>{
+ const env=artworkEnv(),id='e'.repeat(64);await call(env,'submissions/reserve',{id,fingerprint:'b'.repeat(64),key:'c'.repeat(64),kind:'order',createdAt:time()});const exp=env.sql.prepare('SELECT expires FROM submissions').get().expires;let clock=time();env.sql.function('unixepoch',()=>clock);const batch=env.DB.batch;env.DB.batch=stmts=>batch(stmts.map((s,i)=>i===1?{all:async()=>{clock=exp;return s.all()}}:s));const r=await call(env,'submissions/mark',{id,stage:'owner_sent',providerMessageId:'mark-expiry',recipientBinding:binding});assert.equal(r.status,503);const row=env.sql.prepare('SELECT * FROM submissions').get();assert.equal(row.owner_sent,0);assert.equal(row.owner_provider_id,null);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);
+});
+test('a source deleted after the read cannot be recreated by the pending CAS',async()=>{
+ const env=artworkEnv();await initial(env);const batch=env.DB.batch;let once=true;env.DB.batch=stmts=>{if(once){once=false;env.sql.prepare('DELETE FROM submissions').run()}return batch(stmts)};const r=await call(env,'mail-delivery/observe',event());assert.equal((await r.json()).disposition,'ignored');assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,0);
+});
+test('global cardinality added after the read blocks the CAS and bounded contention returns503',async()=>{
+ const env=artworkEnv();await initial(env);const batch=env.DB.batch;let once=true;env.DB.batch=stmts=>{if(once){once=false;env.sql.prepare('UPDATE submissions SET receipt_sent=1,receipt_provider_id=owner_provider_id,receipt_accepted_at=owner_accepted_at').run()}return batch(stmts)};assert.equal((await(await call(env,'mail-delivery/observe',event())).json()).disposition,'ignored');assert.equal(env.sql.prepare('SELECT snapshot FROM mail_delivery_state').get().snapshot,null);
+ const other=artworkEnv();await initial(other);const real=other.DB.batch;let tries=0;other.DB.batch=stmts=>{tries++;other.sql.prepare('UPDATE mail_delivery_state SET revision=revision+1').run();return real(stmts)};assert.equal((await call(other,'mail-delivery/observe',event())).status,503);assert.equal(tries,3);assert.equal(other.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,0);
+});
+test('cross-receipt event identities cannot transfer outcomes',async()=>{
+ const env=artworkEnv();await initial(env);await initial(env,'receipt');assert.equal((await call(env,'mail-delivery/observe',event())).status,200);const r=await call(env,'mail-delivery/observe',{...event(),providerMessageId:'provider-receipt'});assert.equal((await r.json()).reason,'event-conflict');assert.equal(env.sql.prepare("SELECT snapshot FROM mail_delivery_state WHERE purpose='customer-receipt'").get().snapshot,null);
+});
+test('hourly cleanup and exact SQL expiry hide only short-lived evidence, preserving acceptance history',async()=>{
+ const env={...artworkEnv(),ADMIN_SEND_ENABLED:'true',RESEND_API_KEY:'synthetic'};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};const {id}=await order(env);await sendOrderUpdate(env,id,0,async()=>Response.json({id:'manual-cleanup'}));const expiration=env.sql.prepare('SELECT expires_at FROM mail_delivery_state').get().expires_at;env.sql.function('unixepoch',()=>expiration);let detail=await(await call(env,'orders/detail',{id})).json();assert.deepEqual(detail.mailDelivery,[]);const {cleanMailDelivery}=await import('../security/mail-delivery.mjs');await cleanMailDelivery(env);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);assert.equal(env.sql.prepare('SELECT state FROM order_update_attempts').get().state,'accepted');assert.equal(env.sql.prepare('SELECT count(*) n FROM orders').get().n,1);
+});
+test('unmatched legacy, malformed projection and sentinel payload never gain evidence or leak diagnostics',async()=>{
+ const env=artworkEnv();await initial(env);env.sql.prepare('DELETE FROM mail_delivery_state').run();assert.equal((await(await call(env,'mail-delivery/observe',event())).json()).disposition,'ignored');const raw={...event(),subject:'PRIVATE_SUBJECT',recipient:'PRIVATE_ADDRESS',body:'PRIVATE_BODY',url:'PRIVATE_URL',diagnostic:'PRIVATE_DIAGNOSTIC'};const r=await call(env,'mail-delivery/observe',raw);assert.equal(r.status,400);const stored=JSON.stringify(env.sql.prepare('SELECT * FROM mail_delivery_state').all())+JSON.stringify(env.sql.prepare('SELECT * FROM mail_delivery_events').all());assert.doesNotMatch(stored,/PRIVATE/);assert.equal(env.sql.prepare('SELECT owner_sent FROM submissions').get().owner_sent,1);
+});
+test('duplicate provider IDs preserve truthful acceptance while delivery correlation fails closed',async()=>{
+ const env=artworkEnv(),id=await initial(env);const r=await call(env,'submissions/mark',{id,stage:'receipt_sent',providerMessageId:'provider-owner',recipientBinding:binding});assert.equal(r.status,200);const source=env.sql.prepare('SELECT * FROM submissions').get();assert.equal(source.owner_sent,1);assert.equal(source.receipt_sent,1);assert.equal(source.receipt_provider_id,'provider-owner');assert.equal((await(await call(env,'mail-delivery/observe',event())).json()).disposition,'ignored');
+});
+test('manual binding failure rolls back accepted marking and retains the existing locked attempt',async()=>{
+ const env={...artworkEnv(),ADMIN_SEND_ENABLED:'true',RESEND_API_KEY:'synthetic'};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};const {id}=await order(env);env.sql.exec("CREATE TRIGGER synthetic_binding_failure BEFORE INSERT ON mail_delivery_state BEGIN SELECT RAISE(ABORT,'synthetic binding'); END");assert.equal((await sendOrderUpdate(env,id,0,async()=>Response.json({id:'binding-failure'}))).status,503);const attempt=env.sql.prepare('SELECT * FROM order_update_attempts').get();assert.equal(attempt.state,'pending');assert.equal(attempt.provider_message_id,null);assert.equal((await sendOrderUpdate(env,id,0,async()=>assert.fail('must not resend locked attempt'))).status,409);
+});
+test('repeated manual provider IDs retain each exact attempt without ambiguous delivery acceptance',async()=>{
+ const env={...artworkEnv(),ADMIN_SEND_ENABLED:'true',RESEND_API_KEY:'synthetic'};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};const {id}=await order(env);assert.equal((await sendOrderUpdate(env,id,0,async()=>Response.json({id:'same-manual-id'}))).status,200);assert.equal((await call(env,'orders/status',{id,version:0,status:'in_progress'})).status,200);assert.equal((await sendOrderUpdate(env,id,1,async()=>Response.json({id:'same-manual-id'}))).status,200);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,2);assert.equal(env.sql.prepare("SELECT count(*) n FROM order_update_attempts WHERE state='accepted'").get().n,2);assert.equal((await(await call(env,'mail-delivery/observe',{...event(),providerMessageId:'same-manual-id'})).json()).disposition,'ignored');
+});
+test('uncertain commit never returns applied and later exact replay observes the durable result',async()=>{
+ const env=artworkEnv();await initial(env);const batch=env.DB.batch;env.DB.batch=async statements=>{await batch(statements);throw Error('Synthetic lost commit acknowledgement')};assert.equal((await call(env,'mail-delivery/observe',event())).status,503);assert.equal(env.sql.prepare('SELECT count(*) n FROM mail_delivery_events').get().n,1);env.DB.batch=batch;assert.equal((await(await call(env,'mail-delivery/observe',event())).json()).disposition,'duplicate');
+});
+// Exercise the real released public sender against the additive migrated backend.
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {mkdtempSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {build} from 'esbuild';
+import {submissions as currentSender} from '../server/submissions.mjs';
+import {defaultContent} from '../src/content/model.mjs';
+import {tile} from './helpers/artwork.mjs';
+let releasedSenderPromise;
+// Exact source-only snapshot from db23134b8f3336c8b0f33223b9e7dab3e4bed7ba:
+// server/submissions.mjs, Git blob 71f31019483d82976ca5ca4136fca827d4f0f3f6,
+// 11735 bytes, SHA256 d991a42a3f2454b55237a8296e9efb2159cb8dc71cce9b6be24929c2758b9b34.
+// No credentials or customer records. The fixture bytes and released logic are
+// unchanged. Resolve its original relative imports from server/ as before;
+// only this test loader replaces git-show, so shallow CI needs no old objects.
+async function releasedSender(){
+ if(!releasedSenderPromise)releasedSenderPromise=(async()=>{const bytes=readFileSync(new URL('./fixtures/released-submissions-db231.mjs',import.meta.url));assert.equal(bytes.length,11735,'Released sender fixture length');assert.equal(createHash('sha256').update(bytes).digest('hex'),'d991a42a3f2454b55237a8296e9efb2159cb8dc71cce9b6be24929c2758b9b34','Released sender fixture identity');const bundled=await build({stdin:{contents:bytes.toString('utf8'),resolveDir:process.cwd()+'/server',sourcefile:'released-submissions.mjs'},bundle:true,platform:'node',format:'cjs',write:false});const directory=mkdtempSync(join(tmpdir(),'tech03-released-recovery-'));test.after(()=>rmSync(directory,{recursive:true,force:true}));const path=join(directory,'released.cjs');writeFileSync(path,bundled.outputFiles[0].text);return createRequire(import.meta.url)(path).submissions})();
+ return releasedSenderPromise;
+}
+async function recoveryFixture({partial=false,current=false}={}){
+ const env={...artworkEnv(),ORDER_RECORDS_ENABLED:'true',SUBMISSIONS_ENABLED:'true',RESEND_API_KEY:'synthetic',TURNSTILE_SECRET_KEY:'synthetic',TURNSTILE_SITE_KEY:'synthetic',SESSION_SECRET:'a'.repeat(64),CATALOGUE:{fetch:async()=>Response.json(defaultContent)}};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};
+ const origin='https://customvibe.co.za',form=await currentSender(new Request(origin+'/api/forms'),env),config=await form.json(),cookie=form.headers.get('set-cookie').split(';')[0];
+ const payload={id:crypto.randomUUID(),createdAt:time(),contact:{name:'Synthetic recovery',email:'customer@example.test',phone:'0821234567'},locker:{name:'Fictional',area:'Durban'},consent:true,items:[{kind:'photo',qty:1,files:[tile.toString('base64')]}]};
+ const request=()=>new Request(origin+'/api/order-request',{method:'POST',headers:{origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.7',cookie,'X-CSRF-Token':config.csrf},body:JSON.stringify({payload,turnstile:'synthetic'})});
+ const sends=[];let failCustomer=partial;const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});const outgoing=JSON.parse(init.body);sends.push({to:outgoing.to[0],key:init.headers['Idempotency-Key']});if(failCustomer&&outgoing.to[0]!=='hello@customvibe.co.za')return new Response(null,{status:503});return Response.json({id:'recovery-provider-'+sends.length})};
+ const sender=current?currentSender:await releasedSender(),first=await sender(request(),env,network);assert.equal(first.status,200);const firstResult=await first.json();assert.equal(firstResult.receiptSent,!partial);
+ return {env,request,network,sends,firstResult,recover:()=>{failCustomer=false},source:()=>env.sql.prepare('SELECT * FROM submissions').get(),record:()=>env.sql.prepare('SELECT * FROM orders').get()};
+}
+test('released fully accepted unlinked public order retains exact same-key recovery without link or binding backfill',async()=>{
+ const f=await recoveryFixture(),source=f.source(),record=f.record();assert.equal(source.order_id,null);assert.equal(f.env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);const released=await releasedSender();assert.equal((await released(f.request(),f.env,f.network)).status,200);
+ const retried=await currentSender(f.request(),f.env,f.network);assert.equal(retried.status,200);assert.equal((await retried.json()).reference,f.firstResult.reference);assert.equal(f.sends.length,2);assert.equal(f.source().order_id,null);assert.equal(f.env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);assert.deepEqual(f.record(),record);for(const key of ['id','fingerprint','reservation','expires','owner_sent','receipt_sent','owner_provider_id','receipt_provider_id','owner_accepted_at','receipt_accepted_at'])assert.equal(f.source()[key],source[key]);
+});
+test('released owner-only accepted unlinked public order recovers only customer receipt without historical association',async()=>{
+ const f=await recoveryFixture({partial:true}),original=f.source(),record=f.record();assert.equal(original.owner_sent,1);assert.equal(original.receipt_sent,0);assert.equal(original.order_id,null);f.recover();const response=await currentSender(f.request(),f.env,f.network);assert.equal(response.status,200);assert.equal((await response.json()).receiptSent,true);assert.equal(f.sends.length,3);assert.equal(f.sends.filter(x=>x.to==='hello@customvibe.co.za').length,1);assert.equal(f.sends[1].key,f.sends[2].key);assert.equal(f.source().order_id,null);assert.equal(f.source().owner_provider_id,original.owner_provider_id);assert.equal(f.source().owner_accepted_at,original.owner_accepted_at);assert.equal(f.source().expires,original.expires);assert.deepEqual({...f.record()},{...record,receipt_sent:1});const states=f.env.sql.prepare('SELECT purpose,order_id FROM mail_delivery_state').all();assert.deepEqual(states.map(x=>({...x})),[{purpose:'customer-receipt',order_id:null}]);assert.equal((await currentSender(f.request(),f.env,f.network)).status,200);assert.equal(f.sends.length,3);
+});
+test('new linked public orders retain their association and bindings on exact recovery',async()=>{
+ const f=await recoveryFixture({current:true}),source=f.source(),record=f.record(),states=f.env.sql.prepare('SELECT * FROM mail_delivery_state ORDER BY purpose').all();assert.equal(source.order_id,record.id);assert.equal(states.length,2);assert.ok(states.every(s=>s.order_id===record.id));assert.equal((await currentSender(f.request(),f.env,f.network)).status,200);assert.equal(f.sends.length,2);assert.equal(f.source().order_id,record.id);assert.deepEqual(f.record(),record);assert.deepEqual(f.env.sql.prepare('SELECT * FROM mail_delivery_state ORDER BY purpose').all(),states);
+});
+test('historical unlinked recovery rejects mismatched expired competing and missing exact sources without mutation',async()=>{
+ for(const mutation of ['fingerprint','expiry','snapshot','competing','source-missing','new-order']){
+  const f=await recoveryFixture(),source=f.source(),record=f.record(),body={id:record.id,fingerprint:source.fingerprint,snapshot:JSON.parse(record.snapshot),submissionId:source.id};
+  if(mutation==='fingerprint')f.env.sql.prepare('UPDATE submissions SET fingerprint=?').run('f'.repeat(64));
+  if(mutation==='expiry')f.env.sql.prepare('UPDATE submissions SET expires=?').run(time());
+  if(mutation==='snapshot')body.snapshot.contact.name='Different snapshot';
+  if(mutation==='competing')f.env.sql.prepare('INSERT INTO submissions(id,fingerprint,reservation,kind,expires,order_id) VALUES(?,?,?,?,?,?)').run('f'.repeat(64),'e'.repeat(64),crypto.randomUUID(),'order',time()+100,record.id);
+  if(mutation==='source-missing')f.env.sql.prepare('DELETE FROM submissions').run();
+  if(mutation==='new-order')body.id=crypto.randomUUID();
+  const before=f.env.sql.prepare('SELECT * FROM submissions ORDER BY id').all();const r=await call(f.env,'orders/create',body);assert.equal(r.status,409,mutation);assert.deepEqual(f.env.sql.prepare('SELECT * FROM submissions ORDER BY id').all(),before);assert.deepEqual(f.record(),record);assert.equal(f.env.sql.prepare('SELECT count(*) n FROM orders').get().n,1);assert.equal(f.env.sql.prepare('SELECT count(*) n FROM mail_delivery_state').get().n,0);assert.equal(f.sends.length,2);
+ }
+});

@@ -1,3 +1,4 @@
+import {recipientBinding} from './mail-recipient.mjs';
 import {validProviderMessageId} from './mail-receipt.mjs';
 import {requestReference} from '../src/request-reference.mjs';
 import {lockerLookupEnabled,verifyLockerSelection} from './lockers.mjs';
@@ -11,7 +12,7 @@ const fail=(status,message)=>Response.json({error:message},{status});
 const ready=(env,kind)=>env.SUBMISSIONS_ENABLED==='true'&&(kind==='contact'?env.W3FORMS_ACCESS_KEY:env.RESEND_API_KEY&&env.CATALOGUE)&&env.TURNSTILE_SECRET_KEY&&env.TURNSTILE_SITE_KEY&&/^[a-f0-9]{64}$/.test(env.SESSION_SECRET||'')&&env.AUTH;
 async function digest(value,secret){const key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(value))),b=>b.toString(16).padStart(2,'0')).join('');}
 async function state(env,path,body){const r=await env.AUTH.fetch('https://auth.internal/submissions/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('Unavailable');return r.json();}
-async function mail(payload,id,env,network){const r=await network('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':id},body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)});if(!r.ok)throw new Error('Email unavailable');const result=await r.json();if(!validProviderMessageId(result?.id))throw new Error('Email unavailable');return result.id;}
+async function mail(payload,id,env,network){const r=await network('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':id},body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)});if(!r.ok)throw new Error('Email unavailable');const result=await r.json();if(!validProviderMessageId(result?.id))throw new Error('Email unavailable');const binding=await recipientBinding(result.id,payload);return {providerMessageId:result.id,...(binding?{recipientBinding:binding}:{})};}
 export async function submissions(request,env,network=fetch,lockerSource){
  const url=new URL(request.url),name='__Host-cv-form',kind=url.pathname==='/api/contact'||url.pathname==='/api/forms'&&url.searchParams.get('kind')==='contact'?'contact':'order';
  if(!['/api/forms','/api/contact','/api/order-request','/api/artwork/init','/api/artwork/upload'].includes(url.pathname))return fail(404,'Not found');
@@ -89,13 +90,13 @@ export async function submissions(request,env,network=fetch,lockerSource){
   if(submission.referenceVersion===2&&!recordEnabled)return fail(503,'Order numbers are temporarily unavailable. Keep this tab open and retry.');
   let assignedReference;
   const recordCall=async(path,body)=>{const r=await env.AUTH.fetch('https://auth.internal/orders/'+path,{method:'POST',body:JSON.stringify({id:submission.id,...body})});if(!r.ok)throw Object.assign(Error('Order record unavailable'),{status:r.status});return r.json()};
-  if(recordEnabled){try{assignedReference=(await recordCall('create',{fingerprint,snapshot:orderRecord(submission,privateArtwork),privateArtwork})).reference;}catch(error){if(error.status===409)return fail(409,'This order reference needs review. Keep this draft and contact CustomVibe with its reference before sending again.');throw error;}}
+  if(recordEnabled){try{assignedReference=(await recordCall('create',{fingerprint,snapshot:orderRecord(submission,privateArtwork),privateArtwork,submissionId:id})).reference;}catch(error){if(error.status===409)return fail(409,'This order reference needs review. Keep this draft and contact CustomVibe with its reference before sending again.');throw error;}}
   const emails=orderEmails(submission,privateArtwork,assignedReference);
   if(recordEnabled&&privateArtwork){for(const field of ['text','html'])emails.owner[field]=emails.owner[field].replace('/artwork?request=','/orders?order=');}
 
-  if(!permit.ownerSent){const providerMessageId=await mail(emails.owner,`cv-${kind}-${submission.id}-owner`,env,network);await state(env,'mark',{id,stage:'owner_sent',providerMessageId});}
+  if(!permit.ownerSent){const accepted=await mail(emails.owner,`cv-${kind}-${submission.id}-owner`,env,network);await state(env,'mark',{id,stage:'owner_sent',...accepted});}
   let receiptSent=permit.receiptSent;
-  if(kind==='order'&&!receiptSent){try{const providerMessageId=await mail(emails.customer,`cv-${kind}-${submission.id}-customer`,env,network);await state(env,'mark',{id,stage:'receipt_sent',providerMessageId});receiptSent=true;}catch{receiptSent=false;}}
+  if(kind==='order'&&!receiptSent){try{const accepted=await mail(emails.customer,`cv-${kind}-${submission.id}-customer`,env,network);await state(env,'mark',{id,stage:'receipt_sent',...accepted});receiptSent=true;}catch{receiptSent=false;}}
   if(recordEnabled){await recordCall('delivery',{stage:'owner_sent'});if(receiptSent)await recordCall('delivery',{stage:'receipt_sent'});}
   return Response.json({ok:true,reference:submission.referenceVersion===2?assignedReference:requestReference(submission),status:kind==='order'?'unpaid-request':'message-sent',receiptSent:kind==='order'?receiptSent:null});
  }catch{return fail(503,'We could not confirm sending. Retry here without changing your details to avoid duplicates. Keep this tab open.');}

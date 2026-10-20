@@ -20,6 +20,7 @@ test('initial owner and customer acceptance retain separate provider IDs/timesta
  const env=setup(),context=await form(env),payload=order(),seen=[],before=Math.floor(Date.now()/1000);
  const r=await submissions(post(context,payload),env,network(['owner-accepted_1','customer-accepted_2'],seen));assert.equal(r.status,200);const result=await r.json();assert.equal(result.status,'unpaid-request');assert.equal(result.receiptSent,true);assert.doesNotMatch(JSON.stringify(result),/owner-accepted|customer-accepted|acceptedAt|delivered/i);
  const row=env.sql.prepare('SELECT * FROM submissions').get();assert.equal(row.owner_provider_id,'owner-accepted_1');assert.equal(row.receipt_provider_id,'customer-accepted_2');for(const t of [row.owner_accepted_at,row.receipt_accepted_at])assert.ok(Number.isSafeInteger(t)&&t>=before&&t<=Math.floor(Date.now()/1000));
+ const bindings=env.sql.prepare('SELECT order_id,recipient_digest FROM mail_delivery_state ORDER BY purpose').all();assert.equal(bindings.length,2);assert.ok(bindings.every(r=>r.order_id===null));assert.notEqual(bindings[0].recipient_digest,bindings[1].recipient_digest);
  const expires=row.expires;assert.equal((await submissions(post(context,payload),env,network([],seen))).status,200);assert.equal(seen.length,2);assert.equal(env.sql.prepare('SELECT expires FROM submissions').get().expires,expires);
 });
 test('manual accepted metadata is tied to the exact reservation and never unlocks resend',async()=>{
@@ -44,7 +45,7 @@ test('invalid provider IDs remain uncertain and cannot create accepted metadata 
 test('initial mark failure keeps its existing truthful response and same-key recovery contract',async()=>{
  for(const stage of ['owner','receipt']){
   const env=setup(),context=await form(env),payload=order(),prepare=env.DB.prepare,keys=[];let fail=true;
-  env.DB.prepare=(sql,...args)=>{const statement=prepare(sql,...args);return sql.startsWith(`UPDATE submissions SET ${stage}_sent=1,`)?{...statement,bind(...values){const bound=statement.bind(...values);return {...bound,first:async()=>{if(fail)throw Error('Synthetic D1 write failure');return bound.first()}}}}:statement;};
+  env.DB.prepare=(sql,...args)=>{const statement=prepare(sql,...args);return sql.startsWith(`UPDATE submissions SET ${stage}_sent=1,`)?{...statement,bind(...values){const bound=statement.bind(...values);return {...bound,first:async()=>{if(fail)throw Error('Synthetic D1 write failure');return bound.first()},all:async()=>{if(fail)throw Error('Synthetic D1 write failure');return bound.all()}}}}:statement;};
   const net=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});keys.push(init.headers['Idempotency-Key']);return Response.json({id:JSON.parse(init.body).to[0]==='hello@customvibe.co.za'?'owner-id':'receipt-id'});};
   const first=await submissions(post(context,payload),env,net),body=await first.json();assert.equal(first.status,stage==='owner'?503:200);if(stage==='owner')assert.notEqual(body.ok,true);else assert.equal(body.receiptSent,false);
   const row=env.sql.prepare('SELECT * FROM submissions').get();assert.equal(row[stage+'_sent'],0);assert.equal(row[stage+'_provider_id'],null);assert.equal(row[stage+'_accepted_at'],null);
