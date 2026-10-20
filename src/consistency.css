@@ -398,7 +398,7 @@ body:has(.javascript-guidance) #root{padding-top:0}
  .studio-copies .stepper button,.studio-choice-row button[aria-pressed=false],
  .design-quantity button,.artwork-select-label,.collection-picker-summary>h3,.form-security,
  .locker-location-search,.locker-map,.locker-official-link,
- .contact-section,.unified-footer{display:none!important}
+ .thread-brand:not(.contact-page) .contact-section,.contact-form .action,.unified-footer{display:none!important}
  .shop-shell .studio-review-bar,.shop-shell .delivery-summary{position:static;box-shadow:none}
  .shop-shell .delivery-flow-page .checkout-grid{display:block}
  .shop-shell .delivery-summary{break-before:page;break-inside:avoid}
