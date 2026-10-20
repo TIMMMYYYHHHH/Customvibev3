@@ -58,3 +58,10 @@ test('private service guard rejects public exposure and foreign storage destinat
  assert.throws(()=>validateCatalogue({...catalogue,workers_dev:true},cSettings));assert.throws(()=>validateCatalogue(catalogue,{bindings:[]}));
  assert.throws(()=>validateSecurity({...security,routes:['public.example/*']},sSettings));assert.throws(()=>validateSecurity(security,{bindings:[]}));
 });
+
+test('final Pages guard rejects same-source replacement deployment IDs',()=>{
+ const id='12345678-1234-1234-1234-123456789abc',replacement='87654321-1234-1234-1234-123456789abc';
+ const deployment={id:replacement,environment:'production',latest_stage:{status:'success'},...project().deployment_configs.production,deployment_trigger:{metadata:{commit_hash:'expected-commit'}}};
+ assert.throws(()=>validateDeployment(deployment,'true','expected-commit',id));
+ validateDeployment({...deployment,id},'true','expected-commit',id);
+});

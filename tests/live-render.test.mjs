@@ -23,3 +23,13 @@ test('Handy at home shows nine choices and leads into its existing-studio sectio
  assert.equal(detail.status,200);assert.match(detail.html,/Add your details/);assert.match(detail.html,/href="\/studio\/business"/);
  const studio=renderDocument(template,'/studio/business',content,'testnonce');assert.equal(studio.status,200);assert.match(studio.html,/Business magnets/);assert.match(studio.html,/Guest Wi-Fi/);assert.match(studio.html,/Business contact/);
  });
+
+test('route CSS belongs only to checkout even when rendering from a previously composed root template',()=>{
+ const checkout=renderDocument(template,'/checkout',defaultContent,'test');
+ assert.match(checkout.html,/<link[^>]+data-cv-route-style="checkout"/,'checkout must link its stylesheet before synchronous markup');
+ const content=structuredClone(defaultContent);content.products.push({...content.products[0],id:'css-live',status:'available'});
+ for(const path of ['/','/studio','/basket','/products/css-live','/missing']){
+  const next=renderDocument(checkout.html,path,content,'test');assert.doesNotMatch(next.html,/<link[^>]+data-cv-route-style=/,path);
+  assert.equal((next.html.match(/name="cv-route-styles"/g)||[]).length,1);
+ }
+});

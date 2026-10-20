@@ -1,24 +1,21 @@
 name: Publish protected CustomVibe site
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       reviewed_sha:
-        description: Exact reviewed 40-character main commit (must still be current main)
+        description: Exact reviewed 40-character main commit, still current main
         type: string
         required: true
       publish_admin:
-        description: Also publish admin when change classification does not already require it
+        description: Keep off, Admin uses the existing private helper
         type: boolean
         default: false
       release_evidence_json:
-        description: Optional sanitized baseline/prerequisite record; omit to reuse the last workflow artifact
+        description: Explicit reviewed sanitized baseline and fresh prerequisite snapshots
         type: string
-        required: false
+        required: true
 permissions:
   contents: read
-  actions: read
 concurrency:
   group: customvibe-production
   cancel-in-progress: false
@@ -44,10 +41,14 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run build:admin
+      - name: Verify shipped third-party notices
+        run: node scripts/check-dependency-notices.mjs --outputs --bundles
       - run: npm test
-      - name: Build private-service comparison bundles without credentials or publication
+        env:
+          CV_CHECK_BUILT_NOTICES: '1'
+      - name: Build comparison closures without credentials or publication
         run: node scripts/release-manifest.mjs private-builds
-      - name: Record source, current versions and compatible prerequisites
+      - name: Verify explicit reviewed release evidence and Pages destination
         id: release_plan
         run: node scripts/release-manifest.mjs plan
         env:
@@ -61,18 +62,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-      - name: Publish matching admin when required by the release plan
-        id: publish_admin
-        if: steps.release_plan.outputs.publish_admin == 'true'
-        run: node scripts/release-manifest.mjs publish admin
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-      - name: Verify paired versions and protection
+      - name: Observe Pages protection and preserve partial paired status
         if: always() && steps.release_plan.outcome == 'success'
         run: node scripts/release-manifest.mjs finish
         env:
-          RELEASE_PUBLICATION_SUCCEEDED: ${{ steps.publish_pages.outcome == 'success' && (steps.publish_admin.outcome == 'success' || steps.publish_admin.outcome == 'skipped') }}
           GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
       - name: Preserve complete or incomplete release evidence

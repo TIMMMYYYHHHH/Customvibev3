@@ -2,7 +2,17 @@
 
 17 October 2026. Scope: existing cookies, browser storage, optional map controls and factual service disclosures. Business/legal approval remains in Required business information. No emails, orders, production-record changes or provider settings changes are part of this work.
 
-## Inventory
+## Current implementation note, 19 October 2026
+
+The 17 October inventory, provider-policy observations, test counts and live checks below are historical evidence, not fresh verification of the current implementation.
+
+- The optional locker map now uses `src/LockerPicker.jsx`, `src/NearbyLockerMap.jsx` and `server/map-api.mjs`. See [the capacity and searchable-map rollout](paid-capacity-rollout.md). The old `DeliveryMap` iframe component had no runtime callers and was removed during the audit fixes. Its Show/Hide iframe counts below describe the earlier implementation only.
+- Artwork, associated artwork request records and proof review access expire 14 days after the original upload. Reduced order details, including whole-order notes, are retained for six calendar months from submission or delivered/collected completion when Fulfilled. Reopening keeps the established order-detail expiry until fulfilled again and never restarts artwork expiry. This supersedes the combined “14-day artwork/order” wording below. See [current operating policy](operating-mode.md).
+- Current contact-delivery evidence remains tracked separately under EXT-01. Remaining privacy schedules and disclosures remain under DEC-02 and the existing launch requirements. This annotation does not establish a fresh provider retention or live mail check.
+
+20 October 2026: Public mailbox wording distinguishes the hello Google Workspace mailbox from the retained legacy W3Forms notification account. This corrects the technical route description only; it does not verify current contact forwarding or Reply-To, approve unresolved mailbox/contact/log periods, or complete the privacy notice for public launch. EXT-01 and DEC-02 remain separate.
+
+## Historical inventory, 17 October 2026
 
 | Item | Purpose and lifetime | Evidence |
 | --- | --- | --- |
@@ -39,9 +49,9 @@ Application cookies are host-only, Secure, HttpOnly and SameSite=Lax. No custome
 - https://resend.com/legal/privacy-policy
 - https://policies.google.com/privacy
 
-W3Forms is not Web3Forms. Its policy currently retains submissions while the account is active unless deleted; backups roll off within 30 days after source deletion and technical logs within 90 days. Resend email/log retention is 30 days. Delivered mailbox copies require a separate deletion process. These periods do not extend the application’s 14-day artwork/order retention.
+W3Forms is not Web3Forms. Its policy, as checked on 17 October, retains submissions while the account is active unless deleted; backups roll off within 30 days after source deletion and technical logs within 90 days. Resend email/log retention is 30 days. Delivered mailbox copies require a separate deletion process. These periods do not extend the application’s 14-day artwork/order retention.
 
-## Verification
+## Historical verification, 17 October 2026
 
 - Local public build, SSR/prerender of 21 routes and admin build passed.
 - 167 automated tests passed, including existing authentication, CSRF, form validation and retention checks.

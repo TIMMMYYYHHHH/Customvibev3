@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local Themes focus fixture</title><link rel="stylesheet" href="/src/fonts.css"><link rel="stylesheet" href="/admin/seasons/admin.css"><link rel="stylesheet" href="/admin/workroom.css"></head>
+<body><div class="cv-admin admin-workroom cv-seasons"><button id="outside-control">Outside Themes</button><span id="connection-status" role="status"></span><div id="admin-main" tabindex="-1"><main class="workspace" id="app"></main></div><div id="toast" role="status" hidden></div></div>
+<script>
+// This fixture owns its clock. Production has no test hooks or accelerated timers.
+const nativeInterval=window.setInterval;
+window.setInterval=(callback,delay,...args)=>delay===60000?(window.runSeasonRefresh=callback,0):nativeInterval(callback,delay,...args);
+</script><script type="module" src="/admin/seasons/admin.mjs"></script></body></html>

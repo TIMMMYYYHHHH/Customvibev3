@@ -1,3 +1,5 @@
+import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
+import {validProviderMessageId} from '../server/mail-receipt.mjs';
 const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 export async function submissionState(request,env){
  const body=await request.json(),path=new URL(request.url).pathname,now=Math.floor(Date.now()/1000);
@@ -9,6 +11,13 @@ export async function submissionState(request,env){
  }
  if(path==='/submissions/mark'){
   if(!['owner_sent','receipt_sent'].includes(body.stage))return new Response(null,{status:400});
+  if(body.providerMessageId!==undefined){
+   if(!validProviderMessageId(body.providerMessageId)||!Number.isSafeInteger(now)||now<1)return new Response(null,{status:400});
+   const prefix=body.stage==='owner_sent'?'owner':'receipt';
+   // Success and its first receipt share one write; retries cannot replace the receipt.
+   const marked=await env.DB.prepare(`UPDATE submissions SET ${body.stage}=1,${prefix}_provider_id=COALESCE(${prefix}_provider_id,?),${prefix}_accepted_at=COALESCE(${prefix}_accepted_at,?) WHERE id=? AND expires>? AND kind='order' RETURNING id`).bind(body.providerMessageId,now,body.id,now).first();
+   return Response.json({ok:!!marked},{status:marked?200:409});
+  }
   await env.DB.prepare(`UPDATE submissions SET ${body.stage}=1 WHERE id=? AND expires>?`).bind(body.id,now).run();return Response.json({ok:true});
  }
  if(path!=='/submissions/reserve'||!hex(body.key)||!hex(body.fingerprint)||!['order','contact'].includes(body.kind))return new Response(null,{status:400});
@@ -20,7 +29,7 @@ export async function submissionState(request,env){
  }
  if(!Number.isSafeInteger(body.createdAt)||body.createdAt<now-3600||body.createdAt>now+60)return Response.json({expired:true});
  const day=Math.floor(now/86400),month=new Date(now*1000).toISOString().slice(0,7),weight=body.kind==='order'?2:1;
- const counters=[['forms:ip:'+body.key,1,now+900,5],['forms:day:'+day,weight,(day+1)*86400,80],['forms:month:'+month,weight,Math.floor(Date.UTC(new Date(now*1000).getUTCFullYear(),new Date(now*1000).getUTCMonth()+1,1)/1000),2400]];
+ const counters=[['forms:ip:'+body.key,1,now+900,5],['forms:day:'+day,weight,(day+1)*86400,DAILY_SEND_LIMIT],['forms:month:'+month,weight,Math.floor(Date.UTC(new Date(now*1000).getUTCFullYear(),new Date(now*1000).getUTCMonth()+1,1)/1000),MONTHLY_SEND_LIMIT]];
  // The conditional insert and all counter updates run in one D1 transaction.
  // A rejected IP, an exhausted budget or a duplicate ID reserves no global quota.
  const reservation=crypto.randomUUID();

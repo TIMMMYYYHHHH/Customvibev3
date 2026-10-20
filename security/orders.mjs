@@ -1,3 +1,5 @@
+import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
+import {validProviderMessageId} from '../server/mail-receipt.mjs';
 import {sixMonthsAfter,artworkExpiry,retainedSnapshot} from '../server/order-retention.mjs';
 import {proofDetail,cleanProofs} from './proofs.mjs';
 import {readSelect} from './read.mjs';
@@ -47,22 +49,52 @@ export async function orderService(request,env){
  }
  if(!row)return fail(404,'Order not found. Older orders may only have artwork.');
  if(row.expires<=time)return fail(410,'This order has expired.');
- if(path==='detail')return Response.json({...view(row),...(JSON.parse(row.snapshot).approvalRequired?{proof:await proofDetail(env,b.id)}:{}),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,'SELECT version,status,state,created,updated FROM order_updates WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results});
+ if(path==='detail')return Response.json({...view(row),...(JSON.parse(row.snapshot).approvalRequired?{proof:await proofDetail(env,b.id)}:{}),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,"SELECT attempt,version,status,state,created,updated,rejected,CASE WHEN ? THEN provider_message_id ELSE NULL END AS providerMessageId,CASE WHEN ? THEN accepted_at ELSE NULL END AS acceptedAt,'manual-update' AS purpose,(state='failed' AND rejected=1 AND status<>'fulfilled') AS retryable FROM order_update_attempts WHERE order_id=? ORDER BY version DESC,rowid DESC",[artworkExpiry(row)>time?1:0,artworkExpiry(row)>time?1:0,b.id],'all')).results});
+ if(path==='preview-retry'){
+  if(!Number.isSafeInteger(b.version)||b.version!==row.version||!artworkHash(b.tokenHash))return fail(409,'Order changed. Preview again.');
+  const proof=JSON.parse(row.snapshot).approvalRequired&&(await proofDetail(env,b.id)).status==='awaiting_approval';
+  if(proof&&(!artworkHash(b.proofTokenHash)||artworkExpiry(row)<=time))return fail(409,'Preview the current review invitation first.');
+  const statement=env.DB.prepare("UPDATE order_update_attempts SET preview_hash=?,preview_until=? WHERE order_id=? AND version=? AND attempt=? AND state='failed' AND rejected=1 AND status<>'fulfilled' AND EXISTS(SELECT 1 FROM order_updates u JOIN orders o ON o.id=u.order_id WHERE u.order_id=? AND u.version=? AND u.reservation=order_update_attempts.attempt AND u.state='failed' AND o.version=u.version AND o.status<>'fulfilled' AND o.expires>?) AND (?=0 OR EXISTS(SELECT 1 FROM proof_state WHERE order_id=? AND status='awaiting_approval')) RETURNING attempt").bind(b.tokenHash,time+600,b.id,b.version,b.attempt,b.id,b.version,time,proof?1:0,b.id);
+  const changed=proof?(await env.DB.batch([statement,env.DB.prepare("UPDATE proof_state SET token_hash=? WHERE order_id=? AND changes()>0").bind(b.proofTokenHash,b.id)]))[0]:await statement.all();
+  return changed.results.length?Response.json({ok:true}):fail(409,'The previous attempt changed. Review a fresh preview.');
+ }
  if(path==='claim-update'){
   if(!Number.isSafeInteger(b.version)||b.version!==row.version)return fail(409,'Order changed.');
-  const existing=await env.DB.prepare("SELECT state FROM order_updates WHERE order_id=? AND (version=? OR (?='fulfilled' AND status='fulfilled'))").bind(b.id,b.version,row.status).first();if(existing)return Response.json({claimed:false,state:existing.state});
+  const retry=typeof b.retryAttempt==='string'&&artworkHash(b.retryTokenHash);
+  const existing=await env.DB.prepare("SELECT reservation,state FROM order_updates WHERE order_id=? AND (version=? OR (?='fulfilled' AND status='fulfilled'))").bind(b.id,b.version,row.status).first();
+  if(existing&&(!retry||row.status==='fulfilled'))return Response.json({claimed:false,state:existing.state});
+  if(!existing&&b.retryAttempt!==undefined)return fail(409,'The previous attempt changed.');
   const day=Math.floor(time/86400),date=new Date(time*1000),month=date.toISOString().slice(0,7),reservation=crypto.randomUUID();
-  const counters=[['forms:day:'+day,(day+1)*86400,80],['forms:month:'+month,Math.floor(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)/1000),2400]];
+  const counters=[['forms:day:'+day,(day+1)*86400,DAILY_SEND_LIMIT],['forms:month:'+month,Math.floor(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)/1000),MONTHLY_SEND_LIMIT]];
   const available=counters.map(()=>'(NOT EXISTS(SELECT 1 FROM attempts WHERE id=? AND until>? AND count+1>?))').join(' AND ');
-  const insert=env.DB.prepare(`INSERT INTO order_updates(order_id,version,status,created,updated,reservation) SELECT id,version,status,?,?,? FROM orders WHERE id=? AND version=? AND expires>? AND ${available} ON CONFLICT DO NOTHING`).bind(time,time,reservation,b.id,b.version,time,...counters.flatMap(([id,,limit])=>[id,time,limit]));
+  // The summary swap, attempt trigger and allowance charges share one transaction.
+  const insert=env.DB.prepare(`INSERT INTO order_updates(order_id,version,status,created,updated,reservation)
+   SELECT id,version,status,?,?,? FROM orders WHERE id=? AND version=? AND expires>?
+   AND (status<>'fulfilled' OR NOT EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND status='fulfilled')) AND ${available}
+   ON CONFLICT(order_id,version) DO UPDATE SET state='pending',created=excluded.created,updated=excluded.updated,reservation=excluded.reservation
+   WHERE order_updates.status<>'fulfilled' AND order_updates.state='failed' AND order_updates.reservation=?
+   AND EXISTS(SELECT 1 FROM order_update_attempts a WHERE a.attempt=order_updates.reservation AND a.state='failed' AND a.rejected=1 AND a.preview_hash=? AND a.preview_until>?)`).bind(time,time,reservation,b.id,b.version,time,b.id,...counters.flatMap(([id,,limit])=>[id,time,limit]),retry?b.retryAttempt:null,retry?b.retryTokenHash:null,time);
   await env.DB.batch([insert,...counters.map(([id,until])=>env.DB.prepare('INSERT INTO attempts(id,count,until) SELECT ?,1,? WHERE EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND version=? AND reservation=?) ON CONFLICT(id) DO UPDATE SET count=CASE WHEN until<=? THEN 1 ELSE count+1 END,until=CASE WHEN until<=? THEN excluded.until ELSE until END').bind(id,until,b.id,b.version,reservation,time,time))]);
   const result=await env.DB.prepare('SELECT reservation,state FROM order_updates WHERE order_id=? AND version=?').bind(b.id,b.version).first();
-  if(!result){const latest=await env.DB.prepare('SELECT version FROM orders WHERE id=? AND expires>?').bind(b.id,time).first();return latest?.version!==b.version?fail(409,'Order changed.'):fail(429,'The shared email allowance is full.');}
-  return Response.json({claimed:result.reservation===reservation,state:result.state});
+  if(!result||retry&&result.reservation!==reservation){
+   const latest=await env.DB.prepare('SELECT version FROM orders WHERE id=? AND expires>?').bind(b.id,time).first();
+   if(latest?.version!==b.version)return fail(409,'Order changed.');
+   for(const [id,,limit] of counters){const cap=await env.DB.prepare('SELECT count FROM attempts WHERE id=? AND until>?').bind(id,time).first();if(cap?.count>=limit)return fail(429,'The shared email allowance is full.');}
+   return fail(409,'This attempt changed. Review its history and preview again.');
+  }
+  return Response.json({claimed:result.reservation===reservation,state:result.state,attempt:result.reservation});
  }
  if(path==='mark-update'){
-  if(!Number.isSafeInteger(b.version)||!['accepted','failed','uncertain'].includes(b.state))return fail(400,'Invalid update.');
-  await env.DB.prepare("UPDATE order_updates SET state=?,updated=? WHERE order_id=? AND version=? AND state='pending'").bind(b.state,time,b.id,b.version).run();return Response.json({ok:true});
+  if(!Number.isSafeInteger(b.version)||!['accepted','failed','uncertain'].includes(b.state)||b.attempt!==undefined&&!artworkId(b.attempt))return fail(400,'Invalid update.');
+  if(b.providerMessageId!==undefined&&(b.state!=='accepted'||!validProviderMessageId(b.providerMessageId)||!Number.isSafeInteger(time)||time<1))return fail(400,'Invalid receipt.');
+  // Legacy workers may finish their first reservation, but cannot mark a retry by version alone.
+  const attempt=b.attempt??(await env.DB.prepare('SELECT attempt FROM order_update_attempts WHERE order_id=? AND version=? GROUP BY order_id,version HAVING count(*)=1').bind(b.id,b.version).first())?.attempt;
+  if(!attempt)return fail(409,'Attempt identity is required.');
+  const receipt=b.providerMessageId&&artworkExpiry(row)>time?b.providerMessageId:null;
+  await env.DB.batch([
+   env.DB.prepare("UPDATE order_updates SET state=?,updated=? WHERE order_id=? AND version=? AND reservation=? AND state='pending'").bind(b.state,time,b.id,b.version,attempt),
+   env.DB.prepare("UPDATE order_update_attempts SET provider_message_id=?,accepted_at=?,rejected=?,preview_hash=NULL,preview_until=NULL WHERE order_id=? AND version=? AND attempt=? AND state=? AND EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND version=? AND reservation=? AND updated=? AND state=?) AND changes()>0").bind(receipt,receipt?time:null,b.state==='failed'&&b.rejected===true&&b.attempt!==undefined?1:0,b.id,b.version,attempt,b.state,b.id,b.version,attempt,time,b.state)
+  ]);return Response.json({ok:true});
  }
  if(path==='delivery'){
   if(!['owner_sent','receipt_sent'].includes(b.stage))return fail(400,'Invalid delivery stage.');
@@ -80,4 +112,5 @@ export async function orderService(request,env){
 export async function cleanOrders(env){const time=now();await cleanProofs(env);
  const expired=(await env.DB.prepare("SELECT id,snapshot FROM orders WHERE artwork_expires<=? AND expires>? AND json_extract(snapshot,'$.artworkRemoved') IS NULL LIMIT 50").bind(time,time).all()).results;
  for(const row of expired)await env.DB.prepare('UPDATE orders SET snapshot=? WHERE id=?').bind(JSON.stringify({...retainedSnapshot(JSON.parse(row.snapshot)),artworkRemoved:true}),row.id).run();
- await env.DB.batch([env.DB.prepare('DELETE FROM order_updates WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_history WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM orders WHERE expires<=?').bind(time)]);}
+ // Receipt metadata ends at the original artwork deadline; attempt history keeps its existing lifetime.
+ await env.DB.batch([env.DB.prepare('UPDATE order_update_attempts SET provider_message_id=NULL,accepted_at=NULL WHERE (provider_message_id IS NOT NULL OR accepted_at IS NOT NULL) AND order_id IN (SELECT id FROM orders WHERE artwork_expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_update_attempts WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_updates WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM order_history WHERE order_id IN (SELECT id FROM orders WHERE expires<=?)').bind(time),env.DB.prepare('DELETE FROM orders WHERE expires<=?').bind(time)]);}
