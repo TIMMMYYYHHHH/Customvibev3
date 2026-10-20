@@ -1,7 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
 import {gate,signToken} from '../server/auth.mjs';
 import worker from '../admin/worker.mjs';
+import catalogue from '../catalogue/index.mjs';
+import fallback from '../data/site-content.json' with {type:'json'};
+import {seedState} from '../src/seasons/model.mjs';
+
+// Let Node emit SQLite's experimental warning before tests capture diagnostic output.
+await new Promise(resolve=>setImmediate(resolve));
 
 const secret='a'.repeat(64);
 const env={ADMIN_PASSWORD_HASH:secret,ADMIN_PASSWORD_SALT:secret,ADMIN_SESSION_SECRET:secret};
@@ -124,4 +131,103 @@ test('read helper refuses writes and artwork download quota failures are never r
  const DB={prepare:sql=>({bind:()=>({first:async()=>{if(sql.startsWith('SELECT'))return {finalized:1,expires:Math.floor(Date.now()/1000)+60,manifest:'[{"name":"design-01-photo.jpg"}]'};quotaWrites++;throw Error('D1_ERROR: transient failure')}})})};
  const result=await security.fetch(new Request('https://auth.internal/artwork/download',{method:'POST',body:JSON.stringify({id:crypto.randomUUID(),index:0})}),{DB,ARTWORK:{get:async()=>{objectReads++}}});
  assert.equal(result.status,503);assert.equal(quotaWrites,1);assert.equal(objectReads,0);
+});
+
+const catalogueSentinel='PRIVATE_CATALOGUE_TOKEN_customer@example.invalid_query';
+const catalogueRequest=path=>new Request('https://catalogue.internal'+path+'?private='+catalogueSentinel,{headers:{Authorization:'Bearer '+catalogueSentinel,'X-Private':catalogueSentinel}});
+const catalogueRoutes=[['/content.json','catalogue_content'],['/season.json','catalogue_season']];
+for(const [path,step] of catalogueRoutes)test(`${path}: caught database failures emit one safe category without retrying or changing the 503`,async t=>{
+ const events=[];t.mock.method(console,'error',(...args)=>events.push(args));
+ for(const [message,reason] of [
+  ['D1_ERROR: Network connection lost.','network_connection_lost'],
+  ['D1_ERROR: Cannot resolve D1 DB due to transient issue on remote node.','database_transient'],
+  ['D1_ERROR: Internal error in D1 DB storage caused object to be reset.','database_reset'],
+  ['D1_ERROR: internal error','database_internal'],
+  ['D1_ERROR: no such column: private_column','database_schema'],
+  ["D1_ERROR: Your account has exceeded D1's free tier daily row read limit.",'service_limit'],
+  ['D1_ERROR: SQLITE_BUSY','database'],
+  ['Operation timed out.','timeout'],
+  ['Unrecognized failure.','unknown']
+ ]){
+  let reads=0;const error=Object.assign(Error(message+' '+catalogueSentinel),{cause:{token:catalogueSentinel},query:catalogueSentinel});
+  const CONTENT_DB={prepare:query=>{assert.match(query,/^SELECT /);return {first:async()=>{reads++;throw error}}}};
+  const response=await catalogue.fetch(catalogueRequest(path),{CONTENT_DB});
+  assert.equal(response.status,503);assert.equal(await response.text(),'Temporarily unavailable');
+  assert.equal(response.headers.get('Cache-Control'),null);assert.equal(reads,1);
+  assert.deepEqual(events.splice(0),[[{event:'customvibe_unavailable',step,reason}]]);
+ }
+});
+
+function catalogueStorage(sql,queries=[]){return {prepare(query){assert.match(query,/^SELECT /,'Catalogue requests must remain read-only');queries.push(query);return {first:async()=>sql.prepare(query).get()||null}}}}
+
+test('real catalogue schema failures name only the failed route and never reveal SQLite details',async t=>{
+ const events=[];t.mock.method(console,'error',(...args)=>events.push(args));
+ for(const [path,step] of catalogueRoutes){
+  const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());
+  if(path==='/season.json')sql.exec('CREATE TABLE seasonal_settings (id INTEGER PRIMARY KEY)');
+  sql.exec('PRAGMA query_only=ON');
+  const response=await catalogue.fetch(catalogueRequest(path),{CONTENT_DB:catalogueStorage(sql)});
+  assert.equal(response.status,503);assert.equal(await response.text(),'Temporarily unavailable');
+  assert.deepEqual(events.splice(0),[[{event:'customvibe_unavailable',step,reason:'database_schema'}]]);
+ }
+});
+
+test('corrupted saved catalogue and seasonal records stay unavailable instead of hiding failure behind defaults',async t=>{
+ const events=[];t.mock.method(console,'error',(...args)=>events.push(args));
+ for(const [path,step] of catalogueRoutes){
+  const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());
+  const table=path==='/content.json'?'content':'seasonal_settings';
+  sql.exec(`CREATE TABLE ${table} (id INTEGER PRIMARY KEY, body TEXT)`);
+  sql.prepare(`INSERT INTO ${table} VALUES (1,?)`).run(catalogueSentinel);
+  sql.exec('PRAGMA query_only=ON');
+  const response=await catalogue.fetch(catalogueRequest(path),{CONTENT_DB:catalogueStorage(sql)});
+  assert.equal(response.status,503);assert.equal(await response.text(),'Temporarily unavailable');
+  assert.deepEqual(events.splice(0),[[{event:'customvibe_unavailable',step,reason:'unknown'}]]);
+  assert.equal(sql.prepare(`SELECT body FROM ${table} WHERE id=1`).get().body,catalogueSentinel);
+ }
+});
+
+test('successful catalogue reads preserve saved authority, private filtering and no-store without diagnostic noise or writes',async t=>{
+ const events=[],queries=[];t.mock.method(console,'error',(...args)=>events.push(args));
+ const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());
+ sql.exec('CREATE TABLE content (id INTEGER PRIMARY KEY, body TEXT); CREATE TABLE seasonal_settings (id INTEGER PRIMARY KEY, body TEXT)');
+ const content=structuredClone(fallback);content.revision=23;content.pricing={single:6000,six:30000,ten:48000};content.products[0].name='Saved catalogue wording';content.products[1].status='hidden';
+ const seasons=seedState();seasons.history=[{action:catalogueSentinel}];
+ const contentBytes=JSON.stringify(content),seasonBytes=JSON.stringify(seasons);
+ sql.prepare('INSERT INTO content VALUES (1,?)').run(contentBytes);sql.prepare('INSERT INTO seasonal_settings VALUES (1,?)').run(seasonBytes);
+ sql.exec('PRAGMA query_only=ON');
+ const CONTENT_DB=catalogueStorage(sql,queries);
+ const response=await catalogue.fetch(catalogueRequest('/content.json'),{CONTENT_DB});
+ assert.equal(response.status,200);assert.equal(response.headers.get('Cache-Control'),'no-store');
+ const value=await response.json();assert.equal(value.revision,23);assert.equal(value.products[0].name,'Saved catalogue wording');assert.equal(value.products.some(p=>p.id==='counting'),false);assert.deepEqual(value.pricing,{single:6000,six:30000,ten:48000});
+ const season=await catalogue.fetch(catalogueRequest('/season.json'),{CONTENT_DB});
+ assert.equal(season.status,200);assert.equal(season.headers.get('Cache-Control'),'no-store');assert.deepEqual(await season.json(),{campaign:null,definition:null,until:null});
+ assert.equal(sql.prepare('SELECT body FROM content WHERE id=1').get().body,contentBytes);assert.equal(sql.prepare('SELECT body FROM seasonal_settings WHERE id=1').get().body,seasonBytes);
+ assert.equal(queries.length,3);assert.deepEqual(events,[]);
+});
+
+test('normal absent catalogue rows and seasonal tables still use existing defaults without an incident',async t=>{
+ const events=[];t.mock.method(console,'error',(...args)=>events.push(args));
+ const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());sql.exec('CREATE TABLE content (id INTEGER PRIMARY KEY, body TEXT); PRAGMA query_only=ON');
+ const CONTENT_DB=catalogueStorage(sql);
+ const content=await catalogue.fetch(catalogueRequest('/content.json'),{CONTENT_DB});assert.equal(content.status,200);assert.equal((await content.json()).revision,fallback.revision);
+ const season=await catalogue.fetch(catalogueRequest('/season.json'),{CONTENT_DB});assert.equal(season.status,200);assert.deepEqual(await season.json(),{campaign:null,definition:null,until:null});assert.deepEqual(events,[]);
+});
+
+test('unsupported catalogue routes and methods remain empty 404s without database access or diagnostic noise',async t=>{
+ const events=[];t.mock.method(console,'error',(...args)=>events.push(args));
+ const env={get CONTENT_DB(){assert.fail('Unsupported request must not reach the database')}};
+ for(const [method,path] of [['GET','/'],['GET','/debug'],['GET','/content.json/extra'],['POST','/content.json'],['HEAD','/season.json']]){
+  const response=await catalogue.fetch(new Request('https://catalogue.internal'+path,{method}),env);
+  assert.equal(response.status,404);assert.equal(await response.text(),'');assert.equal(response.headers.get('Cache-Control'),null);
+ }
+ assert.deepEqual(events,[]);
+});
+
+test('repeated failed catalogue requests produce at most one bounded record each without retry amplification',async t=>{
+ const events=[];t.mock.method(console,'error',(...args)=>events.push(args));let reads=0;
+ const CONTENT_DB={prepare:()=>({first:async()=>{reads++;throw Error('D1_ERROR: transient '+catalogueSentinel.repeat(1000))}})};
+ for(let i=0;i<20;i++)assert.equal((await catalogue.fetch(catalogueRequest('/content.json'),{CONTENT_DB})).status,503);
+ assert.equal(reads,20);assert.equal(events.length,20);
+ for(const entry of events){assert.deepEqual(entry,[{event:'customvibe_unavailable',step:'catalogue_content',reason:'database_transient'}]);assert.ok(Buffer.byteLength(JSON.stringify(entry))<150);}
 });
