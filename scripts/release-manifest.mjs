@@ -1,10 +1,10 @@
 // Release metadata only. Never read customer rows, stored login tokens, or secret values.
-import {readFile,writeFile,mkdir,readdir,stat,rm} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,readdir,stat,rm,open} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
 import {resolve,relative,dirname,posix} from 'node:path';
-import {pathToFileURL} from 'node:url';
+import {pathToFileURL,fileURLToPath} from 'node:url';
 import {createRequest,DESTINATION_ACCOUNT,PAGES_PROJECT} from './cloudflare-target.mjs';
 export const REPOSITORY='TIMMMYYYHHHH/Customvibev3';
 const COMPONENTS=['pages','admin','security','catalogue'];
@@ -229,6 +229,7 @@ export function validatePagesUploadEvidence(value,expected){
 const ARCHIVE_RECORD_KEYS=['schemaVersion','repository','state','required','completed','reasons','planComplete','sourceSha','workflow','observedAt','baseSha','paths','schemas','beforePagesSourceSha','before','components','sourceDigests','schemaSources','build','activationCompatibility','prerequisites','evidence','guards','attempts','pagesUploadEvidence','githubArtifact','finalProtection','finalIdentityReadbacks','archivedRelease','historicalFunctionsDigest','runAttempt','prewriteValidation','completionEvidence','mandatoryValidation'];
 function historicalTime(value){ensure(typeof value==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d{3}Z$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString()===value&&Date.parse(value)<=Date.now()+30000,'Invalid historical observation.');return value;}
 export function validateReleaseArchiveRecord(record,{sourceSha,candidateSha,baseline}={}){
+ if(record?.kind==='paired-release-recovery-v1')return validatePairedRecoveryRecord(record,{sourceSha,candidateSha,baseline});
  const summary=validateBaseline(record);ensure(summary.state==='verified'&&record.schemaVersion===2&&record.sourceSha===sourceSha&&sourceSha!==candidateSha,'Archive is not the completed historical baseline.');
  ensure(Object.keys(record).every(k=>ARCHIVE_RECORD_KEYS.includes(k))&&(!record.reasons||record.reasons.length===0)&&(!('planComplete' in record)||record.planComplete===true),'Archive contains unknown or incomplete release fields.');
  const receipts={};
@@ -262,19 +263,101 @@ export function validateReleaseArchiveRecord(record,{sourceSha,candidateSha,base
  }else ensure(!('prewriteValidation' in record)&&!('completionEvidence' in record)&&!('runAttempt' in record)&&!('attempts' in record)&&!('build' in record)&&!('activationCompatibility' in record)&&!('mandatoryValidation' in record),'Automated records cannot fall back to the historical manual archive path.');
  // Reject payload-bearing or secret/provider diagnostic fields anywhere. Other
  // provenance content is accepted only through the exact reviewed archive hash.
- let nodes=0;function bounded(value){ensure(++nodes<=30000,'Archive metadata is too large.');if(Array.isArray(value)){ensure(value.length<=30000,'Archive array is too large.');for(const item of value)bounded(item);}else if(value&&typeof value==='object'){for(const [key,item]of Object.entries(value)){ensure(!/^(?:token|secret|secret_key|password|customer|body|raw|output|stdout|stderr|formdata|bindings|env_vars|diagnostic|diagnostics|providerresponse|providerdiagnostics)$/i.test(key),'Archive contains raw or private payload fields.');bounded(item);}}else if(typeof value==='string')ensure(value.length<=1000&&!value.includes('/blob/'+candidateSha+'/'),'Archive contains unbounded or self-referential metadata.');else ensure(value===null||typeof value==='boolean'||(typeof value==='number'&&Number.isFinite(value)),'Invalid archive metadata.');}bounded(record);
+ validateArchiveMetadata(record,candidateSha);
  return {sourceSha,receiptDigest:hash(canonical(receipts))};
 }
+function validateArchiveMetadata(record,candidateSha){
+ let nodes=0;function bounded(value){ensure(++nodes<=30000,'Archive metadata is too large.');if(Array.isArray(value)){ensure(value.length<=30000,'Archive array is too large.');for(const item of value)bounded(item);}else if(value&&typeof value==='object'){for(const [key,item]of Object.entries(value)){ensure(!/^(?:token|secret|secret_key|password|customer|body|raw|output|stdout|stderr|formdata|bindings|env_vars|diagnostic|diagnostics|providerresponse|providerdiagnostics)$/i.test(key),'Archive contains raw or private payload fields.');bounded(item);}}else if(typeof value==='string')ensure(value.length<=1000&&!value.includes('/blob/'+candidateSha+'/'),'Archive contains unbounded or self-referential metadata.');else ensure(value===null||typeof value==='boolean'||(typeof value==='number'&&Number.isFinite(value)),'Invalid archive metadata.');}bounded(record);
+}
+// A new recovery entry never replaces or edits a failed working manifest.
+// This policy admits only the independently proved T invocation failure.
+const PAIRED_RECOVERY_POLICY=Object.freeze(
+{
+ "sourceSha":"8058ccfb7313e359043e0148e2b514327b8fb04a",
+ "original":{"bytes":148701,"sha256":"c9271253c236391104164adab499a6c5ddd9091b28f2100d5c6391337655ca15","canonicalSha256":"6d61acc807c82695aa41f789d34decc79d1ecf24e0e6224448d0d69f7e4ffb86"},
+ "failed":{"bytes":154660,"sha256":"aafa0cdc1adce87e8a9bff0e58bec49bc9e886de396040cb325f2b44a3b1d26c","canonicalSha256":"e286990d3ffc233fc0a3630fb1456f9f52e97556135854eeab7d60b931084d24"},
+ "admin":{"bytes":624,"sha256":"8572fc97b636081623af0b31ec99d72a03ac1b9489ddec9e9f6be8c6aa490745","canonicalSha256":"d4ef680cc1f7ed17339c92995be4f0bca4a198709e70b694c12904e61e352c6c"},
+ "zipSha256":"61e2a0749a4e6a6077fa79d7f62bb39268b815a1611bdc536d619650ab6a39eb",
+ "artifactCanonicalSha256":"c25605d0d105dfe757bcbd14a9bdf746821ac39fd9220284af66fbb101e8ad4e",
+ "stampVersion":2,
+ "leasePath":"/private/tmp/customvibe-artwork-access.lease",
+ "nodeRuntime":"v24.19.0",
+ "compilerRoot":"node_modules",
+ "installedInputs":{"sha256":"92f1cbb0e4ec704fcdda1b273b88a3e1ccea33c044df3a30370ceccae65b7390","fileCount":13436,"bytes":284043434},
+ "nodeSha256":"2bf0da35856edc1840d7cbc90e937811bf23a03d44aea07e4b491be44af18d91",
+ "docChanges":[{"path":"docs/dependency-maintenance.md","before":{"mode":"100644","blob":"edd3924c040c9ad534dc506004a69608f1dbbcc2"},"after":{"mode":"100644","blob":"65b03d43ddd58dfdd95a97c80ee93cdf3a6ac460"}}]
+});
+const RECOVERY_REASON='FINAL_GUARD_FAILED: One or more local component protections failed.';
+const RECOVERY_PATHS=new Set(['scripts/release-manifest.mjs','tests/release-manifest.test.mjs','tests/release-cli.test.mjs','docs/release-process.md','docs/releases/README.md']);
+function recoveryMember(value,key){
+ const expected=PAIRED_RECOVERY_POLICY[key];
+ ensure(exactKeys(value,['sha256','canonicalSha256','bytes','value'])&&value.sha256===expected.sha256&&value.canonicalSha256===expected.canonicalSha256&&hash(canonical(value.value))===expected.canonicalSha256&&value.bytes===expected.bytes&&Number.isSafeInteger(value.bytes)&&value.bytes>0&&value.bytes<1024*1024,'Immutable recovery history differs.');return value.value;
+}
+export function validatePairedRecoveryHistory(history){
+ ensure(history&&typeof history==='object','Immutable recovery history missing.');
+ const original=recoveryMember(history.original,'original'),failed=recoveryMember(history.failed,'failed'),admin=recoveryMember(history.admin,'admin');
+ ensure(original.schemaVersion===2&&original.sourceSha===PAIRED_RECOVERY_POLICY.sourceSha&&original.repository===REPOSITORY&&original.state==='partial'&&original.planComplete===true&&original.reasons.length===0&&original.prewriteValidation?.version===PAIRED_RECOVERY_POLICY.stampVersion&&original.attempts?.length===1&&original.attempts[0].outcome==='observed','Original acknowledged release is not eligible.');
+ ensure(failed.sourceSha===original.sourceSha&&failed.state==='partial'&&canonical(failed.reasons)===canonical([RECOVERY_REASON])&&!failed.completionEvidence&&canonical(authorizationSnapshot(failed,original.prewriteValidation.version))===canonical(authorizationSnapshot(original,original.prewriteValidation.version))&&canonical(failed.attempts)===canonical(original.attempts),'Failed recovery history is not the retained invocation failure.');
+ ensure(hash(canonical(history.artifact))===PAIRED_RECOVERY_POLICY.artifactCanonicalSha256,'Immutable actual GitHub handoff differs.');
+ const artifact=validateArtifactHandoff(history.artifact,{record:original,manifestDigest:history.original.sha256});ensure(artifact.zipSha256===PAIRED_RECOVERY_POLICY.zipSha256,'Original ZIP differs.');
+ validatePrewriteAuthorization(original,{repository:REPOSITORY,sourceSha:original.sourceSha,runId:artifact.runId,runAttempt:artifact.runAttempt});
+ ensure(failed.finalProtection?.status==='failed'&&failed.finalProtection.checks?.length===4&&failed.finalIdentityReadbacks?.length===4,'Historical failure proof incomplete.');
+ for(const c of COMPONENTS){const g=failed.finalProtection.checks.find(v=>v.component===c),r=failed.finalIdentityReadbacks.find(v=>v.component===c),id=failed.completed[c]?.id;ensure(g?.status==='failed'&&g.code==='PROTECTION_OBSERVATION_FAILED'&&g.identityStatus==='passed'&&g.expectedId===id&&g.observedId===id&&r?.identityStatus==='passed'&&r.observedId===id&&r.expectedId===id,'Failure was not guard invocation only.');}
+ ensure(admin.id===failed.completed.admin.id&&admin.sourceSha===original.sourceSha&&admin.sourceDigest===original.sourceDigests.admin&&admin.assetsDigest===original.build.admin.sha256&&admin.runtimeDigest===original.build.private.admin.runtimeDigest&&admin.configDigest===original.build.private.admin.configDigest,'Admin acknowledgement/closure changed.');
+ return {original,failed,admin,artifact};
+}
+function recoveryRevision(proof,{readGit=true}={}){
+ ensure(exactKeys(proof,['reviewed','revision','tree','changes'])&&proof.reviewed===true&&SHA.test(proof.revision||'')&&SHA.test(proof.tree||'')&&Array.isArray(proof.changes)&&proof.changes.length<=6,'Reviewed verifier revision missing.');
+ const names=new Set();for(const entry of proof.changes){ensure(exactKeys(entry,['path','before','after'])&&!names.has(entry.path),'Duplicate verifier entry.');names.add(entry.path);for(const side of ['before','after'])ensure(exactKeys(entry[side],['mode','blob'])&&entry[side].mode==='100644'&&SHA.test(entry[side].blob||''),'Verifier mode/blob missing.');ensure(RECOVERY_PATHS.has(entry.path)||PAIRED_RECOVERY_POLICY.docChanges.some(v=>canonical(v)===canonical(entry)),'Unreviewed product/schema/documentation change.');}
+ if(readGit){
+  const revisionGit=(...args)=>git('-C',dirname(dirname(fileURLToPath(import.meta.url))),...args);const target=PAIRED_RECOVERY_POLICY.sourceSha;ensure(revisionGit('merge-base',target,proof.revision)===target&&revisionGit('rev-parse',proof.revision+'^{tree}')===proof.tree,'Verifier ancestry/tree differs.');
+  if(target===proof.revision){ensure(proof.changes.length===0,'Unchanged verifier has changes.');return structuredClone(proof);}
+  const tree=sha=>new Map(revisionGit('ls-tree','-r',sha).split('\n').filter(Boolean).map(v=>{const m=/^(100644|100755|120000) blob ([a-f0-9]{40})\t(.+)$/.exec(v);ensure(m,'Unsupported tracked entry.');return [m[3],{mode:m[1],blob:m[2]}];}));
+  const before=tree(target),after=tree(proof.revision),actual=[];ensure(before.size===after.size&&[...before.keys()].every(p=>after.has(p)),'Verifier added or removed source.');for(const [path,v]of before)if(canonical(v)!==canonical(after.get(path)))actual.push({path,before:v,after:after.get(path)});
+  ensure(canonical(actual.sort((a,b)=>a.path.localeCompare(b.path,'en')))===canonical([...proof.changes].sort((a,b)=>a.path.localeCompare(b.path,'en'))),'Complete verifier Git entry inventory differs.');
+ }
+ return structuredClone(proof);
+}
+function recoveryFinal(final,readbacks,original,components,checkedAt){
+ ensure(final?.status==='passed'&&final.expectedSourceSha===original.sourceSha&&final.checks?.length===4&&readbacks?.length===4&&new Set(final.checks.map(v=>v.component)).size===4&&new Set(readbacks.map(v=>v.component)).size===4,'Recovery final protections incomplete.');
+ freshTime(final.observedAt,utc(checkedAt));
+ for(const c of COMPONENTS){const g=final.checks.find(v=>v.component===c),r=readbacks.find(v=>v.component===c),id=components[c].receipt.id;ensure(g?.status==='passed'&&g.identityStatus==='passed'&&!g.code&&!g.identityCode&&g.expectedId===id&&g.observedId===id&&r?.identityStatus==='passed'&&!r.identityCode&&r.expectedId===id&&r.observedId===id&&r.identityObservedAt===g.identityObservedAt,'Recovery current identity/protection differs.');for(const t of [g.protectionObservedAt,g.identityObservedAt])freshTime(t,utc(checkedAt));if(c==='pages')ensure(g.observedSourceSha===original.sourceSha&&r.observedSourceSha===original.sourceSha,'Recovery Pages source differs.');}
+}
+export function validatePairedRecoveryRecord(record,{sourceSha,candidateSha,baseline,readGit=true}={}){
+ ensure(exactKeys(record,['schemaVersion','kind','repository','state','sourceSha','baseSha','required','components','completed','prerequisites','guards','finalProtection','finalIdentityReadbacks','recovery'])&&record.schemaVersion===3&&record.kind==='paired-release-recovery-v1'&&record.repository===REPOSITORY&&record.state==='verified','Unrecognized canonical recovery entry.');
+ const r=record.recovery;ensure(exactKeys(r,['version','original','failed','admin','artifact','verifier','supportStartedAt','conservativeCutoff','checkedAt','evidence','localCompiler','sourceChecks','providerMutations'])&&r.version===1&&r.providerMutations===0,'Recovery provenance is incomplete.');
+ validateArchiveMetadata(record,candidateSha);
+ ensure(canonical(r.localCompiler)===canonical({runtime:PAIRED_RECOVERY_POLICY.nodeRuntime,nodeSha256:PAIRED_RECOVERY_POLICY.nodeSha256,installedInputs:PAIRED_RECOVERY_POLICY.installedInputs}),'Recovery local compiler provenance differs.');
+ const h=validatePairedRecoveryHistory(r);ensure(record.sourceSha===h.original.sourceSha&&(!sourceSha||sourceSha===record.sourceSha)&&record.sourceSha!==candidateSha&&record.baseSha===h.original.baseSha&&canonical(record.required)===canonical(COMPONENTS),'Recovery target differs.');
+ ensure(exactKeys(r.sourceChecks,['first','final']),'Recovery source observations missing.');for(const check of Object.values(r.sourceChecks)){ensure(exactKeys(check,['sourceSha','mainSha','noActiveProductionRun','observedAt'])&&check.sourceSha===record.sourceSha&&check.mainSha===r.verifier.revision&&check.noActiveProductionRun===true,'Recovery source/main observation differs.');freshTime(check.observedAt,utc(r.checkedAt));}
+ historicalTime(r.checkedAt);ensure(utc(r.conservativeCutoff)===utc(r.supportStartedAt)+600000&&utc(r.checkedAt)<=utc(r.conservativeCutoff),'Recovery support cutoff expired.');freshTime(r.supportStartedAt,utc(r.checkedAt));recoveryRevision(r.verifier,{readGit});
+ const admin=validateReceipt(r.evidence.receipts?.admin,{component:'admin',id:h.admin.id,sourceDigest:h.admin.sourceDigest,...h.original.build.private.admin,now:utc(r.checkedAt)});for(const k of ['account','component','id','sourceSha','sourceDigest','runtimeDigest','configDigest','assetsDigest','origin','observedAt'])ensure(admin[k]===h.admin[k],'Recovery Admin receipt relabelled.');ensure(canonical(admin)===canonical(validateReceipt(h.failed.components.admin.receipt,{component:'admin',id:h.admin.id,sourceDigest:h.admin.sourceDigest,...h.original.build.private.admin,now:utc(r.checkedAt)})),'Recovery Admin receipt differs from its immutable acknowledgement association.');
+ const observed={pagesSha:record.sourceSha,versions:Object.fromEntries(COMPONENTS.map(c=>[c,record.completed[c]?.id]))};
+ const checked=completePair({record:{...h.original,githubArtifact:h.artifact},evidence:r.evidence,observed,now:utc(r.checkedAt)});
+ for(const key of ['components','completed','prerequisites'])ensure(canonical(record[key])===canonical(checked[key]),'Recovered pair closure differs.');ensure(canonical(record.guards)===canonical({protection:'passed',publication:'recovered pair independently observed'}),'Recovery guard summary differs.');recoveryFinal(record.finalProtection,record.finalIdentityReadbacks,h.original,record.components,r.checkedAt);
+ if(baseline)for(const c of COMPONENTS)ensure(canonical(record.components[c].receipt)===canonical(baseline.components?.[c]?.receipt),'Recovery baseline receipts differ.');
+ return {sourceSha:record.sourceSha,receiptDigest:hash(canonical(Object.fromEntries(COMPONENTS.map(c=>[c,record.components[c].receipt]))))};
+}
+export function createPairedRecoveryRecord({history,verifier,supportStartedAt,evidence,finalProtection,finalIdentityReadbacks,sourceChecks,checkedAt}){
+ const h=validatePairedRecoveryHistory(history),now=utc(checkedAt);ensure(now<=utc(supportStartedAt)+600000,'Recovery support cutoff expired.');
+ const observed={pagesSha:h.original.sourceSha,versions:Object.fromEntries(finalIdentityReadbacks.map(v=>[v.component,v.observedId]))},pair=completePair({record:{...h.original,githubArtifact:h.artifact},evidence,observed,now});
+ const value={schemaVersion:3,kind:'paired-release-recovery-v1',repository:REPOSITORY,state:'verified',sourceSha:h.original.sourceSha,baseSha:h.original.baseSha,required:[...COMPONENTS],components:pair.components,completed:pair.completed,prerequisites:pair.prerequisites,guards:{protection:'passed',publication:'recovered pair independently observed'},finalProtection:structuredClone(finalProtection),finalIdentityReadbacks:structuredClone(finalIdentityReadbacks),recovery:{version:1,original:history.original,failed:history.failed,admin:history.admin,artifact:history.artifact,verifier,supportStartedAt,conservativeCutoff:new Date(utc(supportStartedAt)+600000).toISOString(),checkedAt,evidence:pair.completionEvidence.evidence,sourceChecks,localCompiler:{runtime:PAIRED_RECOVERY_POLICY.nodeRuntime,nodeSha256:PAIRED_RECOVERY_POLICY.nodeSha256,installedInputs:PAIRED_RECOVERY_POLICY.installedInputs},providerMutations:0}};
+ validatePairedRecoveryRecord(value,{readGit:false});return value;
+}
+
+function validateRecoveryDocChanges(value){ensure(Array.isArray(value)&&value.length<=PAIRED_RECOVERY_POLICY.docChanges.length&&new Set(value.map(v=>v.path)).size===value.length&&value.every(v=>PAIRED_RECOVERY_POLICY.docChanges.some(p=>canonical(p)===canonical(v))),'Unreviewed recovery document tuple.');return value;}
 async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline,presentation}){
  if(presentation)validatePresentationInputs(presentation);
- const extra=paths.filter(p=>!TOOLING_PATHS.has(p)&&!(presentation&&PRESENTATION_PATHS.has(p)));if(extra.length===0){ensure(!proof,'Unexpected archive evidence without an archive change.');return undefined;}
- ensure(extra.length===1&&proof&&Object.keys(proof).every(k=>['origin','reviewed','path','sha256','sourceSha','reviewedAgainstSha','receiptDigest'].includes(k))&&proof.origin==='reviewed-complete-release-archive'&&proof.reviewed===true&&proof.path===extra[0]&&/^docs\/releases\/\d{4}-\d\d-\d\d-release-[a-zA-Z0-9_-]{1,64}[.]json$/.test(proof.path)&&DIGEST.test(proof.sha256||'')&&proof.sourceSha===baseSha&&proof.reviewedAgainstSha===sourceSha,'Archive is not an explicitly reviewed historical release record.');
+ const docPaths=paths.filter(p=>PAIRED_RECOVERY_POLICY.docChanges.some(v=>v.path===p)),extra=paths.filter(p=>!TOOLING_PATHS.has(p)&&!(presentation&&PRESENTATION_PATHS.has(p))&&!docPaths.includes(p));if(extra.length===0){ensure(!proof&&docPaths.length===0,'Unexpected archive evidence or document change without a recovery archive.');return undefined;}
+ ensure(extra.length===1&&proof&&Object.keys(proof).every(k=>['origin','reviewed','path','sha256','sourceSha','reviewedAgainstSha','receiptDigest','recoveryDocChanges'].includes(k))&&proof.origin==='reviewed-complete-release-archive'&&proof.reviewed===true&&proof.path===extra[0]&&/^docs\/releases\/\d{4}-\d\d-\d\d-release-[a-zA-Z0-9_-]{1,64}[.]json$/.test(proof.path)&&DIGEST.test(proof.sha256||'')&&proof.sourceSha===baseSha&&proof.reviewedAgainstSha===sourceSha,'Archive is not an explicitly reviewed historical release record.');
  ensure(git('diff','--name-status',baseSha,sourceSha,'--',proof.path)==='A\t'+proof.path,'An archived record must be a new immutable addition.');
  const entry=git('ls-tree',sourceSha,'--',proof.path),match=/^100644 blob ([a-f0-9]{40})\t(.+)$/.exec(entry);ensure(match&&match[2]===proof.path,'Archive must be a committed regular file.');
  const bytes=await readFile(proof.path);ensure(bytes.length>0&&bytes.length<2*1024*1024&&hash(bytes)===proof.sha256&&createHash('sha1').update(Buffer.concat([Buffer.from('blob '+bytes.length+'\0'),bytes])).digest('hex')===match[1],'Archive bytes differ from the reviewed committed record.');
  const record=JSON.parse(bytes.toString('utf8')),validated=validateReleaseArchiveRecord(record,{sourceSha:baseSha,candidateSha:sourceSha,baseline});
+ const recoveryDocChanges=docPaths.map(path=>{ensure(record.kind==='paired-release-recovery-v1'&&baseSha===PAIRED_RECOVERY_POLICY.sourceSha,'Only the complete recovery archive admits its exact dependency document.');const expected=PAIRED_RECOVERY_POLICY.docChanges.find(v=>v.path===path);for(const [side,sha]of [['before',baseSha],['after',sourceSha]])ensure(git('ls-tree',sha,'--',path)===expected[side].mode+' blob '+expected[side].blob+'\t'+path,'Recovery document Git blob/mode differs.');return expected;});
+ if(proof.recoveryDocChanges!==undefined)ensure(canonical(validateRecoveryDocChanges(proof.recoveryDocChanges))===canonical(recoveryDocChanges),'Recovery archive document proof differs.');
  if(proof.receiptDigest!==undefined)ensure(proof.receiptDigest===validated.receiptDigest,'Archive original receipt binding changed.');
- return {origin:proof.origin,reviewed:true,path:proof.path,sha256:proof.sha256,sourceSha:baseSha,reviewedAgainstSha:sourceSha,receiptDigest:validated.receiptDigest};
+ return {...(recoveryDocChanges.length?{recoveryDocChanges}:{}),origin:proof.origin,reviewed:true,path:proof.path,sha256:proof.sha256,sourceSha:baseSha,reviewedAgainstSha:sourceSha,receiptDigest:validated.receiptDigest};
 }
 
 // Fixed data from the independently reviewed retained input/manifest comparison.
@@ -387,7 +470,9 @@ function validateAdminManifestCompatibility(v,expected){
 export function validateActivationCompatibility(value,expected){
  const presentation=value?.basis==='reviewed-public-presentation-v1';
  ensure((presentation||value?.basis==='source-input-tooling-only-v1')&&value.reviewedAgainstSha===expected.sourceSha&&value.baselineSha===expected.baseSha&&value.baselineSha===expected.beforePagesSourceSha&&value.historicalFunctionsDigest===null,'Activation compatibility is not reviewed source-based evidence.');
- const archive=p=>expected.archivedRelease?.path===p&&expected.archivedRelease.sourceSha===expected.baseSha&&expected.archivedRelease.reviewedAgainstSha===expected.sourceSha&&DIGEST.test(expected.archivedRelease.receiptDigest||'');
+ const linked=expected.archivedRelease?.sourceSha===expected.baseSha&&expected.archivedRelease.reviewedAgainstSha===expected.sourceSha&&DIGEST.test(expected.archivedRelease.receiptDigest||'');
+ const recoveredDocs=expected.archivedRelease?.recoveryDocChanges===undefined?[]:validateRecoveryDocChanges(expected.archivedRelease.recoveryDocChanges);
+ const archive=p=>linked&&(expected.archivedRelease.path===p||(expected.baseSha===PAIRED_RECOVERY_POLICY.sourceSha&&recoveredDocs.some(v=>v.path===p)));
  if(presentation){
   ensure(exactKeys(value,['basis','reviewedAgainstSha','baselineSha','observedAt','sourceInputDigest','baselineSourceInputDigest','presentation','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest','historicalFunctionsDigest',...(Object.hasOwn(value,'privateSnapshotGap')?['privateSnapshotGap']:[]),...(Object.hasOwn(value,'adminAssetManifest')?['adminAssetManifest']:[])])&&(!Object.hasOwn(value,'privateSnapshotGap')||value.privateSnapshotGap==='Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'), 'Unexpected presentation compatibility fields.');
   const facts=validatePresentationInputs(expected.presentation);validatePresentationInputs(value.presentation);
@@ -511,6 +596,7 @@ export function validateLedger(applied,expected){
 export function releaseState({required,completed}){return required.every(c=>completed[c]?.id)?'verified':Object.keys(completed).length?'partial':'blocked';}
 export function assertUnchanged(expected,current){for(const [component,id] of Object.entries(expected))ensure(current[component]===id,'Current '+component+' deployment changed; re-plan without overwriting it.');}
 export function validateBaseline(record){
+ if(record?.kind==='paired-release-recovery-v1'){const {reviewed,evidenceUrl,...core}=record;validatePairedRecoveryRecord(core,{sourceSha:record.sourceSha});return {schemaVersion:2,repository:REPOSITORY,state:'verified',sourceSha:record.sourceSha,baseSha:record.sourceSha};}
  ensure([1,2].includes(record?.schemaVersion)&&record.repository===REPOSITORY,'Unrecognized release baseline.');
  ensure(['verified','partial','blocked'].includes(record.state)&&SHA.test(record.sourceSha||'')&&SHA.test(record.baseSha||''),'Baseline source evidence missing.');
  if(record.state==='verified'){
@@ -756,7 +842,7 @@ async function observeProtection(components,{expected={},sourceSha,request}={}){
  const checks=[];
  for(const component of components){
   const script=component==='pages'?'scripts/check-deployment.mjs':`scripts/check-${component}-deployment.mjs`;
-  const env={...process.env,EXPECTED_RELEASE_SHA:SHA.test(sourceSha||'')?sourceSha:'',EXPECTED_PAGES_DEPLOYMENT_ID:expected.pages||'',EXPECTED_ADMIN_VERSION:expected.admin||'',EXPECTED_SECURITY_VERSION:expected.security||'',EXPECTED_CATALOGUE_VERSION:expected.catalogue||''};
+  const env={...process.env,CLOUDFLARE_ACCOUNT_ID:DESTINATION_ACCOUNT,EXPECTED_RELEASE_SHA:SHA.test(sourceSha||'')?sourceSha:'',EXPECTED_PAGES_DEPLOYMENT_ID:expected.pages||'',EXPECTED_ADMIN_VERSION:expected.admin||'',EXPECTED_SECURITY_VERSION:expected.security||'',EXPECTED_CATALOGUE_VERSION:expected.catalogue||''};
   const check={component,status:'passed',...(ID.test(expected[component]||'')?{expectedId:expected[component]}:{})};
   try{command(process.execPath,[script,...(component==='pages'?['after']:[])],{env});}
   catch{check.status='failed';check.code='PROTECTION_OBSERVATION_FAILED';}
@@ -887,11 +973,40 @@ async function finishLocal(){
  }
  if(failure)throw failure;
 }
+async function recoverLocal(inputPath,outputPath){
+ ensure(process.env.GITHUB_ACTIONS!=='true'&&process.env.CUSTOMVIBE_MIGRATION_SOCKET&&!process.env.CLOUDFLARE_API_TOKEN,'Recovery is local and read-only.');
+ ensure(inputPath&&outputPath&&process.argv.length===5,'Use recover-local INPUT_JSON NEW_OUTPUT_JSON.');
+ const destination=resolve(outputPath),out=await open(destination,'wx',0o600);let lease,leaseInode,result;
+ try{
+  const inputBytes=await readFile(inputPath);ensure(inputBytes.length<100000,'Recovery input is too large.');const input=strictJson(inputBytes.toString('utf8'));
+  ensure(exactKeys(input,['version','originalPath','failedPath','adminReceiptPath','zipPath','artifact','evidence','supportStartedAt','verifier'])&&input.version===1,'Unexpected recovery input.');
+  const inputs=[];async function member(path,key){ensure(resolve(path)!==destination,'Recovery output overlaps history.');const bytes=await readFile(path);ensure(bytes.length>0&&bytes.length<1024*1024,'Recovery input size invalid.');const value=strictJson(bytes.toString('utf8')),entry={sha256:hash(bytes),canonicalSha256:hash(canonical(value)),bytes:bytes.length,value};recoveryMember(entry,key);inputs.push({path,sha256:hash(bytes)});return entry;}
+  const history={original:await member(input.originalPath,'original'),failed:await member(input.failedPath,'failed'),admin:await member(input.adminReceiptPath,'admin'),artifact:input.artifact};
+  const zip=await readFile(input.zipPath);ensure(zip.length>0&&zip.length<16*1024*1024&&hash(zip)===PAIRED_RECOVERY_POLICY.zipSha256,'Original ZIP bytes differ.');inputs.push({path:input.zipPath,sha256:hash(zip)},{path:inputPath,sha256:hash(inputBytes)});
+  const h=validatePairedRecoveryHistory(history),verifier=recoveryRevision(input.verifier);ensure(process.version===PAIRED_RECOVERY_POLICY.nodeRuntime&&hash(await readFile(process.execPath))===PAIRED_RECOVERY_POLICY.nodeSha256,'Local compiler runtime differs.');
+  const verifierRoot=dirname(dirname(fileURLToPath(import.meta.url)));ensure(git('-C',verifierRoot,'rev-parse','HEAD')===verifier.revision&&!git('-C',verifierRoot,'status','--porcelain'),'Verifier checkout must be exact and clean.');
+  function currentSource(){ensure(JSON.parse(command('gh',['api','--hostname','github.com',`repos/${REPOSITORY}/git/ref/heads/main`])).object.sha===verifier.revision,'Current main differs from reviewed verifier.');for(const status of ['queued','in_progress','waiting','pending','requested']){const v=JSON.parse(command('gh',['api','--hostname','github.com',`repos/${REPOSITORY}/actions/runs?branch=main&status=${status}&per_page=100`]));ensure(v.total_count===0&&v.workflow_runs.length===0,'Production workflow overlap.');}ensure(git('rev-parse','HEAD')===h.original.sourceSha&&!git('status','--porcelain'),'Deployed source checkout differs.');return {sourceSha:h.original.sourceSha,mainSha:verifier.revision,noActiveProductionRun:true,observedAt:new Date().toISOString()};}
+  const firstSource=currentSource();freshTime(input.supportStartedAt,Date.now());ensure(canonical(await installedInputDigest(resolve(PAIRED_RECOVERY_POLICY.compilerRoot)))===canonical(PAIRED_RECOVERY_POLICY.installedInputs),'Local installed compiler inputs differ.');await verifyBuild(h.original,{local:true,afterWrite:true});for(const c of COMPONENTS)ensure(fingerprint(h.original.sourceSha,c)===h.original.sourceDigests[c],'Recovery source fingerprint differs.');ensure(canonical(await schemaSources())===canonical(h.original.schemaSources),'Recovery schema source differs.');
+  const leasePath=PAIRED_RECOVERY_POLICY.leasePath;lease=await open(leasePath,'wx',0o600);await lease.writeFile(JSON.stringify({purpose:'read-only paired canonical recovery',at:new Date().toISOString()}));leaseInode=(await lease.stat()).ino;
+  const base=createRequest({CLOUDFLARE_ACCOUNT_ID:DESTINATION_ACCOUNT,CUSTOMVIBE_MIGRATION_SOCKET:process.env.CUSTOMVIBE_MIGRATION_SOCKET}),allowed=new Set([`accounts/${DESTINATION_ACCOUNT}/pages/projects/${PAGES_PROJECT}`,...['admin','security','catalogue'].map(c=>`accounts/${DESTINATION_ACCOUNT}/workers/scripts/customvibe-${c}/deployments`)]);let reads=0;
+  const request=async(path,method='GET',body)=>{ensure(allowed.has(path)&&method==='GET'&&body===undefined&&++reads<=8,'Recovery permits fixed identity GETs only.');return base(path,'GET');};
+  const observed=await observeVersions(request),operational={...h.original,githubArtifact:h.artifact};completePair({record:operational,evidence:input.evidence,observed});
+  const expected={...observed.versions};const finalProtection=await observeProtection(COMPONENTS,{expected,sourceSha:h.original.sourceSha,request});
+  const finalIdentityReadbacks=finalProtection.checks.map(({component,expectedId,observedId,observedSourceSha,identityStatus,identityCode,identityObservedAt})=>Object.fromEntries(Object.entries({component,expectedId,observedId,observedSourceSha,identityStatus,identityCode,identityObservedAt}).filter(([,v])=>v!==undefined)));
+  // Every potentially expensive final read precedes the single completion clock.
+  await verifyBuild(h.original,{local:true,afterWrite:true});ensure(canonical(await installedInputDigest(resolve(PAIRED_RECOVERY_POLICY.compilerRoot)))===canonical(PAIRED_RECOVERY_POLICY.installedInputs),'Local installed compiler inputs changed.');const finalSource=currentSource();recoveryRevision(verifier);for(const file of inputs)ensure(hash(await readFile(file.path))===file.sha256,'Immutable recovery input changed.');ensure(hash(await readFile(OUTPUT))===history.failed.sha256,'Failed working manifest changed.');
+  await lease.close();ensure((await stat(leasePath)).ino===leaseInode,'Lease ownership changed.');await rm(leasePath);lease=undefined;
+  const checkedAt=new Date().toISOString();result=createPairedRecoveryRecord({history,verifier,supportStartedAt:input.supportStartedAt,evidence:input.evidence,finalProtection,finalIdentityReadbacks,sourceChecks:{first:firstSource,final:finalSource},checkedAt});
+ }catch{result={kind:'paired-release-recovery-attempt',state:'blocked',reason:'RECOVERY_REJECTED: History, closure, current guards, source or fresh support failed. Original records remain unchanged.'};throw Error('Read-only recovery rejected.');}
+ finally{if(lease){await lease.close();const s=await stat(PAIRED_RECOVERY_POLICY.leasePath);ensure(s.ino===leaseInode,'Lease ownership changed.');await rm(PAIRED_RECOVERY_POLICY.leasePath);}try{await out.writeFile(JSON.stringify(result,null,2)+'\n');}finally{await out.close();}}
+}
+
 async function main(){
  await mkdir('dist/release',{recursive:true});
  const mode=process.argv[2];
  if(mode==='fingerprints'){const sha=process.argv[3];ensure(SHA.test(sha||''),'Supply an exact SHA.');console.log(JSON.stringify(Object.fromEntries(COMPONENTS.map(c=>[c,fingerprint(sha,c)])),null,2));}
  else if(mode==='private-builds')await privateBuilds();
+ else if(mode==='recover-local')await recoverLocal(process.argv[3],process.argv[4]);
  else if(mode==='plan')await plan();else if(mode==='publish')await publish(process.argv[3]);else if(mode==='finish')await finish();else if(mode==='finish-local')await finishLocal();
  else throw Error('Use fingerprints SHA, private-builds, plan, publish pages, finish, or finish-local. Private publication is never automated.');
 }

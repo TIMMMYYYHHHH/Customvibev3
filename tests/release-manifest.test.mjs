@@ -377,3 +377,19 @@ test('presentation compatibility binds fixed reviewed blobs and unequal input fa
  assert.equal(release.validateActivationCompatibility(derived,generated).adminAssetManifest.basis,'reviewed-admin-asset-manifest-v1');
  for(const mutate of [v=>v.adminAssetManifest.baseline.id='87654321-1234-1234-1234-123456789abc',v=>v.adminAssetManifest.baseline.runtimeDigest='e'.repeat(64),v=>v.adminAssetManifest.baseline.assetsDigest='e'.repeat(64),v=>v.adminAssetManifest.candidate.manifestSha256='e'.repeat(64),v=>v.adminAssetManifest.candidate.protectedInputDigest='e'.repeat(64),v=>v.adminAssetManifest.candidate.runtimeDigest='e'.repeat(64)]){const value=structuredClone(derived);mutate(value);assert.throws(()=>release.validateActivationCompatibility(value,generated));}
 });
+
+
+test('paired recovery refuses an ordinary partial label without immutable acknowledged history',async()=>{
+ const release=await import('../scripts/release-manifest.mjs');
+ assert.throws(()=>release.validatePairedRecoveryHistory({original:{state:'partial'},failed:{state:'partial'}}),/recovery history|immutable/i);
+});
+
+test('recovery archive admits only the exact approved dependency document tuple without weakening source parity',async()=>{
+ const {validateActivationCompatibility}=await import('../scripts/release-manifest.mjs');
+ const base='8058ccfb7313e359043e0148e2b514327b8fb04a',candidate='f'.repeat(40),path='docs/releases/2026-10-20-release-T-recovered.json';
+ const doc={path:'docs/dependency-maintenance.md',before:{mode:'100644',blob:'edd3924c040c9ad534dc506004a69608f1dbbcc2'},after:{mode:'100644',blob:'65b03d43ddd58dfdd95a97c80ee93cdf3a6ac460'}};
+ const v={basis:'source-input-tooling-only-v1',reviewedAgainstSha:candidate,baselineSha:base,observedAt:fresh,sourceInputDigest:digest,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,historicalFunctionsDigest:null};
+ const e={sourceSha:candidate,baseSha:base,beforePagesSourceSha:base,paths:[doc.path,path],sourceInputDigest:digest,baselineSourceInputDigest:digest,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,archivedRelease:{path,sourceSha:base,reviewedAgainstSha:candidate,receiptDigest:digest,recoveryDocChanges:[doc]},now};
+ assert.equal(validateActivationCompatibility(v,e).sourceInputDigest,digest);
+ for(const change of [x=>x.archivedRelease.recoveryDocChanges[0].after.blob=old,x=>x.archivedRelease.recoveryDocChanges[0].after.mode='100755',x=>x.archivedRelease.recoveryDocChanges[0].path='docs/arbitrary.md',x=>delete x.archivedRelease.recoveryDocChanges,x=>x.sourceInputDigest='d'.repeat(64)]){const altered=structuredClone(e);change(altered);assert.throws(()=>validateActivationCompatibility(v,altered));}
+});
