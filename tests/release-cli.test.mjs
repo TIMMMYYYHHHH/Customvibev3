@@ -11,9 +11,25 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 const cli=fileURLToPath(new URL('../scripts/release-manifest.mjs',import.meta.url));
 const sha='a'.repeat(40),old='b'.repeat(40),id='12345678-1234-1234-1234-123456789abc',next='87654321-1234-1234-1234-123456789abc';
 const marker='PRIVATE_SENTINEL_MUST_NOT_PERSIST';
+function mandatoryCliFixture(){
+ const candidate=sha,head='e'.repeat(40),base=old,merge='bc4e80b61dd30338e62f1b922dded516cd250d30',tree='d9ebd59f26e2fea7ef82e5e2831cb66851a5ae1a';
+ const repo={full_name:'TIMMMYYYHHHH/Customvibev3',id:1269416306,private:false};
+ const checkout='Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262',setup='Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020';
+ const names=['Set up job',checkout,setup,'Install locked dependencies','Build storefront and server-rendered pages','Build admin and storefront preview','Verify shipped third-party notices','Run local fixture tests','Run Python security-helper fixtures','Post '+setup,'Post '+checkout,'Complete job'];
+ const steps=[{"name":"Set up job","status":"completed","conclusion":"success","number":1,"started_at":"2026-10-20T10:01:42Z","completed_at":"2026-10-20T10:01:43Z"},{"name":"Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262","status":"completed","conclusion":"success","number":2,"started_at":"2026-10-20T10:01:43Z","completed_at":"2026-10-20T10:01:48Z"},{"name":"Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020","status":"completed","conclusion":"success","number":3,"started_at":"2026-10-20T10:01:48Z","completed_at":"2026-10-20T10:01:49Z"},{"name":"Install locked dependencies","status":"completed","conclusion":"success","number":4,"started_at":"2026-10-20T10:01:49Z","completed_at":"2026-10-20T10:01:56Z"},{"name":"Build storefront and server-rendered pages","status":"completed","conclusion":"success","number":5,"started_at":"2026-10-20T10:01:56Z","completed_at":"2026-10-20T10:02:09Z"},{"name":"Build admin and storefront preview","status":"completed","conclusion":"success","number":6,"started_at":"2026-10-20T10:02:09Z","completed_at":"2026-10-20T10:02:15Z"},{"name":"Verify shipped third-party notices","status":"completed","conclusion":"success","number":7,"started_at":"2026-10-20T10:02:15Z","completed_at":"2026-10-20T10:02:24Z"},{"name":"Run local fixture tests","status":"completed","conclusion":"success","number":8,"started_at":"2026-10-20T10:02:24Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Run Python security-helper fixtures","status":"completed","conclusion":"success","number":9,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020","status":"completed","conclusion":"success","number":17,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262","status":"completed","conclusion":"success","number":18,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"},{"name":"Complete job","status":"completed","conclusion":"success","number":19,"started_at":"2026-10-20T10:09:35Z","completed_at":"2026-10-20T10:09:35Z"}];
+ const run={id:39404961304,run_attempt:1,workflow_id:389570831,path:'.github/workflows/validate.yml',name:'Validate proposed CustomVibe changes',event:'pull_request',head_sha:head,repository:repo,head_repository:repo,pull_requests:[],status:'completed',conclusion:'success',check_suite_id:987,created_at:'2026-10-20T10:01:39Z',run_started_at:'2026-10-20T10:01:42Z',updated_at:'2026-10-20T10:09:38Z',html_url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304'};
+ const job={id:118568540207,run_id:run.id,run_attempt:1,head_sha:head,name:'Node 22 build and fixture tests',status:'completed',conclusion:'success',started_at:'2026-10-20T10:01:42Z',completed_at:'2026-10-20T10:09:38Z',steps,url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/jobs/118568540207',run_url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304',html_url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304/job/118568540207',check_run_url:'https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/check-runs/118568540207'};
+ const log=['##[group]Operating System','Ubuntu','##[endgroup]','##[group]'+checkout,'##[endgroup]','##[group]Fetching the repository','[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +'+merge+':refs/remotes/pull/45/merge','##[endgroup]','##[group]Checking out the ref','[command]/usr/bin/git checkout --progress --force refs/remotes/pull/45/merge','##[endgroup]','[command]/usr/bin/git log -1 --format=%H',merge,'##[group]'+setup,'##[endgroup]','node: v22.23.3','##[group]Run npm ci','##[endgroup]','##[group]Run npm test','##[endgroup]','# tests 566','# suites 0','# pass 566','# fail 0','# cancelled 0','# skipped 0','# todo 0','# duration_ms 1','##[group]Run python3 -B -m unittest discover tests/python','##[endgroup]','.......','----------------------------------------------------------------------','Ran 7 tests in 0.001s','','OK','##[group]Post job cleanup.','##[endgroup]'].join('\n');
+ const selector={version:1,origin:'owner-selected-github-validation',reviewed:true,repository:repo.full_name,repositoryId:repo.id,candidateSha:candidate,candidateTreeSha:tree,pullRequestNumber:45,prHeadSha:head,prBaseSha:base,checkedMergeSha:merge,checkedTreeSha:tree,workflowId:run.workflow_id,workflowPath:run.path,workflowSha256:'1021fd8f5c961d5e65b49a91e7870c339015f57c5e2b681a44cbaa4d225e2389',runId:run.id,runAttempt:1,jobId:job.id,checkRunId:job.id,checkSuiteId:987,url:run.html_url,nodeVersion:'v22.23.3',nodeTests:566,pythonTests:7,originalJobLogSha256:createHash('sha256').update(log).digest('hex'),ownerProofSha256:'d'.repeat(64)};
+ const check={id:job.id,name:job.name,status:'completed',conclusion:'success',head_sha:head,app:{id:15368},check_suite:{id:987},started_at:job.started_at,completed_at:job.completed_at};
+ const facts={workflow:{id:run.workflow_id,path:run.path,state:'active'},run,attempt:structuredClone(run),jobs:{total_count:1,jobs:[job]},check,commit:{sha:merge,tree:{sha:tree},parents:[{sha:base},{sha:head}]},mergedPull:{number:45,merged:true,merge_commit_sha:candidate,head:{sha:head,repo},base:{ref:'main',sha:'f'.repeat(40),repo}},rules:[{type:'required_status_checks',ruleset_id:25416396,parameters:{required_status_checks:[{context:job.name,integration_id:15368}]}}],log,runs:{total_count:1,workflow_runs:[structuredClone(run)]},finalRun:structuredClone(run),finalCheck:structuredClone(check)};
+ return {selector,facts,local:{sourceSha:candidate,treeSha:tree,parents:[base,head],workflowSha256:selector.workflowSha256,publisherRuntime:'v22.23.3',compilerRuntime:'v22.23.3'},checkedAt:'2026-10-20T10:10:00.000Z'};
+}
+
 const preload=`
 const cp=require('node:child_process'),fs=require('node:fs');
-const RealDate=Date;global.__clockShift=Number(process.env.CLOCK_SHIFT_MS||0);global.Date=class extends RealDate{constructor(...args){super(...(args.length?args:[RealDate.now()+global.__clockShift]));}static now(){return RealDate.now()+global.__clockShift;}};
+const actualVersion=process.version;Object.defineProperty(process,'version',{get:()=>process.env.PUBLISHER_RUNTIME||(process.env.COMPILER_RUNTIME&&global.__apiCalls>=13?process.env.COMPILER_RUNTIME:actualVersion)});
+const RealDate=Date;global.__clockShift=Number(process.env.CLOCK_SHIFT_MS||0);global.Date=class extends RealDate{constructor(...args){if(!args.length&&global.__delayNextDate){global.__delayNextDate=false;global.__clockShift+=Number(process.env.POST_VALIDATION_DELAY_MS||0);}super(...(args.length?args:[RealDate.now()+global.__clockShift]));}static now(){return RealDate.now()+global.__clockShift;}toISOString(){const result=super.toISOString();if(global.__apiCalls===13&&process.env.PARSE_DELAY_MS&&!global.__parseDelayed){global.__parseDelayed=true;global.__clockShift+=Number(process.env.PARSE_DELAY_MS);}if(global.__afterValidationClock){global.__afterValidationClock=false;global.__delayNextDate=true;}return result;}};
 const sha=process.env.FIXTURE_SOURCE_SHA||'${sha}',old=process.env.FIXTURE_BASE_SHA||'${old}',id=process.env.FIXTURE_BEFORE_ID||'${id}',next=process.env.FIXTURE_NEXT_ID||'${next}';
 cp.execFileSync=(program,args)=>{
  if(program==='git'){
@@ -22,11 +38,14 @@ cp.execFileSync=(program,args)=>{
   if(args[0]==='diff')return process.env.CHANGED_PATH||'docs/release-process.md';
   if(args[0]==='merge-base')return old;
   if(args[0]==='ls-tree'&&args[1]!=='-r'){const file=args.at(-1),bytes=fs.readFileSync(file),blob=require('node:crypto').createHash('sha1').update(Buffer.concat([Buffer.from('blob '+bytes.length+'\\0'),bytes])).digest('hex');return (process.env.ARCHIVE_MODE||'100644')+' blob '+(process.env.ARCHIVE_BLOB||blob)+'\\t'+file;}
+  if(args[0]==='show'&&args.includes('--format=%P'))return old+' '+(process.env.FIXTURE_PR_HEAD_SHA||'e'.repeat(40));
+  if(args[0]==='show'&&String(args.at(-1)).endsWith(':.github/workflows/validate.yml'))return fs.readFileSync('validate.yml');
+  if(args[0]==='rev-parse'&&String(args.at(-1)).endsWith('^{tree}'))return 'd9ebd59f26e2fea7ef82e5e2831cb66851a5ae1a';
   if(args[0]==='show')return 'export default {};';
   if(args[0]==='ls-tree')return 'security/index.mjs\\ncatalogue/index.mjs\\nserver/proof-api.mjs';
   return sha;
  }
- if(program==='gh'){if(process.env.FAIL_CONTEXT==='true')throw Error('${marker}');return JSON.stringify({object:{sha:process.env.DRIFT==='true'?old:sha}});}
+ if(program==='gh'){if(process.env.AMBIENT_GH_HOST_PROBE==='true'&&!(args.includes('--hostname')&&args[args.indexOf('--hostname')+1]==='github.com'))throw Error('PRIVATE_AMBIENT_HOST_SENTINEL');fs.appendFileSync('context-calls.log','current-main\\n');if(process.env.FAIL_CONTEXT==='true')throw Error('${marker}');return JSON.stringify({object:{sha:process.env.DRIFT==='true'?old:sha}});}
  if(program==='npx'){
   fs.appendFileSync('provider-calls.log',args.join(' ')+'\\n');
   if(process.env.UPLOAD_RESULT==='success'){fs.writeFileSync('uploaded','yes');return 'synthetic acknowledgement';}
@@ -62,7 +81,32 @@ import {createHash} from 'node:crypto';const requireHash=x=>createHash('sha256')
 require('node:module').registerHooks({resolve(specifier,context,nextResolve){if(specifier==='wrangler'&&context.conditions.includes('import'))return {url:'data:text/javascript,'+encodeURIComponent(fakeApi),shortCircuit:true};return nextResolve(specifier,context);}});
 
 require('node:module').syncBuiltinESMExports();
-global.fetch=async url=>{
+global.fetch=async (url,options)=>{
+ if(String(url).startsWith('https://api.github.com/')||String(url).startsWith('https://results-receiver.actions.githubusercontent.com/')){
+  const f=JSON.parse(fs.readFileSync('mandatory.json')),s=f.selector,v=f.facts;global.__apiCalls=(global.__apiCalls||0)+1;
+  if(options.method!=='GET'||options.headers?.Cookie||options.headers?.Referer)throw Error('Unexpected request');
+  if(process.env.REQUIRE_NATIVE_AUTH==='true'){const download=String(url).startsWith('https://results-receiver.actions.githubusercontent.com/');if(download?options.headers?.Authorization!==undefined:options.headers?.Authorization!=='Bearer '+process.env.GH_TOKEN)throw Error('Synthetic auth boundary rejected');fs.appendFileSync('auth-boundary.log',download?'download-clean\\n':'fixed-api-native\\n');}
+  fs.appendFileSync('validation-calls.log',String(url).startsWith('https://results-receiver.actions.githubusercontent.com/')?'log-download\\n':String(url)+'\\n');
+  const base='https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/';const routes={
+   ['actions/workflows/'+s.workflowId]:v.workflow,['actions/runs/'+s.runId]:global.__apiCalls>11?v.finalRun:v.run,['actions/runs/'+s.runId+'/attempts/'+s.runAttempt]:v.attempt,['actions/runs/'+s.runId+'/attempts/'+s.runAttempt+'/jobs?per_page=100']:v.jobs,['check-runs/'+s.checkRunId]:global.__apiCalls>12?v.finalCheck:v.check,['git/commits/'+s.checkedMergeSha]:v.commit,['pulls/'+s.pullRequestNumber]:v.mergedPull,['rules/branches/main']:v.rules,['actions/workflows/'+s.workflowId+'/runs?event=pull_request&head_sha='+s.prHeadSha+'&per_page=100']:v.runs};
+  if(process.env.FAIL_VALIDATION==='network')throw Error('PRIVATE_NETWORK_SENTINEL');
+  if(process.env.FAIL_VALIDATION==='echo')throw Error('PRIVATE_ECHO '+process.env.GH_TOKEN+' https://results-receiver.actions.githubusercontent.com/PRIVATE_SIGNED_SENTINEL');
+  if(process.env.FAIL_VALIDATION==='deadline')global.__clockShift+=31000;
+  const headers={'content-type':'application/json','x-ratelimit-remaining':String(process.env.FAIL_VALIDATION==='quota'?0:60-global.__apiCalls),'x-ratelimit-reset':String(global.__rateReset??=(Math.floor(Date.now()/1000)+3600))};
+  if(process.env.FAIL_VALIDATION==='huge-quota')headers['x-ratelimit-remaining']='999999999999999999999999999999999999';
+  if(process.env.FAIL_VALIDATION==='huge-reset')headers['x-ratelimit-reset']='999999999999999999999999999999999999';
+  if(process.env.FAIL_VALIDATION==='changing-reset')headers['x-ratelimit-reset']=String(Math.floor(Date.now()/1000)+3600+global.__apiCalls);
+  if(process.env.FAIL_VALIDATION==='late-quota'&&global.__apiCalls===11)headers['x-ratelimit-remaining']='0';
+  if(process.env.FAIL_VALIDATION==='headers')delete headers['x-ratelimit-remaining'];
+  if(process.env.FAIL_VALIDATION==='media')headers['content-type']='text/html';
+  if(process.env.FAIL_VALIDATION==='pagination')headers.link='<https://api.github.com/?page=2>; rel=next';
+  if(String(url).startsWith('https://results-receiver.actions.githubusercontent.com/')){headers['content-type']='text/plain';if(process.env.FAIL_VALIDATION==='download-redirect')return new Response(null,{status:302,headers:{location:'https://results-receiver.actions.githubusercontent.com/PRIVATE_SIGNED_SENTINEL'}});return new Response(process.env.FAIL_VALIDATION==='log-size'?'x'.repeat(4194305):v.log,{headers});}
+  if(url===base+'actions/jobs/'+s.jobId+'/logs'){headers.location=process.env.REDIRECT_LOCATION||(process.env.FAIL_VALIDATION==='redirect'?'http://logs.invalid/PRIVATE_SIGNED_SENTINEL':'https://results-receiver.actions.githubusercontent.com/temporary');return new Response(null,{status:302,headers});}
+  const path=String(url).slice(base.length);if(!(path in routes))throw Error('Unexpected GitHub path');
+  if(global.__apiCalls===13&&process.env.POST_VALIDATION_DELAY_MS)global.__afterValidationClock=true;
+  return new Response(process.env.FAIL_VALIDATION==='json-size'?'x'.repeat(1048577):process.env.FAIL_VALIDATION==='duplicate'?' {\"id\":1,\"id\":2}':JSON.stringify(routes[path]),{status:process.env.FAIL_VALIDATION==='status'?403:200,headers});
+ }
+
  fs.appendFileSync('request-calls.log',String(url)+'\\n');
  if(!String(url).includes('/pages/projects/customvibe-business'))throw Error('Private request attempted');
  return {ok:true,json:async()=>({success:true,result:{canonical_deployment:{id:fs.existsSync('uploaded')?next:id,latest_stage:{status:'success'},deployment_trigger:{metadata:{commit_hash:fs.existsSync('uploaded')?sha:old}}}}})};
@@ -73,23 +117,24 @@ async function fixture(t){
  await mkdir(join(dir,'dist/release'),{recursive:true});
  for(const side of ['client','admin','ssr']){await mkdir(join(dir,'dist',side));await writeFile(join(dir,'dist',side,'index.html'),'fixture');}
  await writeFile(join(dir,'preload.cjs'),preload);
+ const mandatory=mandatoryCliFixture();await writeFile(join(dir,'mandatory.json'),JSON.stringify(mandatory));await copyFile(join(root,'.github/workflows/validate.yml'),join(dir,'validate.yml'));
  for(const name of ['wrangler.jsonc','package-lock.json'])await copyFile(join(root,name),join(dir,name));
  for(const family of ['security','content']){await mkdir(join(dir,'migrations',family),{recursive:true});await writeFile(join(dir,'migrations',family,'0001.sql'),'-- fixture only');await writeFile(join(dir,family==='security'?'wrangler.security.jsonc':'wrangler.catalogue.jsonc'),JSON.stringify({d1_databases:[{database_name:family,database_id:id}]}));}
  await writeFile(join(dir,'wrangler.admin.jsonc'),'{}');
  const path=join(dir,'dist/release/release-manifest.json');
  const baseline={schemaVersion:1,repository:'TIMMMYYYHHHH/Customvibev3',state:'partial',sourceSha:old,baseSha:old,reviewed:true,evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/100'};
- const evidence={baseline,sourceSha:sha};
- const env={PATH:process.env.PATH,TMPDIR:tmpdir(),GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:baseline.repository,GITHUB_REF:'refs/heads/main',GITHUB_SHA:sha,GITHUB_EVENT_NAME:'workflow_dispatch',REVIEWED_SHA:sha,GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1',CLOUDFLARE_ACCOUNT_ID:'4f57d4e924674cb87b33d4c884745cf6',CLOUDFLARE_API_TOKEN:'synthetic-pages-only-token',WRANGLER_SEND_METRICS:'false',RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)};
+ const evidence={baseline,sourceSha:sha,mandatoryValidation:mandatory.selector};
+ const env={PATH:process.env.PATH,TMPDIR:tmpdir(),GH_TOKEN:'synthetic-native-github-token',GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:baseline.repository,GITHUB_REF:'refs/heads/main',GITHUB_SHA:sha,GITHUB_EVENT_NAME:'workflow_dispatch',REVIEWED_SHA:sha,GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1',CLOUDFLARE_ACCOUNT_ID:'4f57d4e924674cb87b33d4c884745cf6',CLOUDFLARE_API_TOKEN:'synthetic-pages-only-token',WRANGLER_SEND_METRICS:'false',RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)};
  const fixture={dir,path,evidence,async run(args,extra={}){
   let result;try{result={status:0,stdout:execFileSync(process.execPath,['--require',join(dir,'preload.cjs'),cli,...args],{cwd:dir,env:{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence),...extra},encoding:'utf8',stdio:['ignore','pipe','pipe']})};}catch(e){result={status:e.status,stdout:String(e.stdout||''),stderr:String(e.stderr||'')};}
   const text=await readFile(path,'utf8').catch(()=> '{}');
   const log=name=>readFile(join(dir,name),'utf8').catch(()=> '');
-  return {...result,text,record:JSON.parse(text),calls:await log('guard-calls.log'),requests:await log('request-calls.log'),uploads:await log('provider-calls.log')};
+  return {...result,text,record:JSON.parse(text),calls:await log('guard-calls.log'),requests:await log('request-calls.log'),uploads:await log('provider-calls.log'),validationRequests:await log('validation-calls.log'),contextCalls:await log('context-calls.log'),authBoundary:await log('auth-boundary.log')};
  }};
  const seed=await fixture.run(['plan']);
- if(!seed.record.build)throw Error('Fixture source/build setup failed: '+JSON.stringify(seed));
+ if(!seed.record.build)throw Error('Fixture source/build setup failed: '+seed.record.reasons?.join('; '));
  evidence.activationCompatibility={basis:'source-input-tooling-only-v1',reviewedAgainstSha:sha,baselineSha:old,observedAt:new Date().toISOString(),sourceInputDigest:seed.record.build.sourceInputDigest,compilerConfigDigest:seed.record.build.compiler.compilerConfigDigest,configDigest:seed.record.build.compiler.configDigest,pagesBuildDigest:seed.record.build.pages.sha256,adminAssetsDigest:seed.record.build.admin.sha256,historicalFunctionsDigest:null};
- for(const log of ['guard-calls.log','request-calls.log','provider-calls.log'])await writeFile(join(dir,log),'');
+ for(const log of ['guard-calls.log','request-calls.log','provider-calls.log','validation-calls.log','context-calls.log','auth-boundary.log'])await writeFile(join(dir,log),'');
  return fixture;
 }
 test('Pages-only publication needs no private request and records partial unknown compatibility',async t=>{
@@ -136,7 +181,7 @@ test('Pages drift and changed built output abort before an upload attempt',async
 test('local final failure still attempts every protection independently',async t=>{
  const f=await fixture(t);await f.run(['plan']);await f.run(['publish','pages'],{UPLOAD_RESULT:'success'});
  await writeFile(join(f.dir,'guard-calls.log'),'');
- const result=await f.run(['finish-local'],{GITHUB_ACTIONS:'false',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',FAIL_CONTEXT:'true',FAIL_GUARDS:'true'});
+ const result=await f.run(['finish-local'],{GITHUB_ACTIONS:'false',GH_TOKEN:'',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',FAIL_CONTEXT:'true',FAIL_GUARDS:'true'});
  assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.finalProtection.checks.length,4);
  assert.equal(result.record.finalProtection.checks.filter(v=>v.identityCode==='FINAL_IDENTITY_OBSERVATION_FAILED').length,4);
  for(const name of ['check-deployment','check-admin-deployment','check-security-deployment','check-catalogue-deployment'])assert.match(result.calls,new RegExp(name+'[.]mjs'));
@@ -194,7 +239,32 @@ require('node:module').syncBuiltinESMExports();
 const services={AUTH:{service:'customvibe-security'},CATALOGUE:{service:'customvibe-catalogue'}};
 const privateKeys=['SITE_PASSWORD_HASH','SITE_PASSWORD_SALT','SESSION_SECRET','RESEND_API_KEY','W3FORMS_ACCESS_KEY','TURNSTILE_SECRET_KEY','TURNSTILE_SITE_KEY'];
 function settings(c){if(c==='admin')return {bindings:[{name:'SITE_GATE_ENABLED',text:'true'},{name:'ADMIN_SEND_ENABLED',text:'true'},{name:'AUTH',service:'customvibe-security'},...['ADMIN_PASSWORD_HASH','ADMIN_SESSION_SECRET','RESEND_API_KEY'].map(name=>({name,type:'secret_text'}))]};if(c==='security')return {bindings:${JSON.stringify(bindings)}};return {bindings:[{name:'CONTENT_DB',type:'d1',id:${JSON.stringify(catalogue.d1_databases[0].database_id)}}]};}
-global.fetch=async url=>{const path=String(url);let payload;
+global.fetch=async (url,options)=>{
+ if(String(url).startsWith('https://api.github.com/')||String(url).startsWith('https://results-receiver.actions.githubusercontent.com/')){
+  const f=JSON.parse(fs.readFileSync('mandatory.json')),s=f.selector,v=f.facts;global.__apiCalls=(global.__apiCalls||0)+1;
+  if(options.method!=='GET'||options.headers?.Cookie||options.headers?.Referer)throw Error('Unexpected request');
+  if(process.env.REQUIRE_NATIVE_AUTH==='true'){const download=String(url).startsWith('https://results-receiver.actions.githubusercontent.com/');if(download?options.headers?.Authorization!==undefined:options.headers?.Authorization!=='Bearer '+process.env.GH_TOKEN)throw Error('Synthetic auth boundary rejected');fs.appendFileSync('auth-boundary.log',download?'download-clean\\n':'fixed-api-native\\n');}
+  fs.appendFileSync('validation-calls.log',String(url).startsWith('https://results-receiver.actions.githubusercontent.com/')?'log-download\\n':String(url)+'\\n');
+  const base='https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/';const routes={
+   ['actions/workflows/'+s.workflowId]:v.workflow,['actions/runs/'+s.runId]:global.__apiCalls>11?v.finalRun:v.run,['actions/runs/'+s.runId+'/attempts/'+s.runAttempt]:v.attempt,['actions/runs/'+s.runId+'/attempts/'+s.runAttempt+'/jobs?per_page=100']:v.jobs,['check-runs/'+s.checkRunId]:global.__apiCalls>12?v.finalCheck:v.check,['git/commits/'+s.checkedMergeSha]:v.commit,['pulls/'+s.pullRequestNumber]:v.mergedPull,['rules/branches/main']:v.rules,['actions/workflows/'+s.workflowId+'/runs?event=pull_request&head_sha='+s.prHeadSha+'&per_page=100']:v.runs};
+  if(process.env.FAIL_VALIDATION==='network')throw Error('PRIVATE_NETWORK_SENTINEL');
+  if(process.env.FAIL_VALIDATION==='echo')throw Error('PRIVATE_ECHO '+process.env.GH_TOKEN+' https://results-receiver.actions.githubusercontent.com/PRIVATE_SIGNED_SENTINEL');
+  if(process.env.FAIL_VALIDATION==='deadline')global.__clockShift+=31000;
+  const headers={'content-type':'application/json','x-ratelimit-remaining':String(process.env.FAIL_VALIDATION==='quota'?0:60-global.__apiCalls),'x-ratelimit-reset':String(global.__rateReset??=(Math.floor(Date.now()/1000)+3600))};
+  if(process.env.FAIL_VALIDATION==='huge-quota')headers['x-ratelimit-remaining']='999999999999999999999999999999999999';
+  if(process.env.FAIL_VALIDATION==='huge-reset')headers['x-ratelimit-reset']='999999999999999999999999999999999999';
+  if(process.env.FAIL_VALIDATION==='changing-reset')headers['x-ratelimit-reset']=String(Math.floor(Date.now()/1000)+3600+global.__apiCalls);
+  if(process.env.FAIL_VALIDATION==='late-quota'&&global.__apiCalls===11)headers['x-ratelimit-remaining']='0';
+  if(process.env.FAIL_VALIDATION==='headers')delete headers['x-ratelimit-remaining'];
+  if(process.env.FAIL_VALIDATION==='media')headers['content-type']='text/html';
+  if(process.env.FAIL_VALIDATION==='pagination')headers.link='<https://api.github.com/?page=2>; rel=next';
+  if(String(url).startsWith('https://results-receiver.actions.githubusercontent.com/')){headers['content-type']='text/plain';if(process.env.FAIL_VALIDATION==='download-redirect')return new Response(null,{status:302,headers:{location:'https://results-receiver.actions.githubusercontent.com/PRIVATE_SIGNED_SENTINEL'}});return new Response(process.env.FAIL_VALIDATION==='log-size'?'x'.repeat(4194305):v.log,{headers});}
+  if(url===base+'actions/jobs/'+s.jobId+'/logs'){headers.location=process.env.REDIRECT_LOCATION||(process.env.FAIL_VALIDATION==='redirect'?'http://logs.invalid/PRIVATE_SIGNED_SENTINEL':'https://results-receiver.actions.githubusercontent.com/temporary');return new Response(null,{status:302,headers});}
+  const path=String(url).slice(base.length);if(!(path in routes))throw Error('Unexpected GitHub path');
+  if(global.__apiCalls===13&&process.env.POST_VALIDATION_DELAY_MS)global.__afterValidationClock=true;
+  return new Response(process.env.FAIL_VALIDATION==='json-size'?'x'.repeat(1048577):process.env.FAIL_VALIDATION==='duplicate'?' {\"id\":1,\"id\":2}':JSON.stringify(routes[path]),{status:process.env.FAIL_VALIDATION==='status'?403:200,headers});
+ }
+const path=String(url);let payload;
  if(path.endsWith('/accounts/4f57d4e924674cb87b33d4c884745cf6'))payload={success:true,result:{id:'4f57d4e924674cb87b33d4c884745cf6'}};
  else if(path.includes('/pages/')){
   payload=metadata(path);const environments=Object.fromEntries(['production','preview'].map(c=>[c,{fail_open:false,services,env_vars:{SITE_GATE_ENABLED:{value:'true'},SUBMISSIONS_ENABLED:{value:c==='production'?'true':'false'},...Object.fromEntries(privateKeys.map(name=>[name,{type:'secret_text'}]))}}]));
@@ -223,7 +293,7 @@ global.fetch=async url=>{const path=String(url);let payload;
  for(const family of ['security','content']){const item=record.schemaSources[family];finalEvidence.schema[family]={origin:'console-metadata',databaseId:item.databaseId,reviewedAgainstSha:sha,observedAt,sourceFiles:item.source,applied:item.source.map(v=>v.name),objectsDigest:'c'.repeat(64),ddlReviewed:true};}
  await writeFile(join(f.dir,'guard-calls.log'),'');
  const artifactBytes=await readFile(f.path);finalEvidence.githubArtifact={origin:'owner-github-run-artifact',reviewed:true,sourceSha:sha,runId:'123',url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123',artifactName:'release-manifest-123',runStatus:'completed',conclusion:'success',manifestSha256:hash(artifactBytes),runAttempt:'1',artifactId:'321',jobId:'987',zipSha256:'c'.repeat(64),publishStep:{name:'Publish protected Pages from the reviewed build',number:9,startedAt:record.attempts[0].startedAt,completedAt:new Date().toISOString()}};
- return {...f,finalEvidence,local(extra={}){return f.run(['finish-local'],{GITHUB_ACTIONS:'false',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',RELEASE_EVIDENCE_JSON:JSON.stringify(finalEvidence),...extra});}};
+ return {...f,finalEvidence,local(extra={}){return f.run(['finish-local'],{GITHUB_ACTIONS:'false',GH_TOKEN:'',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',RELEASE_EVIDENCE_JSON:JSON.stringify(finalEvidence),...extra});}};
 }
 test('real CLI local completion verifies unchanged final component identities',async t=>{
  const f=await completionFixture(t),result=await f.local();assert.equal(result.status,0);assert.equal(result.record.state,'verified');
@@ -291,17 +361,15 @@ test('installed pinned Pages API receipt matches each actual submitted inner Fil
  for(const path of ['index.html','_headers','_redirects','_routes.json']){const b=await fs.readFile('dist/client/'+path);assetInventory.push({path,sha256:hash(b),bytes:b.length});}
  const expected={sourceSha:sha,runId:'123',sourceInputDigest:'c'.repeat(64),compilerConfigDigest:hash(await fs.readFile(require.resolve('wrangler'))),configDigest:hash(await fs.readFile('wrangler.jsonc')),buildDigest:'c'.repeat(64),assetsDigest:'c'.repeat(64),config,assetInventory,controls:Object.fromEntries(assetInventory.filter(v=>v.path!=='index.html').map(({path,...v})=>[path,v]))};
  const {unstable_pages}=require('wrangler'),proofs=[],returnedMime=[];for(let i=0;i<2;i++){const result=await unstable_pages.deploy({directory:'dist/client',accountId:'4f57d4e924674cb87b33d4c884745cf6',projectName:'customvibe-business',branch:'main',commitHash:sha,commitDirty:false,functionsDirectory:'functions',bundle:true,sourceMaps:false,args:{config:'wrangler.jsonc'}});returnedMime.push(result.formData.get('_worker.bundle').type);proofs.push(await capturePagesUpload(result,expected));}let beforeCount=0,ackClock;
- proofs.push(await officialPagesUpload(expected,{onBeforeInvoke:({invokedAt})=>{beforeCount++;events.push('invoke');if(!/^\\d{4}-/.test(invokedAt))throw Error('Invalid runner clock');},onAcknowledgement:(ack,{acknowledgementObservedAt})=>{events.push('ack');ackClock=acknowledgementObservedAt;}}));
- const rejected=[];for(const callback of [()=>{throw Error('PRIVATE_CALLBACK_SENTINEL')},async()=>{},()=>({then(resolve){resolve()}})]){try{await officialPagesUpload(expected,{onBeforeInvoke:callback});rejected.push(false)}catch{rejected.push(true)}};
- mode='lost';let failure='';try{await officialPagesUpload(expected)}catch(e){failure=e.message;}
+ const rejected=[];let failure='';mode='lost';try{await unstable_pages.deploy({directory:'dist/client',accountId:'4f57d4e924674cb87b33d4c884745cf6',projectName:'customvibe-business',branch:'main',commitHash:sha,commitDirty:false,functionsDirectory:'functions',bundle:true,sourceMaps:false,args:{config:'wrangler.jsonc'}})}catch{failure='Actual uploader failure retained.';}
  console.log(JSON.stringify({proofs,captured,returnedMime,postCount,failure,beforeCount,ackClock,events,rejected}));
  `;
  await writeFile(join(dir,'fixture.mjs'),script);
  const output=execFileSync(process.execPath,[join(dir,'fixture.mjs')],{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe'],env:{PATH:process.env.PATH,TMPDIR:tmpdir(),CLOUDFLARE_API_TOKEN:'PRIVATE_TOKEN_SENTINEL',CLOUDFLARE_ACCOUNT_ID:'4f57d4e924674cb87b33d4c884745cf6',WRANGLER_SEND_METRICS:'false',WRANGLER_WRITE_LOGS:'false',WRANGLER_LOG:'none'}});
- const result=JSON.parse(output);assert.equal(result.postCount,4);assert.equal(result.beforeCount,1);assert.deepEqual(result.rejected,[true,true,true]);assert.deepEqual(result.events.slice(2,5),['invoke','post','ack']);assert.ok(Number.isFinite(Date.parse(result.ackClock)));assert.equal(result.proofs.length,3);assert.deepEqual(result.returnedMime,['','']);
- for(let i=0;i<3;i++){assert.equal(result.proofs[i].uploadedBundleDigest,result.captured[i].rawHash);assert.equal(result.proofs[i].uploadedBundleBytes,result.captured[i].bytes);assert.equal(result.proofs[i].uploadedModuleInventory[0].sha256,result.captured[i].moduleHash);assert.equal(result.captured[i].submittedSha,sha);assert.equal(result.proofs[i].acknowledgement.id,id);}
+ const result=JSON.parse(output);assert.equal(result.postCount,3);assert.equal(result.proofs.length,2);assert.deepEqual(result.returnedMime,['','']);
+ for(let i=0;i<2;i++){assert.equal(result.proofs[i].uploadedBundleDigest,result.captured[i].rawHash);assert.equal(result.proofs[i].uploadedBundleBytes,result.captured[i].bytes);assert.equal(result.proofs[i].uploadedModuleInventory[0].sha256,result.captured[i].moduleHash);assert.equal(result.captured[i].submittedSha,sha);assert.equal(result.proofs[i].acknowledgement.id,id);}
  assert.notEqual(result.proofs[0].uploadedBundleDigest,result.proofs[1].uploadedBundleDigest);assert.notEqual(result.proofs[0].uploadedModuleInventory[0].name,result.proofs[1].uploadedModuleInventory[0].name);
- assert.match(result.failure,/Official Pages upload or fingerprint validation failed/);assert.doesNotMatch(output,/PRIVATE_|export function|Authorization|Bearer|jwt|diagnostic/);
+ assert.match(result.failure,/Actual uploader failure retained/);assert.doesNotMatch(output,/PRIVATE_|export function|Authorization|Bearer|jwt|diagnostic/);
 });
 
 test('post-acknowledgement build failure retains the actual upload receipt and remains unconfirmed',async t=>{
@@ -333,7 +401,7 @@ test('local completion preserves original Node22 compiler provenance without cla
  const {compilerConfigDigest,...compiler}=record.build.compiler;record.build.compiler.compilerConfigDigest=hash(canonical(compiler));
  record.activationCompatibility.compilerConfigDigest=record.build.compiler.compilerConfigDigest;
  const {integrityDigest,...proof}=record.pagesUploadEvidence;proof.compilerConfigDigest=record.build.compiler.compilerConfigDigest;record.pagesUploadEvidence={...proof,integrityDigest:hash(canonical(proof))};
- const snapshot=Object.fromEntries(['sourceSha','repository','workflow','runAttempt','planComplete','baseSha','beforePagesSourceSha','before','required','schemas','paths','archivedRelease','sourceDigests','schemaSources','build','activationCompatibility','evidence'].map(k=>[k,record[k]]));
+ const snapshot=Object.fromEntries(['mandatoryValidation','sourceSha','repository','workflow','runAttempt','planComplete','baseSha','beforePagesSourceSha','before','required','schemas','paths','archivedRelease','sourceDigests','schemaSources','build','activationCompatibility','evidence'].map(k=>[k,record[k]]));
  record.prewriteValidation.snapshotDigest=hash(canonical(snapshot));const {integrityDigest:oldStamp,...stamp}=record.prewriteValidation;record.prewriteValidation.integrityDigest=hash(canonical(stamp));record.attempts[0].prewriteValidationDigest=record.prewriteValidation.integrityDigest;
  await writeFile(f.path,JSON.stringify(record));f.finalEvidence.githubArtifact.manifestSha256=hash(await readFile(f.path));
  const result=await f.local();assert.equal(result.status,0);assert.equal(result.record.state,'verified');assert.equal(result.record.build.compiler.runtime,'v22.23.3');assert.equal(result.record.pagesUploadEvidence.compilerConfigDigest,record.build.compiler.compilerConfigDigest);
@@ -357,9 +425,17 @@ async function archiveFixture(t){
  const record=done.record,dir=await fixture(t),candidate='c'.repeat(40),newId='11111111-1234-1234-1234-123456789abc',archivePath='docs/releases/2026-10-20-release-M.json';
  await mkdir(join(dir.dir,'docs/releases'),{recursive:true});await writeFile(join(dir.dir,archivePath),JSON.stringify(record,null,2)+'\n');
  const hash=v=>createHash('sha256').update(v).digest('hex');
- const evidence={sourceSha:candidate,baseline:{...record,reviewed:true,evidenceUrl:`https://github.com/TIMMMYYYHHHH/Customvibev3/blob/${candidate}/${archivePath}`},archivedRelease:{origin:'reviewed-complete-release-archive',reviewed:true,path:archivePath,sha256:hash(await readFile(join(dir.dir,archivePath))),sourceSha:sha,reviewedAgainstSha:candidate}};
- const env={FIXTURE_SOURCE_SHA:candidate,FIXTURE_BASE_SHA:sha,FIXTURE_BEFORE_ID:next,FIXTURE_NEXT_ID:newId,GITHUB_SHA:candidate,REVIEWED_SHA:candidate,GITHUB_RUN_ID:'456',CHANGED_PATH:archivePath};
- const seeded=await dir.run(['plan'],{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.ok(seeded.record.build);
+ // Archive N needs its own synthetic matched validation, never M's tuple.
+ const mandatory=mandatoryCliFixture(),s=mandatory.selector,head='f'.repeat(40),merge='d'.repeat(40),runId=39404961305,jobId=118568540208,suiteId=988;
+ Object.assign(s,{candidateSha:candidate,prBaseSha:sha,prHeadSha:head,checkedMergeSha:merge,pullRequestNumber:46,runId,jobId,checkRunId:jobId,checkSuiteId:suiteId,url:`https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/${runId}`});
+ for(const run of [mandatory.facts.run,mandatory.facts.attempt,mandatory.facts.finalRun,mandatory.facts.runs.workflow_runs[0]])Object.assign(run,{id:runId,head_sha:head,check_suite_id:suiteId,html_url:s.url});
+ Object.assign(mandatory.facts.jobs.jobs[0],{id:jobId,run_id:runId,head_sha:head,url:`https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/jobs/${jobId}`,run_url:`https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/runs/${runId}`,html_url:`${s.url}/job/${jobId}`,check_run_url:`https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/check-runs/${jobId}`});
+ for(const check of [mandatory.facts.check,mandatory.facts.finalCheck])Object.assign(check,{id:jobId,head_sha:head,check_suite:{id:suiteId}});
+ mandatory.facts.commit={sha:merge,tree:{sha:s.checkedTreeSha},parents:[{sha},{sha:head}]};Object.assign(mandatory.facts.mergedPull,{number:46,merge_commit_sha:candidate});mandatory.facts.mergedPull.head.sha=head;
+ mandatory.facts.log=mandatory.facts.log.replaceAll('bc4e80b61dd30338e62f1b922dded516cd250d30',merge).replaceAll('/pull/45/','/pull/46/');s.originalJobLogSha256=hash(mandatory.facts.log);await writeFile(join(dir.dir,'mandatory.json'),JSON.stringify(mandatory));
+ const evidence={sourceSha:candidate,mandatoryValidation:s,baseline:{...record,reviewed:true,evidenceUrl:`https://github.com/TIMMMYYYHHHH/Customvibev3/blob/${candidate}/${archivePath}`},archivedRelease:{origin:'reviewed-complete-release-archive',reviewed:true,path:archivePath,sha256:hash(await readFile(join(dir.dir,archivePath))),sourceSha:sha,reviewedAgainstSha:candidate}};
+ const env={FIXTURE_SOURCE_SHA:candidate,FIXTURE_PR_HEAD_SHA:head,FIXTURE_BASE_SHA:sha,FIXTURE_BEFORE_ID:next,FIXTURE_NEXT_ID:newId,GITHUB_SHA:candidate,REVIEWED_SHA:candidate,GITHUB_RUN_ID:'456',CHANGED_PATH:archivePath};
+ const seeded=await dir.run(['plan'],{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.ok(seeded.record.build,seeded.record.reasons?.join('; '));
  const build=seeded.record.build;evidence.activationCompatibility={basis:'source-input-tooling-only-v1',reviewedAgainstSha:candidate,baselineSha:sha,observedAt:new Date().toISOString(),sourceInputDigest:build.sourceInputDigest,compilerConfigDigest:build.compiler.compilerConfigDigest,configDigest:build.compiler.configDigest,pagesBuildDigest:build.pages.sha256,adminAssetsDigest:build.admin.sha256,historicalFunctionsDigest:null};
  return {...dir,record,evidence,env,candidate,newId,archivePath,async runArchive(args,extra={}){return dir.run(args,{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence),...extra});}};
 }
@@ -387,7 +463,7 @@ test('actual CLI rejects untrusted, changed, incomplete or self-referential arch
 });
 test('strict historical manual archive permits unknown Functions bytes and retains original private receipt sources',async t=>{
  const f=await archiveFixture(t),{validateReleaseArchiveRecord}=await import('../scripts/release-manifest.mjs');const record=structuredClone(f.record);
- record.pagesUploadEvidence=null;delete record.prewriteValidation;delete record.completionEvidence;delete record.runAttempt;delete record.attempts;delete record.build;delete record.activationCompatibility;record.historicalFunctionsDigest=null;record.components.security.receipt.sourceSha=old;
+ record.pagesUploadEvidence=null;delete record.prewriteValidation;delete record.completionEvidence;delete record.runAttempt;delete record.attempts;delete record.build;delete record.activationCompatibility;delete record.mandatoryValidation;record.historicalFunctionsDigest=null;record.components.security.receipt.sourceSha=old;
  const baseline=structuredClone(record);const result=validateReleaseArchiveRecord(record,{sourceSha:sha,candidateSha:f.candidate,baseline});assert.equal(result.sourceSha,sha);assert.match(result.receiptDigest,/^[a-f0-9]{64}$/);assert.equal(record.pagesUploadEvidence,null);assert.equal(record.components.security.receipt.sourceSha,old);
 });
 test('invalid acknowledged source, environment or time is not retained or retried after upload',async t=>{
@@ -446,4 +522,75 @@ test('automatic archives cannot omit clocks or serialize private additions in ne
  for(const mutate of [r=>delete r.prewriteValidation,r=>delete r.completionEvidence,r=>r.prewriteValidation.privatePath='/private/PRIVATE_SENTINEL',r=>r.attempts[0].customer='PRIVATE_SENTINEL',r=>r.githubArtifact.publishStep.raw='PRIVATE_SENTINEL',r=>r.completionEvidence.ddl='PRIVATE_SENTINEL',r=>r.completionEvidence.evidence.schema.content.sql='PRIVATE_SENTINEL',r=>{r.pagesUploadEvidence=null;delete r.prewriteValidation;delete r.completionEvidence;delete r.runAttempt;}]){
   const record=structuredClone(f.record);mutate(record);assert.throws(()=>validateReleaseArchiveRecord(record,{sourceSha:sha,candidateSha:f.candidate,baseline:record}));
  }
+});
+
+test('mandatory plan gate cannot be omitted, forged or replaced by legacy modes and never reaches provider guards',async t=>{
+ for(const change of ['missing','forged','legacy','unknown']){const f=await fixture(t);if(change==='missing')delete f.evidence.mandatoryValidation;if(change==='forged')f.evidence.mandatoryValidation={origin:'github-public-api',contentDigest:'a'.repeat(64)};if(change==='legacy')f.evidence.mandatoryValidation.origin='owner-attestation';if(change==='unknown')f.evidence.mandatoryValidation.skip=true;const r=await f.run(['plan']);assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.calls,'');assert.equal(r.requests,'');assert.equal(r.record.planComplete,false);assert.match(r.record.reasons.join(''),/PLAN_MANDATORY_VALIDATION_FAILED/);}
+});
+test('fixed reader rejects quota, headers, status, media, pagination, duplicate JSON, redirects and network errors without upload or private diagnostics',async t=>{
+ for(const failure of ['quota','headers','status','media','pagination','duplicate','redirect','network']){const f=await fixture(t),r=await f.run(['plan'],{FAIL_VALIDATION:failure});assert.equal(r.status,1,failure);assert.equal(r.uploads,'');assert.equal(r.calls,'');assert.equal(r.requests,'');assert.match(r.record.reasons.join(''),/PLAN_MANDATORY_VALIDATION_FAILED/);assert.ok(r.validationRequests.trim().split('\n').length<=13);assert.doesNotMatch(r.text+r.stdout+r.stderr,/PRIVATE_|https:\/\/logs/);}
+});
+test('invocation requires a fresh internally retrieved matching receipt after the pinned import',async t=>{
+ const f=await fixture(t);assert.equal((await f.run(['plan'])).status,0);const r=await f.run(['publish','pages'],{UPLOAD_RESULT:'success',IMPORT_DELAY_MS:'31000'});assert.equal(r.status,0);assert.equal(r.record.prewriteValidation.version,2);assert.equal(r.record.mandatoryValidation.plan.contentDigest,r.record.mandatoryValidation.invocation.contentDigest);assert.ok(Date.parse(r.record.mandatoryValidation.invocation.checkedAt)>=Date.parse(r.record.attempts[0].startedAt)+31000);assert.equal(r.validationRequests.trim().split('\n').length,26);assert.equal(r.uploads.trim(),'official-pages-api');
+});
+
+test('real CLI rejects independent required-validation facts with zero uploader calls',async t=>{
+ const f=await fixture(t),original=mandatoryCliFixture();
+ const mutations=[x=>x.facts.run.repository.private=true,x=>x.facts.run.event='workflow_dispatch',x=>x.facts.run.head_sha=x.selector.checkedMergeSha,x=>x.facts.mergedPull.number=46,x=>x.facts.mergedPull.merged=false,x=>x.facts.mergedPull.merge_commit_sha=old,x=>x.facts.mergedPull.head.sha=old,x=>x.facts.mergedPull.base.ref='other',x=>x.facts.commit.tree.sha=old,x=>x.facts.commit.parents.reverse(),x=>x.facts.workflow.id=1,x=>x.facts.workflow.path='other.yml',x=>x.facts.workflow.state='disabled_manually',x=>x.facts.jobs.jobs[0].id=1,x=>x.facts.check.check_suite.id=1,x=>x.facts.check.app.id=1,x=>x.facts.jobs.jobs[0].steps[7].conclusion='skipped',x=>x.facts.check.conclusion='neutral',x=>x.facts.finalRun.run_attempt=2,x=>x.facts.finalCheck.conclusion='cancelled',x=>x.facts.runs.total_count=2,x=>x.facts.runs.workflow_runs=[],x=>x.facts.runs.workflow_runs[0].run_attempt=2,x=>x.facts.runs.workflow_runs.push({...x.facts.run,id:12,conclusion:'failure'}),x=>x.facts.runs.workflow_runs.push({...x.facts.run,id:12,status:'queued',conclusion:null}),x=>x.facts.runs.workflow_runs.push({...x.facts.run,id:12,conclusion:'cancelled'}),x=>x.facts.runs.workflow_runs.push({...x.facts.run,id:12,run_attempt:2,created_at:'2026-10-19T10:00:00Z'}),x=>x.facts.runs.workflow_runs.push({...x.facts.run,id:12,run_started_at:null}),x=>x.facts.log=x.facts.log.replace('refs/remotes/pull/45/merge','refs/remotes/pull/46/merge'),x=>x.facts.log=x.facts.log.replace('git checkout --progress --force refs/remotes/pull/45/merge','git checkout --progress --force other'),x=>x.facts.log=x.facts.log.replace('# skipped 0','# skipped 1'),x=>x.facts.log+='\n# tests 566',x=>x.facts.log=x.facts.log.replace('\nOK',''),x=>x.facts.log=x.facts.log.slice(0,-150),x=>x.facts.rules=[]];
+ for(const mutate of mutations){const x=structuredClone(original);mutate(x);if(x.facts.runs.workflow_runs.length>1&&x.facts.runs.total_count===1)x.facts.runs.total_count=x.facts.runs.workflow_runs.length;await writeFile(join(f.dir,'mandatory.json'),JSON.stringify(x));await writeFile(join(f.dir,'validation-calls.log'),'');const r=await f.run(['plan']);assert.equal(r.status,1,mutate.toString());assert.equal(r.uploads,'');assert.equal(r.calls,'');assert.equal(r.requests,'');assert.equal(r.record.attempts,undefined);assert.equal(r.record.planComplete,false);assert.ok(r.validationRequests.trim().split('\n').length<=13);assert.doesNotMatch(r.text+r.stdout+r.stderr,/PRIVATE_|https:\/\/logs/);}
+});
+test('actual publisher and actual captured compiler patch mismatches cannot be replaced by selector agreement',async t=>{
+ const f=await fixture(t);for(const extra of [{PUBLISHER_RUNTIME:'v22.23.4'},{PUBLISHER_RUNTIME:'v24.0.0'},{COMPILER_RUNTIME:'v22.23.4'}]){const r=await f.run(['plan'],extra);assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.record.planComplete,false);assert.match(r.record.reasons.join(''),/PLAN_MANDATORY_VALIDATION_FAILED/);}
+});
+test('delay after invocation verification beyond 30 seconds rejects before actual API invocation',async t=>{
+ const f=await fixture(t);assert.equal((await f.run(['plan'])).status,0);const r=await f.run(['publish','pages'],{UPLOAD_RESULT:'success',POST_VALIDATION_DELAY_MS:'30001'});assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.record.attempts[0].outcome,'not-invoked');assert.equal(r.record.prewriteValidation,undefined);
+});
+
+
+test('native GH_TOKEN authenticates each fixed evidence GET and never reaches the log download',async t=>{
+ const f=await fixture(t);const r=await f.run(['plan'],{REQUIRE_NATIVE_AUTH:'true'});
+ assert.equal(r.status,0,r.record.reasons?.join('\n'));
+ assert.deepEqual(r.authBoundary.trim().split('\n'),[...Array(9).fill('fixed-api-native'),'download-clean',...Array(3).fill('fixed-api-native')]);
+ assert.doesNotMatch(r.text+r.stdout+r.stderr,/synthetic-native-github-token|Bearer /);
+});
+test('missing native GH_TOKEN cannot fall back to ambient owner auth before plan or publish context',async t=>{
+ const f=await fixture(t);
+ const missing=await f.run(['plan'],{GH_TOKEN:''});
+ assert.equal(missing.status,1);assert.equal(missing.contextCalls,'');assert.equal(missing.validationRequests,'');assert.equal(missing.calls,'');assert.equal(missing.requests,'');assert.equal(missing.uploads,'');
+ assert.equal((await f.run(['plan'])).status,0);
+ await writeFile(join(f.dir,'context-calls.log'),'');await writeFile(join(f.dir,'validation-calls.log'),'');await writeFile(join(f.dir,'guard-calls.log'),'');await writeFile(join(f.dir,'request-calls.log'),'');
+ const rejected=await f.run(['publish','pages'],{GH_TOKEN:''});assert.equal(rejected.status,1);assert.equal(rejected.contextCalls,'');assert.equal(rejected.validationRequests,'');assert.equal(rejected.uploads,'');
+});
+
+test('official authenticated quota resets may differ and never require exact bucket decrements',async t=>{
+ const f=await fixture(t);const r=await f.run(['plan'],{FAIL_VALIDATION:'changing-reset',REQUIRE_NATIVE_AUTH:'true'});assert.equal(r.status,0);assert.equal(r.validationRequests.trim().split('\n').length,13);
+});
+test('malicious download origins, extra redirects, echoed credentials, body and aggregate limits fail closed',async t=>{
+ const f=await fixture(t);
+ const extras=[...['http://results-receiver.actions.githubusercontent.com/PRIVATE_SIGNED_SENTINEL','https://evil.invalid/PRIVATE_SIGNED_SENTINEL','https://api.github.com/repos/other/repo/PRIVATE_SIGNED_SENTINEL','https://user:PRIVATE_SIGNED_SENTINEL@results-receiver.actions.githubusercontent.com/log','https://results-receiver.actions.githubusercontent.com:444/PRIVATE_SIGNED_SENTINEL','https://results-receiver.actions.githubusercontent.com/log#PRIVATE_SIGNED_SENTINEL'].map(REDIRECT_LOCATION=>({REDIRECT_LOCATION})),...['download-redirect','echo','json-size','log-size','deadline','late-quota'].map(FAIL_VALIDATION=>({FAIL_VALIDATION}))];
+ for(const extra of extras){await writeFile(join(f.dir,'validation-calls.log'),'');const r=await f.run(['plan'],{...extra,REQUIRE_NATIVE_AUTH:'true'});assert.equal(r.status,1,JSON.stringify(extra));assert.equal(r.uploads,'');assert.equal(r.record.planComplete,false);assert.ok(r.validationRequests.trim().split('\n').length<=13);assert.doesNotMatch(r.text+r.stdout+r.stderr,/PRIVATE_|synthetic-native-github-token|Bearer |https:\/\/results-receiver/);assert.ok(!r.text.includes(createHash('sha256').update('synthetic-native-github-token').digest('hex')));}
+});
+test('selector and metadata origin forgeries never produce a credential-bearing request to that target',async t=>{
+ const f=await fixture(t),original=mandatoryCliFixture();
+ const changes=[x=>x.selector.url='https://evil.invalid/PRIVATE_SENTINEL',x=>x.selector.repository='other/repository',x=>x.selector.workflowPath='../other.yml',x=>x.selector.workflowId='1/../../other',x=>x.selector.headers={Authorization:'PRIVATE_SENTINEL'},x=>x.facts.jobs.jobs[0].check_run_url='https://evil.invalid/check-runs/1',x=>x.facts.jobs.jobs[0].check_run_url='https://api.github.com/repos/other/repository/check-runs/1'];
+ for(const change of changes){const x=structuredClone(original);change(x);await writeFile(join(f.dir,'mandatory.json'),JSON.stringify(x));f.evidence.mandatoryValidation=x.selector;await writeFile(join(f.dir,'validation-calls.log'),'');const r=await f.run(['plan'],{REQUIRE_NATIVE_AUTH:'true'});assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.requests,'');assert.doesNotMatch(r.validationRequests,/evil|other|PRIVATE/);assert.doesNotMatch(r.text+r.stdout+r.stderr,/PRIVATE_|synthetic-native-github-token/);}
+});
+test('unknown top-level evidence credentials or runtime options cannot be accepted as release proof',async t=>{
+ const f=await fixture(t);for(const key of ['GH_TOKEN','headers','apiBaseUrl','evaluationClock','publisherRuntime']){const r=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify({...f.evidence,[key]:'PRIVATE_SENTINEL'})});assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.validationRequests,'');assert.doesNotMatch(r.text+r.stdout+r.stderr,/PRIVATE_/);}
+});
+
+test('unsafe numeric quota and reset headers cannot authorize publication',async t=>{
+ const f=await fixture(t);for(const FAIL_VALIDATION of ['huge-quota','huge-reset']){const r=await f.run(['plan'],{FAIL_VALIDATION});assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.record.planComplete,false);}
+});
+
+test('native current-main context lookup pins the official host despite ambient gh host selection',async t=>{
+ const f=await fixture(t),r=await f.run(['plan'],{GH_HOST:'synthetic.invalid',AMBIENT_GH_HOST_PROBE:'true',REQUIRE_NATIVE_AUTH:'true'});assert.equal(r.status,0);assert.equal(r.validationRequests.trim().split('\n').length,13);assert.doesNotMatch(r.text+r.stdout+r.stderr,/PRIVATE_|synthetic-native-github-token/);
+});
+
+test('raw API log hashing preserves a leading UTF-8 BOM rather than using a display projection digest',async t=>{
+ const f=await fixture(t),m=mandatoryCliFixture();m.facts.log='\ufeff2026-10-20T10:00:00.000Z '+m.facts.log;m.selector.originalJobLogSha256=createHash('sha256').update(m.facts.log).digest('hex');f.evidence.mandatoryValidation=m.selector;await writeFile(join(f.dir,'mandatory.json'),JSON.stringify(m));const r=await f.run(['plan'],{REQUIRE_NATIVE_AUTH:'true'});assert.equal(r.status,0);assert.equal(r.record.mandatoryValidation.plan.originalJobLogSha256,m.selector.originalJobLogSha256);
+});
+
+test('the aggregate reader deadline includes synchronous parsing and validation before returning a receipt',async t=>{
+ const f=await fixture(t),r=await f.run(['plan'],{PARSE_DELAY_MS:'31000'});assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.record.planComplete,false);assert.match(r.record.reasons.join(''),/PLAN_MANDATORY_VALIDATION_FAILED/);
 });
