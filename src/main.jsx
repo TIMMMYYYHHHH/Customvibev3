@@ -1,7 +1,9 @@
 import React from 'react';
-import {createRoot} from 'react-dom/client';
+import {createRoot,hydrateRoot} from 'react-dom/client';
 import {ContentProvider} from './content/ContentProvider';
-import {installNavigation} from './routing.mjs';
+import {installNavigation,currentPage,navigate} from './routing.mjs';
+import {clientRouteViews} from './routes/client-views.mjs';
+import {startStudioHandoff} from './routes/bootstrap.mjs';
 import {App} from './App.jsx';
 import './shop-base.css';
 import './shop.css';
@@ -10,4 +12,9 @@ import './consistency.css';
 import './mobile.css';
 import './button-system.css';
 installNavigation();
-createRoot(document.getElementById('root')).render(<React.StrictMode><ContentProvider initialContent={document.getElementById('site-content')?JSON.parse(document.getElementById('site-content').textContent):undefined}><App/></ContentProvider></React.StrictMode>);
+const root=document.getElementById('root');
+const mount=({hydrate=false,startup}={})=>{
+ const tree=<React.StrictMode><ContentProvider initialContent={document.getElementById('site-content')?JSON.parse(document.getElementById('site-content').textContent):undefined}><App startup={startup}/></ContentProvider></React.StrictMode>;
+ if(hydrate)hydrateRoot(root,tree);else createRoot(root).render(tree);
+};
+if(location.pathname==='/studio'&&root.querySelector('main.one-studio'))startStudioHandoff({registry:clientRouteViews,getPage:currentPage,navigate,mount});else mount();

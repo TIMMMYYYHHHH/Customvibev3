@@ -18,10 +18,22 @@ export function CropView({photo,onChange,puzzle=false,gridSize=3,onRendered,onEr
 }
 
 
-export function Editor({studio,dispatchStudio,photos,setPhotos,basket=[],setBasket,go,notes='',onNotesChange}){
+export async function prepareUploadBatch(files,{orderItems,content,format='photo'}){
+ const good=[],errors=[];
+ for(const file of Array.from(files||[])){
+  const candidate={kind:format==='puzzle'?'puzzle':'photo',gridSize:3,qty:1};
+  const capacity=orderCapacity([...orderItems,...good.map(p=>({...p,kind:p.format==='puzzle'?'puzzle':'photo'})),candidate],content);
+  if(!capacity.allowed){errors.push('Some photos were not added. '+capacity.issues.join(' '));break;}
+  try{good.push({...await readPhoto(file),format});}catch(e){errors.push(e.message);}
+ }
+ return {good,errors};
+}
+
+export function Editor({studio,dispatchStudio,photos,setPhotos,basket=[],setBasket,go,notes='',onNotesChange,startupBusy=false,startupError='',onStartupErrorClear}){
  const {content}=useContent();
  const {selected}=studio;
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[rendered,setRendered]=useState(null);
+ const working=busy||startupBusy,visibleError=error||startupError;
  const input=useRef();
  const photo=photos.find(p=>p.id===selected)||photos[0],mode=photo?.format||'photo',puzzle=mode==='puzzle',gridSize=photo?.gridSize||3;
  const qty=photos.filter(p=>p.format!=='puzzle').reduce((sum,p)=>sum+p.qty,0);
@@ -32,14 +44,8 @@ export function Editor({studio,dispatchStudio,photos,setPhotos,basket=[],setBask
  const settings=patch=>dispatchStudio({type:'settings',patch});
  const update=patch=>{if(photo)dispatchStudio({type:'update-photo',id:photo.id,patch});};
  async function upload(files){
-  if(!files?.length)return;setBusy(true);setError('');
-  const good=[],errors=[];
-  for(const file of Array.from(files)){
-   const candidate={kind:studio.defaultFormat==='puzzle'?'puzzle':'photo',gridSize:3,qty:1};
-   const capacity=orderCapacity([...orderItems,...good.map(p=>({...p,kind:p.format==='puzzle'?'puzzle':'photo'})),candidate],content);
-   if(!capacity.allowed){errors.push('Some photos were not added. '+capacity.issues.join(' '));break;}
-   try{good.push({...await readPhoto(file),format:studio.defaultFormat||'photo'});}catch(e){errors.push(e.message);}
-  }
+  if(!files?.length||startupBusy)return;setBusy(true);setError('');onStartupErrorClear?.();
+  const {good,errors}=await prepareUploadBatch(files,{orderItems,content,format:studio.defaultFormat||'photo'});
   if(good.length){setPhotos(ps=>[...ps,...good]);settings({selected:good[0].id});}
   setError(errors.join(' '));setBusy(false);if(input.current)input.current.value='';
  }
@@ -48,20 +54,20 @@ export function Editor({studio,dispatchStudio,photos,setPhotos,basket=[],setBask
  return <main className={`one-studio ${photo?'has-photo':''}`}>
   <header className="studio-heading"><div><p className="eyebrow">PHOTO MAGNETS OR PICTURE PUZZLES</p><h1>One little <em>studio.</em></h1><p>Same photos. More ways to make it yours.</p></div><div className="studio-heading-note"><span>Little moments.<br/>Big joy.</span><Heart size={32} weight="light"/></div></header>
   <input ref={input} type="file" accept="image/jpeg,image/png" multiple hidden onChange={e=>upload(e.target.files)} aria-label="Upload photos"/>
-  {error&&<div className="error" role="alert">{error}</div>}
-  <div className="studio-workbench" inert={busy?true:undefined} aria-busy={busy}>
-   <aside className="studio-library"><div className="studio-library-title"><h2>Your photos</h2><span>{photos.length} {photos.length===1?'photo':'photos'}</span></div><button className="studio-add" disabled={busy} onClick={()=>input.current.click()}><Plus size={18}/>Add photos</button><small className="studio-upload-guidance">JPG or PNG, up to 20 MB each.<br/>Up to 40 megapixels and 12,000 pixels per side.<br/><a href="#order-limits">See artwork limits</a>.</small><div className="studio-thumbnails">{photos.map(p=><button key={p.id} aria-label={`Edit ${p.name}`} aria-pressed={p.id===photo?.id} onClick={()=>{settings({selected:p.id});}}><img src={p.src} alt={p.name}/><span className="studio-photo-format">{p.format==='puzzle'?`${p.gridSize||3} × ${p.gridSize||3} puzzle`:'Photo magnet'}</span></button>)}</div><p>{photo?'Choose a photo to set its format.':'Add your photos to get started.'}</p><button className="text-button studio-remove" onClick={remove} disabled={busy||!photo}><Trash size={15}/>Remove selected</button></aside>
-   <section className="studio-canvas" aria-label="Photo preview"><div className={`studio-stage ${!photo?'studio-stage-empty':''}`} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(!busy)upload(e.dataTransfer.files);}}>{photo?<CropView photo={photo} onChange={update} puzzle={puzzle} gridSize={gridSize} onRendered={setRendered} onError={setError}/>:<div className="studio-empty-canvas"><UploadSimple size={38}/><h2>A little room for<br/>your favourites.</h2><p>Click Add photos or drop them here.<br/>Make each one a magnet or a picture puzzle.</p><button className="button" onClick={()=>input.current.click()} disabled={busy}>Add photos</button></div>}</div>{photo&&<><p><ArrowsOutCardinal size={18}/>Drag to position your photo</p><small>{puzzle?`This photo becomes ${gridSize**2} square magnets, 7.5 cm each.`:'Your photo becomes one 7.5 × 7.5 cm magnet.'}</small></>}</section>
+  {visibleError&&<div className="error" role="alert">{visibleError}</div>}
+  <div className="studio-workbench" inert={working?true:undefined} aria-busy={working}>
+   <aside className="studio-library"><div className="studio-library-title"><h2>Your photos</h2><span>{photos.length} {photos.length===1?'photo':'photos'}</span></div><button className="studio-add" disabled={working} onClick={()=>input.current.click()}><Plus size={18}/>Add photos</button><small className="studio-upload-guidance">JPG or PNG, up to 20 MB each.<br/>Up to 40 megapixels and 12,000 pixels per side.<br/><a href="#order-limits">See artwork limits</a>.</small><div className="studio-thumbnails">{photos.map(p=><button key={p.id} aria-label={`Edit ${p.name}`} aria-pressed={p.id===photo?.id} onClick={()=>{settings({selected:p.id});}}><img src={p.src} alt={p.name}/><span className="studio-photo-format">{p.format==='puzzle'?`${p.gridSize||3} × ${p.gridSize||3} puzzle`:'Photo magnet'}</span></button>)}</div><p>{photo?'Choose a photo to set its format.':'Add your photos to get started.'}</p><button className="text-button studio-remove" onClick={remove} disabled={working||!photo}><Trash size={15}/>Remove selected</button></aside>
+   <section className="studio-canvas" aria-label="Photo preview"><div className={`studio-stage ${!photo?'studio-stage-empty':''}`} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(!working)upload(e.dataTransfer.files);}}>{photo?<CropView photo={photo} onChange={update} puzzle={puzzle} gridSize={gridSize} onRendered={setRendered} onError={setError}/>:<div className="studio-empty-canvas"><UploadSimple size={38}/><h2>A little room for<br/>your favourites.</h2><p>Click Add photos or drop them here.<br/>Make each one a magnet or a picture puzzle.</p><button className="button" onClick={()=>input.current.click()} disabled={working}>Add photos</button></div>}</div>{photo&&<><p><ArrowsOutCardinal size={18}/>Drag to position your photo</p><small>{puzzle?`This photo becomes ${gridSize**2} square magnets, 7.5 cm each.`:'Your photo becomes one 7.5 × 7.5 cm magnet.'}</small></>}</section>
    <aside className="studio-inspector"><h2>Make it yours</h2><p>{photo?'Choose a format for this photo. Your other photos keep their own settings.':'Add a photo, then make it yours right here.'}</p>{formatControls}
     {photo&&(puzzle?<fieldset className="studio-grid-size"><legend>Choose your puzzle size</legend><div className="studio-choice-row">{[3,5].map(n=><button key={n} aria-pressed={gridSize===n} onClick={()=>{update({gridSize:n});}}><table className="studio-grid-symbol" aria-hidden="true"><tbody>{Array.from({length:n},(_,row)=><tr key={row}>{Array.from({length:n},(_,col)=><td key={col}/>)}</tr>)}</tbody></table><strong>{n} × {n}</strong><small>{n*n} square magnets</small></button>)}</div></fieldset>:<div className="studio-copies"><strong>Copies of this photo</strong><div className="stepper"><button aria-label="Fewer copies" disabled={photo?.qty===1} onClick={()=>update({qty:photo.qty-1})}><Minus/></button><output>{photo?.qty}</output><button aria-label="More copies" disabled={!canIncrease} onClick={()=>update({qty:photo.qty+1})}><Plus/></button></div><small>Each photo can have its own number of copies.</small></div>)}
     <fieldset className="studio-adjust" disabled={!photo}><div className="studio-adjust-heading"><h3>Adjust your photo</h3><button className="text-button studio-reset" onClick={()=>update({zoom:1,x:.5,y:.5,rotation:0})}>Reset crop</button></div><div className="studio-zoom"><label htmlFor="studio-zoom">Zoom</label><button aria-label="Zoom out" onClick={()=>update({zoom:clamp(photo.zoom-.1,1,3)})}><Minus size={17}/></button><input id="studio-zoom" type="range" min="1" max="3" step=".01" value={photo?.zoom||1} onChange={e=>update({zoom:Number(e.target.value)})}/><button aria-label="Zoom in" onClick={()=>update({zoom:clamp(photo.zoom+.1,1,3)})}><Plus size={17}/></button></div><div className="studio-rotate"><button onClick={()=>update({rotation:(photo.rotation+270)%360,x:.5,y:.5})}><ArrowCounterClockwise size={18}/>Rotate left</button><button onClick={()=>update({rotation:(photo.rotation+90)%360,x:.5,y:.5})}><ArrowClockwise size={18}/>Rotate right</button></div></fieldset>
     {photo&&<CropQuality photo={photo}/>}
-    <details className="studio-notes"><summary>Notes for our team <span>{notes?'Note added':'Optional'}</span></summary><OrderNotes value={notes} onChange={onNotesChange} disabled={busy} compact/></details>
+    <details className="studio-notes"><summary>Notes for our team <span>{notes?'Note added':'Optional'}</span></summary><OrderNotes value={notes} onChange={onNotesChange} disabled={working} compact/></details>
     {magnetCount>0&&<div className="studio-discount"><TierNudge quantity={magnetCount} designer onAdd={()=>input.current.click()}/></div>}
    </aside>
   </div>
   <OrderCapacity items={orderItems} content={content}/>
-  <div className="studio-review-bar"><div className="studio-review-summary"><SquaresFour size={34} weight="fill"/><div><strong>{magnetCount?`${magnetCount} ${magnetCount===1?'magnet':'magnets'} in your basket`:'Your basket starts here'}</strong><small>{qty} photo {qty===1?'magnet':'magnets'}{puzzleCount?` · ${puzzleCount} ${puzzleCount===1?'puzzle':'puzzles'}`:''}</small></div></div><div className="studio-price"><span className="studio-mobile-count">{magnetCount} {magnetCount===1?'magnet':'magnets'}</span><strong>{magnetCount?money(photoPrice(magnetCount,content.pricing)):'No photos yet'}</strong><small>Delivery additional</small></div><button className="button" disabled={busy||!photo||!rendered} onClick={()=>go('basket')}>View basket</button></div>
+  <div className="studio-review-bar"><div className="studio-review-summary"><SquaresFour size={34} weight="fill"/><div><strong>{magnetCount?`${magnetCount} ${magnetCount===1?'magnet':'magnets'} in your basket`:'Your basket starts here'}</strong><small>{qty} photo {qty===1?'magnet':'magnets'}{puzzleCount?` · ${puzzleCount} ${puzzleCount===1?'puzzle':'puzzles'}`:''}</small></div></div><div className="studio-price"><span className="studio-mobile-count">{magnetCount} {magnetCount===1?'magnet':'magnets'}</span><strong>{magnetCount?money(photoPrice(magnetCount,content.pricing)):'No photos yet'}</strong><small>Delivery additional</small></div><button className="button" disabled={working||!photo||!rendered} onClick={()=>go('basket')}>View basket</button></div>
 
  </main>;
 }

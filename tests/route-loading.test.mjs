@@ -56,3 +56,32 @@ test('route readiness waits for CSS before code and cannot bypass a failed style
  await assert.rejects(views.load('checkout'),/stylesheet unavailable/);assert.equal(calls,1);
  styles.load=async()=>{ready=true};assert.equal(await views.load('checkout'),Component);assert.equal(calls,1);
 });
+
+const startup=await import('../src/routes/bootstrap.mjs').catch(()=>({}));
+test('startup resources share the initial request and notify subscribers only through real readiness',async()=>{
+ assert.equal(typeof startup.createStartupResource,'function','startup resource controller is missing');
+ const gate=deferred(),module={Editor:()=>null};let loads=0,notices=0;
+ const resource=startup.createStartupResource({load:()=>{loads++;return gate.promise}});
+ const stop=resource.subscribe(()=>notices++),first=resource.start();assert.equal(resource.start(),first);
+ await Promise.resolve();assert.equal(loads,1);assert.equal(resource.getSnapshot().status,'loading');
+ gate.resolve(module);assert.equal(await first,module);assert.equal(resource.getSnapshot().module,module);
+ assert.equal(resource.getSnapshot().status,'ready');assert.equal(notices,2);stop();
+});
+test('startup failure never repeats a resource request until explicit retry',async()=>{
+ assert.equal(typeof startup.createStartupResource,'function','startup resource controller is missing');
+ const module={Editor:()=>null};let calls=0;
+ const resource=startup.createStartupResource({load:()=>++calls===1?Promise.reject(Error('synthetic unavailable')):Promise.resolve(module)});
+ await assert.rejects(resource.start(),/synthetic unavailable/);await assert.rejects(resource.start(),/synthetic unavailable/);
+ assert.equal(calls,1);assert.equal(resource.getSnapshot().status,'error');
+ assert.equal(await resource.retry(),module);assert.equal(calls,2);assert.equal(resource.getSnapshot().status,'ready');
+});
+test('startup deadline stays failed after a late module completion until explicit retry',async()=>{
+ assert.equal(typeof startup.createStartupResource,'function','startup resource controller is missing');
+ const gate=deferred(),module={Editor:()=>null};let deadline,calls=0;
+ const timers={setTimeout(fn){deadline=fn;return 1},clearTimeout(){}};
+ const resource=startup.createStartupResource({load:()=>++calls===1?gate.promise:Promise.resolve(module),timers});
+ const first=resource.start();await Promise.resolve();deadline();await assert.rejects(first,/time|load/i);
+ gate.resolve(module);await Promise.resolve();await Promise.resolve();
+ assert.equal(resource.getSnapshot().status,'error');assert.equal(calls,1);
+ assert.equal(await resource.retry(),module);assert.equal(calls,2);
+});
