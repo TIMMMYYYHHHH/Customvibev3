@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 2,
+  "repository": "TIMMMYYYHHHH/Customvibev3",
+  "state": "verified",
+  "sourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+  "baseSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+  "required": [
+    "pages",
+    "admin",
+    "security",
+    "catalogue"
+  ],
+  "completed": {
+    "pages": {
+      "id": "f63222a8-21da-4562-89af-2a487b1ba98c"
+    },
+    "admin": {
+      "id": "da3bd3f4-e4f3-4ac3-b0cf-f097a6c94686"
+    },
+    "security": {
+      "id": "2609be51-fb7f-45f4-8133-50217b513d51"
+    },
+    "catalogue": {
+      "id": "ca076596-23f8-4f89-a860-ca36e5d1acba"
+    }
+  },
+  "reasons": [],
+  "planComplete": true,
+  "workflow": {
+    "runId": "39346907370",
+    "url": "https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39346907370",
+    "event": "push"
+  },
+  "observedAt": "2026-10-20T08:12:01.579Z",
+  "historicalFunctionsDigest": null,
+  "pagesUploadEvidence": null,
+  "components": {
+    "pages": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "pages",
+        "id": "f63222a8-21da-4562-89af-2a487b1ba98c",
+        "sourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+        "sourceDigest": "343a954bdaaba05b578fde4c134e0a30df6d5ace48d9d31056b9c83d5a2eded5",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39346907370",
+        "observedAt": "2026-10-20T00:26:13.222Z"
+      }
+    },
+    "admin": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "admin",
+        "id": "da3bd3f4-e4f3-4ac3-b0cf-f097a6c94686",
+        "sourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+        "sourceDigest": "03f0909c7ef9c823772a62104a30403073e779c3574a34a44b91c4febf5e77aa",
+        "runtimeDigest": "040800f28b7658c41198dc5f396823ab02e956dccf719cb45be64a16829dd008",
+        "configDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/6e8b738f0c4d1609119bd6a85ea0850cd0215b5c/docs/releases/2026-10-20-release-M-upload-receipts.json",
+        "observedAt": "2026-10-20T00:25:49.836Z",
+        "assetsDigest": "9a2341ed5742be6befa82c776b7b818a3134bd092e5b8d9a4597270c771963cf"
+      }
+    },
+    "security": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "security",
+        "id": "2609be51-fb7f-45f4-8133-50217b513d51",
+        "sourceSha": "56bfa322eb50f67e4ad23c321f58c4fb98af44c5",
+        "sourceDigest": "2018cedf283acec30d5ee8a3cf1e7d062eb2802dec420fb642064fb716d4182f",
+        "runtimeDigest": "e405f8062a2e57ee059814869a0718bceeeba0c6b65d1958239a336ba8cdec60",
+        "configDigest": "ad35640b98b73cd18c312f951c17508b1caa01d5d8af6b6d5059a0de6ad98936",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/6e8b738f0c4d1609119bd6a85ea0850cd0215b5c/docs/releases/2026-10-20-release-M-upload-receipts.json",
+        "observedAt": "2026-10-19T21:38:11.091Z"
+      }
+    },
+    "catalogue": {
+      "receipt": {
+        "account": "4f57d4e924674cb87b33d4c884745cf6",
+        "component": "catalogue",
+        "id": "ca076596-23f8-4f89-a860-ca36e5d1acba",
+        "sourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+        "sourceDigest": "ad9e68523be2db1191503b7d113ead5307eeeadc7469bf31b94e4488295b2a41",
+        "runtimeDigest": "32e836777892f73f1f4a2d48f27e0e3832110e2a41dd77faef2607a8f3e2438a",
+        "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+        "origin": "guarded-upload",
+        "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/6e8b738f0c4d1609119bd6a85ea0850cd0215b5c/docs/releases/2026-10-20-release-M-upload-receipts.json",
+        "observedAt": "2026-10-20T07:49:34.472Z"
+      }
+    }
+  },
+  "prerequisites": {
+    "complete": true
+  },
+  "guards": {
+    "protection": "passed"
+  },
+  "finalProtection": {
+    "status": "passed",
+    "expectedSourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9",
+    "observedAt": "2026-10-20T08:10:18.621Z",
+    "checks": [
+      {
+        "component": "pages",
+        "status": "passed",
+        "identityStatus": "passed",
+        "expectedId": "f63222a8-21da-4562-89af-2a487b1ba98c",
+        "observedId": "f63222a8-21da-4562-89af-2a487b1ba98c",
+        "protectionObservedAt": "2026-10-20T08:10:09.292Z",
+        "identityObservedAt": "2026-10-20T08:10:09.292Z",
+        "observedSourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9"
+      },
+      {
+        "component": "admin",
+        "status": "passed",
+        "identityStatus": "passed",
+        "expectedId": "da3bd3f4-e4f3-4ac3-b0cf-f097a6c94686",
+        "observedId": "da3bd3f4-e4f3-4ac3-b0cf-f097a6c94686",
+        "protectionObservedAt": "2026-10-20T08:10:10.188Z",
+        "identityObservedAt": "2026-10-20T08:10:12.099Z"
+      },
+      {
+        "component": "security",
+        "status": "passed",
+        "identityStatus": "passed",
+        "expectedId": "2609be51-fb7f-45f4-8133-50217b513d51",
+        "observedId": "2609be51-fb7f-45f4-8133-50217b513d51",
+        "protectionObservedAt": "2026-10-20T08:10:13.010Z",
+        "identityObservedAt": "2026-10-20T08:10:14.915Z"
+      },
+      {
+        "component": "catalogue",
+        "status": "passed",
+        "identityStatus": "passed",
+        "expectedId": "ca076596-23f8-4f89-a860-ca36e5d1acba",
+        "observedId": "ca076596-23f8-4f89-a860-ca36e5d1acba",
+        "protectionObservedAt": "2026-10-20T08:07:36.584Z",
+        "identityObservedAt": "2026-10-20T08:10:17.941Z"
+      }
+    ]
+  },
+  "finalIdentityReadbacks": [
+    {
+      "component": "pages",
+      "expectedId": "f63222a8-21da-4562-89af-2a487b1ba98c",
+      "observedId": "f63222a8-21da-4562-89af-2a487b1ba98c",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T08:10:09.292Z",
+      "observedSourceSha": "f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9"
+    },
+    {
+      "component": "admin",
+      "expectedId": "da3bd3f4-e4f3-4ac3-b0cf-f097a6c94686",
+      "observedId": "da3bd3f4-e4f3-4ac3-b0cf-f097a6c94686",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T08:10:12.099Z"
+    },
+    {
+      "component": "security",
+      "expectedId": "2609be51-fb7f-45f4-8133-50217b513d51",
+      "observedId": "2609be51-fb7f-45f4-8133-50217b513d51",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T08:10:14.915Z"
+    },
+    {
+      "component": "catalogue",
+      "expectedId": "ca076596-23f8-4f89-a860-ca36e5d1acba",
+      "observedId": "ca076596-23f8-4f89-a860-ca36e5d1acba",
+      "identityStatus": "passed",
+      "identityObservedAt": "2026-10-20T08:10:17.941Z"
+    }
+  ],
+  "evidence": {
+    "privateCompletionSha256": "a8dc20c08eabe76a4c35483759bc23ddb9484dcdb9db541cfb71019d3b920dee",
+    "publicReceiptRecordSha256": "9c4b5235cde4a7f5f8815b532910edbe51fcbd9d415964bcbec0720c4bd209cc"
+  }
+}
