@@ -1,26 +1,30 @@
 import {PUBLIC_CONTACT_EMAIL} from '../../shared/business-constants.mjs';
-import React,{useEffect,useRef,useState} from 'react';
+import React,{createContext,useContext,useLayoutEffect,useEffect,useRef,useState} from 'react';
 import {BrandDoodle} from './ReferenceThread';
 import './contact.css';
 import {useFormService,FormSecurity,useDraftProtection} from '../FormService';
+export const NativeContactDraftContext=createContext(null);
 
 export default function Contact({standalone=false}){
  const Heading=standalone?'h1':'h2';
  const form=useRef(null),dialog=useRef(null),submitButton=useRef(null),restoreFocus=useRef(false);
  const service=useFormService('contact');
+ const nativeDraft=useContext(NativeContactDraftContext);
  const [values,setValues]=useState(()=>service.attempt||{name:'',email:'',message:''});
+ useLayoutEffect(()=>{if(nativeDraft&&!service.attempt&&!service.pending&&!service.result)setValues({...nativeDraft.read()});},[]);
  useDraftProtection('contact',['name','email','message'].some(key=>!!values[key]?.trim()));
  const [errors,setErrors]=useState({});
  const [status,setStatus]=useState('');
  useEffect(()=>{if(service.result&&!dialog.current?.open)dialog.current?.showModal();},[service.result]);
  useEffect(()=>{if(!service.result&&restoreFocus.current){restoreFocus.current=false;form.current?.elements.namedItem('name')?.focus();}},[service.result]);
- function dismissSuccess(){if(service.resetCompleted()){restoreFocus.current=true;dialog.current?.close();setValues({name:'',email:'',message:''});setErrors({});setStatus('');}}
+ function dismissSuccess(){if(service.resetCompleted()){restoreFocus.current=true;dialog.current?.close();const empty={name:'',email:'',message:''};if(nativeDraft)nativeDraft.current=empty;setValues(empty);setErrors({});setStatus('');}}
  function validate(name,value){
   if(!value.trim())return {name:'Please enter your name.',email:'Please enter your email address.',message:'Tell us a little about how we can help.'}[name];
   if(name==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()))return 'Enter an email address like you@example.com.';
   return '';
  }
  function change(name,value){
+  if(nativeDraft)nativeDraft.current={...values,[name]:value};
   setValues(previous=>({...previous,[name]:value}));
   setStatus('');
   if(errors[name])setErrors(previous=>({...previous,[name]:validate(name,value)}));
