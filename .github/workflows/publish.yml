@@ -74,6 +74,8 @@ jobs:
           import json
           import os
           import platform
+          import select
+          import signal
           import re
           import socket
           import ssl
@@ -93,6 +95,8 @@ jobs:
           MODE = 'validation_logs_contents_read'
           LOG_CAP = 4 * 1024 * 1024
           ERROR_CAP = 4096
+          REQUEST_SECONDS = 15
+          AGGREGATE_SECONDS = 30
 
 
           class StopProbe(Exception):
@@ -216,10 +220,8 @@ jobs:
               }
 
 
-          def main():
-              started = time.monotonic()
-              deadline = started + 30
-              result = {
+          def initial_result():
+              return {
                   'version': 1, 'mode': MODE, 'outcome': 'capability_not_established',
                   'errorCategory': None, 'probeContext': None,
                   'permissionDeclaration': {'contents': 'read', 'otherExplicitPermissions': 'none'},
@@ -243,10 +245,17 @@ jobs:
                   'targetLog': None,
               }
 
+
+          def collect_result(notify):
+              started = time.monotonic()
+              deadline = started + AGGREGATE_SECONDS
+              result = initial_result()
+
+
               def remaining(request_deadline):
                   value = min(deadline, request_deadline) - time.monotonic()
                   require(value > 0, 'DEADLINE_EXCEEDED')
-                  return min(15, value)
+                  return min(REQUEST_SECONDS, value)
 
               def read_body(connection, response, request_deadline, cap, count_key, error=False):
                   data = bytearray()
@@ -259,6 +268,7 @@ jobs:
                           return bytes(data)
                       data.extend(chunk)
                       result['requests'][count_key] = len(data)
+                      notify('snapshot', result)
                   if error:
                       return bytes(data)
                   if connection.sock is not None:
@@ -270,12 +280,14 @@ jobs:
               def request(host, path, headers, download=False):
                   require(result['requests']['count'] < 2, 'REQUEST_LIMIT')
                   request_started = time.monotonic()
-                  request_deadline = min(deadline, request_started + 15)
+                  request_deadline = min(deadline, request_started + REQUEST_SECONDS)
                   timeout = remaining(request_deadline)
-                  connection = http.client.HTTPSConnection(host, 443, timeout=timeout, context=ssl.create_default_context())
                   key = 'download' if download else 'api'
                   result['requests']['count'] += 1
+                  notify('request-start', result, request_started)
+                  connection = None
                   try:
+                      connection = http.client.HTTPSConnection(host, 443, timeout=timeout, context=ssl.create_default_context())
                       connection.request('GET', path, body=None, headers=headers)
                       remaining(request_deadline)
                       if connection.sock is not None:
@@ -284,6 +296,7 @@ jobs:
                       remaining(request_deadline)
                       require(isinstance(response.status, int) and 100 <= response.status <= 599, 'RESPONSE_REJECTED')
                       result['requests'][key + 'Status'] = response.status
+                      notify('snapshot', result)
                       if not download:
                           raw_remaining = response.getheader('x-ratelimit-remaining', '')
                           raw_reset = response.getheader('x-ratelimit-reset', '')
@@ -319,7 +332,9 @@ jobs:
                       return body
                   finally:
                       result['requests'][key + 'ElapsedMs'] = min(180000, max(0, int((time.monotonic() - request_started) * 1000)))
-                      connection.close()
+                      if connection is not None:
+                          connection.close()
+                      notify('request-end', result)
 
               try:
                   result['probeContext'] = probe_context()
@@ -345,6 +360,111 @@ jobs:
               except Exception:
                   result['errorCategory'] = 'PROBE_FAILED'
               finally:
+                  result['requests']['totalElapsedMs'] = min(180000, max(0, int((time.monotonic() - started) * 1000)))
+              return result
+
+
+          def main():
+              # The parent performs no DNS, TLS or HTTP work. It can kill and reap the
+              # worker even while that worker is blocked inside a C resolver or read.
+              started = time.monotonic()
+              deadline = started + AGGREGATE_SECONDS
+              result = initial_result()
+              read_fd, write_fd = os.pipe()
+              pid = os.fork()
+              if pid == 0:
+                  os.close(read_fd)
+
+                  def notify(kind, value, request_started=None):
+                      message = {'kind': kind, 'result': value, 'requestStarted': request_started}
+                      frame = (json.dumps(message, separators=(',', ':')) + '\n').encode('utf-8')
+                      if len(frame) > 8192:
+                          os._exit(1)
+                      view = memoryview(frame)
+                      while view:
+                          view = view[os.write(write_fd, view):]
+
+                  try:
+                      value = collect_result(notify)
+                      notify('complete', value)
+                  except BaseException:
+                      value = initial_result()
+                      value['errorCategory'] = 'PROBE_FAILED'
+                      try:
+                          notify('complete', value)
+                      except BaseException:
+                          pass
+                  finally:
+                      os.close(write_fd)
+                      os._exit(0)
+
+              os.close(write_fd)
+              os.set_blocking(read_fd, False)
+              request_deadline = None
+              buffer = b''
+              frames = 0
+              complete = False
+              try:
+                  while not complete:
+                      limit = min(deadline, request_deadline) if request_deadline is not None else deadline
+                      require(time.monotonic() < limit, 'DEADLINE_EXCEEDED')
+                      ready, _, _ = select.select([read_fd], [], [], max(0, limit - time.monotonic()))
+                      require(bool(ready), 'DEADLINE_EXCEEDED')
+                      chunk = os.read(read_fd, 65536)
+                      require(bool(chunk), 'PROBE_FAILED')
+                      buffer += chunk
+                      while b'\n' in buffer:
+                          frame, buffer = buffer.split(b'\n', 1)
+                          frames += 1
+                          require(len(frame) <= 8192 and frames <= 128, 'PROBE_FAILED')
+                          message = json.loads(frame)
+                          require(set(message) == {'kind', 'result', 'requestStarted'}, 'PROBE_FAILED')
+                          value = message['result']
+                          require(isinstance(value, dict) and set(value) == set(result)
+                                  and isinstance(value.get('requests'), dict)
+                                  and set(value['requests']) == set(result['requests']), 'PROBE_FAILED')
+                          limit = min(deadline, request_deadline) if request_deadline is not None else deadline
+                          require(time.monotonic() < limit, 'DEADLINE_EXCEEDED')
+                          result = value
+                          kind = message['kind']
+                          if kind == 'request-start':
+                              began = message['requestStarted']
+                              require(request_deadline is None and isinstance(began, (int, float))
+                                      and 0 <= began <= time.monotonic()
+                                      and result['requests']['count'] in (1, 2), 'PROBE_FAILED')
+                              request_deadline = min(deadline, began + REQUEST_SECONDS)
+                              require(time.monotonic() < request_deadline, 'DEADLINE_EXCEEDED')
+                          elif kind == 'request-end':
+                              require(request_deadline is not None, 'PROBE_FAILED')
+                              request_deadline = None
+                          elif kind == 'complete':
+                              require(request_deadline is None, 'PROBE_FAILED')
+                              complete = True
+                          else:
+                              require(kind == 'snapshot', 'PROBE_FAILED')
+                      require(len(buffer) <= 8192, 'PROBE_FAILED')
+              except StopProbe as failure:
+                  result['outcome'] = 'capability_not_established'
+                  result['errorCategory'] = failure.category
+                  result['targetLog'] = None
+              except Exception:
+                  result['outcome'] = 'capability_not_established'
+                  result['errorCategory'] = 'PROBE_FAILED'
+                  result['targetLog'] = None
+              finally:
+                  # Kill on success too, before publishing the single result. This leaves
+                  # no live worker, delayed redirect, late success or background request.
+                  try:
+                      os.kill(pid, signal.SIGKILL)
+                  except ProcessLookupError:
+                      pass
+                  while True:
+                      try:
+                          os.waitpid(pid, 0)
+                          break
+                      except InterruptedError:
+                          continue
+                  os.close(read_fd)
                   result['requests']['totalElapsedMs'] = min(180000, max(0, int((time.monotonic() - started) * 1000)))
                   print(json.dumps(result, separators=(',', ':'), sort_keys=True))
               return 0 if result['outcome'] == 'capability_recognized' else 1
