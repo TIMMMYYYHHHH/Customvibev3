@@ -43,12 +43,9 @@ jobs:
       - run: npm run build:admin
       - name: Verify shipped third-party notices
         run: node scripts/check-dependency-notices.mjs --outputs --bundles
-      - run: npm test
-        env:
-          CV_CHECK_BUILT_NOTICES: '1'
       - name: Build comparison closures without credentials or publication
         run: node scripts/release-manifest.mjs private-builds
-      - name: Verify explicit reviewed release evidence and Pages destination
+      - name: Verify matched mandatory validation and reviewed release evidence
         id: release_plan
         run: node scripts/release-manifest.mjs plan
         env:
