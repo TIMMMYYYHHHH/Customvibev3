@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "account": "4f57d4e924674cb87b33d4c884745cf6",
+  "component": "admin",
+  "id": "ddea75c2-294e-4906-92eb-80370470392b",
+  "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+  "sourceDigest": "4aeb62fa3e816cc9a3a44d38137ef621fdb830ff84b6395728e60765e371b41c",
+  "runtimeDigest": "632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74",
+  "configDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0",
+  "assetsDigest": "8c59382c355df19fd803437544bc5b0188b060b892814d90655a1efac1fcfecc",
+  "origin": "guarded-upload",
+  "observedAt": "2026-10-20T18:50:43.937Z"
+}
