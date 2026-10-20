@@ -1,80 +1,354 @@
-name: Publish protected CustomVibe site
+name: Probe publisher native token, no provider access
 on:
   workflow_dispatch:
     inputs:
-      reviewed_sha:
-        description: Exact reviewed 40-character main commit, still current main
+      expected_sha:
+        description: Exact independently reviewed probe branch commit
         type: string
         required: true
-      publish_admin:
-        description: Keep off, Admin uses the existing private helper
-        type: boolean
-        default: false
-      release_evidence_json:
-        description: Explicit reviewed sanitized baseline and fresh prerequisite snapshots
+      probe_mode:
+        description: Must be validation_logs_contents_read
         type: string
         required: true
 permissions:
   contents: read
 concurrency:
-  group: customvibe-production
+  group: customvibe-tech20-token-probe
   cancel-in-progress: false
 jobs:
   publish:
-    if: github.repository == 'TIMMMYYYHHHH/Customvibev3' && github.ref == 'refs/heads/main'
+    if: >-
+      github.repository == 'TIMMMYYYHHHH/Customvibev3' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/codex/tech20-contents-read-log-probe' &&
+      inputs.probe_mode == 'validation_logs_contents_read' &&
+      github.sha == inputs.expected_sha
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 3
     env:
-      REVIEWED_SHA: ${{ inputs.reviewed_sha }}
-      EXPECTED_RELEASE_SHA: ${{ github.sha }}
-      CLOUDFLARE_ACCOUNT_ID: 4f57d4e924674cb87b33d4c884745cf6
-      WRANGLER_SEND_METRICS: 'false'
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+      PROBE_MODE: ${{ inputs.probe_mode }}
+      PROBE_REPOSITORY: ${{ github.repository }}
+      PROBE_EVENT: ${{ github.event_name }}
+      PROBE_REF: ${{ github.ref }}
+      PROBE_SHA: ${{ github.sha }}
+      PROBE_WORKFLOW_SHA: ${{ github.workflow_sha }}
+      PROBE_WORKFLOW_REF: ${{ github.workflow_ref }}
+      PROBE_RUN_ID: ${{ github.run_id }}
+      PROBE_RUN_ATTEMPT: ${{ github.run_attempt }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '22'
-      - run: npm ci
-      - run: npm run build
-      - run: npm run build:admin
-      - name: Verify shipped third-party notices
-        run: node scripts/check-dependency-notices.mjs --outputs --bundles
-      - run: npm test
+      - name: Verify reviewed probe identity before exposing the native token
+        shell: bash
         env:
-          CV_CHECK_BUILT_NOTICES: '1'
-      - name: Build comparison closures without credentials or publication
-        run: node scripts/release-manifest.mjs private-builds
-      - name: Verify explicit reviewed release evidence and Pages destination
-        id: release_plan
-        run: node scripts/release-manifest.mjs plan
+          PROBE_JOB: ${{ github.job }}
+          PROBE_RUNNER_OS: ${{ runner.os }}
+        run: |
+          set +x
+          if [[ ! "$EXPECTED_SHA" =~ ^[a-f0-9]{40}$ ]] ||
+             [[ "$PROBE_REPOSITORY" != 'TIMMMYYYHHHH/Customvibev3' ]] ||
+             [[ "$PROBE_EVENT" != 'workflow_dispatch' ]] ||
+             [[ "$PROBE_REF" != 'refs/heads/codex/tech20-contents-read-log-probe' ]] ||
+             [[ "$PROBE_MODE" != 'validation_logs_contents_read' ]] ||
+             [[ "$PROBE_SHA" != "$EXPECTED_SHA" ]] ||
+             [[ "$PROBE_WORKFLOW_SHA" != "$EXPECTED_SHA" ]] ||
+             [[ "$PROBE_WORKFLOW_REF" != 'TIMMMYYYHHHH/Customvibev3/.github/workflows/publish.yml@refs/heads/codex/tech20-contents-read-log-probe' ]] ||
+             [[ ! "$PROBE_RUN_ID" =~ ^[1-9][0-9]{0,19}$ ]] ||
+             [[ "$PROBE_RUN_ATTEMPT" != '1' ]] ||
+             [[ "$PROBE_JOB" != 'publish' ]] ||
+             [[ "$PROBE_RUNNER_OS" != 'Linux' ]]; then
+            echo 'PROBE_CONTEXT_REJECTED'
+            exit 1
+          fi
+      - name: Probe only the selected public validation job log
+        shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-          PUBLISH_ADMIN: ${{ inputs.publish_admin }}
-          RELEASE_EVIDENCE_JSON: ${{ inputs.release_evidence_json }}
-      - name: Publish protected Pages from the reviewed build
-        id: publish_pages
-        run: node scripts/release-manifest.mjs publish pages
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-      - name: Observe Pages protection and preserve partial paired status
-        if: always() && steps.release_plan.outcome == 'success'
-        run: node scripts/release-manifest.mjs finish
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CUSTOMVIBE_PAGES_DEPLOY_TOKEN }}
-      - name: Preserve complete or incomplete release evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: release-manifest-${{ github.run_id }}
-          path: |
-            dist/release/build-manifest.json
-            dist/release/release-manifest.json
-          if-no-files-found: warn
-          retention-days: 90
+          PROBE_JOB: ${{ github.job }}
+          PROBE_RUNNER_OS: ${{ runner.os }}
+          PROBE_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set +x
+          python3 - <<'PROBE_PY'
+          import hashlib
+          import http.client
+          import ipaddress
+          import json
+          import os
+          import platform
+          import re
+          import socket
+          import ssl
+          import sys
+          import time
+          from datetime import datetime, timezone
+          from urllib.parse import urlsplit
+
+          REPOSITORY = 'TIMMMYYYHHHH/Customvibev3'
+          REF = 'refs/heads/codex/tech20-contents-read-log-probe'
+          WORKFLOW_REF = REPOSITORY + '/.github/workflows/publish.yml@' + REF
+          API_HOST = 'api.github.com'
+          API_PATH = '/repos/' + REPOSITORY + '/actions/jobs/118568540207/logs'
+          MERGE = 'bc4e80b61dd30338e62f1b922dded516cd250d30'
+          CHECKOUT = 'Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262'
+          SETUP = 'Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020'
+          MODE = 'validation_logs_contents_read'
+          LOG_CAP = 4 * 1024 * 1024
+          ERROR_CAP = 4096
+
+
+          class StopProbe(Exception):
+              def __init__(self, category):
+                  self.category = category
+
+
+          def require(condition, category):
+              if not condition:
+                  raise StopProbe(category)
+
+
+          def probe_context():
+              expected = os.environ.get('EXPECTED_SHA', '')
+              require(re.fullmatch('[a-f0-9]{40}', expected) is not None, 'CONTEXT_REJECTED')
+              fixed = {
+                  'PROBE_MODE': MODE, 'PROBE_REPOSITORY': REPOSITORY,
+                  'PROBE_EVENT': 'workflow_dispatch', 'PROBE_REF': REF,
+                  'PROBE_SHA': expected, 'PROBE_WORKFLOW_SHA': expected,
+                  'PROBE_WORKFLOW_REF': WORKFLOW_REF, 'PROBE_RUN_ATTEMPT': '1',
+                  'PROBE_JOB': 'publish', 'PROBE_RUNNER_OS': 'Linux',
+              }
+              require(all(os.environ.get(k) == v for k, v in fixed.items()), 'CONTEXT_REJECTED')
+              run_id = os.environ.get('PROBE_RUN_ID', '')
+              require(re.fullmatch('[1-9][0-9]{0,19}', run_id) is not None, 'CONTEXT_REJECTED')
+              return {
+                  'version': 1, 'mode': MODE, 'repository': REPOSITORY,
+                  'workflowRef': WORKFLOW_REF, 'workflowSha': expected,
+                  'event': 'workflow_dispatch', 'ref': REF, 'sha': expected,
+                  'runId': run_id, 'runAttempt': 1, 'jobKey': 'publish',
+                  'runnerOS': 'Linux', 'pythonRuntime': platform.python_version(),
+              }
+
+
+          def download_target(response):
+              locations = [v for k, v in response.getheaders() if k.lower() == 'location']
+              require(len(locations) == 1, 'REDIRECT_REJECTED')
+              location = locations[0]
+              require(isinstance(location, str) and 0 < len(location) <= 4096
+                      and location.isascii() and not re.search(r'[\s\\\x00-\x1f\x7f]', location),
+                      'REDIRECT_REJECTED')
+              try:
+                  target = urlsplit(location)
+                  host = target.hostname
+                  require(target.scheme == 'https' and location.startswith('https://')
+                          and not target.username and not target.password
+                          and target.port in (None, 443) and not target.fragment
+                          and host and host == host.lower() and not host.endswith('.'),
+                          'REDIRECT_REJECTED')
+                  require(len(host) <= 253 and all(re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?', label)
+                                                 for label in host.split('.')), 'REDIRECT_REJECTED')
+                  try:
+                      ipaddress.ip_address(host)
+                  except ValueError:
+                      pass
+                  else:
+                      raise StopProbe('REDIRECT_REJECTED')
+                  require(host == 'results-receiver.actions.githubusercontent.com'
+                          or host.endswith('.blob.core.windows.net'), 'REDIRECT_REJECTED')
+                  require(target.netloc in (host, host + ':443'), 'REDIRECT_REJECTED')
+                  return host, (target.path or '/') + ('?' + target.query if target.query else '')
+              except StopProbe:
+                  raise
+              except Exception:
+                  raise StopProbe('REDIRECT_REJECTED') from None
+
+
+          def recognize_log(raw):
+              try:
+                  text = raw.decode('utf-8', errors='strict')
+              except UnicodeError:
+                  raise StopProbe('LOG_REJECTED') from None
+              # API bytes retain their own digest. No gh-rendered-log hash is reused.
+              lines = [re.sub(r'^\ufeff?\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d+Z ', '', line)
+                       for line in text.splitlines()]
+              lines = [re.sub(r'\x1b\[[0-9;]*m', '', line) for line in lines]
+
+              def one(value):
+                  found = [i for i, line in enumerate(lines) if line == value]
+                  require(len(found) == 1, 'LOG_REJECTED')
+                  return found[0]
+
+              checkout = one('##[group]' + CHECKOUT)
+              setup = one('##[group]' + SETUP)
+              install = one('##[group]Run npm ci')
+              node = one('##[group]Run npm test')
+              python = one('##[group]Run python3 -B -m unittest discover tests/python')
+              require(checkout < setup < install < node < python, 'LOG_REJECTED')
+              require('Ubuntu' in lines[:checkout], 'LOG_REJECTED')
+              section = lines[checkout:setup]
+              fetch = ('[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune '
+                       '--no-recurse-submodules --depth=1 origin +' + MERGE + ':refs/remotes/pull/45/merge')
+              select = '[command]/usr/bin/git checkout --progress --force refs/remotes/pull/45/merge'
+              log = '[command]/usr/bin/git log -1 --format=%H'
+              require(section.count(fetch) == section.count(select) == section.count(log) == 1, 'LOG_REJECTED')
+              fetching = section.index('##[group]Fetching the repository') if '##[group]Fetching the repository' in section else -1
+              selecting = section.index('##[group]Checking out the ref') if '##[group]Checking out the ref' in section else -1
+              require(0 <= fetching < section.index(fetch) < selecting < section.index(select) < section.index(log), 'LOG_REJECTED')
+              require(section.index(log) + 1 < len(section) and section[section.index(log) + 1] == MERGE, 'LOG_REJECTED')
+              require(sum(line.startswith('[command]/usr/bin/git -c protocol.version=2 fetch ') for line in section) == 1,
+                      'LOG_REJECTED')
+              require([line for line in lines[setup:install] if line.startswith('node: ')] == ['node: v22.23.3'], 'LOG_REJECTED')
+              node_section = lines[node:python]
+              footers = [i for i, line in enumerate(node_section) if line.startswith('# tests ')]
+              require(len(footers) == 1, 'LOG_REJECTED')
+              require(re.fullmatch(r'# tests 566\n# suites (?:0|[1-9][0-9]*)\n# pass 566\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms [0-9]+(?:[.][0-9]+)?\s*',
+                                   '\n'.join(node_section[footers[0]:])) is not None, 'LOG_REJECTED')
+              p = lines[python:]
+              summaries = [i for i, line in enumerate(p) if line.startswith('Ran ')]
+              require(len(summaries) == 1, 'LOG_REJECTED')
+              i = summaries[0]
+              require(re.fullmatch(r'Ran 7 tests in [0-9]+(?:[.][0-9]+)?s', p[i]) is not None
+                      and p[i + 1:i + 3] == ['', 'OK'] and p.count('OK') == 1, 'LOG_REJECTED')
+              require(not any(re.match(r'^(?:Ran |OK|FAILED|# tests |# skipped )', line) for line in p[i + 3:]), 'LOG_REJECTED')
+              return {
+                  'checkoutSyntheticSha': MERGE, 'checkoutRef': 'refs/remotes/pull/45/merge',
+                  'nodeVersion': 'v22.23.3', 'nodeTests': 566, 'nodePass': 566,
+                  'nodeFail': 0, 'nodeCancelled': 0, 'nodeSkipped': 0, 'nodeTodo': 0,
+                  'pythonTests': 7, 'pythonOutcome': 'OK', 'pythonSkipped': 0,
+                  'rawLogSha256': hashlib.sha256(raw).hexdigest(),
+              }
+
+
+          def main():
+              started = time.monotonic()
+              deadline = started + 30
+              result = {
+                  'version': 1, 'mode': MODE, 'outcome': 'capability_not_established',
+                  'errorCategory': None, 'probeContext': None,
+                  'permissionDeclaration': {'contents': 'read', 'otherExplicitPermissions': 'none'},
+                  'actualPermissionEvidence': {'status': 'unknown', 'contents': None, 'metadata': None, 'actions': None},
+                  'target': {
+                      'repository': REPOSITORY, 'repositoryId': 1269416306,
+                      'runId': 39404961304, 'runAttempt': 1, 'jobId': 118568540207,
+                      'headSha': 'ea324e2c4ad58c821ee80e623c96d1389b49a3e9',
+                      'jobName': 'Node 22 build and fixture tests',
+                      'retainedMetadataSha256': {
+                          'selectedJobs': 'ba75b8545567b1ddfa0c6be05aa6d460f5c9d6534f82e2af5e722e0b727ff718',
+                          'postmergeRun': 'd3b279d6fe20cea8da17fec20b1e9914b782001b9330c644f7243b497aa6aa3d',
+                      },
+                  },
+                  'requests': {
+                      'count': 0, 'apiStatus': None, 'downloadStatus': None,
+                      'quotaRemaining': None, 'quotaResetUtc': None,
+                      'apiErrorBytes': 0, 'downloadBytes': 0,
+                      'apiElapsedMs': 0, 'downloadElapsedMs': 0, 'totalElapsedMs': 0,
+                  },
+                  'targetLog': None,
+              }
+
+              def remaining(request_deadline):
+                  value = min(deadline, request_deadline) - time.monotonic()
+                  require(value > 0, 'DEADLINE_EXCEEDED')
+                  return min(15, value)
+
+              def read_body(connection, response, request_deadline, cap, count_key, error=False):
+                  data = bytearray()
+                  while len(data) < cap:
+                      if connection.sock is not None:
+                          connection.sock.settimeout(remaining(request_deadline))
+                      chunk = response.read(min(65536, cap - len(data)))
+                      remaining(request_deadline)
+                      if not chunk:
+                          return bytes(data)
+                      data.extend(chunk)
+                      result['requests'][count_key] = len(data)
+                  if error:
+                      return bytes(data)
+                  if connection.sock is not None:
+                      connection.sock.settimeout(remaining(request_deadline))
+                  require(not response.read(1), 'DOWNLOAD_SIZE')
+                  remaining(request_deadline)
+                  return bytes(data)
+
+              def request(host, path, headers, download=False):
+                  require(result['requests']['count'] < 2, 'REQUEST_LIMIT')
+                  request_started = time.monotonic()
+                  request_deadline = min(deadline, request_started + 15)
+                  timeout = remaining(request_deadline)
+                  connection = http.client.HTTPSConnection(host, 443, timeout=timeout, context=ssl.create_default_context())
+                  key = 'download' if download else 'api'
+                  result['requests']['count'] += 1
+                  try:
+                      connection.request('GET', path, body=None, headers=headers)
+                      remaining(request_deadline)
+                      if connection.sock is not None:
+                          connection.sock.settimeout(remaining(request_deadline))
+                      response = connection.getresponse()
+                      remaining(request_deadline)
+                      require(isinstance(response.status, int) and 100 <= response.status <= 599, 'RESPONSE_REJECTED')
+                      result['requests'][key + 'Status'] = response.status
+                      if not download:
+                          raw_remaining = response.getheader('x-ratelimit-remaining', '')
+                          raw_reset = response.getheader('x-ratelimit-reset', '')
+                          if re.fullmatch(r'[0-9]{1,10}', raw_remaining):
+                              result['requests']['quotaRemaining'] = int(raw_remaining)
+                          if re.fullmatch(r'[0-9]{1,12}', raw_reset):
+                              try:
+                                  result['requests']['quotaResetUtc'] = datetime.fromtimestamp(int(raw_reset), timezone.utc).isoformat().replace('+00:00', 'Z')
+                              except (OverflowError, OSError, ValueError):
+                                  pass
+                          if response.status != 302:
+                              body = read_body(connection, response, request_deadline, ERROR_CAP, 'downloadBytes' if download else 'apiErrorBytes', error=True)
+                              result['requests']['apiErrorBytes'] = len(body)
+                              del body
+                              raise StopProbe('API_HTTP_DENIED' if response.status in (401, 403, 404) else 'API_HTTP')
+                          return download_target(response)
+                      if 300 <= response.status <= 399:
+                          raise StopProbe('DOWNLOAD_REDIRECT')
+                      if response.status != 200:
+                          body = read_body(connection, response, request_deadline, ERROR_CAP, 'downloadBytes' if download else 'apiErrorBytes', error=True)
+                          result['requests']['downloadBytes'] = len(body)
+                          del body
+                          raise StopProbe('DOWNLOAD_HTTP')
+                      media = response.getheader('content-type', '')
+                      require(re.fullmatch(r'text/plain(?:;\s*charset=(?:utf-8|UTF-8))?', media, flags=re.I) is not None,
+                              'DOWNLOAD_MEDIA')
+                      require(response.getheader('content-encoding', 'identity').lower() == 'identity', 'DOWNLOAD_MEDIA')
+                      length = response.getheader('content-length')
+                      require(length is None or (re.fullmatch(r'[0-9]{1,10}', length) is not None and int(length) <= LOG_CAP), 'DOWNLOAD_SIZE')
+                      body = read_body(connection, response, request_deadline, LOG_CAP, 'downloadBytes')
+                      result['requests']['downloadBytes'] = len(body)
+                      require(length is None or int(length) == len(body), 'DOWNLOAD_SIZE')
+                      return body
+                  finally:
+                      result['requests'][key + 'ElapsedMs'] = min(180000, max(0, int((time.monotonic() - request_started) * 1000)))
+                      connection.close()
+
+              try:
+                  result['probeContext'] = probe_context()
+                  # This is the only credential read, after the independent token-free guard.
+                  token = os.environ.pop('PROBE_GITHUB_TOKEN', '')
+                  require(bool(token) and '\r' not in token and '\n' not in token, 'TOKEN_UNAVAILABLE')
+                  host, path = request(API_HOST, API_PATH, {
+                      'Authorization': 'Bearer ' + token,
+                      'Accept': 'application/vnd.github+json',
+                      'X-GitHub-Api-Version': '2022-11-28',
+                      'User-Agent': 'CustomVibe-native-token-capability-probe',
+                  })
+                  del token
+                  raw = request(host, path, {'Accept': 'text/plain', 'User-Agent': 'CustomVibe-native-token-capability-probe'}, download=True)
+                  result['targetLog'] = recognize_log(raw)
+                  del raw
+                  remaining(deadline)
+                  result['outcome'] = 'capability_recognized'
+              except StopProbe as failure:
+                  result['errorCategory'] = failure.category
+              except (socket.timeout, TimeoutError):
+                  result['errorCategory'] = 'DEADLINE_EXCEEDED'
+              except Exception:
+                  result['errorCategory'] = 'PROBE_FAILED'
+              finally:
+                  result['requests']['totalElapsedMs'] = min(180000, max(0, int((time.monotonic() - started) * 1000)))
+                  print(json.dumps(result, separators=(',', ':'), sort_keys=True))
+              return 0 if result['outcome'] == 'capability_recognized' else 1
+
+
+          sys.exit(main())
+          PROBE_PY
