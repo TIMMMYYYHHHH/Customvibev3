@@ -242,6 +242,7 @@ export function validateReleaseArchiveRecord(record,{sourceSha,candidateSha,base
   ensure(!safe.evidenceUrl.includes('/blob/'+candidateSha+'/'),'Archived receipt cannot refer to its future archive commit.');receipts[c]=safe;
  }
  ensure(receipts.pages.sourceSha===sourceSha,'Historical Pages source mismatch.');
+ if(record.build?.inactiveDelivery){const check=record.finalProtection?.checks?.find(v=>v.component==='pages');validateInactiveIngress(check?.inactiveIngress,{id:receipts.pages.id,sourceSha,now:utc(check?.identityObservedAt)});}
  const final=record.finalProtection;ensure(final?.status==='passed'&&final.expectedSourceSha===sourceSha&&Array.isArray(final.checks)&&final.checks.length===4,'Archive lacks complete final protections.');historicalTime(final.observedAt);
  ensure(new Set(final.checks.map(v=>v.component)).size===4&&Array.isArray(record.finalIdentityReadbacks)&&record.finalIdentityReadbacks.length===4&&new Set(record.finalIdentityReadbacks.map(v=>v.component)).size===4,'Archive lacks independent final readbacks.');
  for(const c of COMPONENTS){
@@ -260,6 +261,7 @@ export function validateReleaseArchiveRecord(record,{sourceSha,candidateSha,base
   ensure(exactKeys(completion,['version','prewriteValidationDigest','completedAt','evidence'])&&completion.version===1&&completion.prewriteValidationDigest===record.prewriteValidation.integrityDigest,'Invalid completion evidence shape.');historicalTime(completion.completedAt);
   const checked=completePair({record,evidence:completion.evidence,observed:{pagesSha:sourceSha,versions:Object.fromEntries(COMPONENTS.map(c=>[c,receipts[c].id]))},now:utc(completion.completedAt)});
   ensure(canonical(checked.completionEvidence)===canonical(completion),'Completion evidence contains unknown or altered fields.');
+  if(record.build?.inactiveDelivery)ensure(canonical(checked.components)===canonical(record.components)&&canonical(checked.prerequisites)===canonical(record.prerequisites),'Inactive Delivery archive changed the actual mixed component receipts or prerequisites.');
  }else ensure(!('prewriteValidation' in record)&&!('completionEvidence' in record)&&!('runAttempt' in record)&&!('attempts' in record)&&!('build' in record)&&!('activationCompatibility' in record)&&!('mandatoryValidation' in record),'Automated records cannot fall back to the historical manual archive path.');
  // Reject payload-bearing or secret/provider diagnostic fields anywhere. Other
  // provenance content is accepted only through the exact reviewed archive hash.
@@ -346,12 +348,340 @@ export function createPairedRecoveryRecord({history,verifier,supportStartedAt,ev
 }
 
 function validateRecoveryDocChanges(value){ensure(Array.isArray(value)&&value.length<=PAIRED_RECOVERY_POLICY.docChanges.length&&new Set(value.map(v=>v.path)).size===value.length&&value.every(v=>PAIRED_RECOVERY_POLICY.docChanges.some(p=>canonical(p)===canonical(v))),'Unreviewed recovery document tuple.');return value;}
-async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline,presentation}){
- if(presentation)validatePresentationInputs(presentation);
- const docPaths=paths.filter(p=>PAIRED_RECOVERY_POLICY.docChanges.some(v=>v.path===p)),extra=paths.filter(p=>!TOOLING_PATHS.has(p)&&!(presentation&&PRESENTATION_PATHS.has(p))&&!docPaths.includes(p));if(extra.length===0){ensure(!proof&&docPaths.length===0,'Unexpected archive evidence or document change without a recovery archive.');return undefined;}
+// One closed T -> inactive Delivery transition, independently reviewed at head39.
+// These exact facts are not configurable by operator evidence or environment.
+const INACTIVE_DELIVERY_POLICY=Object.freeze(
+{
+ "baselineSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+ "archivePath": "docs/releases/2026-10-20-release-T-canonical-recovery.json",
+ "archiveBlob": "15c23602955057ea1cef544901642526b969da1f",
+ "baseline": {
+  "archiveSha256": "5ffa589528503e0661c5815266190e22442252b5bb61fd74c39ede1091290cf5",
+  "receiptDigest": "cca92993afd03e856253183b61db1129523310d65e217d7ca95a69327bec049f",
+  "rollback": {
+   "pagesId": "afae3b21-0d47-4f3a-ab63-ee211cd1de8e",
+   "adminId": "ddea75c2-294e-4906-92eb-80370470392b",
+   "sourceSha": "8058ccfb7313e359043e0148e2b514327b8fb04a",
+   "pagesBuildDigest": "dc379858bf25bdddd081a5df8cf03b62fdbda3864ff26aa985336a3c38607960",
+   "adminAssetsDigest": "8c59382c355df19fd803437544bc5b0188b060b892814d90655a1efac1fcfecc",
+   "adminRuntimeDigest": "632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74",
+   "adminConfigDigest": "3b3591a4c85d95a3d38abfb0118ee4367f449be05448a9ac469f8a4333fd38b0"
+  }
+ },
+ "catalogue": {
+  "id": "92f3472a-3153-447d-a8be-c79db9498407",
+  "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
+  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a1ac2c60cb3930087adfd5018f373",
+  "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
+  "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
+  "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json"
+ },
+ "catalogueInputs": {
+  "inputCount": 52,
+  "inputPathsDigest": "157cdb15f5d1c6f385d1039da3613d64cf28917682e313aafc90bea3c6ecd853",
+  "inputInventoryDigest": "05330406124d45da8cf2154c7d4a1ac7c2b9832684988d943913f50a463ce674",
+  "importGraphDigest": "33992702b6d366eeeb443f4200be451d7a98ed7aca74386b5b4aca2968a0e09e"
+ },
+ "entries": [
+  {
+   "path": "admin/OrderDetail.jsx",
+   "mode": "100644",
+   "baseBlob": "e32dbd29063eac11735ab609992ad12ce6a43d0d",
+   "candidateBlob": "f5cc54589b1d7c19b1afc4e8213d4f48f0e156b9"
+  },
+  {
+   "path": "admin/mail-delivery.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "e896e6f1cd2179d50aeb91ed79e3393d5a244107"
+  },
+  {
+   "path": "admin/order-mail.mjs",
+   "mode": "100644",
+   "baseBlob": "0453367797108b8604dd65d627fc14b9ca1e0733",
+   "candidateBlob": "5cb91e5e6cda53a4630bbb4fb7e7520751c8380f"
+  },
+  {
+   "path": "catalogue/index.mjs",
+   "mode": "100644",
+   "baseBlob": "94b30c5ce4a017794603f16dc81355732222a01d",
+   "candidateBlob": "6245cddfa869ef242a8efcd3f98aba052574fa8b"
+  },
+  {
+   "path": "docs/availability-runbook.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "3f63cef2476e0ec23d1f8ce20ecf472bc1254c24"
+  },
+  {
+   "path": "docs/email-delivery-reconciliation.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "ed443124cec3c47a9ed472a86f5e6b857b59306c"
+  },
+  {
+   "path": "docs/email-delivery-webhook-runbook.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "63ad486aa69f2b4aa9e5f43e7b0653bfc88c4039"
+  },
+  {
+   "path": "docs/mail-delivery-admin.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "82803f9bf0b6be99e826e997de0d3d51ab8cc001"
+  },
+  {
+   "path": "docs/mail-delivery-backend.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "8a76a45278de60add620dbb06654f7fec88f4cb1"
+  },
+  {
+   "path": "docs/mail-delivery-integration.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "c16d0b5d44e82863c0e0ec6e3079a2d19e599b72"
+  },
+  {
+   "path": "docs/superpowers/plans/2026-10-20-mail-delivery-backend.md",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "5a461bd9fb9584bc37a86bed288addb1b093aa6f"
+  },
+  {
+   "path": "functions/_middleware.js",
+   "mode": "100644",
+   "baseBlob": "b7a97720ebe3012844ece8643490bcf5711fc4ac",
+   "candidateBlob": "ad95491d57d93d8fdec396360eb643da458b49e0"
+  },
+  {
+   "path": "migrations/security/0012_mail_delivery.sql",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "f4138cab01adad6c3e7bb196863909e13692da4b"
+  },
+  {
+   "path": "package-lock.json",
+   "mode": "100644",
+   "baseBlob": "ad10111804d934e9be4f8cc14b73ed38ec889d64",
+   "candidateBlob": "a115eb6c16355d095940c5f182ad3cdb7ffc5819"
+  },
+  {
+   "path": "package.json",
+   "mode": "100644",
+   "baseBlob": "08ecb4193c223add3d5a7a1e75b36f1d413047b3",
+   "candidateBlob": "3457bec703f083c7b998a9b76fe1b688308942ae"
+  },
+  {
+   "path": "security/index.mjs",
+   "mode": "100644",
+   "baseBlob": "f3f3c53f054e26792d56f0d8011b9a93fd1fe385",
+   "candidateBlob": "b2003638d9e8c823ece59187b86167ce1885498d"
+  },
+  {
+   "path": "security/mail-delivery.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "97a4252bd92d34e96eaa47ec4d3bc285dcd147fc"
+  },
+  {
+   "path": "security/orders.mjs",
+   "mode": "100644",
+   "baseBlob": "9607e2bef272c63dcd0c6c065b82f2c6e6d36f7e",
+   "candidateBlob": "7d9b17e33e32c74b8185419de681996b07ddafb9"
+  },
+  {
+   "path": "security/submissions.mjs",
+   "mode": "100644",
+   "baseBlob": "b6e5e44ca42d40e3f642757ebd7f3169bdb8fb9e",
+   "candidateBlob": "29cedc24188d500c0b8cc21b479a62c3119bfc64"
+  },
+  {
+   "path": "server/mail-delivery.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "292de5de954b76e517d9006d11c9eec1da41993a"
+  },
+  {
+   "path": "server/mail-recipient.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "fd6bfed565fcc96c9117b553fa54bce236bebe5b"
+  },
+  {
+   "path": "server/mail-webhook.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "acad4b67dd1452aae3a4e5ef08df528357837186"
+  },
+  {
+   "path": "server/submissions.mjs",
+   "mode": "100644",
+   "baseBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6",
+   "candidateBlob": "64a219f7e60b9d89e765d000f878e61dd50f48f8"
+  },
+  {
+   "path": "tests/availability-diagnostics.test.mjs",
+   "mode": "100644",
+   "baseBlob": "34ab771d9c37f67ac84240dc30fcb0ddf98252cb",
+   "candidateBlob": "06776cc9cac4fd9a0a3fbf2c5b89a85661752da7"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-admin.html",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "57d4f6d67b326c689d5bddc91109a629f4d09ef4"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-admin.jsx",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "032445240f114a08325145988ffdd131898f4904"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-integrated-worker.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "fbb5fc178bea37f22a96ef6b856109cd4a14bb14"
+  },
+  {
+   "path": "tests/fixtures/mail-delivery-security-worker.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "75d6f2027fb43fbe74e117c648df29c70ad20056"
+  },
+  {
+   "path": "tests/fixtures/mail-webhook-worker.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "1e0a28a2c79fd62d5c8416d5303f709ca0891690"
+  },
+  {
+   "path": "tests/fixtures/released-submissions-db231.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "71f31019483d82976ca5ca4136fca827d4f0f3f6"
+  },
+  {
+   "path": "tests/mail-delivery-admin.browser.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "9a0b23fa6ab42dcbc51fc97b56e8d0e4e041dcdb"
+  },
+  {
+   "path": "tests/mail-delivery-admin.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "9f9eeb7699b423e8f559295e8e752cf16d3cc192"
+  },
+  {
+   "path": "tests/mail-delivery-integration.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "f710fb962b636cdb02eb1e19edbe9adfc1bb3ca9"
+  },
+  {
+   "path": "tests/mail-delivery-persistence.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "e1f1765f659a2cbab724d3e1ef0c7709bad99a14"
+  },
+  {
+   "path": "tests/mail-delivery-projection.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "b874011a599c3dd2a1674ac6660a8b9d8a278c43"
+  },
+  {
+   "path": "tests/mail-delivery.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "888ee819c8c0628599d32ad7385fb6ded793b8ef"
+  },
+  {
+   "path": "tests/mail-receipts.test.mjs",
+   "mode": "100644",
+   "baseBlob": "1776c31af72340831d6eae36ed7ec551c5840f25",
+   "candidateBlob": "1acb4ebec7e9dec0116485cd2ddece006f5db0e1"
+  },
+  {
+   "path": "tests/mail-recipient.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "f3ee10cade864a23f766786582992e932dcc25a3"
+  },
+  {
+   "path": "tests/mail-webhook.test.mjs",
+   "mode": "100644",
+   "baseBlob": null,
+   "candidateBlob": "2e77ae99eef6ad8f60548354abd12568084a2a59"
+  },
+  {
+   "path": "tests/manual-update-attempts.browser.mjs",
+   "mode": "100644",
+   "baseBlob": "b115a8cbc7e81a8b63ce6dfa51c3da9805866974",
+   "candidateBlob": "ca1ce9004e19f95d563556a57de036cca54e5aab"
+  }
+ ]
+}
+);
+const INACTIVE_DELIVERY_PATHS=new Set(INACTIVE_DELIVERY_POLICY.entries.map(v=>v.path));
+function validateInactiveDeliveryInputs(v){
+ ensure(exactKeys(v,['baselineSourceInputDigest','sourceInputDigest','protectedInputDigest','entries'])&&['baselineSourceInputDigest','sourceInputDigest','protectedInputDigest'].every(k=>DIGEST.test(v[k]||''))&&v.sourceInputDigest!==v.baselineSourceInputDigest&&canonical(v.entries)===canonical(INACTIVE_DELIVERY_POLICY.entries),'Inactive Delivery source facts differ from the fixed review.');return v;
+}
+export function inactiveDeliveryInputs(baseSha,sourceSha,{archivePath}={}){
+ const p=INACTIVE_DELIVERY_POLICY;ensure(baseSha===p.baselineSha&&SHA.test(sourceSha||'')&&sourceSha!==baseSha&&archivePath===p.archivePath,'Inactive Delivery requires the genuine T baseline and canonical archive.');
+ const before=trackedTree(baseSha),after=trackedTree(sourceSha),prior=new Map(before.map(v=>[v.path,v])),current=new Map(after.map(v=>[v.path,v]));
+ for(const v of p.entries){const a=prior.get(v.path),b=current.get(v.path);ensure((v.baseBlob===null?!a:a?.mode===v.mode&&a.blob===v.baseBlob)&&b?.mode===v.mode&&b.blob===v.candidateBlob,'Inactive Delivery blob/mode differs from the independent review.');}
+ const excluded=new Set([...TOOLING_PATHS,...INACTIVE_DELIVERY_PATHS,p.archivePath,...PAIRED_RECOVERY_POLICY.docChanges.map(v=>v.path)]);
+ const protectedEntries=entries=>entries.filter(v=>!excluded.has(v.path)).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+ const protectedBefore=protectedEntries(before);ensure(canonical(protectedBefore)===canonical(protectedEntries(after)),'Protected inactive Delivery tree changed.');
+ return validateInactiveDeliveryInputs({baselineSourceInputDigest:sourceInputs(baseSha),sourceInputDigest:sourceInputs(sourceSha),protectedInputDigest:hash(canonical(protectedBefore)),entries:structuredClone(p.entries)});
+}
+export function inactiveDeliveryBaseline(record){
+ const {reviewed,evidenceUrl,...core}=record;validatePairedRecoveryRecord(core,{sourceSha:INACTIVE_DELIVERY_POLICY.baselineSha});
+ const receipts=Object.fromEntries(COMPONENTS.map(c=>[c,record.components[c].receipt])),pages=receipts.pages,admin=receipts.admin;
+ const facts={archiveSha256:INACTIVE_DELIVERY_POLICY.baseline.archiveSha256,receiptDigest:hash(canonical(receipts)),rollback:{pagesId:pages.id,adminId:admin.id,sourceSha:pages.sourceSha,pagesBuildDigest:pages.buildDigest,adminAssetsDigest:admin.assetsDigest,adminRuntimeDigest:admin.runtimeDigest,adminConfigDigest:admin.configDigest}};
+ ensure(canonical(facts)===canonical(INACTIVE_DELIVERY_POLICY.baseline),'Inactive Delivery rollback differs from genuine T recovery.');return facts;
+}
+export function inactiveDeliveryIngress(project,{id,sourceSha,observedAt=new Date().toISOString()}){
+ const read=config=>{ensure(config?.env_vars&&typeof config.env_vars==='object'&&!Array.isArray(config.env_vars),'Inactive Delivery environment observation missing.');if(!Object.hasOwn(config.env_vars,'MAIL_EVENTS_ENABLED'))return 'absent';const flag=config.env_vars.MAIL_EVENTS_ENABLED;ensure(exactKeys(flag,['type','value'])&&flag.type==='plain_text'&&flag.value==='false','Mail event ingress is enabled or unknown.');return 'false';};
+ const deployment=project?.canonical_deployment;ensure(deployment?.id===id&&deployment.environment==='production'&&deployment.deployment_trigger?.metadata?.commit_hash===sourceSha,'Inactive Delivery canonical observation differs.');
+ return validateInactiveIngress({id,sourceSha,observedAt,production:read(project.deployment_configs?.production),preview:read(project.deployment_configs?.preview),canonical:read(deployment)},{id,sourceSha,now:utc(observedAt)});
+}
+function validateInactiveIngress(v,{id,sourceSha,now}){
+ ensure(exactKeys(v,['id','sourceSha','observedAt','production','preview','canonical'])&&v.id===id&&ID.test(id||'')&&v.sourceSha===sourceSha&&SHA.test(sourceSha||'')&&['production','preview','canonical'].every(k=>['absent','false'].includes(v[k])),'Inactive Delivery ingress evidence differs.');
+ const at=utc(v.observedAt);ensure(at<=now+30000&&now-at<=30000,'Inactive Delivery ingress observation expired.');return v;
+}
+const CATALOGUE_METAFILE='dist/release/private-inputs/catalogue-metafile.json';
+function validateCatalogueInputFacts(v){
+ const p=INACTIVE_DELIVERY_POLICY.catalogueInputs;ensure(exactKeys(v,['version','inputCount','inputPathsDigest','inputInventoryDigest','importGraphDigest','metafileSha256'])&&v.version===1&&Object.keys(p).every(k=>v[k]===p[k])&&DIGEST.test(v.metafileSha256||''),'Catalogue complete compiler/import closure differs.');return v;
+}
+export async function inactiveCatalogueInputs(){
+ const bytes=await readFile(CATALOGUE_METAFILE);ensure(bytes.length>0&&bytes.length<2*1024*1024,'Invalid Catalogue compiler metadata size.');const metadata=strictJson(bytes.toString('utf8')),paths=Object.keys(metadata.inputs||{}).sort(),p=INACTIVE_DELIVERY_POLICY.catalogueInputs;
+ ensure(paths.length===p.inputCount&&hash(canonical(paths))===p.inputPathsDigest,'Catalogue compiler input paths changed.');
+ const inventory=[],graph=[];
+ for(const path of paths){ensure(path===posix.normalize(path)&&!path.startsWith('/')&&!path.startsWith('../')&&!path.includes('\\')&&!path.includes('\0'),'Unsafe Catalogue compiler input.');const input=metadata.inputs[path],data=await readFile(path);ensure(input.bytes===data.length&&Array.isArray(input.imports)&&input.imports.every(v=>v.external?v.path==='<runtime>':paths.includes(v.path)),'Unresolved Catalogue import.');inventory.push([path,hash(data),data.length]);graph.push([path,input.imports]);}
+ const outputs=Object.entries(metadata.outputs||{}).filter(([path])=>!path.endsWith('.map'));ensure(outputs.length===1&&resolve(outputs[0][0])===resolve('dist/release/private/catalogue/index.js')&&outputs[0][1].entryPoint==='catalogue/index.mjs'&&outputs[0][1].bytes===(await stat('dist/release/private/catalogue/index.js')).size&&Array.isArray(outputs[0][1].imports)&&outputs[0][1].imports.length===0&&Object.keys(outputs[0][1].inputs||{}).every(path=>paths.includes(path)),'Catalogue emitted runtime/input metadata differs.');
+ return validateCatalogueInputFacts({version:1,inputCount:paths.length,inputPathsDigest:hash(canonical(paths)),inputInventoryDigest:hash(canonical(inventory)),importGraphDigest:hash(canonical(graph)),metafileSha256:hash(bytes)});
+}
+function validateInactivePrivate({sourceSha,sourceDigests,privateBuild,evidence}){
+ const security=evidence?.receipts?.security,catalogue=evidence?.receipts?.catalogue,p=INACTIVE_DELIVERY_POLICY;
+ ensure(security?.sourceSha===sourceSha&&security.sourceDigest===sourceDigests.security,'Inactive Delivery needs actual candidate Security publication.');
+ ensure(Object.keys(p.catalogue).every(k=>catalogue?.[k]===p.catalogue[k]),'Inactive Delivery must retain the actual K Catalogue receipt.');
+ validateCatalogueInputFacts(privateBuild?.catalogue?.inputClosure);
+ ensure(privateBuild.catalogue.runtimeDigest===p.catalogue.runtimeDigest&&privateBuild.catalogue.configDigest===p.catalogue.configDigest,'Candidate Catalogue emitted runtime/config differs from K.');
+ ensure(canonical(evidence?.staged?.rollback)===canonical(p.baseline.rollback),'Inactive Delivery staged rollback is not genuine T.');
+}
+
+async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline,presentation,inactiveDelivery}){
+ if(presentation)validatePresentationInputs(presentation);if(inactiveDelivery)validateInactiveDeliveryInputs(inactiveDelivery);
+ const docPaths=paths.filter(p=>PAIRED_RECOVERY_POLICY.docChanges.some(v=>v.path===p)),extra=paths.filter(p=>!TOOLING_PATHS.has(p)&&!(presentation&&PRESENTATION_PATHS.has(p))&&!(inactiveDelivery&&INACTIVE_DELIVERY_PATHS.has(p))&&!docPaths.includes(p));if(extra.length===0){ensure(!proof&&docPaths.length===0,'Unexpected archive evidence or document change without a recovery archive.');return undefined;}
  ensure(extra.length===1&&proof&&Object.keys(proof).every(k=>['origin','reviewed','path','sha256','sourceSha','reviewedAgainstSha','receiptDigest','recoveryDocChanges'].includes(k))&&proof.origin==='reviewed-complete-release-archive'&&proof.reviewed===true&&proof.path===extra[0]&&/^docs\/releases\/\d{4}-\d\d-\d\d-release-[a-zA-Z0-9_-]{1,64}[.]json$/.test(proof.path)&&DIGEST.test(proof.sha256||'')&&proof.sourceSha===baseSha&&proof.reviewedAgainstSha===sourceSha,'Archive is not an explicitly reviewed historical release record.');
  ensure(git('diff','--name-status',baseSha,sourceSha,'--',proof.path)==='A\t'+proof.path,'An archived record must be a new immutable addition.');
  const entry=git('ls-tree',sourceSha,'--',proof.path),match=/^100644 blob ([a-f0-9]{40})\t(.+)$/.exec(entry);ensure(match&&match[2]===proof.path,'Archive must be a committed regular file.');
+ if(inactiveDelivery)ensure(proof.path===INACTIVE_DELIVERY_POLICY.archivePath&&proof.sha256===INACTIVE_DELIVERY_POLICY.baseline.archiveSha256&&match[1]===INACTIVE_DELIVERY_POLICY.archiveBlob,'Inactive Delivery archive is not the accepted T bytes.');
  const bytes=await readFile(proof.path);ensure(bytes.length>0&&bytes.length<2*1024*1024&&hash(bytes)===proof.sha256&&createHash('sha1').update(Buffer.concat([Buffer.from('blob '+bytes.length+'\0'),bytes])).digest('hex')===match[1],'Archive bytes differ from the reviewed committed record.');
  const record=JSON.parse(bytes.toString('utf8')),validated=validateReleaseArchiveRecord(record,{sourceSha:baseSha,candidateSha:sourceSha,baseline});
  const recoveryDocChanges=docPaths.map(path=>{ensure(record.kind==='paired-release-recovery-v1'&&baseSha===PAIRED_RECOVERY_POLICY.sourceSha,'Only the complete recovery archive admits its exact dependency document.');const expected=PAIRED_RECOVERY_POLICY.docChanges.find(v=>v.path===path);for(const [side,sha]of [['before',baseSha],['after',sourceSha]])ensure(git('ls-tree',sha,'--',path)===expected[side].mode+' blob '+expected[side].blob+'\t'+path,'Recovery document Git blob/mode differs.');return expected;});
@@ -468,12 +798,20 @@ function validateAdminManifestCompatibility(v,expected){
 }
 
 export function validateActivationCompatibility(value,expected){
- const presentation=value?.basis==='reviewed-public-presentation-v1';
- ensure((presentation||value?.basis==='source-input-tooling-only-v1')&&value.reviewedAgainstSha===expected.sourceSha&&value.baselineSha===expected.baseSha&&value.baselineSha===expected.beforePagesSourceSha&&value.historicalFunctionsDigest===null,'Activation compatibility is not reviewed source-based evidence.');
+ const presentation=value?.basis==='reviewed-public-presentation-v1',delivery=value?.basis==='reviewed-inactive-delivery-v1';
+ ensure((presentation||delivery||value?.basis==='source-input-tooling-only-v1')&&value.reviewedAgainstSha===expected.sourceSha&&value.baselineSha===expected.baseSha&&value.baselineSha===expected.beforePagesSourceSha&&value.historicalFunctionsDigest===null,'Activation compatibility is not reviewed source-based evidence.');
  const linked=expected.archivedRelease?.sourceSha===expected.baseSha&&expected.archivedRelease.reviewedAgainstSha===expected.sourceSha&&DIGEST.test(expected.archivedRelease.receiptDigest||'');
  const recoveredDocs=expected.archivedRelease?.recoveryDocChanges===undefined?[]:validateRecoveryDocChanges(expected.archivedRelease.recoveryDocChanges);
  const archive=p=>linked&&(expected.archivedRelease.path===p||(expected.baseSha===PAIRED_RECOVERY_POLICY.sourceSha&&recoveredDocs.some(v=>v.path===p)));
- if(presentation){
+ if(delivery){
+  ensure(exactKeys(value,['basis','reviewedAgainstSha','baselineSha','observedAt','sourceInputDigest','baselineSourceInputDigest','inactiveDelivery','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest','historicalFunctionsDigest',...(Object.hasOwn(value,'privateSnapshotGap')?['privateSnapshotGap']:[])])&&(!Object.hasOwn(value,'privateSnapshotGap')||value.privateSnapshotGap==='Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'),'Unexpected inactive Delivery compatibility fields.');
+  const p=INACTIVE_DELIVERY_POLICY,facts=validateInactiveDeliveryInputs(expected.inactiveDelivery);validateInactiveDeliveryInputs(value.inactiveDelivery);
+  ensure(expected.baseSha===p.baselineSha&&canonical(facts)===canonical(value.inactiveDelivery)&&facts.baselineSourceInputDigest===expected.baselineSourceInputDigest&&value.baselineSourceInputDigest===expected.baselineSourceInputDigest&&facts.sourceInputDigest===expected.sourceInputDigest,'Inactive Delivery source comparison differs.');
+  ensure(canonical(expected.deliveryBaseline)===canonical(p.baseline)&&linked&&expected.archivedRelease.path===p.archivePath&&expected.archivedRelease.sha256===p.baseline.archiveSha256&&expected.archivedRelease.receiptDigest===p.baseline.receiptDigest&&canonical(expected.rollback)===canonical(p.baseline.rollback)&&expected.before.pages===p.baseline.rollback.pagesId&&expected.before.admin===p.baseline.rollback.adminId,'Inactive Delivery genuine baseline/archive/rollback binding missing.');
+  ensure(new Set(expected.paths).size===expected.paths.length&&p.entries.every(v=>expected.paths.includes(v.path))&&expected.paths.every(path=>TOOLING_PATHS.has(path)||INACTIVE_DELIVERY_PATHS.has(path)||archive(path)),'Unreviewed inactive Delivery path.');
+  validateInactiveIngress(expected.inactiveIngress,{id:expected.before.pages,sourceSha:expected.baseSha,now:expected.now??Date.now()});
+  validateInactivePrivate(expected);
+ }else if(presentation){
   ensure(exactKeys(value,['basis','reviewedAgainstSha','baselineSha','observedAt','sourceInputDigest','baselineSourceInputDigest','presentation','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest','historicalFunctionsDigest',...(Object.hasOwn(value,'privateSnapshotGap')?['privateSnapshotGap']:[]),...(Object.hasOwn(value,'adminAssetManifest')?['adminAssetManifest']:[])])&&(!Object.hasOwn(value,'privateSnapshotGap')||value.privateSnapshotGap==='Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'), 'Unexpected presentation compatibility fields.');
   const facts=validatePresentationInputs(expected.presentation);validatePresentationInputs(value.presentation);
   ensure(canonical(value.presentation)===canonical(facts)&&value.baselineSourceInputDigest===expected.baselineSourceInputDigest&&facts.baselineSourceInputDigest===expected.baselineSourceInputDigest&&facts.sourceInputDigest===expected.sourceInputDigest,'Presentation source/baseline/protected comparison differs.');
@@ -483,7 +821,7 @@ export function validateActivationCompatibility(value,expected){
   else ensure(DIGEST.test(admin?.runtimeDigest||'')&&DIGEST.test(admin?.configDigest||'')&&admin.runtimeDigest===rollback?.adminRuntimeDigest&&admin.configDigest===rollback?.adminConfigDigest,'Presentation changed the private Admin executable or configuration.');
  }else ensure(expected.paths.every(p=>TOOLING_PATHS.has(p)||archive(p))&&expected.sourceInputDigest===expected.baselineSourceInputDigest,'Activation changes application/runtime/build inputs.');
  for(const k of ['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'])ensure(DIGEST.test(expected[k]||'')&&value[k]===expected[k],'Activation source/compiler/config/assets comparison differs.');
- return {basis:value.basis,reviewedAgainstSha:value.reviewedAgainstSha,baselineSha:value.baselineSha,observedAt:freshTime(value.observedAt,expected.now??Date.now()),...Object.fromEntries(['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'].map(k=>[k,value[k]])),...(presentation?{baselineSourceInputDigest:value.baselineSourceInputDigest,presentation:structuredClone(value.presentation),...(value.adminAssetManifest?{adminAssetManifest:structuredClone(value.adminAssetManifest)}:{})}:{}),historicalFunctionsDigest:null,privateSnapshotGap:'Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'};
+ return {basis:value.basis,reviewedAgainstSha:value.reviewedAgainstSha,baselineSha:value.baselineSha,observedAt:freshTime(value.observedAt,expected.now??Date.now()),...Object.fromEntries(['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'].map(k=>[k,value[k]])),...(delivery?{baselineSourceInputDigest:value.baselineSourceInputDigest,inactiveDelivery:structuredClone(value.inactiveDelivery)}:{}),...(presentation?{baselineSourceInputDigest:value.baselineSourceInputDigest,presentation:structuredClone(value.presentation),...(value.adminAssetManifest?{adminAssetManifest:structuredClone(value.adminAssetManifest)}:{})}:{}),historicalFunctionsDigest:null,privateSnapshotGap:'Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'};
 }
 function isSourceInput(path){return /^(src\/|public\/|data\/|server\/|functions\/|admin\/|security\/|catalogue\/|migrations\/|scripts\/|package(-lock)?[.]json$|vite[.]|wrangler.*[.]jsonc$|index[.]html$)/.test(path)&&!TOOLING_PATHS.has(path);}
 function sourceInputs(sha){
@@ -622,8 +960,9 @@ function schemaEvidence(value,expected,{sourceSha,now}){
  const applied=validateLedger(value.applied,expected.source.map(v=>v.name));
  return {origin:value.origin,databaseId:expected.databaseId,reviewedAgainstSha:sourceSha,observedAt:freshTime(value.observedAt,now),sourceFiles:expected.source,applied,objectsDigest:value.objectsDigest,ddlReviewed:true,remoteChecksumEvidence:'source checksums only; remote ledger has no checksums'};
 }
-export function validatePrerequisites({required,sourceSha,before,sourceDigests,privateBuild,schemaSources,evidence={},beforePagesSourceSha,now=Date.now(),rollbackBefore=before,requireStaged=required.includes('admin')}){
+export function validatePrerequisites({required,sourceSha,before,sourceDigests,privateBuild,schemaSources,evidence={},beforePagesSourceSha,now=Date.now(),rollbackBefore=before,requireStaged=required.includes('admin'),inactiveDelivery}){
  ensure(Array.isArray(required)&&required.includes('pages')&&required.every(c=>COMPONENTS.includes(c))&&SHA.test(sourceSha||''),'Invalid release scope.');
+ if(inactiveDelivery){validateInactiveDeliveryInputs(inactiveDelivery);validateInactivePrivate({sourceSha,sourceDigests,privateBuild,evidence});}
  const result={components:{},schema:{},staged:{status:requireStaged?'blocked':'not-required'},complete:false};
  for(const component of ['admin','security','catalogue']){
   const needed=required.includes(component);let value={status:'blocked',code:'UNKNOWN_OR_UNVERIFIED'};
@@ -697,13 +1036,13 @@ async function bundleDigest(directory,{runtimeOnly=false}={}){
  await walk(resolve(directory));ensure(files.length>0,'Built output is empty.');return {sha256:hash(JSON.stringify(files)),fileCount:files.length};
 }
 async function privateBuilds(){
- const sourceSha=git('rev-parse','HEAD');const components={};
+ const sourceSha=git('rev-parse','HEAD');const components={};let inactiveDelivery;try{inactiveDelivery=inactiveDeliveryInputs(INACTIVE_DELIVERY_POLICY.baselineSha,sourceSha,{archivePath:INACTIVE_DELIVERY_POLICY.archivePath});}catch{}
  for(const component of ['admin','security','catalogue']){
   const directory=`dist/release/private/${component}`;
   await rm(directory,{recursive:true,force:true});
-  if(component==='admin'){await mkdir(dirname(ADMIN_METAFILE),{recursive:true});await rm(ADMIN_METAFILE,{force:true});}
-  command('npx',['--no-install','wrangler','deploy','--dry-run','--config',`wrangler.${component}.jsonc`,'--outdir',directory,...(component==='admin'?['--metafile',ADMIN_METAFILE]:[])]);
-  components[component]={runtimeDigest:(await bundleDigest(directory,{runtimeOnly:true})).sha256,configDigest:hash(await readFile(`wrangler.${component}.jsonc`)),...(component==='admin'&&hash(await readFile(ADMIN_MANIFEST_PATH))===ADMIN_MANIFEST_POLICY.manifestSha256?{assetManifest:await adminAssetManifestInputs()}:{})};
+  const metafile=component==='admin'?ADMIN_METAFILE:component==='catalogue'&&inactiveDelivery?CATALOGUE_METAFILE:undefined;if(metafile){await mkdir(dirname(metafile),{recursive:true});await rm(metafile,{force:true});}
+  command('npx',['--no-install','wrangler','deploy','--dry-run','--config',`wrangler.${component}.jsonc`,'--outdir',directory,...(metafile?['--metafile',metafile]:[])]);
+  components[component]={...(component==='catalogue'&&inactiveDelivery?{inputClosure:await inactiveCatalogueInputs()}:{}),runtimeDigest:(await bundleDigest(directory,{runtimeOnly:true})).sha256,configDigest:hash(await readFile(`wrangler.${component}.jsonc`)),...(component==='admin'&&hash(await readFile(ADMIN_MANIFEST_PATH))===ADMIN_MANIFEST_POLICY.manifestSha256?{assetManifest:await adminAssetManifestInputs()}:{})};
  }
  await writeFile('dist/release/private-build-manifest.json',JSON.stringify({sourceSha,components},null,2)+'\n');
 }
@@ -732,30 +1071,37 @@ async function schemaSources(){
 }
 function inputEvidence(sourceSha){
  const text=process.env.RELEASE_EVIDENCE_JSON||'';ensure(text.length>0&&Buffer.byteLength(text)<100000,'Explicit sanitized evidence input is required.');
- const value=strictJson(text);ensure(value&&typeof value==='object'&&!Array.isArray(value)&&value.sourceSha===sourceSha,'Evidence was reviewed for a different source.');ensure(Object.keys(value).every(k=>['sourceSha','baseline','mandatoryValidation','guards','receipts','schema','staged','activationCompatibility','archivedRelease','githubArtifact'].includes(k)),'Unknown evidence input.');return value;
+ const value=strictJson(text);ensure(value&&typeof value==='object'&&!Array.isArray(value)&&value.sourceSha===sourceSha,'Evidence was reviewed for a different source.');ensure(Object.keys(value).every(k=>['sourceSha','baseline','mandatoryValidation','guards','receipts','schema','staged','activationCompatibility','archivedRelease','githubArtifact'].includes(k)),'Unknown evidence input.');
+ if(value.activationCompatibility?.basis==='reviewed-inactive-delivery-v1'){
+  // The completed T record exceeds the bounded dispatch payload. Resolve only
+  // its fixed immutable bytes already committed in this exact candidate tree.
+  const locator=value.baseline,p=INACTIVE_DELIVERY_POLICY;ensure(exactKeys(locator,['sourceSha','reviewed','evidenceUrl'])&&locator.sourceSha===p.baselineSha&&locator.reviewed===true&&locator.evidenceUrl===`https://github.com/${REPOSITORY}/blob/a27d393e35b6657c4800560bbcaffe3bceaf33f9/${p.archivePath}`,'Inactive Delivery baseline locator differs.');
+  const bytes=Buffer.from(execFileSync('git',['show',`${sourceSha}:${p.archivePath}`],{maxBuffer:2*1024*1024,stdio:['ignore','pipe','pipe']}));ensure(hash(bytes)===p.baseline.archiveSha256,'Inactive Delivery baseline committed bytes changed.');value.baseline={...strictJson(bytes.toString('utf8')),reviewed:true,evidenceUrl:locator.evidenceUrl};
+ }
+ return value;
 }
-async function observePages(request=createRequest()){
+async function observePages(request=createRequest(),{inactiveDelivery=false}={}){
  const response=await request(`accounts/${DESTINATION_ACCOUNT}/pages/projects/${PAGES_PROJECT}`);
  const deployment=response?.result?.canonical_deployment;
  ensure(response.success&&deployment?.latest_stage?.status==='success'&&ID.test(deployment.id||'')&&SHA.test(deployment.deployment_trigger?.metadata?.commit_hash||''),'Successful canonical Pages metadata missing.');
- return {pages:deployment.id,sourceSha:deployment.deployment_trigger.metadata.commit_hash};
+ return {pages:deployment.id,sourceSha:deployment.deployment_trigger.metadata.commit_hash,...(inactiveDelivery?{inactiveIngress:inactiveDeliveryIngress(response.result,{id:deployment.id,sourceSha:deployment.deployment_trigger.metadata.commit_hash})}:{})};
 }
 // Poll only read-only canonical metadata while the exact old production pair is
 // still visible. This never retries an upload or accepts an unrelated version.
-export async function observeAcknowledgedPages(request,{id,sourceSha,beforeId,beforeSourceSha},pause=()=>new Promise(resolve=>setTimeout(resolve,5000))){
+export async function observeAcknowledgedPages(request,{id,sourceSha,beforeId,beforeSourceSha,inactiveDelivery=false},pause=()=>new Promise(resolve=>setTimeout(resolve,5000))){
  ensure(ID.test(id||'')&&SHA.test(sourceSha||'')&&ID.test(beforeId||'')&&SHA.test(beforeSourceSha||''),'Unbound Pages observation.');
  for(let attempt=0;attempt<24;attempt++){
-  const observed=await observePages(request);
+  const observed=await observePages(request,{inactiveDelivery});
   if(observed.pages===id&&observed.sourceSha===sourceSha)return observed;
   ensure(observed.pages===beforeId&&observed.sourceSha===beforeSourceSha,'Canonical Pages changed to another ID/source.');
   if(attempt<23)await pause();
  }
  throw Error('Acknowledged Pages is not successful canonical production.');
 }
-function prerequisiteInput(record,evidence=record.evidence){return {required:record.required,sourceSha:record.sourceSha,before:record.before,sourceDigests:record.sourceDigests,beforePagesSourceSha:record.beforePagesSourceSha,privateBuild:record.build.private,schemaSources:record.schemaSources,evidence};}
+function prerequisiteInput(record,evidence=record.evidence){return {required:record.required,sourceSha:record.sourceSha,before:record.before,sourceDigests:record.sourceDigests,beforePagesSourceSha:record.beforePagesSourceSha,privateBuild:record.build.private,schemaSources:record.schemaSources,evidence,inactiveDelivery:record.build.inactiveDelivery};}
 const positiveId=value=>typeof value==='string'&&/^[1-9][0-9]{0,19}$/.test(value);
 function utc(value){ensure(typeof value==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d{3}Z$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString()===value,'Invalid phase clock.');return Date.parse(value);}
-function compatibilityInput(record){return {sourceSha:record.sourceSha,baseSha:record.baseSha,beforePagesSourceSha:record.beforePagesSourceSha,paths:record.paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:record.build.baselineSourceInputDigest??record.build.sourceInputDigest,presentation:record.build.presentation,before:record.before,adminManifestBaseline:record.build.adminManifestBaseline,privateBuild:record.build.private,rollback:record.evidence?.staged?.rollback,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256};}
+function compatibilityInput(record){return {sourceSha:record.sourceSha,baseSha:record.baseSha,beforePagesSourceSha:record.beforePagesSourceSha,paths:record.paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:record.build.baselineSourceInputDigest??record.build.sourceInputDigest,presentation:record.build.presentation,inactiveDelivery:record.build.inactiveDelivery,deliveryBaseline:record.build.deliveryBaseline,inactiveIngress:record.build.inactiveIngress,evidence:record.evidence,sourceDigests:record.sourceDigests,before:record.before,adminManifestBaseline:record.build.adminManifestBaseline,privateBuild:record.build.private,rollback:record.evidence?.staged?.rollback,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256};}
 function authorizationSnapshot(record,version=record.prewriteValidation?.version??2){
  return Object.fromEntries([...(version===2?['mandatoryValidation']:[]),'sourceSha','repository','workflow','runAttempt','planComplete','baseSha','beforePagesSourceSha','before','required','schemas','paths','archivedRelease','sourceDigests','schemaSources','build','activationCompatibility','evidence'].map(k=>[k,record[k]]));
 }
@@ -809,18 +1155,19 @@ async function plan(){
   phase='SCOPE';ensure(git('merge-base',baseSha,ctx.sourceSha)===baseSha,'Baseline must be an ancestor of reviewed main.');
   const paths=git('diff','--name-only',baseSha,ctx.sourceSha).split('\n').filter(Boolean),dep=dependencies(ctx.sourceSha),prior=dependencies(baseSha);
   const classification=classifyChanges(paths,Object.fromEntries(['security','catalogue'].map(c=>[c,[...new Set([...dep[c],...prior[c]])]])));
-  const presentation=paths.some(p=>PRESENTATION_PATHS.has(p))?presentationInputs(baseSha,ctx.sourceSha,{archivePath:evidence.archivedRelease?.path}):undefined;
-  phase='ARCHIVE';record.archivedRelease=await releaseArchive(evidence.archivedRelease,{paths,sourceSha:ctx.sourceSha,baseSha,baseline:evidence.baseline,presentation});
-  phase='VERSIONS';const pages=await observePages();
+  const delivery=evidence.activationCompatibility?.basis==='reviewed-inactive-delivery-v1',inactiveDelivery=delivery?inactiveDeliveryInputs(baseSha,ctx.sourceSha,{archivePath:evidence.archivedRelease?.path}):undefined,deliveryBaseline=delivery?inactiveDeliveryBaseline(evidence.baseline):undefined;
+  const presentation=!delivery&&paths.some(p=>PRESENTATION_PATHS.has(p))?presentationInputs(baseSha,ctx.sourceSha,{archivePath:evidence.archivedRelease?.path}):undefined;
+  phase='ARCHIVE';record.archivedRelease=await releaseArchive(evidence.archivedRelease,{paths,sourceSha:ctx.sourceSha,baseSha,baseline:evidence.baseline,presentation,inactiveDelivery});
+  phase='VERSIONS';const pages=await observePages(undefined,{inactiveDelivery:delivery});
   record={...record,baseSha,paths,required:classification.components,schemas:classification.schemas,beforePagesSourceSha:pages.sourceSha,before:{pages:pages.pages,...Object.fromEntries(['admin','security','catalogue'].filter(c=>ID.test(evidence.guards?.[c]?.id||'')).map(c=>[c,evidence.guards[c].id]))},components:{},sourceDigests:Object.fromEntries(COMPONENTS.map(c=>[c,fingerprint(ctx.sourceSha,c)])),schemaSources:await schemaSources()};
   phase='BUILD';let comparison={components:{}};
   try{comparison=await readJson('dist/release/private-build-manifest.json');ensure(comparison.sourceSha===ctx.sourceSha,'Comparison build source differs.');
-   for(const c of Object.keys(comparison.components)){ensure(['admin','security','catalogue'].includes(c),'Unknown comparison component.');ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===comparison.components[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===comparison.components[c].configDigest,'Comparison bytes/config changed.');if(comparison.components[c].assetManifest)ensure(c==='admin'&&canonical(await adminAssetManifestInputs())===canonical(comparison.components[c].assetManifest),'Admin compiler input evidence changed.');}
+   for(const c of Object.keys(comparison.components)){ensure(['admin','security','catalogue'].includes(c),'Unknown comparison component.');ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===comparison.components[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===comparison.components[c].configDigest,'Comparison bytes/config changed.');if(comparison.components[c].inputClosure)ensure(c==='catalogue'&&inactiveDelivery&&canonical(await inactiveCatalogueInputs())===canonical(comparison.components[c].inputClosure),'Catalogue compiler/input evidence changed.');if(comparison.components[c].assetManifest)ensure(c==='admin'&&canonical(await adminAssetManifestInputs())===canonical(comparison.components[c].assetManifest),'Admin compiler input evidence changed.');}
   }catch{comparison={components:{}};ensure(!record.required.some(c=>['admin','security','catalogue'].includes(c)),'Required private comparison build missing or changed.');}
-  record.build={schemaVersion:2,sourceSha:ctx.sourceSha,sourceInputDigest:sourceInputs(ctx.sourceSha),...(presentation?{baselineSourceInputDigest:presentation.baselineSourceInputDigest,presentation}:{}),compiler:await compilerConfig(),ssr:await bundleDigest('dist/ssr'),private:comparison.components,pages:await bundleDigest('dist/client'),admin:await bundleDigest('dist/admin')};
+  record.build={schemaVersion:2,sourceSha:ctx.sourceSha,sourceInputDigest:sourceInputs(ctx.sourceSha),...(inactiveDelivery?{baselineSourceInputDigest:inactiveDelivery.baselineSourceInputDigest,inactiveDelivery,deliveryBaseline,inactiveIngress:pages.inactiveIngress}:{}),...(presentation?{baselineSourceInputDigest:presentation.baselineSourceInputDigest,presentation}:{}),compiler:await compilerConfig(),ssr:await bundleDigest('dist/ssr'),private:comparison.components,pages:await bundleDigest('dist/client'),admin:await bundleDigest('dist/admin')};
   phase='MANDATORY_VALIDATION';validateMandatoryRecord(record);
   if(evidence.activationCompatibility?.adminAssetManifest){const receipt=evidence.baseline.components?.admin?.receipt;ensure(receipt?.sourceSha===baseSha&&DIGEST.test(receipt.assetsDigest||''),'Genuine baseline Admin asset receipt missing.');record.build.adminManifestBaseline={sourceSha:receipt.sourceSha,id:receipt.id,runtimeDigest:receipt.runtimeDigest,configDigest:receipt.configDigest,assetsDigest:receipt.assetsDigest,manifestSha256:ADMIN_MANIFEST_POLICY.baselineManifestSha256};}
-  phase='ACTIVATION_COMPATIBILITY';record.activationCompatibility=validateActivationCompatibility(evidence.activationCompatibility,{...compatibilityInput(record),baselineSourceInputDigest:sourceInputs(baseSha),rollback:evidence.staged?.rollback});
+  phase='ACTIVATION_COMPATIBILITY';record.activationCompatibility=validateActivationCompatibility(evidence.activationCompatibility,{...compatibilityInput(record),baselineSourceInputDigest:sourceInputs(baseSha),rollback:evidence.staged?.rollback,evidence});
   await writeFile('dist/release/build-manifest.json',JSON.stringify(record.build,null,2)+'\n');
   phase='PREREQUISITES';record.prerequisites=validatePrerequisites(prerequisiteInput(record,evidence));
   record.evidence=sanitizedEvidence(ctx.sourceSha,record.prerequisites);
@@ -838,7 +1185,7 @@ function expectedIdentities(record,components){
  }catch{}
  return Object.fromEntries(components.map(c=>[c,record.components?.[c]?.receipt?.id||record.completed?.[c]?.id||(c==='pages'?(record.pagesUploadEvidence?.acknowledgement?.id||acknowledgedId):undefined)||record.before?.[c]]).filter(([,id])=>ID.test(id||'')));
 }
-async function observeProtection(components,{expected={},sourceSha,request}={}){
+async function observeProtection(components,{expected={},sourceSha,request,inactiveDelivery=false}={}){
  const checks=[];
  for(const component of components){
   const script=component==='pages'?'scripts/check-deployment.mjs':`scripts/check-${component}-deployment.mjs`;
@@ -852,7 +1199,7 @@ async function observeProtection(components,{expected={},sourceSha,request}={}){
   try{
    ensure(typeof request==='function','No observation transport.');
    if(check.component==='pages'){
-    const observed=await observePages(request);check.observedId=observed.pages;check.observedSourceSha=observed.sourceSha;
+    const observed=await observePages(request,{inactiveDelivery});check.observedId=observed.pages;check.observedSourceSha=observed.sourceSha;if(inactiveDelivery)check.inactiveIngress=observed.inactiveIngress;
    }else check.observedId=currentWorkerVersion(await request(`accounts/${DESTINATION_ACCOUNT}/workers/scripts/customvibe-${check.component}/deployments`));
    if(!check.expectedId||(check.component==='pages'&&!SHA.test(sourceSha||''))){check.status='failed';check.identityCode='FINAL_IDENTITY_UNBOUND';}
    else if(check.observedId!==check.expectedId||(check.component==='pages'&&check.observedSourceSha!==sourceSha)){check.status='failed';check.identityCode='FINAL_IDENTITY_DRIFT';}
@@ -869,7 +1216,7 @@ async function publish(component){
  try{
   const ctx=context({native:true});ensure(ctx.sourceSha===record.sourceSha&&record.planComplete===true&&record.state==='planned','No current complete publication plan.');
   validateMandatoryRecord(record);validatePrerequisites(prerequisiteInput(record));
-  ensure((await observePages()).pages===record.before.pages,'Pages deployment drifted; re-plan.');
+  const pages=await observePages(undefined,{inactiveDelivery:!!record.build.inactiveDelivery});ensure(pages.pages===record.before.pages&&pages.sourceSha===record.beforePagesSourceSha,'Pages deployment drifted; re-plan.');if(record.build.inactiveDelivery)record.build.inactiveIngress=pages.inactiveIngress;
   await verifyBuild(record);
   command(process.execPath,['scripts/check-deployment.mjs','before']);
   record.attempts??=[];record.attempts.push({component,startedAt:new Date().toISOString(),outcome:'unconfirmed'});await save(record);attempted=true;
@@ -877,12 +1224,12 @@ async function publish(component){
   await save(record);
   validatePrewriteAuthorization(record,runAuthorizationContext(ctx));
   await verifyBuild(record,{afterWrite:true});
-  const observed=await observeAcknowledgedPages(createRequest(),{id:record.pagesUploadEvidence.acknowledgement.id,sourceSha:record.sourceSha,beforeId:record.before.pages,beforeSourceSha:record.beforePagesSourceSha});
+  const observed=await observeAcknowledgedPages(createRequest(),{id:record.pagesUploadEvidence.acknowledgement.id,sourceSha:record.sourceSha,beforeId:record.before.pages,beforeSourceSha:record.beforePagesSourceSha,inactiveDelivery:!!record.build.inactiveDelivery});
   record.components.pages={receipt:{account:DESTINATION_ACCOUNT,component:'pages',id:observed.pages,sourceSha:record.sourceSha,sourceDigest:record.sourceDigests.pages,buildDigest:record.build.pages.sha256,origin:'guarded-upload',evidenceUrl:record.workflow.url,observedAt:new Date().toISOString()}};
   record.completed.pages={id:observed.pages};record.attempts.at(-1).outcome='observed';record.state='partial';
  }catch{failure=Error('Pages publication failed.');record.state=incompleteState(record);record.reasons.push('PUBLICATION_FAILED: Upload or observation failed; inspect metadata before retrying.');}
  finally{
-  if(attempted){const protection=await observeProtection(['pages'],{expected:expectedIdentities(record,['pages']),sourceSha:record.sourceSha,request:createRequest()});record.attempts.at(-1).protection=protection;if(protection.status!=='passed'){record.state='partial';record.reasons.push('POST_ATTEMPT_GUARD_FAILED: Pages protection/source observation failed.');failure??=Error('Protection failed.');}}
+  if(attempted){const protection=await observeProtection(['pages'],{expected:expectedIdentities(record,['pages']),sourceSha:record.sourceSha,request:createRequest(),inactiveDelivery:!!record.build.inactiveDelivery});record.attempts.at(-1).protection=protection;if(protection.status!=='passed'){record.state='partial';record.reasons.push('POST_ATTEMPT_GUARD_FAILED: Pages protection/source observation failed.');failure??=Error('Protection failed.');}}
   await save(record);
  }
  if(failure)throw failure;
@@ -898,7 +1245,7 @@ async function finish(){
   ensure(record.reasons.length===0&&record.attempts?.length===1&&record.attempts[0].outcome==='observed','A failed or unconfirmed attempt remains.');
  }catch{failure=Error('Pages final verification failed.');record.reasons.push('FINAL_VERIFICATION_FAILED: Pages receipt remains incomplete.');}
  finally{
-  record.finalProtection=await observeProtection(['pages'],{expected:expectedIdentities(record,['pages']),sourceSha:record.sourceSha,request:createRequest()});record.guards??={};record.guards.protection=record.finalProtection.status;
+  record.finalProtection=await observeProtection(['pages'],{expected:expectedIdentities(record,['pages']),sourceSha:record.sourceSha,request:createRequest(),inactiveDelivery:!!record.build.inactiveDelivery});record.guards??={};record.guards.protection=record.finalProtection.status;
   if(record.finalProtection.checks.some(c=>c.identityCode))record.reasons.push('FINAL_IDENTITY_FAILED: Final deployment IDs or Pages source do not match validated receipts.');
   if(record.finalProtection.status!=='passed'){record.reasons.push('FINAL_GUARD_FAILED: Pages protection/source check failed.');failure??=Error('Protection failed.');}
   record.guards.publication=failure?'incomplete':'Pages observed; paired verification pending';record.state=incompleteState(record);record.observedAt=new Date().toISOString();await save(record);
@@ -925,19 +1272,22 @@ export function completePair({record,evidence,observed,now=Date.now()}){
  return {components,completed:Object.fromEntries(COMPONENTS.map(c=>[c,{id:observed.versions[c]}])),prerequisites,completionEvidence:{version:1,prewriteValidationDigest:record.prewriteValidation.integrityDigest,completedAt:new Date(now).toISOString(),evidence:current}};
 }
 async function verifyBuild(record,{local=false,afterWrite=false}={}){
+ const inactiveDelivery=record.build.inactiveDelivery?inactiveDeliveryInputs(record.baseSha,record.sourceSha,{archivePath:record.archivedRelease?.path}):undefined;
  const presentation=record.build.presentation?presentationInputs(record.baseSha,record.sourceSha,{archivePath:record.archivedRelease?.path}):undefined;
- await releaseArchive(record.archivedRelease,{paths:record.paths,sourceSha:record.sourceSha,baseSha:record.baseSha,presentation});
+ await releaseArchive(record.archivedRelease,{paths:record.paths,sourceSha:record.sourceSha,baseSha:record.baseSha,presentation,inactiveDelivery});
  ensure(!git('status','--porcelain'),'Release source changed after planning.');
  const configDigest=hash(await readFile('wrangler.jsonc')),lockfileDigest=hash(await readFile('package-lock.json'));
  validateCompilerEvidence(record.build.compiler,{configDigest,lockfileDigest});
  // Local Node24/platform bytes are different provenance. Actual runtime/assets
  // parity is checked below; never relabel the retained GitHub compiler as local.
  ensure(sourceInputs(record.sourceSha)===record.build.sourceInputDigest&&(local||(await compilerConfig()).compilerConfigDigest===record.build.compiler.compilerConfigDigest)&&(await bundleDigest('dist/ssr')).sha256===record.build.ssr.sha256,'Source/compiler/SSR inputs changed.');
- if(presentation)ensure(record.activationCompatibility?.basis==='reviewed-public-presentation-v1'&&canonical(presentation)===canonical(record.build.presentation)&&presentation.baselineSourceInputDigest===record.build.baselineSourceInputDigest&&presentation.sourceInputDigest===record.build.sourceInputDigest,'Presentation baseline/protected inputs differ.');
- else ensure(record.activationCompatibility?.basis!=='reviewed-public-presentation-v1'&&sourceInputs(record.baseSha)===record.build.sourceInputDigest,'Baseline runtime/build inputs differ.');
+ if(inactiveDelivery)ensure(record.activationCompatibility?.basis==='reviewed-inactive-delivery-v1'&&canonical(inactiveDelivery)===canonical(record.build.inactiveDelivery)&&inactiveDelivery.baselineSourceInputDigest===record.build.baselineSourceInputDigest&&inactiveDelivery.sourceInputDigest===record.build.sourceInputDigest,'Inactive Delivery source/protected facts changed.');
+ else if(presentation)ensure(record.activationCompatibility?.basis==='reviewed-public-presentation-v1'&&canonical(presentation)===canonical(record.build.presentation)&&presentation.baselineSourceInputDigest===record.build.baselineSourceInputDigest&&presentation.sourceInputDigest===record.build.sourceInputDigest,'Presentation baseline/protected inputs differ.');
+ else ensure(!['reviewed-public-presentation-v1','reviewed-inactive-delivery-v1'].includes(record.activationCompatibility?.basis)&&sourceInputs(record.baseSha)===record.build.sourceInputDigest,'Baseline runtime/build inputs differ.');
  if(!afterWrite)validateActivationCompatibility(record.activationCompatibility,compatibilityInput(record));
  ensure((await bundleDigest('dist/client')).sha256===record.build.pages.sha256&&(await bundleDigest('dist/admin')).sha256===record.build.admin.sha256,'Client output changed after planning.');
  for(const c of Object.keys(record.build.private)){
+  if(record.build.private[c].inputClosure){const actual=await inactiveCatalogueInputs(),retained=record.build.private[c].inputClosure;ensure(c==='catalogue'&&inactiveDelivery&&Object.keys(actual).filter(k=>!local||k!=='metafileSha256').every(k=>actual[k]===retained[k]),'Catalogue candidate compiler/import closure changed.');}
   if(record.build.private[c].assetManifest){const facts=await adminAssetManifestInputs(),retained=record.build.private[c].assetManifest,keys=ADMIN_INPUT_KEYS.filter(k=>!local||k!=='metafileSha256');ensure(c==='admin'&&keys.every(k=>facts[k]===retained[k]),'Admin candidate compiler input/manifest/assets changed.');}
   ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===record.build.private[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===record.build.private[c].configDigest,'Private comparison bytes/config changed after planning.');
  }
@@ -961,7 +1311,7 @@ async function finishLocal(){
 
  }catch{failure=Error('Local paired verification failed.');record.reasons.push('LOCAL_VERIFICATION_FAILED: Source, current versions, full closure or schema evidence is incomplete.');}
  finally{
-  record.finalProtection=await observeProtection(COMPONENTS,{expected:expectedIdentities(record,COMPONENTS),sourceSha:record.sourceSha,request});record.guards??={};record.guards.protection=record.finalProtection.status;
+  record.finalProtection=await observeProtection(COMPONENTS,{expected:expectedIdentities(record,COMPONENTS),sourceSha:record.sourceSha,request,inactiveDelivery:!!record.build.inactiveDelivery});record.guards??={};record.guards.protection=record.finalProtection.status;
   if(record.finalProtection.checks.some(c=>c.identityCode))record.reasons.push('FINAL_IDENTITY_FAILED: Final deployment IDs or Pages source do not match validated receipts.');
   if(record.finalProtection.status!=='passed'){record.reasons.push('FINAL_GUARD_FAILED: One or more local component protections failed.');failure??=Error('Protection failed.');}
   record.finalIdentityReadbacks=record.finalProtection.checks.map(({component,expectedId,observedId,observedSourceSha,identityStatus,identityCode,identityObservedAt})=>Object.fromEntries(Object.entries({component,expectedId,observedId,observedSourceSha,identityStatus,identityCode,identityObservedAt}).filter(([,v])=>v!==undefined)));
