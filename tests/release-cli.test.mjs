@@ -1,10 +1,10 @@
 // Exercise real CLI state transitions. Process/provider shims are child-only and synthetic.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,writeFile,mkdir,readFile,rm,copyFile} from 'node:fs/promises';
+import {mkdtemp,readdir,writeFile,mkdir,readFile,rm,copyFile,chmod,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath,pathToFileURL} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 const root=fileURLToPath(new URL('../',import.meta.url));
@@ -27,12 +27,13 @@ function mandatoryCliFixture(){
 }
 
 const preload=`
-const cp=require('node:child_process'),fs=require('node:fs');
+const cp=require('node:child_process'),fs=require('node:fs'),originalExec=cp.execFileSync;
 const actualVersion=process.version;Object.defineProperty(process,'version',{get:()=>process.env.PUBLISHER_RUNTIME||(process.env.COMPILER_RUNTIME&&global.__apiCalls>=13?process.env.COMPILER_RUNTIME:actualVersion)});
 const RealDate=Date;global.__clockShift=Number(process.env.CLOCK_SHIFT_MS||0);global.Date=class extends RealDate{constructor(...args){if(!args.length&&global.__delayNextDate){global.__delayNextDate=false;global.__clockShift+=Number(process.env.POST_VALIDATION_DELAY_MS||0);}super(...(args.length?args:[RealDate.now()+global.__clockShift]));}static now(){return RealDate.now()+global.__clockShift;}toISOString(){const result=super.toISOString();if(global.__apiCalls===13&&process.env.PARSE_DELAY_MS&&!global.__parseDelayed){global.__parseDelayed=true;global.__clockShift+=Number(process.env.PARSE_DELAY_MS);}if(global.__afterValidationClock){global.__afterValidationClock=false;global.__delayNextDate=true;}return result;}};
 const sha=process.env.FIXTURE_SOURCE_SHA||'${sha}',old=process.env.FIXTURE_BASE_SHA||'${old}',id=process.env.FIXTURE_BEFORE_ID||'${id}',next=process.env.FIXTURE_NEXT_ID||'${next}';
 cp.execFileSync=(program,args)=>{
  if(program==='git'){
+  if(process.env.PRESENTATION_GIT&&(args[0]==='ls-tree'||args[0]==='grep'||(args[0]==='show'&&!args.includes('--format=%P')&&!String(args.at(-1)).endsWith(':.github/workflows/validate.yml'))||(args[0]==='rev-parse'&&String(args.at(-1)).includes(':')))){const mapped=args.map(v=>String(v).replaceAll(sha,process.env.PRESENTATION_SOURCE).replaceAll(old,process.env.PRESENTATION_BASE));return originalExec('git',mapped,{cwd:process.env.PRESENTATION_GIT,encoding:'utf8',stdio:['ignore','pipe','pipe']});}
   if(args[0]==='status')return '';
   if(args[0]==='diff'&&args[1]==='--name-status')return (process.env.ARCHIVE_STATUS||'A')+'\\t'+args.at(-1);
   if(args[0]==='diff')return process.env.CHANGED_PATH||'docs/release-process.md';
@@ -112,7 +113,7 @@ global.fetch=async (url,options)=>{
  return {ok:true,json:async()=>({success:true,result:{canonical_deployment:{id:fs.existsSync('uploaded')?next:id,latest_stage:{status:'success'},deployment_trigger:{metadata:{commit_hash:fs.existsSync('uploaded')?sha:old}}}}})};
 };
 `;
-async function fixture(t){
+async function fixture(t,{presentation=false}={}){
  const dir=await mkdtemp(join(tmpdir(),'customvibe-release-cli-'));t.after(()=>rm(dir,{recursive:true,force:true}));
  await mkdir(join(dir,'dist/release'),{recursive:true});
  for(const side of ['client','admin','ssr']){await mkdir(join(dir,'dist',side));await writeFile(join(dir,'dist',side,'index.html'),'fixture');}
@@ -125,12 +126,14 @@ async function fixture(t){
  const baseline={schemaVersion:1,repository:'TIMMMYYYHHHH/Customvibev3',state:'partial',sourceSha:old,baseSha:old,reviewed:true,evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/100'};
  const evidence={baseline,sourceSha:sha,mandatoryValidation:mandatory.selector};
  const env={PATH:process.env.PATH,TMPDIR:tmpdir(),GH_TOKEN:'synthetic-native-github-token',GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:baseline.repository,GITHUB_REF:'refs/heads/main',GITHUB_SHA:sha,GITHUB_EVENT_NAME:'workflow_dispatch',REVIEWED_SHA:sha,GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1',CLOUDFLARE_ACCOUNT_ID:'4f57d4e924674cb87b33d4c884745cf6',CLOUDFLARE_API_TOKEN:'synthetic-pages-only-token',WRANGLER_SEND_METRICS:'false',RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)};
- const fixture={dir,path,evidence,async run(args,extra={}){
-  let result;try{result={status:0,stdout:execFileSync(process.execPath,['--require',join(dir,'preload.cjs'),cli,...args],{cwd:dir,env:{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence),...extra},encoding:'utf8',stdio:['ignore','pipe','pipe']})};}catch(e){result={status:e.status,stdout:String(e.stdout||''),stderr:String(e.stderr||'')};}
+ const fixture={dir,path,evidence,extraEnv:{},async run(args,extra={}){
+  let result;try{result={status:0,stdout:execFileSync(process.execPath,['--require',join(dir,'preload.cjs'),args[0]==='capture-admin-inputs'?fixture.capture:fixture.cli||cli,...(args[0]==='capture-admin-inputs'?[]:args)],{cwd:dir,env:{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence),...fixture.extraEnv,...extra},encoding:'utf8',stdio:['ignore','pipe','pipe']})};}catch(e){result={status:e.status,stdout:String(e.stdout||''),stderr:String(e.stderr||'')};}
   const text=await readFile(path,'utf8').catch(()=> '{}');
   const log=name=>readFile(join(dir,name),'utf8').catch(()=> '');
   return {...result,text,record:JSON.parse(text),calls:await log('guard-calls.log'),requests:await log('request-calls.log'),uploads:await log('provider-calls.log'),validationRequests:await log('validation-calls.log'),contextCalls:await log('context-calls.log'),authBoundary:await log('auth-boundary.log')};
  }};
+ fixture.cli=await coordinatorFixture(dir,{presentation});
+ fixture.capture=join(dir,'capture-admin.mjs');await writeFile(fixture.capture,`import {adminAssetManifestInputs} from ${JSON.stringify(pathToFileURL(fixture.cli).href)};import {writeFile} from 'node:fs/promises';await writeFile('captured-admin.json',JSON.stringify(await adminAssetManifestInputs()));`);
  const seed=await fixture.run(['plan']);
  if(!seed.record.build)throw Error('Fixture source/build setup failed: '+seed.record.reasons?.join('; '));
  evidence.activationCompatibility={basis:'source-input-tooling-only-v1',reviewedAgainstSha:sha,baselineSha:old,observedAt:new Date().toISOString(),sourceInputDigest:seed.record.build.sourceInputDigest,compilerConfigDigest:seed.record.build.compiler.compilerConfigDigest,configDigest:seed.record.build.compiler.configDigest,pagesBuildDigest:seed.record.build.pages.sha256,adminAssetsDigest:seed.record.build.admin.sha256,historicalFunctionsDigest:null};
@@ -192,14 +195,17 @@ test('local final failure still attempts every protection independently',async t
 // Real final guard programs run against synthetic metadata. The parent CLI's
 // existing helper transport is simulated at the socket boundary, with no socket
 // listener and no network. The race starts after its initial version readback.
-async function completionFixture(t,{allFour=false}={}){
- const f=await fixture(t),root=fileURLToPath(new URL('../',import.meta.url));
+async function completionFixture(t,{allFour=false,presentation=false,planOnly=false,adminManifest=false}={}){
+ if(presentation)allFour=true;
+ const f=await fixture(t,{presentation}),root=fileURLToPath(new URL('../',import.meta.url));
  const hash=value=>createHash('sha256').update(value).digest('hex');
+ const adminData=adminManifest?await adminInputFixture(f):undefined;
  const components={};
  for(const c of ['admin','security','catalogue']){
-  await mkdir(join(f.dir,'dist/release/private',c),{recursive:true});await writeFile(join(f.dir,'dist/release/private',c,'worker.js'),'fixture-worker');
-  components[c]={runtimeDigest:hash(JSON.stringify([['worker.js',hash('fixture-worker')]])),configDigest:hash(await readFile(join(f.dir,`wrangler.${c}.jsonc`)))};
+  await mkdir(join(f.dir,'dist/release/private',c),{recursive:true});await writeFile(join(f.dir,'dist/release/private',c,'worker.js'),adminManifest&&c==='admin'?'fixture-admin-candidate':'fixture-worker');
+  components[c]={runtimeDigest:hash(JSON.stringify([['worker.js',hash(adminManifest&&c==='admin'?'fixture-admin-candidate':'fixture-worker')]])),configDigest:hash(await readFile(join(f.dir,`wrangler.${c}.jsonc`)))};
  }
+ if(adminManifest){const capture=await f.run(['capture-admin-inputs']);assert.equal(capture.status,0,capture.stderr);components.admin.assetManifest=JSON.parse(await readFile(join(f.dir,'captured-admin.json'),'utf8'));}
  await writeFile(join(f.dir,'dist/release/private-build-manifest.json'),JSON.stringify({sourceSha:sha,components}));
  const evidence={...f.evidence,guards:Object.fromEntries(['admin','security','catalogue'].map(c=>[c,{id}]))};
  let source=preload.replace('cp.execFileSync=(program,args)=>{','const actualExec=cp.execFileSync;cp.execFileSync=(program,args,options={})=>{');
@@ -274,26 +280,37 @@ const path=String(url);let payload;
  return {ok:true,json:async()=>payload};
 };`;
  await writeFile(join(f.dir,'guard-preload.cjs'),guardSource);
- const planned=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(planned.status,0,JSON.stringify(planned));
+ if(presentation)Object.assign(f.extraEnv,await presentationGitFixture(f.dir));
+ const planned=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});
+ if(presentation){assert.equal(planned.status,1);assert.ok(planned.record.build,planned.record.reasons.join('\n'));assert.match(planned.record.reasons.join('\n'),/ACTIVATION_COMPATIBILITY/);}
+ else assert.equal(planned.status,0,JSON.stringify(planned));
  if(allFour){
   const r=planned.record,observedAt=new Date().toISOString(),account='4f57d4e924674cb87b33d4c884745cf6';evidence.guards={};evidence.receipts={};evidence.schema={};
   for(const c of ['admin','security','catalogue']){evidence.guards[c]={account,component:c,id,origin:'private-helper-get',candidateSha:sha,observedAt,protection:'passed'};if(c!=='admin')evidence.receipts[c]={account,component:c,id,sourceSha:old,sourceDigest:r.sourceDigests[c],...components[c],origin:'guarded-upload',evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/100',observedAt};}
   for(const family of ['security','content']){const item=r.schemaSources[family];evidence.schema[family]={origin:'console-metadata',databaseId:item.databaseId,reviewedAgainstSha:sha,observedAt,sourceFiles:item.source,applied:item.source.map(v=>v.name),objectsDigest:'c'.repeat(64),ddlReviewed:true};}
-  evidence.staged={reviewedAgainstSha:sha,observedAt,clientPairCompatibleWithSchema:true,rollback:{pagesId:id,adminId:id,sourceSha:old,pagesBuildDigest:r.build.pages.sha256,adminAssetsDigest:r.build.admin.sha256,adminRuntimeDigest:components.admin.runtimeDigest,adminConfigDigest:components.admin.configDigest}};
-  const full=await f.run(['plan'],{CHANGED_PATH:'scripts/release-manifest.mjs',RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(full.status,0,full.record.reasons.join('\n'));assert.equal(full.record.required.length,4);
+  const baselineRuntime=adminManifest?hash(JSON.stringify([['worker.js',hash('fixture-worker')]])):components.admin.runtimeDigest;
+  const baselineAssets=adminManifest?hash('genuine retained baseline Admin assets'):r.build.admin.sha256;
+  evidence.staged={reviewedAgainstSha:sha,observedAt,clientPairCompatibleWithSchema:true,rollback:{pagesId:id,adminId:id,sourceSha:old,pagesBuildDigest:r.build.pages.sha256,adminAssetsDigest:baselineAssets,adminRuntimeDigest:baselineRuntime,adminConfigDigest:components.admin.configDigest}};
+  if(presentation){
+   evidence.baseline={schemaVersion:2,repository:evidence.baseline.repository,state:'verified',sourceSha:old,baseSha:old,reviewed:true,evidenceUrl:evidence.baseline.evidenceUrl,prerequisites:{complete:true},guards:{protection:'passed'},components:Object.fromEntries(['pages','admin','security','catalogue'].map(c=>[c,{receipt:{account,component:c,id,sourceSha:old,sourceDigest:r.sourceDigests[c],origin:'guarded-upload',evidenceUrl:evidence.baseline.evidenceUrl,observedAt,...(components[c]?{runtimeDigest:c==='admin'?baselineRuntime:components[c].runtimeDigest,configDigest:components[c].configDigest}:{}),...(c==='admin'?{assetsDigest:baselineAssets}:{})}}]))};
+   evidence.activationCompatibility={...evidence.activationCompatibility,basis:'reviewed-public-presentation-v1',adminAssetsDigest:r.build.admin.sha256,sourceInputDigest:r.build.sourceInputDigest,baselineSourceInputDigest:r.build.baselineSourceInputDigest,presentation:r.build.presentation};
+   if(adminManifest)evidence.activationCompatibility.adminAssetManifest={basis:'reviewed-admin-asset-manifest-v1',baseline:{sourceSha:old,id,runtimeDigest:baselineRuntime,configDigest:components.admin.configDigest,assetsDigest:baselineAssets,manifestSha256:adminData.policy.baselineManifestSha256},candidate:{sourceSha:sha,runtimeDigest:components.admin.runtimeDigest,configDigest:components.admin.configDigest,...components.admin.assetManifest}};
+  }
+  const full=await f.run(['plan'],{CHANGED_PATH:presentation?f.extraEnv.CHANGED_PATH:'scripts/release-manifest.mjs',RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(full.status,0,full.record.reasons.join('\n'));assert.equal(full.record.required.length,4);
  }
+ if(planOnly)return {...f,originalEvidence:evidence};
  const uploaded=await f.run(['publish','pages'],{UPLOAD_RESULT:'success'});assert.equal(uploaded.status,0);
  if(allFour)await writeFile(join(f.dir,'admin-uploaded'),'synthetic actual Admin acknowledgement');
  const record=uploaded.record,observedAt=new Date().toISOString(),account='4f57d4e924674cb87b33d4c884745cf6';
  const finalEvidence={sourceSha:sha,guards:{},receipts:{},schema:{},...(record.evidence.staged?{staged:structuredClone(record.evidence.staged)}:{})};
  for(const c of ['admin','security','catalogue']){
   finalEvidence.guards[c]={account,component:c,id:allFour&&c==='admin'?next:id,origin:'private-helper-get',candidateSha:sha,observedAt,protection:'passed'};
-  finalEvidence.receipts[c]={account,component:c,id:allFour&&c==='admin'?next:id,sourceSha:allFour&&c!=='admin'?old:sha,sourceDigest:record.sourceDigests[c],...components[c],...(c==='admin'?{assetsDigest:record.build.admin.sha256}:{}),origin:'guarded-upload',evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123',observedAt};
+  finalEvidence.receipts[c]={account,component:c,id:allFour&&c==='admin'?next:id,sourceSha:allFour&&c!=='admin'?old:sha,sourceDigest:record.sourceDigests[c],runtimeDigest:components[c].runtimeDigest,configDigest:components[c].configDigest,...(c==='admin'?{assetsDigest:record.build.admin.sha256}:{}),origin:'guarded-upload',evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123',observedAt};
  }
  for(const family of ['security','content']){const item=record.schemaSources[family];finalEvidence.schema[family]={origin:'console-metadata',databaseId:item.databaseId,reviewedAgainstSha:sha,observedAt,sourceFiles:item.source,applied:item.source.map(v=>v.name),objectsDigest:'c'.repeat(64),ddlReviewed:true};}
  await writeFile(join(f.dir,'guard-calls.log'),'');
  const artifactBytes=await readFile(f.path);finalEvidence.githubArtifact={origin:'owner-github-run-artifact',reviewed:true,sourceSha:sha,runId:'123',url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123',artifactName:'release-manifest-123',runStatus:'completed',conclusion:'success',manifestSha256:hash(artifactBytes),runAttempt:'1',artifactId:'321',jobId:'987',zipSha256:'c'.repeat(64),publishStep:{name:'Publish protected Pages from the reviewed build',number:9,startedAt:record.attempts[0].startedAt,completedAt:new Date().toISOString()}};
- return {...f,finalEvidence,local(extra={}){return f.run(['finish-local'],{GITHUB_ACTIONS:'false',GH_TOKEN:'',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',RELEASE_EVIDENCE_JSON:JSON.stringify(finalEvidence),...extra});}};
+ return {...f,originalEvidence:evidence,finalEvidence,local(extra={}){return f.run(['finish-local'],{GITHUB_ACTIONS:'false',GH_TOKEN:'',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',RELEASE_EVIDENCE_JSON:JSON.stringify(finalEvidence),...extra});}};
 }
 test('real CLI local completion verifies unchanged final component identities',async t=>{
  const f=await completionFixture(t),result=await f.local();assert.equal(result.status,0);assert.equal(result.record.state,'verified');
@@ -593,4 +610,234 @@ test('raw API log hashing preserves a leading UTF-8 BOM rather than using a disp
 
 test('the aggregate reader deadline includes synchronous parsing and validation before returning a receipt',async t=>{
  const f=await fixture(t),r=await f.run(['plan'],{PARSE_DELAY_MS:'31000'});assert.equal(r.status,1);assert.equal(r.uploads,'');assert.equal(r.record.planComplete,false);assert.match(r.record.reasons.join(''),/PLAN_MANDATORY_VALIDATION_FAILED/);
+});
+
+// Small synthetic content keeps these actual-Git tests independent of historical
+// objects in shallow CI. Only fixed trusted policy DATA in a disposable module
+// copy is adapted. The real coordinator never reads an eligibility override.
+const presentationPolicy=[
+ ['index.html','615e463834f226d6cf1ebcd03e5531b9c8535f69','618e5002998db47014174393216c913eede6fb01','<main>before</main>','<noscript>Shopping needs JavaScript</noscript><main>after</main>'],
+ ['src/button-system.css','0c5790252e1dc1ffe5f48674efc208cbffd3f6e0','7fad2ba9c9e4d501adbbf18f4de66feb9d5e5cfd','button{color:black}','button{color:white}'],
+ ['src/consistency.css','2bee9d951e0438db52d304efea6e86d0be9c8a4c','acc40d8da9b2c393f85d06bffea1a4628c109a56','body{margin:1px}','body{margin:2px}'],
+ ['src/designs/collection-picker.css','c80088a6c8b8e6f898b46c706d7617f34e26814a','0f6aa6df61241ed473a102ff7811c61a5371f7e4','.picker{gap:1px}','.picker{gap:2px}'],
+ ['tests/contact-print.browser.mjs',null,'116ef654d68b438fc646d4be8563b37b3cab9b59',null,'// nonshipping print regression fixture']
+];
+const gitBlob=text=>createHash('sha1').update('blob '+Buffer.byteLength(text)+'\0'+text).digest('hex');
+function fixturePresentationPolicy(source){
+ const start='const PRESENTATION_ENTRIES=[',end="].map(([path,baseBlob,candidateBlob])=>({path,mode:'100644',baseBlob,candidateBlob}));";
+ assert.equal(source.split(start).length,2,'trusted policy start must be unique');assert.equal(source.split(end).length,2,'trusted policy end must be unique');
+ const a=source.indexOf(start),b=source.indexOf(end,a)+end.length;assert.ok(b>a);
+ let data=source.slice(a,b);
+ for(const [,before,after,original,changed]of presentationPolicy)for(const [blob,text]of [[before,original],[after,changed]])if(blob){const token="'"+blob+"'";assert.equal(data.split(token).length,2,'expected trusted blob must occur exactly once');data=data.replace(token,"'"+gitBlob(text)+"'");}
+ const adapted=source.slice(0,a)+data+source.slice(b);
+ assert.equal(adapted.slice(0,a),source.slice(0,a));assert.equal(adapted.slice(a+data.length),source.slice(b),'all validator logic must remain byte-identical');
+ return adapted;
+}
+// Only the fixed policy object is substituted in disposable copies. Its seven
+// reviewed field deltas stay identical; the tiny input graph avoids a source copy.
+function adminFixturePolicy(source){
+ const start='const ADMIN_MANIFEST_POLICY=Object.freeze(',end='\n});';
+ assert.equal(source.split(start).length,2,'Admin policy start must be unique');
+ const a=source.indexOf(start)+start.length,b=source.indexOf(end,a)+2;assert.ok(b>a,'Admin policy terminator absent');
+ const text=source.slice(a,b),policy=JSON.parse(text);
+ assert.equal(policy.inputCount,63);assert.equal(policy.manifestBytes,9321);
+ assert.equal(policy.baselineManifestSha256,'df5b83212280c77865eeb77c616adb262070368132ff8084ad1b4b949fabb329');
+ assert.equal(policy.manifestSha256,'62c0c0a6323dec4c2801ae0684038c2eb53e109446c8c1c3ecb0b9a0452fbd61');
+ assert.equal(policy.inputPathsDigest,'452ac699e8cc2eabf5c3abc0b932c5100a05bb9569067a87d25a48c8e4d93df3');
+ assert.equal(policy.protectedInputDigest,'f21d97dd4142245ad9d1ce41424e96c911e82db622250c1be9607e73db005528');
+ assert.equal(policy.inputInventoryDigest,'19f1a70961cad4c061964fbfdcd1636756e166ab4abf3d12faaa55cf39ea6cc8');
+ const before={},after={};
+ for(const [entry,field,oldValue,newValue]of policy.deltas){before[entry]??={};after[entry]??={};before[entry][field]=oldValue;after[entry][field]=newValue;}
+ const baseline=JSON.stringify(before),manifest=JSON.stringify(after),digest=value=>createHash('sha256').update(value).digest('hex');
+ const inputs={'admin/worker.mjs':'// unchanged private fixture','shared/route-styles.mjs':'// unchanged routing fixture','dist/admin/.vite/manifest.json':manifest};
+ const inventory=Object.entries(inputs).sort(([a],[b])=>a<b?-1:1).map(([path,text])=>[path,digest(text),Buffer.byteLength(text)]);
+ const data={...policy,inputCount:inventory.length,inputPathsDigest:digest(JSON.stringify(inventory.map(v=>v[0]))),protectedInputDigest:digest(JSON.stringify(inventory.filter(v=>v[0]!=='dist/admin/.vite/manifest.json'))),inputInventoryDigest:digest(JSON.stringify(inventory)),baselineManifestSha256:digest(baseline),manifestSha256:digest(manifest),manifestBytes:Buffer.byteLength(manifest)};
+ const adapted=source.slice(0,a)+JSON.stringify(data,null,1)+source.slice(b);
+ assert.equal(adapted.slice(0,a),source.slice(0,a));assert.equal(adapted.slice(a+JSON.stringify(data,null,1).length),source.slice(b),'Admin validator logic must stay byte-identical');
+ assert.deepEqual(data.deltas,policy.deltas);
+ return {source:adapted,policy:data,inputs,manifest,baseline};
+}
+async function adminInputFixture(f){
+ const data=adminFixturePolicy(await readFile(cli,'utf8'));
+ for(const [path,text]of Object.entries(data.inputs)){await mkdir(join(f.dir,path,'..'),{recursive:true});await writeFile(join(f.dir,path),text);}
+ const manifest=JSON.parse(data.manifest);
+ for(const entry of Object.values(manifest))for(const path of [entry.file,...(entry.css||[])].filter(Boolean)){await mkdir(join(f.dir,'dist/admin',path,'..'),{recursive:true});await writeFile(join(f.dir,'dist/admin',path),'actual candidate asset '+path);}
+ // Copied files need not be manifest targets. They remain in the complete tree.
+ await writeFile(join(f.dir,'dist/admin','copied-image.png'),'unreferenced copied static asset');
+ await mkdir(join(f.dir,'dist/release/private/admin'),{recursive:true});await writeFile(join(f.dir,'dist/release/private/admin/worker.js'),'fixture-admin-candidate');
+ const metadata={inputs:Object.fromEntries(Object.entries(data.inputs).map(([path,text])=>[path,{bytes:Buffer.byteLength(text),imports:[]}])),outputs:{'dist/release/private/admin/worker.js':{bytes:Buffer.byteLength('fixture-admin-candidate'),entryPoint:'admin/worker.mjs',inputs:{'admin/worker.mjs':{bytesInOutput:1}},imports:[]}}};
+ await mkdir(join(f.dir,'dist/release/private-inputs'),{recursive:true});await writeFile(join(f.dir,'dist/release/private-inputs/admin-metafile.json'),JSON.stringify(metadata));
+ return data;
+}
+async function coordinatorFixture(dir,{presentation=false}={}){
+ const copy=join(dir,'coordinator');await mkdir(join(copy,'scripts'),{recursive:true});
+ const source=await readFile(cli,'utf8');await writeFile(join(copy,'scripts/release-manifest.mjs'),presentation?adminFixturePolicy(fixturePresentationPolicy(source)).source:source);
+ for(const name of ['cloudflare-target.mjs','deployment-protection.mjs'])await copyFile(join(root,'scripts',name),join(copy,'scripts',name));
+ // All callers of fixture() use synthetic provider/runtime closures; their compiler
+ // inventory can also be small and synthetic. The existing installed-API test
+ // still exercises real pinned Wrangler separately. No production logic changes.
+ const put=async(path,text)=>{const target=join(copy,'node_modules',path);await mkdir(join(target,'..'),{recursive:true});await writeFile(target,text);};
+ for(const [name,main]of [['wrangler','wrangler-dist/cli.js'],['esbuild','lib/main.js'],['wrangler/node_modules/esbuild','lib/main.js'],['vite','index.js'],['@vitejs/plugin-react','index.js']]){await put(name+'/package.json',JSON.stringify({name:name.split('/').at(-1),version:name==='wrangler'?'4.150.0':'0.0.0',main}));await put(name+'/'+main,'// synthetic compiler input '+name);}
+ for(const prefix of ['', 'wrangler/node_modules/'])await put(prefix+'@esbuild/'+process.platform+'-'+process.arch+'/bin/esbuild','synthetic esbuild executable bytes');
+ return realpath(join(copy,'scripts/release-manifest.mjs'));
+}
+async function presentationGitFixture(dir){
+ const repo=join(dir,'presentation-git');await mkdir(repo);
+ const git=(...args)=>execFileSync('git',args,{cwd:repo,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+ git('init','-q');git('config','user.name','Release fixture');git('config','user.email','release-fixture@example.invalid');git('config','commit.gpgsign','false');git('config','core.hooksPath','/dev/null');
+ for(const [path,,,before]of presentationPolicy)if(before!==null){await mkdir(join(repo,path,'..'),{recursive:true});await writeFile(join(repo,path),before);}
+ for(const path of ['security/index.mjs','catalogue/index.mjs','server/proof-api.mjs','package.json','package-lock.json','wrangler.jsonc','wrangler.admin.jsonc','wrangler.security.jsonc','wrangler.catalogue.jsonc']){await mkdir(join(repo,path,'..'),{recursive:true});await writeFile(join(repo,path),path.endsWith('.mjs')?'export default {};':'{}');}
+ git('add','.');git('commit','-qm','Synthetic manual baseline');const base=git('rev-parse','HEAD');
+ for(const [path,,,,after]of presentationPolicy){await mkdir(join(repo,path,'..'),{recursive:true});await writeFile(join(repo,path),after);}
+ git('add','.');git('commit','-qm','Exact reviewed presentation');const source=git('rev-parse','HEAD');
+ return {PRESENTATION_GIT:repo,PRESENTATION_BASE:base,PRESENTATION_SOURCE:source,CHANGED_PATH:git('diff','--name-only',base,source)};
+}
+test('presentation fixture adapter fails on absent or ambiguous policy and preserves validator logic',async()=>{
+ const source=await readFile(cli,'utf8'),adapted=fixturePresentationPolicy(source);assert.notEqual(adapted,source);
+ assert.throws(()=>fixturePresentationPolicy(source.replace('615e463834f226d6cf1ebcd03e5531b9c8535f69','0'.repeat(40))));
+ assert.throws(()=>fixturePresentationPolicy(source.replace("'615e463834f226d6cf1ebcd03e5531b9c8535f69'", "'615e463834f226d6cf1ebcd03e5531b9c8535f69','615e463834f226d6cf1ebcd03e5531b9c8535f69'")));
+ assert.throws(()=>fixturePresentationPolicy(source+source));
+ assert.throws(()=>adminFixturePolicy(source.replace('inputCount', 'missingCount')));
+ assert.throws(()=>adminFixturePolicy(source+source));
+ assert.throws(()=>adminFixturePolicy(source.replace('f21d97dd4142245ad9d1ce41424e96c911e82db622250c1be9607e73db005528','0'.repeat(64))));
+});
+test('presentation CLI publishes and completes from manual baseline with unequal public hashes and original private sources',async t=>{
+ const f=await completionFixture(t,{presentation:true}),result=await f.local();
+ assert.equal(result.status,0,result.record.reasons.join('\n'));assert.equal(result.record.state,'verified');
+ assert.equal(result.record.activationCompatibility.basis,'reviewed-public-presentation-v1');
+ assert.notEqual(result.record.build.baselineSourceInputDigest,result.record.build.sourceInputDigest);
+ assert.equal(result.record.components.security.receipt.sourceSha,old);assert.equal(result.record.components.catalogue.receipt.sourceSha,old);assert.equal(result.record.components.admin.receipt.sourceSha,sha);
+ assert.equal(result.record.finalIdentityReadbacks.length,4);
+ const {validateReleaseArchiveRecord}=await import(pathToFileURL(f.cli).href);
+ assert.equal(validateReleaseArchiveRecord(result.record,{sourceSha:sha,candidateSha:'c'.repeat(40)}).sourceSha,sha);
+ for(const mutate of [v=>v.build.baselineSourceInputDigest=v.build.sourceInputDigest,v=>v.build.presentation.protectedInputDigest='e'.repeat(64),v=>v.activationCompatibility.presentation.entries[0].candidateBlob='e'.repeat(40),v=>v.baseSha='e'.repeat(40)]){const record=structuredClone(result.record);mutate(record);assert.throws(()=>validateReleaseArchiveRecord(record,{sourceSha:sha,candidateSha:'c'.repeat(40)}));}
+});
+
+test('presentation CLI rejects incomplete manual baseline instead of activating from a partial label',async t=>{
+ const f=await completionFixture(t,{presentation:true,planOnly:true}),evidence=structuredClone(f.originalEvidence);
+ evidence.baseline.state='partial';const result=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});
+ assert.equal(result.status,1);assert.equal(result.uploads,'');assert.equal(result.record.attempts,undefined);
+});
+test('presentation CLI derives eligibility from Git and rejects unrelated, substituted and mode-changed content',async t=>{
+ const f=await fixture(t,{presentation:true}),env=await presentationGitFixture(f.dir),repo=env.PRESENTATION_GIT;
+ const git=(...args)=>execFileSync('git',args,{cwd:repo,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+ const variants=[
+  ['src/extra.jsx',async()=>writeFile(join(repo,'src/extra.jsx'),'export default null;')],
+  ['src/unreviewed.css',async()=>writeFile(join(repo,'src/unreviewed.css'),'body{display:none}')],
+  ['wrangler.admin.jsonc',async()=>writeFile(join(repo,'wrangler.admin.jsonc'),'{"changed":true}')],
+  ['migrations/security/9999.sql',async()=>{await mkdir(join(repo,'migrations/security'),{recursive:true});await writeFile(join(repo,'migrations/security/9999.sql'),'SELECT 1;');}],
+  ['security/index.mjs',async()=>writeFile(join(repo,'security/index.mjs'),'export default {changed:true};')],
+  ['src/consistency.css',async()=>writeFile(join(repo,'src/consistency.css'),'body{display:none}')],
+  ['index.html',async()=>chmod(join(repo,'index.html'),0o755)],
+  ['tests/contact-print.browser.mjs',async()=>rm(join(repo,'tests/contact-print.browser.mjs'))]
+ ];
+ for(const [path,mutate]of variants){git('switch','--detach',env.PRESENTATION_SOURCE);await mutate();git('add','-A');git('commit','-qm','Invalid presentation '+path);Object.assign(f.extraEnv,env,{PRESENTATION_SOURCE:git('rev-parse','HEAD')});
+  // Deliberately omit the unexpected path from the caller's list. Actual trees
+  // must still reject it, including a caller trying to disguise another CSS file.
+  const result=await f.run(['plan']);assert.equal(result.status,1,path);assert.match(result.record.reasons.join('\n'),/PLAN_SCOPE_FAILED/);assert.equal(result.uploads,'');assert.equal(result.record.attempts,undefined);
+ }
+ git('switch','--detach',env.PRESENTATION_BASE);await writeFile(join(repo,'server/proof-api.mjs'),"import '../tests/contact-print.browser.mjs';");git('add','.');git('commit','-qm','Unchanged shipping dependency');const base=git('rev-parse','HEAD');
+ for(const [path,,,,after]of presentationPolicy){await mkdir(join(repo,path,'..'),{recursive:true});await writeFile(join(repo,path),after);}
+ git('add','.');git('commit','-qm','Exact public blobs with shipping test import');Object.assign(f.extraEnv,env,{PRESENTATION_BASE:base,PRESENTATION_SOURCE:git('rev-parse','HEAD')});
+ const shipping=await f.run(['plan']);assert.equal(shipping.status,1);assert.match(shipping.record.reasons.join('\n'),/PLAN_SCOPE_FAILED/);assert.equal(shipping.uploads,'');
+});
+test('presentation CLI rejects forged compatibility, missing rollback and stale or changed private prerequisites',async t=>{
+ const f=await completionFixture(t,{presentation:true,planOnly:true});
+ const mutations=[
+  e=>e.activationCompatibility.baselineSourceInputDigest=e.activationCompatibility.sourceInputDigest,
+  e=>e.activationCompatibility.presentation.protectedInputDigest='e'.repeat(64),
+  e=>e.activationCompatibility.presentation.entries[0].candidateBlob='e'.repeat(40),
+  e=>delete e.staged.rollback,
+  e=>e.staged.rollback.adminRuntimeDigest='e'.repeat(64),
+  e=>e.staged.rollback.adminConfigDigest='e'.repeat(64),
+  e=>e.staged.observedAt='2026-10-19T00:00:00.000Z',
+  e=>e.schema.security.observedAt='2026-10-19T00:00:00.000Z',
+  e=>e.receipts.security.runtimeDigest='e'.repeat(64),
+  e=>e.receipts.catalogue.configDigest='e'.repeat(64)
+ ];
+ for(const mutate of mutations){const evidence=structuredClone(f.originalEvidence);mutate(evidence);const result=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(result.status,1);assert.equal(result.uploads,'');assert.equal(result.record.attempts,undefined);}
+});
+test('presentation CLI refuses stale completion-cwd assets and private output drift before invoking Pages',async t=>{
+ const f=await completionFixture(t,{presentation:true,planOnly:true});
+ for(const path of ['dist/client/index.html','dist/admin/index.html','dist/ssr/index.html','dist/release/private/admin/worker.js']){const full=join(f.dir,path),bytes=await readFile(full);
+  const planned=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(f.originalEvidence)});assert.equal(planned.status,0,planned.record.reasons.join('\n'));
+  await writeFile(full,'stale or changed output');const result=await f.run(['publish','pages'],{UPLOAD_RESULT:'success'});assert.equal(result.status,1,path);assert.equal(result.uploads,'');assert.equal(result.record.attempts,undefined);await writeFile(full,bytes);
+ }
+});
+
+test('presentation CLI accepts only the separately bound genuine manual archive beside presentation paths',async t=>{
+ const f=await completionFixture(t,{presentation:true,planOnly:true}),evidence=structuredClone(f.originalEvidence),observedAt=new Date().toISOString();
+ const archive={schemaVersion:2,repository:evidence.baseline.repository,state:'verified',sourceSha:old,baseSha:old,prerequisites:{complete:true},guards:{protection:'passed'},components:evidence.baseline.components,completed:Object.fromEntries(['pages','admin','security','catalogue'].map(c=>[c,{id}])),historicalFunctionsDigest:null};
+ const checks=['pages','admin','security','catalogue'].map(component=>({component,status:'passed',identityStatus:'passed',expectedId:id,observedId:id,protectionObservedAt:observedAt,identityObservedAt:observedAt,...(component==='pages'?{observedSourceSha:old}:{})}));
+ archive.finalProtection={status:'passed',expectedSourceSha:old,observedAt,checks};archive.finalIdentityReadbacks=checks.map(v=>({...v}));
+ const path='docs/releases/2026-10-20-release-M.json',repo=f.extraEnv.PRESENTATION_GIT;
+ const git=(...args)=>execFileSync('git',args,{cwd:repo,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+ const bind=async value=>{const bytes=JSON.stringify(value);await mkdir(join(f.dir,path,'..'),{recursive:true});await mkdir(join(repo,path,'..'),{recursive:true});await writeFile(join(f.dir,path),bytes);await writeFile(join(repo,path),bytes);git('add','.');git('commit','-qm','Reviewed manual archive');f.extraEnv.PRESENTATION_SOURCE=git('rev-parse','HEAD');f.extraEnv.CHANGED_PATH=git('diff','--name-only',f.extraEnv.PRESENTATION_BASE,f.extraEnv.PRESENTATION_SOURCE);evidence.archivedRelease={origin:'reviewed-complete-release-archive',reviewed:true,path,sha256:createHash('sha256').update(bytes).digest('hex'),sourceSha:old,reviewedAgainstSha:sha};};
+ await bind(archive);const result=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(result.status,0,result.record.reasons.join('\n'));assert.equal(result.record.archivedRelease.sourceSha,old);assert.notEqual(result.record.build.baselineSourceInputDigest,result.record.build.sourceInputDigest);
+ const altered=structuredClone(archive);altered.components.security.receipt.sourceSha='e'.repeat(40);await bind(altered);const rejected=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(rejected.status,1);assert.match(rejected.record.reasons.join('\n'),/PLAN_ARCHIVE_FAILED/);assert.equal(rejected.uploads,'');
+});
+
+
+test('generated Admin manifest subcase completes, preserves original rollback and archives the new runtime',async t=>{
+ const f=await completionFixture(t,{presentation:true,adminManifest:true}),snapshot=await readFile(f.path),workerPath=join(f.dir,'dist/release/private/admin/worker.js'),worker=await readFile(workerPath);
+ await writeFile(workerPath,'different local compiler runtime');const drift=await f.local();assert.equal(drift.status,1);assert.match(drift.record.reasons.join('\n'),/LOCAL_VERIFICATION_FAILED/);assert.equal(drift.record.finalIdentityReadbacks.length,4);
+ // Restore only this disposable scenario's pre-failure artifact to exercise the
+ // independent positive completion. Production failures remain sticky.
+ await writeFile(f.path,snapshot);await writeFile(workerPath,worker);const result=await f.local();
+ assert.equal(result.status,0,result.record.reasons.join('\n'));assert.equal(result.record.state,'verified');
+ const r=result.record;assert.equal(r.activationCompatibility.adminAssetManifest.basis,'reviewed-admin-asset-manifest-v1');assert.notEqual(r.build.private.admin.runtimeDigest,r.evidence.staged.rollback.adminRuntimeDigest);
+ assert.equal(r.components.admin.receipt.runtimeDigest,r.build.private.admin.runtimeDigest);assert.equal(r.finalIdentityReadbacks.length,4);
+ assert.equal(r.build.private.admin.assetManifest.inputCount,3);assert.notEqual(r.build.admin.sha256,r.build.adminManifestBaseline.assetsDigest);
+ const {validateReleaseArchiveRecord}=await import(pathToFileURL(f.cli).href);assert.equal(validateReleaseArchiveRecord(r,{sourceSha:sha,candidateSha:'c'.repeat(40)}).sourceSha,sha);
+ for(const mutate of [v=>v.build.adminManifestBaseline.assetsDigest='e'.repeat(64),v=>v.activationCompatibility.adminAssetManifest.candidate.runtimeDigest='e'.repeat(64),v=>v.build.private.admin.assetManifest.protectedInputDigest='e'.repeat(64)]){const record=structuredClone(r);mutate(record);assert.throws(()=>validateReleaseArchiveRecord(record,{sourceSha:sha,candidateSha:'c'.repeat(40)}));}
+});
+test('Admin compiler input capture rejects extra/missing/duplicate/changed inputs and manifest references',async t=>{
+ const f=await fixture(t,{presentation:true}),data=await adminInputFixture(f),metadataPath=join(f.dir,'dist/release/private-inputs/admin-metafile.json'),original=await readFile(metadataPath,'utf8');
+ assert.equal((await f.run(['capture-admin-inputs'])).status,0,'complete tree permits an unreferenced copied image');
+ const reset=async()=>{await adminInputFixture(f);await writeFile(metadataPath,original);};
+ const mutations=[
+  async()=>{const v=JSON.parse(original);v.inputs['extra-private.js']={bytes:0,imports:[]};await writeFile(metadataPath,JSON.stringify(v));},
+  async()=>{const v=JSON.parse(original);delete v.inputs['admin/worker.mjs'];await writeFile(metadataPath,JSON.stringify(v));},
+  async()=>writeFile(metadataPath,original.replace('"inputs":{','"inputs":{"admin/worker.mjs":{"bytes":0,"imports":[]},')),
+  async()=>writeFile(join(f.dir,'admin/worker.mjs'),'// substituted private input'),
+  async()=>{const v=JSON.parse(original);v.outputs['dist/release/private/admin/worker.js'].bytes++;await writeFile(metadataPath,JSON.stringify(v));},
+  async()=>{const v=JSON.parse(original);v.inputs['admin/worker.mjs'].imports=[{path:'../outside',external:false}];await writeFile(metadataPath,JSON.stringify(v));},
+  async()=>writeFile(join(f.dir,'dist/admin/.vite/manifest.json'),data.manifest.replace('src/Checkout.jsx','src/Changed.jsx')),
+  async()=>writeFile(join(f.dir,'dist/admin/.vite/manifest.json'),data.manifest.replace('assets/preview-BO2S5IF5.js','https://remote.invalid/worker.js')),
+  async()=>rm(join(f.dir,'dist/admin/assets/preview-B8oIOMo5.css'))
+ ];
+ for(const mutate of mutations){await reset();await mutate();const result=await f.run(['capture-admin-inputs']);assert.notEqual(result.status,0);assert.equal(result.uploads,'');}
+});
+test('Admin manifest compatibility rejects wrong baseline, substituted runtime and post-plan candidate drift',async t=>{
+ const f=await completionFixture(t,{presentation:true,adminManifest:true,planOnly:true}),original=structuredClone(f.originalEvidence);
+ for(const mutate of [v=>v.baseline.components.admin.receipt.assetsDigest='e'.repeat(64),v=>v.activationCompatibility.adminAssetManifest.baseline.id=next,v=>v.activationCompatibility.adminAssetManifest.candidate.runtimeDigest='e'.repeat(64),v=>v.activationCompatibility.adminAssetManifest.candidate.inputInventoryDigest='e'.repeat(64)]){
+  const evidence=structuredClone(original);mutate(evidence);const result=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(result.status,1);assert.equal(result.uploads,'');assert.equal(result.record.attempts,undefined);
+ }
+ assert.equal((await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(original)})).status,0);
+ await writeFile(join(f.dir,'dist/admin/copied-image.png'),'changed complete-tree asset');const result=await f.run(['publish','pages'],{UPLOAD_RESULT:'success'});assert.equal(result.status,1);assert.equal(result.uploads,'');
+});
+
+
+test('private-builds requests the Admin metafile outside the runtime tree and captures actual inputs',async t=>{
+ const f=await fixture(t,{presentation:true}),data=await adminInputFixture(f);
+ const metadata=await readFile(join(f.dir,'dist/release/private-inputs/admin-metafile.json'),'utf8');
+ let source=await readFile(join(f.dir,'preload.cjs'),'utf8');
+ const marker=" if(program==='git'){";assert.ok(source.includes(marker));
+ source=source.replace(marker,`
+ if(program==='npx'){
+  if(args.slice(0,4).join(' ')!=='--no-install wrangler deploy --dry-run')throw Error('Unexpected compiler command');
+  const out=args[args.indexOf('--outdir')+1],admin=args.includes('wrangler.admin.jsonc');
+  fs.mkdirSync(out,{recursive:true});fs.writeFileSync(out+'/worker.js',admin?'fixture-admin-candidate':'fixture-worker');
+  if(admin){if(args[args.indexOf('--metafile')+1]!=='dist/release/private-inputs/admin-metafile.json')throw Error('Metafile must stay outside runtime tree');fs.writeFileSync('dist/release/private-inputs/admin-metafile.json',${JSON.stringify(metadata)});}
+  else if(args.includes('--metafile'))throw Error('Unexpected extra private metadata');
+  fs.appendFileSync('compiler-calls.log',JSON.stringify(args)+'\\n');return '';
+ }
+`+marker);
+ await writeFile(join(f.dir,'preload.cjs'),source);
+ const result=await f.run(['private-builds']);assert.equal(result.status,0,result.stderr);
+ const record=JSON.parse(await readFile(join(f.dir,'dist/release/private-build-manifest.json'),'utf8'));
+ assert.equal(record.sourceSha,sha);assert.equal(record.components.admin.assetManifest.inputCount,3);assert.equal(record.components.admin.assetManifest.protectedInputDigest,data.policy.protectedInputDigest);assert.equal(record.components.admin.assetManifest.manifestSha256,data.policy.manifestSha256);assert.equal(record.components.admin.runtimeDigest,createHash('sha256').update(JSON.stringify([['worker.js',createHash('sha256').update('fixture-admin-candidate').digest('hex')]])).digest('hex'));
+ assert.deepEqual(Object.keys(record.components),['admin','security','catalogue']);
+ const calls=(await readFile(join(f.dir,'compiler-calls.log'),'utf8')).trim().split('\n').map(JSON.parse);assert.equal(calls.length,3);assert.equal(calls.filter(v=>v.includes('--metafile')).length,1);
+ assert.deepEqual((await readdir(join(f.dir,'dist/release/private/admin'))).sort(),['worker.js']);
 });
