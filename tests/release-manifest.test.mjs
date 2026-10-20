@@ -348,3 +348,32 @@ test('official job URLs must independently bind exact repository run and selecte
  const {validateMandatoryValidation}=await import('../scripts/release-manifest.mjs');
  for(const [key,value]of [['url','https://api.github.com/repos/other/repo/actions/jobs/118568540207'],['run_url','https://api.github.com/repos/TIMMMYYYHHHH/Customvibev3/actions/runs/1'],['html_url','https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/39404961304/job/1']]){const f=mandatoryFixture();f.facts.jobs.jobs[0][key]=value;assert.throws(()=>validateMandatoryValidation(f.selector,f.facts,f.local,f.checkedAt));}
 });
+
+// The fixed presentation content was independently reviewed; arbitrary CSS or a
+// caller-provided path list must never acquire this release authority.
+test('presentation compatibility binds fixed reviewed blobs and unequal input facts',async()=>{
+ const release=await import('../scripts/release-manifest.mjs');
+ const facts={baselineSourceInputDigest:'b'.repeat(64),sourceInputDigest:'d'.repeat(64),protectedInputDigest:'e'.repeat(64),entries:[
+  {path:'index.html',mode:'100644',baseBlob:'615e463834f226d6cf1ebcd03e5531b9c8535f69',candidateBlob:'618e5002998db47014174393216c913eede6fb01'},
+  {path:'src/button-system.css',mode:'100644',baseBlob:'0c5790252e1dc1ffe5f48674efc208cbffd3f6e0',candidateBlob:'7fad2ba9c9e4d501adbbf18f4de66feb9d5e5cfd'},
+  {path:'src/consistency.css',mode:'100644',baseBlob:'2bee9d951e0438db52d304efea6e86d0be9c8a4c',candidateBlob:'acc40d8da9b2c393f85d06bffea1a4628c109a56'},
+  {path:'src/designs/collection-picker.css',mode:'100644',baseBlob:'c80088a6c8b8e6f898b46c706d7617f34e26814a',candidateBlob:'0f6aa6df61241ed473a102ff7811c61a5371f7e4'},
+  {path:'tests/contact-print.browser.mjs',mode:'100644',baseBlob:null,candidateBlob:'116ef654d68b438fc646d4be8563b37b3cab9b59'}
+ ]};
+ const f={sourceSha:sha,baseSha:old,beforePagesSourceSha:old,paths:facts.entries.map(v=>v.path),sourceInputDigest:facts.sourceInputDigest,baselineSourceInputDigest:facts.baselineSourceInputDigest,presentation:facts,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,privateBuild:{admin:{runtimeDigest:digest,configDigest:digest}},rollback:{adminRuntimeDigest:digest,adminConfigDigest:digest},now};
+ const evidence={basis:'reviewed-public-presentation-v1',reviewedAgainstSha:sha,baselineSha:old,observedAt:fresh,sourceInputDigest:f.sourceInputDigest,baselineSourceInputDigest:f.baselineSourceInputDigest,presentation:facts,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,historicalFunctionsDigest:null};
+ assert.deepEqual(release.validateActivationCompatibility(evidence,f).presentation,facts);
+ for(const mutate of [v=>v.baselineSourceInputDigest=v.sourceInputDigest,v=>v.presentation.entries[0].candidateBlob='e'.repeat(40),v=>v.presentation.entries.pop(),v=>v.presentation.entries.push(v.presentation.entries[0]),v=>v.presentation.protectedInputDigest='f'.repeat(64),v=>v.presentation.entries[0].mode='120000']){const v=structuredClone(evidence);mutate(v);assert.throws(()=>release.validateActivationCompatibility(v,f));}
+ assert.throws(()=>release.validateActivationCompatibility(evidence,{...f,rollback:{adminRuntimeDigest:'e'.repeat(64),adminConfigDigest:digest}}));
+ assert.throws(()=>release.validateActivationCompatibility(evidence,{...f,paths:[...f.paths,'src/extra.css']}));
+ const claimed=structuredClone(facts);claimed.entries[0].candidateBlob='1'.repeat(40);
+ assert.throws(()=>release.validateActivationCompatibility({...evidence,presentation:claimed},{...f,presentation:claimed}),'caller cannot replace the fixed trusted policy');
+ // A genuine new Admin executable is permitted only by the separately reviewed
+ // single generated-manifest proof, never by asserting arbitrary runtime safety.
+ const manifestFacts={version:1,inputCount:63,inputPathsDigest:'452ac699e8cc2eabf5c3abc0b932c5100a05bb9569067a87d25a48c8e4d93df3',protectedInputDigest:'f21d97dd4142245ad9d1ce41424e96c911e82db622250c1be9607e73db005528',inputInventoryDigest:'19f1a70961cad4c061964fbfdcd1636756e166ab4abf3d12faaa55cf39ea6cc8',metafileSha256:digest,manifestSha256:'62c0c0a6323dec4c2801ae0684038c2eb53e109446c8c1c3ecb0b9a0452fbd61',manifestBytes:9321,assetsDigest:digest};
+ const generated={...f,before:{admin:id},privateBuild:{admin:{runtimeDigest:'632866622fd3136540efba5e8296e9d0e2fd6de411f9f52ba809e4527ebbea74',configDigest:digest,assetManifest:manifestFacts}},rollback:{adminId:id,sourceSha:old,adminRuntimeDigest:digest,adminConfigDigest:digest,adminAssetsDigest:digest}};
+ const derived={...evidence,adminAssetManifest:{basis:'reviewed-admin-asset-manifest-v1',baseline:{sourceSha:old,id,runtimeDigest:digest,configDigest:digest,assetsDigest:digest,manifestSha256:'df5b83212280c77865eeb77c616adb262070368132ff8084ad1b4b949fabb329'},candidate:{sourceSha:sha,runtimeDigest:generated.privateBuild.admin.runtimeDigest,configDigest:digest,...manifestFacts}}};
+ generated.adminManifestBaseline=structuredClone(derived.adminAssetManifest.baseline);
+ assert.equal(release.validateActivationCompatibility(derived,generated).adminAssetManifest.basis,'reviewed-admin-asset-manifest-v1');
+ for(const mutate of [v=>v.adminAssetManifest.baseline.id='87654321-1234-1234-1234-123456789abc',v=>v.adminAssetManifest.baseline.runtimeDigest='e'.repeat(64),v=>v.adminAssetManifest.baseline.assetsDigest='e'.repeat(64),v=>v.adminAssetManifest.candidate.manifestSha256='e'.repeat(64),v=>v.adminAssetManifest.candidate.protectedInputDigest='e'.repeat(64),v=>v.adminAssetManifest.candidate.runtimeDigest='e'.repeat(64)]){const value=structuredClone(derived);mutate(value);assert.throws(()=>release.validateActivationCompatibility(value,generated));}
+});

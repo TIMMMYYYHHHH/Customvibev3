@@ -114,6 +114,36 @@ export async function readMandatoryValidation(selector,local,{phase='plan'}={}){
 
 // Hash the actual inner multipart File, never a separate prebuild or a rewritten module.
 const TOOLING_PATHS=new Set(['.github/workflows/publish.yml','docs/release-process.md','docs/releases/README.md','scripts/check-admin-deployment.mjs','scripts/check-catalogue-deployment.mjs','scripts/check-deployment.mjs','scripts/check-security-deployment.mjs','scripts/release-manifest.mjs','tests/deployment-safety.test.mjs','tests/release-cli.test.mjs','tests/release-manifest.test.mjs']);
+// Independently reviewed M/S to corrected PR47 content, including its separate
+// nonshipping print regression. Suffixes and operator lists confer no authority.
+const PRESENTATION_ENTRIES=[
+ ['index.html','615e463834f226d6cf1ebcd03e5531b9c8535f69','618e5002998db47014174393216c913eede6fb01'],
+ ['src/button-system.css','0c5790252e1dc1ffe5f48674efc208cbffd3f6e0','7fad2ba9c9e4d501adbbf18f4de66feb9d5e5cfd'],
+ ['src/consistency.css','2bee9d951e0438db52d304efea6e86d0be9c8a4c','acc40d8da9b2c393f85d06bffea1a4628c109a56'],
+ ['src/designs/collection-picker.css','c80088a6c8b8e6f898b46c706d7617f34e26814a','0f6aa6df61241ed473a102ff7811c61a5371f7e4'],
+ ['tests/contact-print.browser.mjs',null,'116ef654d68b438fc646d4be8563b37b3cab9b59']
+].map(([path,baseBlob,candidateBlob])=>({path,mode:'100644',baseBlob,candidateBlob}));
+const PRESENTATION_PATHS=new Set(PRESENTATION_ENTRIES.map(v=>v.path));
+function validatePresentationInputs(value){
+ ensure(exactKeys(value,['baselineSourceInputDigest','sourceInputDigest','protectedInputDigest','entries'])&&['baselineSourceInputDigest','sourceInputDigest','protectedInputDigest'].every(k=>DIGEST.test(value[k]||''))&&value.baselineSourceInputDigest!==value.sourceInputDigest&&canonical(value.entries)===canonical(PRESENTATION_ENTRIES),'Presentation inputs are not the independently reviewed content.');return value;
+}
+function trackedTree(sha){
+ ensure(SHA.test(sha||''),'Invalid presentation source.');
+ const entries=git('ls-tree','-rz',sha).split('\0').filter(Boolean).map(line=>{const m=/^(100644|100755) blob ([a-f0-9]{40})\t([^\0\r\n]+)$/.exec(line);ensure(m,'Presentation tree contains an unsupported file mode or type.');return {path:m[3],mode:m[1],blob:m[2]};});
+ ensure(entries.length>0&&new Set(entries.map(v=>v.path)).size===entries.length,'Incomplete presentation tree.');return entries;
+}
+export function presentationInputs(baseSha,sourceSha,{archivePath}={}){
+ const before=trackedTree(baseSha),after=trackedTree(sourceSha),prior=new Map(before.map(v=>[v.path,v])),current=new Map(after.map(v=>[v.path,v]));
+ for(const v of PRESENTATION_ENTRIES){const a=prior.get(v.path),b=current.get(v.path);ensure((v.baseBlob===null?!a:a?.mode===v.mode&&a.blob===v.baseBlob)&&b?.mode===v.mode&&b.blob===v.candidateBlob,'Presentation blob or mode differs from the independent review.');}
+ const protectedEntries=entries=>entries.filter(v=>!TOOLING_PATHS.has(v.path)&&!PRESENTATION_PATHS.has(v.path)&&v.path!==archivePath).sort((a,b)=>a.path.localeCompare(b.path,'en'));
+ const protectedBefore=protectedEntries(before),protectedAfter=protectedEntries(after);ensure(canonical(protectedBefore)===canonical(protectedAfter),'Protected presentation inputs changed.');
+ // The sole excluded test must not become a shipping import. All other shipping
+ // source remains protected, including build programs and their input files.
+ const shipping=after.filter(v=>isSourceInput(v.path)&&/[.](mjs|js|jsx|ts|tsx)$/.test(v.path)).map(v=>v.path);
+ if(shipping.length){let referenced;try{referenced=git('grep','-I','-l','-F','contact-print.browser',sourceSha,'--',...shipping);}catch(error){ensure(error.status===1,'Cannot verify nonshipping presentation test.');}ensure(!referenced,'Presentation test is a shipping dependency.');}
+ const inputs=entries=>hash(entries.filter(v=>isSourceInput(v.path)).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0).map(v=>`${v.path}\0${v.blob}`).join('\n'));
+ return validatePresentationInputs({baselineSourceInputDigest:inputs(before),sourceInputDigest:inputs(after),protectedInputDigest:hash(canonical(protectedBefore)),entries:structuredClone(PRESENTATION_ENTRIES)});
+}
 const CONTROL_NAMES=['_headers','_redirects','_routes.json'];
 const UPLOAD_KEYS=['manifest','branch','commit_hash','commit_dirty','_worker.bundle','functions-filepath-routing-config.json','wrangler_config_hash','pages_build_output_dir',...CONTROL_NAMES];
 const exactKeys=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).sort().join('\0')===[...keys].sort().join('\0');
@@ -235,8 +265,9 @@ export function validateReleaseArchiveRecord(record,{sourceSha,candidateSha,base
  let nodes=0;function bounded(value){ensure(++nodes<=30000,'Archive metadata is too large.');if(Array.isArray(value)){ensure(value.length<=30000,'Archive array is too large.');for(const item of value)bounded(item);}else if(value&&typeof value==='object'){for(const [key,item]of Object.entries(value)){ensure(!/^(?:token|secret|secret_key|password|customer|body|raw|output|stdout|stderr|formdata|bindings|env_vars|diagnostic|diagnostics|providerresponse|providerdiagnostics)$/i.test(key),'Archive contains raw or private payload fields.');bounded(item);}}else if(typeof value==='string')ensure(value.length<=1000&&!value.includes('/blob/'+candidateSha+'/'),'Archive contains unbounded or self-referential metadata.');else ensure(value===null||typeof value==='boolean'||(typeof value==='number'&&Number.isFinite(value)),'Invalid archive metadata.');}bounded(record);
  return {sourceSha,receiptDigest:hash(canonical(receipts))};
 }
-async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline}){
- const extra=paths.filter(p=>!TOOLING_PATHS.has(p));if(extra.length===0){ensure(!proof,'Unexpected archive evidence without an archive change.');return undefined;}
+async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline,presentation}){
+ if(presentation)validatePresentationInputs(presentation);
+ const extra=paths.filter(p=>!TOOLING_PATHS.has(p)&&!(presentation&&PRESENTATION_PATHS.has(p)));if(extra.length===0){ensure(!proof,'Unexpected archive evidence without an archive change.');return undefined;}
  ensure(extra.length===1&&proof&&Object.keys(proof).every(k=>['origin','reviewed','path','sha256','sourceSha','reviewedAgainstSha','receiptDigest'].includes(k))&&proof.origin==='reviewed-complete-release-archive'&&proof.reviewed===true&&proof.path===extra[0]&&/^docs\/releases\/\d{4}-\d\d-\d\d-release-[a-zA-Z0-9_-]{1,64}[.]json$/.test(proof.path)&&DIGEST.test(proof.sha256||'')&&proof.sourceSha===baseSha&&proof.reviewedAgainstSha===sourceSha,'Archive is not an explicitly reviewed historical release record.');
  ensure(git('diff','--name-status',baseSha,sourceSha,'--',proof.path)==='A\t'+proof.path,'An archived record must be a new immutable addition.');
  const entry=git('ls-tree',sourceSha,'--',proof.path),match=/^100644 blob ([a-f0-9]{40})\t(.+)$/.exec(entry);ensure(match&&match[2]===proof.path,'Archive must be a committed regular file.');
@@ -246,14 +277,132 @@ async function releaseArchive(proof,{paths,sourceSha,baseSha,baseline}){
  return {origin:proof.origin,reviewed:true,path:proof.path,sha256:proof.sha256,sourceSha:baseSha,reviewedAgainstSha:sourceSha,receiptDigest:validated.receiptDigest};
 }
 
-export function validateActivationCompatibility(value,expected){
- ensure(value?.basis==='source-input-tooling-only-v1'&&value.reviewedAgainstSha===expected.sourceSha&&value.baselineSha===expected.baseSha&&value.baselineSha===expected.beforePagesSourceSha&&value.historicalFunctionsDigest===null,'Initial activation compatibility is not reviewed source-based evidence.');
- ensure(expected.paths.every(p=>TOOLING_PATHS.has(p)||(expected.archivedRelease?.path===p&&expected.archivedRelease.sourceSha===expected.baseSha&&expected.archivedRelease.reviewedAgainstSha===expected.sourceSha&&DIGEST.test(expected.archivedRelease.receiptDigest||'')))&&expected.sourceInputDigest===expected.baselineSourceInputDigest,'Activation changes application/runtime/build inputs.');
- for(const k of ['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'])ensure(DIGEST.test(expected[k]||'')&&value[k]===expected[k],'Activation source/compiler/config/assets comparison differs.');
- return {basis:value.basis,reviewedAgainstSha:value.reviewedAgainstSha,baselineSha:value.baselineSha,observedAt:freshTime(value.observedAt,expected.now??Date.now()),...Object.fromEntries(['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'].map(k=>[k,value[k]])),historicalFunctionsDigest:null,privateSnapshotGap:'Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'};
+// Fixed data from the independently reviewed retained input/manifest comparison.
+// There is no environment, evidence or command-line eligibility override.
+const ADMIN_MANIFEST_POLICY=Object.freeze({
+ "inputCount": 63,
+ "inputPathsDigest": "452ac699e8cc2eabf5c3abc0b932c5100a05bb9569067a87d25a48c8e4d93df3",
+ "protectedInputDigest": "f21d97dd4142245ad9d1ce41424e96c911e82db622250c1be9607e73db005528",
+ "inputInventoryDigest": "19f1a70961cad4c061964fbfdcd1636756e166ab4abf3d12faaa55cf39ea6cc8",
+ "baselineManifestSha256": "df5b83212280c77865eeb77c616adb262070368132ff8084ad1b4b949fabb329",
+ "manifestSha256": "62c0c0a6323dec4c2801ae0684038c2eb53e109446c8c1c3ecb0b9a0452fbd61",
+ "manifestBytes": 9321,
+ "deltas": [
+  [
+   "admin/preview.html",
+   "file",
+   "assets/preview-DClyXgPw.js",
+   "assets/preview-BO2S5IF5.js"
+  ],
+  [
+   "admin/preview.html",
+   "css",
+   [
+    "assets/preview-Bmgh2UZY.css"
+   ],
+   [
+    "assets/preview-B8oIOMo5.css"
+   ]
+  ],
+  [
+   "src/Checkout.jsx",
+   "file",
+   "assets/Checkout-DujRvOPI.js",
+   "assets/Checkout-yiAHbjDd.js"
+  ],
+  [
+   "src/CollectionReview.jsx",
+   "file",
+   "assets/CollectionReview-DTTUK1U2.js",
+   "assets/CollectionReview-CFlK5LvH.js"
+  ],
+  [
+   "src/Editor.jsx",
+   "file",
+   "assets/Editor-A_tQgYFk.js",
+   "assets/Editor-ClNrCAAT.js"
+  ],
+  [
+   "src/designs/BusinessStudio.jsx",
+   "file",
+   "assets/BusinessStudio-A0vgIenU.js",
+   "assets/BusinessStudio-Crs7nnJN.js"
+  ],
+  [
+   "src/designs/HandyStudio.jsx",
+   "file",
+   "assets/HandyStudio-DC1xw29y.js",
+   "assets/HandyStudio-DQlNggb1.js"
+  ]
+ ]
+});
+const ADMIN_MANIFEST_PATH='dist/admin/.vite/manifest.json',ADMIN_METAFILE='dist/release/private-inputs/admin-metafile.json';
+const ADMIN_INPUT_KEYS=['version','inputCount','inputPathsDigest','protectedInputDigest','inputInventoryDigest','metafileSha256','manifestSha256','manifestBytes','assetsDigest'];
+function validateAdminInputFacts(v){
+ const p=ADMIN_MANIFEST_POLICY;
+ ensure(exactKeys(v,ADMIN_INPUT_KEYS)&&v.version===1&&['inputCount','inputPathsDigest','protectedInputDigest','inputInventoryDigest','manifestSha256','manifestBytes'].every(k=>v[k]===p[k])&&DIGEST.test(v.metafileSha256||'')&&DIGEST.test(v.assetsDigest||''),'Admin generated input facts differ from the fixed review.');return v;
 }
+// Validate paths before reading input bytes. Raw metadata stays outside the
+// runtime aggregate; only its bounded fingerprint travels with the release.
+export async function adminAssetManifestInputs(){
+ const bytes=await readFile(ADMIN_METAFILE);ensure(bytes.length>0&&bytes.length<2*1024*1024,'Invalid Admin compiler metadata size.');
+ const metadata=strictJson(bytes.toString('utf8')),paths=Object.keys(metadata.inputs||{}).sort(),p=ADMIN_MANIFEST_POLICY;
+ ensure(paths.length===p.inputCount&&hash(JSON.stringify(paths))===p.inputPathsDigest&&paths.includes(ADMIN_MANIFEST_PATH),'Admin compiler input path inventory changed.');
+ const inventory=[];
+ for(const path of paths){
+  ensure(path===posix.normalize(path)&&!path.startsWith('/')&&!path.startsWith('../')&&!path.includes('\\')&&!path.includes('\0'),'Unsafe Admin compiler input.');
+  const input=metadata.inputs[path],data=await readFile(path);ensure(input.bytes===data.length&&Array.isArray(input.imports)&&input.imports.every(v=>v.external?v.path==='<runtime>':paths.includes(v.path)),'Unresolved Admin compiler input.');inventory.push([path,hash(data),data.length]);
+ }
+ const outputs=Object.entries(metadata.outputs||{}).filter(([path])=>!path.endsWith('.map'));
+ ensure(outputs.length===1&&resolve(outputs[0][0])===resolve('dist/release/private/admin/worker.js')&&outputs[0][1].entryPoint==='admin/worker.mjs'&&outputs[0][1].bytes===(await stat('dist/release/private/admin/worker.js')).size&&Array.isArray(outputs[0][1].imports)&&outputs[0][1].imports.length===0&&Object.keys(outputs[0][1].inputs||{}).every(path=>paths.includes(path)),'Admin compiler output metadata differs from its actual emitted runtime.');
+ const protectedInputDigest=hash(JSON.stringify(inventory.filter(v=>v[0]!==ADMIN_MANIFEST_PATH))),inputInventoryDigest=hash(JSON.stringify(inventory));
+ const manifestBytes=await readFile(ADMIN_MANIFEST_PATH),text=manifestBytes.toString('utf8'),manifest=strictJson(text),prior=structuredClone(manifest);
+ ensure(hash(manifestBytes)===p.manifestSha256&&manifestBytes.length===p.manifestBytes,'Admin manifest is not the reviewed candidate.');
+ let oldText=text;
+ for(const [entry,field,before,after]of p.deltas){
+  ensure(canonical(manifest[entry]?.[field])===canonical(after),'Admin manifest field changed.');prior[entry][field]=before;
+  const oldValue=JSON.stringify(Array.isArray(before)?before[0]:before),newValue=JSON.stringify(Array.isArray(after)?after[0]:after);
+  ensure(oldText.split(newValue).length===2,'Ambiguous Admin manifest field.');oldText=oldText.replace(newValue,oldValue);
+ }
+ ensure(hash(oldText)===p.baselineManifestSha256&&canonical(strictJson(oldText))===canonical(prior),'Admin manifest changed outside its seven reviewed fields.');
+ const files=new Set();async function walk(dir){for(const name of (await readdir(dir)).sort()){const path=resolve(dir,name);if((await stat(path)).isDirectory())await walk(path);else files.add(relative(resolve('dist/admin'),path).split('\\').join('/'));}}await walk(resolve('dist/admin'));
+ for(const value of Object.values(manifest)){
+  ensure(value&&typeof value==='object'&&!Array.isArray(value),'Invalid Admin manifest entry.');
+  for(const field of ['file','css','assets'])if(Object.hasOwn(value,field)){
+   const references=field==='file'?[value[field]]:value[field];ensure(Array.isArray(references),'Invalid Admin asset references.');
+   for(const path of references)ensure(typeof path==='string'&&path===posix.normalize(path)&&!path.startsWith('/')&&!path.startsWith('../')&&!/[\\:?\0]/.test(path)&&files.has(path),'Admin manifest asset is missing or unsafe.');
+  }
+  for(const field of ['imports','dynamicImports'])if(Object.hasOwn(value,field))ensure(Array.isArray(value[field])&&value[field].every(key=>Object.hasOwn(manifest,key)),'Admin manifest import is unresolved.');
+ }
+ return validateAdminInputFacts({version:1,inputCount:paths.length,inputPathsDigest:hash(JSON.stringify(paths)),protectedInputDigest,inputInventoryDigest,metafileSha256:hash(bytes),manifestSha256:hash(manifestBytes),manifestBytes:manifestBytes.length,assetsDigest:(await bundleDigest('dist/admin')).sha256});
+}
+function validateAdminManifestCompatibility(v,expected){
+ const admin=expected.privateBuild?.admin,rollback=expected.rollback,b=expected.adminManifestBaseline;
+ ensure(exactKeys(v,['basis','baseline','candidate'])&&v.basis==='reviewed-admin-asset-manifest-v1'&&exactKeys(v.baseline,['sourceSha','id','runtimeDigest','configDigest','assetsDigest','manifestSha256']),'Invalid Admin manifest compatibility.');
+ ensure(b&&canonical(v.baseline)===canonical(b)&&b.sourceSha===expected.baseSha&&b.id===expected.before?.admin&&b.id===rollback?.adminId&&b.sourceSha===rollback?.sourceSha&&b.runtimeDigest===rollback?.adminRuntimeDigest&&b.configDigest===rollback?.adminConfigDigest&&b.assetsDigest===rollback?.adminAssetsDigest&&b.manifestSha256===ADMIN_MANIFEST_POLICY.baselineManifestSha256,'Admin baseline manifest provenance differs.');
+ const c=v.candidate;ensure(exactKeys(c,['sourceSha','runtimeDigest','configDigest',...ADMIN_INPUT_KEYS])&&c.sourceSha===expected.sourceSha&&c.runtimeDigest===admin?.runtimeDigest&&c.configDigest===admin?.configDigest&&c.configDigest===b.configDigest&&DIGEST.test(c.runtimeDigest||''),'Admin candidate runtime/config differs.');
+ const facts=Object.fromEntries(ADMIN_INPUT_KEYS.map(k=>[k,c[k]]));validateAdminInputFacts(facts);ensure(canonical(facts)===canonical(admin.assetManifest)&&c.assetsDigest===expected.adminAssetsDigest,'Admin candidate manifest/input/assets binding differs.');return structuredClone(v);
+}
+
+export function validateActivationCompatibility(value,expected){
+ const presentation=value?.basis==='reviewed-public-presentation-v1';
+ ensure((presentation||value?.basis==='source-input-tooling-only-v1')&&value.reviewedAgainstSha===expected.sourceSha&&value.baselineSha===expected.baseSha&&value.baselineSha===expected.beforePagesSourceSha&&value.historicalFunctionsDigest===null,'Activation compatibility is not reviewed source-based evidence.');
+ const archive=p=>expected.archivedRelease?.path===p&&expected.archivedRelease.sourceSha===expected.baseSha&&expected.archivedRelease.reviewedAgainstSha===expected.sourceSha&&DIGEST.test(expected.archivedRelease.receiptDigest||'');
+ if(presentation){
+  ensure(exactKeys(value,['basis','reviewedAgainstSha','baselineSha','observedAt','sourceInputDigest','baselineSourceInputDigest','presentation','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest','historicalFunctionsDigest',...(Object.hasOwn(value,'privateSnapshotGap')?['privateSnapshotGap']:[]),...(Object.hasOwn(value,'adminAssetManifest')?['adminAssetManifest']:[])])&&(!Object.hasOwn(value,'privateSnapshotGap')||value.privateSnapshotGap==='Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'), 'Unexpected presentation compatibility fields.');
+  const facts=validatePresentationInputs(expected.presentation);validatePresentationInputs(value.presentation);
+  ensure(canonical(value.presentation)===canonical(facts)&&value.baselineSourceInputDigest===expected.baselineSourceInputDigest&&facts.baselineSourceInputDigest===expected.baselineSourceInputDigest&&facts.sourceInputDigest===expected.sourceInputDigest,'Presentation source/baseline/protected comparison differs.');
+  ensure(new Set(expected.paths).size===expected.paths.length&&PRESENTATION_ENTRIES.every(v=>expected.paths.includes(v.path))&&expected.paths.every(p=>TOOLING_PATHS.has(p)||PRESENTATION_PATHS.has(p)||archive(p)),'Unreviewed presentation path.');
+  const admin=expected.privateBuild?.admin,rollback=expected.rollback;
+  if(value.adminAssetManifest)validateAdminManifestCompatibility(value.adminAssetManifest,expected);
+  else ensure(DIGEST.test(admin?.runtimeDigest||'')&&DIGEST.test(admin?.configDigest||'')&&admin.runtimeDigest===rollback?.adminRuntimeDigest&&admin.configDigest===rollback?.adminConfigDigest,'Presentation changed the private Admin executable or configuration.');
+ }else ensure(expected.paths.every(p=>TOOLING_PATHS.has(p)||archive(p))&&expected.sourceInputDigest===expected.baselineSourceInputDigest,'Activation changes application/runtime/build inputs.');
+ for(const k of ['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'])ensure(DIGEST.test(expected[k]||'')&&value[k]===expected[k],'Activation source/compiler/config/assets comparison differs.');
+ return {basis:value.basis,reviewedAgainstSha:value.reviewedAgainstSha,baselineSha:value.baselineSha,observedAt:freshTime(value.observedAt,expected.now??Date.now()),...Object.fromEntries(['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'].map(k=>[k,value[k]])),...(presentation?{baselineSourceInputDigest:value.baselineSourceInputDigest,presentation:structuredClone(value.presentation),...(value.adminAssetManifest?{adminAssetManifest:structuredClone(value.adminAssetManifest)}:{})}:{}),historicalFunctionsDigest:null,privateSnapshotGap:'Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'};
+}
+function isSourceInput(path){return /^(src\/|public\/|data\/|server\/|functions\/|admin\/|security\/|catalogue\/|migrations\/|scripts\/|package(-lock)?[.]json$|vite[.]|wrangler.*[.]jsonc$|index[.]html$)/.test(path)&&!TOOLING_PATHS.has(path);}
 function sourceInputs(sha){
- const files=git('ls-tree','-r','--name-only',sha).split('\n').filter(p=>/^(src\/|public\/|data\/|server\/|functions\/|admin\/|security\/|catalogue\/|migrations\/|scripts\/|package(-lock)?[.]json$|vite[.]|wrangler.*[.]jsonc$|index[.]html$)/.test(p)&&!TOOLING_PATHS.has(p));
+ const files=git('ls-tree','-r','--name-only',sha).split('\n').filter(isSourceInput);
  ensure(files.length>0,'Missing source inputs.');return hash(files.sort().map(p=>`${p}\0${git('rev-parse',`${sha}:${p}`)}`).join('\n'));
 }
 const COMPILER_OPTIONS={directory:'dist/client',functionsDirectory:'functions',bundle:true,sourceMaps:false,branch:'main',commitDirty:false,args:{config:'wrangler.jsonc'}};
@@ -466,8 +615,9 @@ async function privateBuilds(){
  for(const component of ['admin','security','catalogue']){
   const directory=`dist/release/private/${component}`;
   await rm(directory,{recursive:true,force:true});
-  command('npx',['--no-install','wrangler','deploy','--dry-run','--config',`wrangler.${component}.jsonc`,'--outdir',directory]);
-  components[component]={runtimeDigest:(await bundleDigest(directory,{runtimeOnly:true})).sha256,configDigest:hash(await readFile(`wrangler.${component}.jsonc`))};
+  if(component==='admin'){await mkdir(dirname(ADMIN_METAFILE),{recursive:true});await rm(ADMIN_METAFILE,{force:true});}
+  command('npx',['--no-install','wrangler','deploy','--dry-run','--config',`wrangler.${component}.jsonc`,'--outdir',directory,...(component==='admin'?['--metafile',ADMIN_METAFILE]:[])]);
+  components[component]={runtimeDigest:(await bundleDigest(directory,{runtimeOnly:true})).sha256,configDigest:hash(await readFile(`wrangler.${component}.jsonc`)),...(component==='admin'&&hash(await readFile(ADMIN_MANIFEST_PATH))===ADMIN_MANIFEST_POLICY.manifestSha256?{assetManifest:await adminAssetManifestInputs()}:{})};
  }
  await writeFile('dist/release/private-build-manifest.json',JSON.stringify({sourceSha,components},null,2)+'\n');
 }
@@ -519,7 +669,7 @@ export async function observeAcknowledgedPages(request,{id,sourceSha,beforeId,be
 function prerequisiteInput(record,evidence=record.evidence){return {required:record.required,sourceSha:record.sourceSha,before:record.before,sourceDigests:record.sourceDigests,beforePagesSourceSha:record.beforePagesSourceSha,privateBuild:record.build.private,schemaSources:record.schemaSources,evidence};}
 const positiveId=value=>typeof value==='string'&&/^[1-9][0-9]{0,19}$/.test(value);
 function utc(value){ensure(typeof value==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[.]\d{3}Z$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString()===value,'Invalid phase clock.');return Date.parse(value);}
-function compatibilityInput(record){return {sourceSha:record.sourceSha,baseSha:record.baseSha,beforePagesSourceSha:record.beforePagesSourceSha,paths:record.paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:record.build.sourceInputDigest,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256};}
+function compatibilityInput(record){return {sourceSha:record.sourceSha,baseSha:record.baseSha,beforePagesSourceSha:record.beforePagesSourceSha,paths:record.paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:record.build.baselineSourceInputDigest??record.build.sourceInputDigest,presentation:record.build.presentation,before:record.before,adminManifestBaseline:record.build.adminManifestBaseline,privateBuild:record.build.private,rollback:record.evidence?.staged?.rollback,compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256};}
 function authorizationSnapshot(record,version=record.prewriteValidation?.version??2){
  return Object.fromEntries([...(version===2?['mandatoryValidation']:[]),'sourceSha','repository','workflow','runAttempt','planComplete','baseSha','beforePagesSourceSha','before','required','schemas','paths','archivedRelease','sourceDigests','schemaSources','build','activationCompatibility','evidence'].map(k=>[k,record[k]]));
 }
@@ -568,20 +718,23 @@ async function plan(){
   phase='MANDATORY_VALIDATION';const evidence=inputEvidence(ctx.sourceSha);record.mandatoryValidation={version:1,plan:await readMandatoryValidation(evidence.mandatoryValidation,validationLocal(ctx))};
   phase='GUARDS';command(process.execPath,['scripts/check-deployment.mjs','before']);
   phase='BASELINE';const previous=validateBaseline(evidence.baseline),baseSha=previous.baseSha;
+  if(evidence.activationCompatibility?.basis==='reviewed-public-presentation-v1')ensure(previous.schemaVersion===2&&previous.state==='verified','Presentation release needs a genuinely completed reviewed baseline.');
   ensure(evidence.baseline.reviewed===true&&typeof evidence.baseline.evidenceUrl==='string'&&new RegExp('^https://github[.]com/'+REPOSITORY+'/(?:actions/runs/[0-9]+|blob/[a-f0-9]{40}/docs/releases/[a-zA-Z0-9_.-]+[.]json)$').test(evidence.baseline.evidenceUrl),'Baseline needs an explicitly reviewed immutable evidence reference.');
   phase='SCOPE';ensure(git('merge-base',baseSha,ctx.sourceSha)===baseSha,'Baseline must be an ancestor of reviewed main.');
   const paths=git('diff','--name-only',baseSha,ctx.sourceSha).split('\n').filter(Boolean),dep=dependencies(ctx.sourceSha),prior=dependencies(baseSha);
   const classification=classifyChanges(paths,Object.fromEntries(['security','catalogue'].map(c=>[c,[...new Set([...dep[c],...prior[c]])]])));
-  phase='ARCHIVE';record.archivedRelease=await releaseArchive(evidence.archivedRelease,{paths,sourceSha:ctx.sourceSha,baseSha,baseline:evidence.baseline});
+  const presentation=paths.some(p=>PRESENTATION_PATHS.has(p))?presentationInputs(baseSha,ctx.sourceSha,{archivePath:evidence.archivedRelease?.path}):undefined;
+  phase='ARCHIVE';record.archivedRelease=await releaseArchive(evidence.archivedRelease,{paths,sourceSha:ctx.sourceSha,baseSha,baseline:evidence.baseline,presentation});
   phase='VERSIONS';const pages=await observePages();
   record={...record,baseSha,paths,required:classification.components,schemas:classification.schemas,beforePagesSourceSha:pages.sourceSha,before:{pages:pages.pages,...Object.fromEntries(['admin','security','catalogue'].filter(c=>ID.test(evidence.guards?.[c]?.id||'')).map(c=>[c,evidence.guards[c].id]))},components:{},sourceDigests:Object.fromEntries(COMPONENTS.map(c=>[c,fingerprint(ctx.sourceSha,c)])),schemaSources:await schemaSources()};
   phase='BUILD';let comparison={components:{}};
   try{comparison=await readJson('dist/release/private-build-manifest.json');ensure(comparison.sourceSha===ctx.sourceSha,'Comparison build source differs.');
-   for(const c of Object.keys(comparison.components)){ensure(['admin','security','catalogue'].includes(c),'Unknown comparison component.');ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===comparison.components[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===comparison.components[c].configDigest,'Comparison bytes/config changed.');}
+   for(const c of Object.keys(comparison.components)){ensure(['admin','security','catalogue'].includes(c),'Unknown comparison component.');ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===comparison.components[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===comparison.components[c].configDigest,'Comparison bytes/config changed.');if(comparison.components[c].assetManifest)ensure(c==='admin'&&canonical(await adminAssetManifestInputs())===canonical(comparison.components[c].assetManifest),'Admin compiler input evidence changed.');}
   }catch{comparison={components:{}};ensure(!record.required.some(c=>['admin','security','catalogue'].includes(c)),'Required private comparison build missing or changed.');}
-  record.build={schemaVersion:2,sourceSha:ctx.sourceSha,sourceInputDigest:sourceInputs(ctx.sourceSha),compiler:await compilerConfig(),ssr:await bundleDigest('dist/ssr'),private:comparison.components,pages:await bundleDigest('dist/client'),admin:await bundleDigest('dist/admin')};
+  record.build={schemaVersion:2,sourceSha:ctx.sourceSha,sourceInputDigest:sourceInputs(ctx.sourceSha),...(presentation?{baselineSourceInputDigest:presentation.baselineSourceInputDigest,presentation}:{}),compiler:await compilerConfig(),ssr:await bundleDigest('dist/ssr'),private:comparison.components,pages:await bundleDigest('dist/client'),admin:await bundleDigest('dist/admin')};
   phase='MANDATORY_VALIDATION';validateMandatoryRecord(record);
-  phase='ACTIVATION_COMPATIBILITY';record.activationCompatibility=validateActivationCompatibility(evidence.activationCompatibility,{sourceSha:ctx.sourceSha,baseSha,beforePagesSourceSha:pages.sourceSha,paths,archivedRelease:record.archivedRelease,sourceInputDigest:record.build.sourceInputDigest,baselineSourceInputDigest:sourceInputs(baseSha),compilerConfigDigest:record.build.compiler.compilerConfigDigest,configDigest:record.build.compiler.configDigest,pagesBuildDigest:record.build.pages.sha256,adminAssetsDigest:record.build.admin.sha256});
+  if(evidence.activationCompatibility?.adminAssetManifest){const receipt=evidence.baseline.components?.admin?.receipt;ensure(receipt?.sourceSha===baseSha&&DIGEST.test(receipt.assetsDigest||''),'Genuine baseline Admin asset receipt missing.');record.build.adminManifestBaseline={sourceSha:receipt.sourceSha,id:receipt.id,runtimeDigest:receipt.runtimeDigest,configDigest:receipt.configDigest,assetsDigest:receipt.assetsDigest,manifestSha256:ADMIN_MANIFEST_POLICY.baselineManifestSha256};}
+  phase='ACTIVATION_COMPATIBILITY';record.activationCompatibility=validateActivationCompatibility(evidence.activationCompatibility,{...compatibilityInput(record),baselineSourceInputDigest:sourceInputs(baseSha),rollback:evidence.staged?.rollback});
   await writeFile('dist/release/build-manifest.json',JSON.stringify(record.build,null,2)+'\n');
   phase='PREREQUISITES';record.prerequisites=validatePrerequisites(prerequisiteInput(record,evidence));
   record.evidence=sanitizedEvidence(ctx.sourceSha,record.prerequisites);
@@ -686,17 +839,20 @@ export function completePair({record,evidence,observed,now=Date.now()}){
  return {components,completed:Object.fromEntries(COMPONENTS.map(c=>[c,{id:observed.versions[c]}])),prerequisites,completionEvidence:{version:1,prewriteValidationDigest:record.prewriteValidation.integrityDigest,completedAt:new Date(now).toISOString(),evidence:current}};
 }
 async function verifyBuild(record,{local=false,afterWrite=false}={}){
- await releaseArchive(record.archivedRelease,{paths:record.paths,sourceSha:record.sourceSha,baseSha:record.baseSha});
+ const presentation=record.build.presentation?presentationInputs(record.baseSha,record.sourceSha,{archivePath:record.archivedRelease?.path}):undefined;
+ await releaseArchive(record.archivedRelease,{paths:record.paths,sourceSha:record.sourceSha,baseSha:record.baseSha,presentation});
  ensure(!git('status','--porcelain'),'Release source changed after planning.');
  const configDigest=hash(await readFile('wrangler.jsonc')),lockfileDigest=hash(await readFile('package-lock.json'));
  validateCompilerEvidence(record.build.compiler,{configDigest,lockfileDigest});
  // Local Node24/platform bytes are different provenance. Actual runtime/assets
  // parity is checked below; never relabel the retained GitHub compiler as local.
  ensure(sourceInputs(record.sourceSha)===record.build.sourceInputDigest&&(local||(await compilerConfig()).compilerConfigDigest===record.build.compiler.compilerConfigDigest)&&(await bundleDigest('dist/ssr')).sha256===record.build.ssr.sha256,'Source/compiler/SSR inputs changed.');
- ensure(sourceInputs(record.baseSha)===record.build.sourceInputDigest,'Baseline runtime/build inputs differ.');
+ if(presentation)ensure(record.activationCompatibility?.basis==='reviewed-public-presentation-v1'&&canonical(presentation)===canonical(record.build.presentation)&&presentation.baselineSourceInputDigest===record.build.baselineSourceInputDigest&&presentation.sourceInputDigest===record.build.sourceInputDigest,'Presentation baseline/protected inputs differ.');
+ else ensure(record.activationCompatibility?.basis!=='reviewed-public-presentation-v1'&&sourceInputs(record.baseSha)===record.build.sourceInputDigest,'Baseline runtime/build inputs differ.');
  if(!afterWrite)validateActivationCompatibility(record.activationCompatibility,compatibilityInput(record));
  ensure((await bundleDigest('dist/client')).sha256===record.build.pages.sha256&&(await bundleDigest('dist/admin')).sha256===record.build.admin.sha256,'Client output changed after planning.');
  for(const c of Object.keys(record.build.private)){
+  if(record.build.private[c].assetManifest){const facts=await adminAssetManifestInputs(),retained=record.build.private[c].assetManifest,keys=ADMIN_INPUT_KEYS.filter(k=>!local||k!=='metafileSha256');ensure(c==='admin'&&keys.every(k=>facts[k]===retained[k]),'Admin candidate compiler input/manifest/assets changed.');}
   ensure((await bundleDigest(`dist/release/private/${c}`,{runtimeOnly:true})).sha256===record.build.private[c].runtimeDigest&&hash(await readFile(`wrangler.${c}.jsonc`))===record.build.private[c].configDigest,'Private comparison bytes/config changed after planning.');
  }
 }
