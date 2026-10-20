@@ -37,3 +37,31 @@ test('disabling sending can recover from missing provider keys in currently enab
 });
 
 test('preview and local environments cannot enable private order capture',()=>{for(const name of ['local','preview'])for(const flag of ['ORDER_RECORDS_ENABLED','ARTWORK_STORAGE_ENABLED']){const c=config();(name==='local'?c:c.env[name]).vars[flag]='true';assert.throws(()=>validateConfig(c));}});
+
+test('admin guard preserves sign-in, gate and manual sending and rejects wrong current version',async()=>{
+ const {validateAdmin,checkAdmin}=await import('../scripts/check-admin-deployment.mjs');
+ const c={account_id:'4f57d4e924674cb87b33d4c884745cf6',name:'customvibe-admin',workers_dev:false,preview_urls:false,assets:{run_worker_first:true}};
+ const settings={bindings:[{name:'SITE_GATE_ENABLED',text:'true'},{name:'ADMIN_SEND_ENABLED',text:'true'},{name:'AUTH',service:'customvibe-security'},...['ADMIN_PASSWORD_HASH','ADMIN_SESSION_SECRET','RESEND_API_KEY'].map(name=>({name,type:'secret_text'}))]};
+ validateAdmin(c,settings);
+ for(const mutation of [s=>s.bindings.splice(0,1),s=>s.bindings[2].service='wrong',s=>s.bindings.pop()]){const altered=structuredClone(settings);mutation(altered);assert.throws(()=>validateAdmin(c,altered));}
+ await assert.rejects(()=>checkAdmin({expectedVersion:'wrong',request:async path=>path.endsWith('/settings')?{success:true,result:settings}:{success:true,result:{deployments:[{created_on:'2026-10-19T00:00:00Z',versions:[{version_id:'12345678-1234-1234-1234-123456789abc',percentage:100}]}]}}}),/version/);
+});
+test('private service guard rejects public exposure and foreign storage destinations',async()=>{
+ const {validateCatalogue}=await import('../scripts/check-catalogue-deployment.mjs');
+ const {validateSecurity}=await import('../scripts/check-security-deployment.mjs');
+ const {readFile}=await import('node:fs/promises');
+ const catalogue=JSON.parse(await readFile(new URL('../wrangler.catalogue.jsonc',import.meta.url)));
+ const security=JSON.parse(await readFile(new URL('../wrangler.security.jsonc',import.meta.url)));
+ const cSettings={bindings:[{name:'CONTENT_DB',type:'d1',id:catalogue.d1_databases[0].database_id}]};
+ const sSettings={bindings:[...security.d1_databases.map(d=>({name:d.binding,type:'d1',id:d.database_id})),...security.kv_namespaces.map(k=>({name:k.binding,type:'kv_namespace',namespace_id:k.id})),...security.r2_buckets.map(b=>({name:b.binding,type:'r2_bucket',bucket_name:b.bucket_name}))]};
+ validateCatalogue(catalogue,cSettings);validateSecurity(security,sSettings);
+ assert.throws(()=>validateCatalogue({...catalogue,workers_dev:true},cSettings));assert.throws(()=>validateCatalogue(catalogue,{bindings:[]}));
+ assert.throws(()=>validateSecurity({...security,routes:['public.example/*']},sSettings));assert.throws(()=>validateSecurity(security,{bindings:[]}));
+});
+
+test('final Pages guard rejects same-source replacement deployment IDs',()=>{
+ const id='12345678-1234-1234-1234-123456789abc',replacement='87654321-1234-1234-1234-123456789abc';
+ const deployment={id:replacement,environment:'production',latest_stage:{status:'success'},...project().deployment_configs.production,deployment_trigger:{metadata:{commit_hash:'expected-commit'}}};
+ assert.throws(()=>validateDeployment(deployment,'true','expected-commit',id));
+ validateDeployment({...deployment,id},'true','expected-commit',id);
+});

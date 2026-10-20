@@ -1,0 +1,382 @@
+// Exercise real CLI state transitions. Process/provider shims are child-only and synthetic.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,writeFile,mkdir,readFile,rm,copyFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const cli=fileURLToPath(new URL('../scripts/release-manifest.mjs',import.meta.url));
+const sha='a'.repeat(40),old='b'.repeat(40),id='12345678-1234-1234-1234-123456789abc',next='87654321-1234-1234-1234-123456789abc';
+const marker='PRIVATE_SENTINEL_MUST_NOT_PERSIST';
+const preload=`
+const cp=require('node:child_process'),fs=require('node:fs');
+const sha=process.env.FIXTURE_SOURCE_SHA||'${sha}',old=process.env.FIXTURE_BASE_SHA||'${old}',id=process.env.FIXTURE_BEFORE_ID||'${id}',next=process.env.FIXTURE_NEXT_ID||'${next}';
+cp.execFileSync=(program,args)=>{
+ if(program==='git'){
+  if(args[0]==='status')return '';
+  if(args[0]==='diff'&&args[1]==='--name-status')return (process.env.ARCHIVE_STATUS||'A')+'\\t'+args.at(-1);
+  if(args[0]==='diff')return process.env.CHANGED_PATH||'docs/release-process.md';
+  if(args[0]==='merge-base')return old;
+  if(args[0]==='ls-tree'&&args[1]!=='-r'){const file=args.at(-1),bytes=fs.readFileSync(file),blob=require('node:crypto').createHash('sha1').update(Buffer.concat([Buffer.from('blob '+bytes.length+'\\0'),bytes])).digest('hex');return (process.env.ARCHIVE_MODE||'100644')+' blob '+(process.env.ARCHIVE_BLOB||blob)+'\\t'+file;}
+  if(args[0]==='show')return 'export default {};';
+  if(args[0]==='ls-tree')return 'security/index.mjs\\ncatalogue/index.mjs\\nserver/proof-api.mjs';
+  return sha;
+ }
+ if(program==='gh'){if(process.env.FAIL_CONTEXT==='true')throw Error('${marker}');return JSON.stringify({object:{sha:process.env.DRIFT==='true'?old:sha}});}
+ if(program==='npx'){
+  fs.appendFileSync('provider-calls.log',args.join(' ')+'\\n');
+  if(process.env.UPLOAD_RESULT==='success'){fs.writeFileSync('uploaded','yes');return 'synthetic acknowledgement';}
+  throw Object.assign(Error('${marker}'),{stdout:'${marker}',stderr:'${marker}'});
+ }
+ if(program===process.execPath){
+  fs.appendFileSync('guard-calls.log',args.join(' ')+'\\n');
+  if(process.env.FAIL_GUARDS==='true'&&args.at(-1)==='after')throw Error('${marker}');return '';
+ }
+ throw Error('Unexpected process');
+};
+
+const fakeApi=\`
+import fs from 'node:fs';
+export const unstable_pages={async deploy(options){
+ fs.appendFileSync('provider-calls.log','official-pages-api\\\\n');
+ if(process.env.UPLOAD_RESULT!=='success')throw Error('PRIVATE_SENTINEL_MUST_NOT_PERSIST');
+ fs.writeFileSync('uploaded','yes');
+ const config=JSON.parse(fs.readFileSync('wrangler.jsonc','utf8')),production=config.env.production;
+ const main='functionsWorker-0.123.js',metadata={main_module:main,bindings:[...Object.entries(production.vars).map(([name,text])=>({name,type:'plain_text',text})),...production.services.map(v=>({name:v.binding,type:'service',service:v.service}))],compatibility_date:config.compatibility_date,compatibility_flags:[],limits:config.limits};
+ const inner=new FormData();inner.set('metadata',JSON.stringify(metadata));inner.set(main,new File(['export default {};'],main,{type:'application/javascript+module'}));
+ const outer=new FormData();outer.set('_worker.bundle',new File([await new Response(inner).arrayBuffer()],'_worker.bundle'));outer.set('manifest',JSON.stringify({'/index.html':'a'.repeat(32)}));outer.set('branch','main');outer.set('commit_hash',options.commitHash);outer.set('commit_dirty','false');outer.set('wrangler_config_hash',requireHash(fs.readFileSync('wrangler.jsonc')));outer.set('pages_build_output_dir','dist/client');outer.set('functions-filepath-routing-config.json',new File(['{"routes":[]}'],'functions-filepath-routing-config.json'));
+ if(process.env.BAD_UPLOAD_PAYLOAD==='multipart')outer.set('_worker.bundle',new File(['PRIVATE_INVALID_MULTIPART_SENTINEL'],'_worker.bundle'));
+ if(process.env.BAD_UPLOAD_PAYLOAD==='metadata'){const altered=new FormData();altered.set('metadata',JSON.stringify({...metadata,private:'PRIVATE_METADATA_SENTINEL'}));altered.set(main,new File(['PRIVATE_CODE_SENTINEL'],main,{type:'application/javascript+module'}));outer.set('_worker.bundle',new File([await new Response(altered).arrayBuffer()],'_worker.bundle'));}
+ if(process.env.ACK_THEN_MUTATE==='true')fs.writeFileSync('dist/client/index.html','changed after acknowledgement');
+ return {formData:outer,deploymentResponse:{id:process.env.WRONG_ACK_ID==='true'?'11111111-1234-1234-1234-123456789abc':(process.env.FIXTURE_NEXT_ID||'${next}'),environment:process.env.INVALID_ACK==='environment'?'preview':'production',created_on:process.env.INVALID_ACK==='date'?'PRIVATE_DATE_SENTINEL':new Date().toISOString(),deployment_trigger:{metadata:{commit_hash:process.env.INVALID_ACK==='source'?'${old}':options.commitHash}},diagnostic:'PRIVATE_SENTINEL_MUST_NOT_PERSIST'}};
+}};
+import {createHash} from 'node:crypto';const requireHash=x=>createHash('sha256').update(x).digest('hex');
+\`;
+require('node:module').registerHooks({resolve(specifier,context,nextResolve){if(specifier==='wrangler'&&context.conditions.includes('import'))return {url:'data:text/javascript,'+encodeURIComponent(fakeApi),shortCircuit:true};return nextResolve(specifier,context);}});
+
+require('node:module').syncBuiltinESMExports();
+global.fetch=async url=>{
+ fs.appendFileSync('request-calls.log',String(url)+'\\n');
+ if(!String(url).includes('/pages/projects/customvibe-business'))throw Error('Private request attempted');
+ return {ok:true,json:async()=>({success:true,result:{canonical_deployment:{id:fs.existsSync('uploaded')?next:id,latest_stage:{status:'success'},deployment_trigger:{metadata:{commit_hash:fs.existsSync('uploaded')?sha:old}}}}})};
+};
+`;
+async function fixture(t){
+ const dir=await mkdtemp(join(tmpdir(),'customvibe-release-cli-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+ await mkdir(join(dir,'dist/release'),{recursive:true});
+ for(const side of ['client','admin','ssr']){await mkdir(join(dir,'dist',side));await writeFile(join(dir,'dist',side,'index.html'),'fixture');}
+ await writeFile(join(dir,'preload.cjs'),preload);
+ for(const name of ['wrangler.jsonc','package-lock.json'])await copyFile(join(root,name),join(dir,name));
+ for(const family of ['security','content']){await mkdir(join(dir,'migrations',family),{recursive:true});await writeFile(join(dir,'migrations',family,'0001.sql'),'-- fixture only');await writeFile(join(dir,family==='security'?'wrangler.security.jsonc':'wrangler.catalogue.jsonc'),JSON.stringify({d1_databases:[{database_name:family,database_id:id}]}));}
+ await writeFile(join(dir,'wrangler.admin.jsonc'),'{}');
+ const path=join(dir,'dist/release/release-manifest.json');
+ const baseline={schemaVersion:1,repository:'TIMMMYYYHHHH/Customvibev3',state:'partial',sourceSha:old,baseSha:old,reviewed:true,evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/100'};
+ const evidence={baseline,sourceSha:sha};
+ const env={PATH:process.env.PATH,TMPDIR:tmpdir(),GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:baseline.repository,GITHUB_REF:'refs/heads/main',GITHUB_SHA:sha,GITHUB_EVENT_NAME:'workflow_dispatch',REVIEWED_SHA:sha,GITHUB_RUN_ID:'123',CLOUDFLARE_ACCOUNT_ID:'4f57d4e924674cb87b33d4c884745cf6',CLOUDFLARE_API_TOKEN:'synthetic-pages-only-token',WRANGLER_SEND_METRICS:'false',RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)};
+ const fixture={dir,path,evidence,async run(args,extra={}){
+  let result;try{result={status:0,stdout:execFileSync(process.execPath,['--require',join(dir,'preload.cjs'),cli,...args],{cwd:dir,env:{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence),...extra},encoding:'utf8',stdio:['ignore','pipe','pipe']})};}catch(e){result={status:e.status,stdout:String(e.stdout||''),stderr:String(e.stderr||'')};}
+  const text=await readFile(path,'utf8').catch(()=> '{}');
+  const log=name=>readFile(join(dir,name),'utf8').catch(()=> '');
+  return {...result,text,record:JSON.parse(text),calls:await log('guard-calls.log'),requests:await log('request-calls.log'),uploads:await log('provider-calls.log')};
+ }};
+ const seed=await fixture.run(['plan']);
+ if(!seed.record.build)throw Error('Fixture source/build setup failed: '+JSON.stringify(seed));
+ evidence.activationCompatibility={basis:'source-input-tooling-only-v1',reviewedAgainstSha:sha,baselineSha:old,observedAt:new Date().toISOString(),sourceInputDigest:seed.record.build.sourceInputDigest,compilerConfigDigest:seed.record.build.compiler.compilerConfigDigest,configDigest:seed.record.build.compiler.configDigest,pagesBuildDigest:seed.record.build.pages.sha256,adminAssetsDigest:seed.record.build.admin.sha256,historicalFunctionsDigest:null};
+ for(const log of ['guard-calls.log','request-calls.log','provider-calls.log'])await writeFile(join(dir,log),'');
+ return fixture;
+}
+test('Pages-only publication needs no private request and records partial unknown compatibility',async t=>{
+ const f=await fixture(t);assert.equal((await f.run(['plan'])).status,0);
+ const published=await f.run(['publish','pages'],{UPLOAD_RESULT:'success'});assert.equal(published.status,0,JSON.stringify(published));
+ const done=await f.run(['finish']);assert.equal(done.status,0);assert.equal(done.record.state,'partial');
+ assert.equal(done.record.completed.pages.id,next);assert.equal(done.record.prerequisites.components.catalogue.status,'blocked');
+ assert.equal(done.record.prerequisites.schema.content.status,'blocked');assert.ok(!done.requests.includes('/workers/'));assert.ok(!done.uploads.includes('d1'));
+});
+test('required private/schema and shared Admin staged evidence fail closed before upload',async t=>{
+ for(const path of ['security/orders.mjs','catalogue/index.mjs','src/App.jsx']){
+  const f=await fixture(t);const plan=await f.run(['plan'],{CHANGED_PATH:path});assert.equal(plan.status,1);assert.equal(plan.record.state,'blocked');
+  const upload=await f.run(['publish','pages']);assert.equal(upload.status,1);assert.equal(upload.uploads,'');assert.ok(!upload.requests.includes('/workers/'));
+ }
+});
+test('missing baseline or source drift never uploads and stores only sanitized stage errors',async t=>{
+ for(const extra of [{RELEASE_EVIDENCE_JSON:''},{DRIFT:'true'},{FAIL_CONTEXT:'true'}]){
+  const f=await fixture(t);const result=await f.run(['plan'],extra);assert.equal(result.status,1);assert.equal(result.record.state,'blocked');assert.equal(result.uploads,'');
+  assert.ok(!result.text.includes(marker));assert.ok(!(result.stdout+result.stderr).includes(marker));
+ }
+});
+test('lost Pages acknowledgement still observes protection and preserves failure',async t=>{
+ const f=await fixture(t);await f.run(['plan']);const result=await f.run(['publish','pages']);
+ assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.attempts[0].outcome,'unconfirmed');assert.equal(result.record.completed.pages,undefined);
+ assert.equal(result.record.attempts[0].protection.status,'failed');assert.equal(result.record.attempts[0].protection.checks[0].identityCode,'FINAL_IDENTITY_DRIFT');assert.match(result.calls,/check-deployment.mjs after/);assert.ok(!result.text.includes(marker));
+ const final=await f.run(['finish']);assert.equal(final.status,1);assert.equal(final.record.state,'partial');assert.equal(final.record.attempts[0].outcome,'unconfirmed');
+});
+test('post-attempt guard failure preserves the primary upload failure and final observation',async t=>{
+ const f=await fixture(t);await f.run(['plan']);const result=await f.run(['publish','pages'],{FAIL_GUARDS:'true'});
+ assert.equal(result.status,1);assert.equal(result.record.attempts[0].protection.status,'failed');assert.match(result.record.reasons.join('\n'),/PUBLICATION_FAILED/);assert.match(result.record.reasons.join('\n'),/POST_ATTEMPT_GUARD_FAILED/);
+ const done=await f.run(['finish'],{FAIL_CONTEXT:'true',FAIL_GUARDS:'true'});assert.equal(done.status,1);assert.equal(done.record.finalProtection.status,'failed');assert.equal(done.record.state,'partial');assert.ok(!done.text.includes(marker));
+});
+test('Admin publication and local completion cannot run from GitHub or use its Pages credential',async t=>{
+ const f=await fixture(t);const admin=await f.run(['publish','admin']);assert.equal(admin.status,1);assert.equal(admin.uploads,'');assert.equal(admin.requests,'');
+ const local=await f.run(['finish-local']);assert.equal(local.status,1);assert.equal(local.uploads,'');assert.equal(local.requests,'');
+});
+
+test('Pages drift and changed built output abort before an upload attempt',async t=>{
+ for(const mutate of [async f=>writeFile(join(f.dir,'uploaded'),'unrelated newer release'),async f=>writeFile(join(f.dir,'dist/client/index.html'),'changed after planning')]){
+  const f=await fixture(t);await f.run(['plan']);await mutate(f);const result=await f.run(['publish','pages']);
+  assert.equal(result.status,1);assert.equal(result.uploads,'');assert.equal(result.record.attempts,undefined);
+ }
+});
+test('local final failure still attempts every protection independently',async t=>{
+ const f=await fixture(t);await f.run(['plan']);await f.run(['publish','pages'],{UPLOAD_RESULT:'success'});
+ await writeFile(join(f.dir,'guard-calls.log'),'');
+ const result=await f.run(['finish-local'],{GITHUB_ACTIONS:'false',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',FAIL_CONTEXT:'true',FAIL_GUARDS:'true'});
+ assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.finalProtection.checks.length,4);
+ assert.equal(result.record.finalProtection.checks.filter(v=>v.identityCode==='FINAL_IDENTITY_OBSERVATION_FAILED').length,4);
+ for(const name of ['check-deployment','check-admin-deployment','check-security-deployment','check-catalogue-deployment'])assert.match(result.calls,new RegExp(name+'[.]mjs'));
+ assert.ok(!result.text.includes(marker));assert.match(result.record.reasons.join('\n'),/LOCAL_VERIFICATION_FAILED/);
+});
+
+
+// Real final guard programs run against synthetic metadata. The parent CLI's
+// existing helper transport is simulated at the socket boundary, with no socket
+// listener and no network. The race starts after its initial version readback.
+async function completionFixture(t){
+ const f=await fixture(t),root=fileURLToPath(new URL('../',import.meta.url));
+ const hash=value=>createHash('sha256').update(value).digest('hex');
+ const components={};
+ for(const c of ['admin','security','catalogue']){
+  await mkdir(join(f.dir,'dist/release/private',c),{recursive:true});await writeFile(join(f.dir,'dist/release/private',c,'worker.js'),'fixture-worker');
+  components[c]={runtimeDigest:hash(JSON.stringify([['worker.js',hash('fixture-worker')]])),configDigest:hash(await readFile(join(f.dir,`wrangler.${c}.jsonc`)))};
+ }
+ await writeFile(join(f.dir,'dist/release/private-build-manifest.json'),JSON.stringify({sourceSha:sha,components}));
+ const evidence={...f.evidence,guards:Object.fromEntries(['admin','security','catalogue'].map(c=>[c,{id}]))};
+ let source=preload.replace('cp.execFileSync=(program,args)=>{','const actualExec=cp.execFileSync;cp.execFileSync=(program,args,options={})=>{');
+ const a=source.indexOf(' if(program===process.execPath){'),b=source.indexOf("\n throw Error('Unexpected process');",a);
+ source=source.slice(0,a)+`
+ if(program===process.execPath){
+  fs.appendFileSync('guard-calls.log',args.join(' ')+'\\n');
+  if(process.env.RACE_COMPONENT&&!fs.existsSync('race-on'))fs.writeFileSync('race-on',process.env.RACE_COMPONENT);
+  if(process.env.FAIL_FINAL_IDENTITY)fs.writeFileSync('final-readback','yes');
+  fs.appendFileSync('guard-bindings.log',JSON.stringify({script:args[0],expected:Object.fromEntries(Object.entries(options.env||{}).filter(([k])=>k.startsWith('EXPECTED_')))})+'\\n');
+  return actualExec(process.execPath,['--require',require('node:path').resolve('guard-preload.cjs'),require('node:path').join(${JSON.stringify(root)},args[0]),...args.slice(1)],{cwd:process.cwd(),env:{...(options.env||process.env),CUSTOMVIBE_MIGRATION_SOCKET:'',CLOUDFLARE_API_TOKEN:'synthetic-guard-token'},encoding:'utf8',stdio:['ignore','pipe','pipe']});
+ }
+`+source.slice(b);
+ const metadata=`
+const replacement='11111111-1234-1234-1234-123456789abc';
+function version(c){const raced=fs.existsSync('race-on')?fs.readFileSync('race-on','utf8'):'';return raced===c?(c==='pages'?replacement:next):(c==='pages'&&fs.existsSync('uploaded')?next:id);}
+function metadata(path){
+ if(path.includes('/pages/'))return {success:true,result:{canonical_deployment:{id:version('pages'),latest_stage:{status:'success'},deployment_trigger:{metadata:{commit_hash:fs.existsSync('race-on')&&fs.readFileSync('race-on','utf8')==='pages-source'?old:fs.existsSync('uploaded')?sha:old}}}}};
+ for(const c of ['admin','security','catalogue'])if(path.includes('customvibe-'+c+'/deployments'))return {success:true,result:{deployments:[{created_on:'2026-10-20T00:00:00.000Z',versions:[{version_id:version(c),percentage:100}]}]}};
+ throw Error('Unexpected synthetic helper metadata path');
+}
+`;
+ source+=metadata+`
+const net=require('node:net'),{EventEmitter}=require('node:events');
+net.createConnection=()=>{
+ const connection=new EventEmitter();connection.setTimeout=()=>connection;
+ connection.write=line=>{const request=JSON.parse(line);if(request.method!=='GET'||request.account!=='4f57d4e924674cb87b33d4c884745cf6')throw Error('Unexpected helper operation');fs.appendFileSync('helper-calls.log',request.path+'\\n');if(process.env.FAIL_FINAL_IDENTITY&&fs.existsSync('final-readback')&&request.path.includes('customvibe-'+process.env.FAIL_FINAL_IDENTITY+'/deployments')){setImmediate(()=>connection.emit('error',Error('${marker}')));return;}setImmediate(()=>connection.emit('data',Buffer.from(JSON.stringify(metadata(request.path))+'\\n')));};
+ connection.end=()=>setImmediate(()=>connection.emit('end'));connection.destroy=error=>connection.emit('error',error);
+ setImmediate(()=>connection.emit('connect'));return connection;
+};
+require('node:module').syncBuiltinESMExports();
+`;
+ await writeFile(join(f.dir,'preload.cjs'),source);
+ const security=JSON.parse(await readFile(join(root,'wrangler.security.jsonc'),'utf8')),catalogue=JSON.parse(await readFile(join(root,'wrangler.catalogue.jsonc'),'utf8'));
+ const bindings=[...(security.d1_databases||[]).map(v=>({name:v.binding,type:'d1',id:v.database_id})),...(security.kv_namespaces||[]).map(v=>({name:v.binding,type:'kv_namespace',namespace_id:v.id})),...(security.r2_buckets||[]).map(v=>({name:v.binding,type:'r2_bucket',bucket_name:v.bucket_name}))];
+ const guardSource=`const fs=require('node:fs');const sha='${sha}',old='${old}',id='${id}',next='${next}';${metadata}
+const services={AUTH:{service:'customvibe-security'},CATALOGUE:{service:'customvibe-catalogue'}};
+const privateKeys=['SITE_PASSWORD_HASH','SITE_PASSWORD_SALT','SESSION_SECRET','RESEND_API_KEY','W3FORMS_ACCESS_KEY','TURNSTILE_SECRET_KEY','TURNSTILE_SITE_KEY'];
+function settings(c){if(c==='admin')return {bindings:[{name:'SITE_GATE_ENABLED',text:'true'},{name:'ADMIN_SEND_ENABLED',text:'true'},{name:'AUTH',service:'customvibe-security'},...['ADMIN_PASSWORD_HASH','ADMIN_SESSION_SECRET','RESEND_API_KEY'].map(name=>({name,type:'secret_text'}))]};if(c==='security')return {bindings:${JSON.stringify(bindings)}};return {bindings:[{name:'CONTENT_DB',type:'d1',id:${JSON.stringify(catalogue.d1_databases[0].database_id)}}]};}
+global.fetch=async url=>{const path=String(url);let payload;
+ if(path.endsWith('/accounts/4f57d4e924674cb87b33d4c884745cf6'))payload={success:true,result:{id:'4f57d4e924674cb87b33d4c884745cf6'}};
+ else if(path.includes('/pages/')){
+  payload=metadata(path);const environments=Object.fromEntries(['production','preview'].map(c=>[c,{fail_open:false,services,env_vars:{SITE_GATE_ENABLED:{value:'true'},SUBMISSIONS_ENABLED:{value:c==='production'?'true':'false'},...Object.fromEntries(privateKeys.map(name=>[name,{type:'secret_text'}]))}}]));
+  payload.result={...payload.result,name:'customvibe-business',production_branch:'main',deployment_configs:environments};payload.result.canonical_deployment={...payload.result.canonical_deployment,environment:'production',...environments.production};
+ }else if(path.endsWith('/settings')){const c=['admin','security','catalogue'].find(c=>path.includes('customvibe-'+c+'/'));if(!c)throw Error('Unexpected guard');payload={success:true,result:settings(c)};}
+ else payload=metadata(path);
+ return {ok:true,json:async()=>payload};
+};`;
+ await writeFile(join(f.dir,'guard-preload.cjs'),guardSource);
+ const planned=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(planned.status,0,JSON.stringify(planned));
+ const uploaded=await f.run(['publish','pages'],{UPLOAD_RESULT:'success'});assert.equal(uploaded.status,0);
+ const record=uploaded.record,observedAt=new Date().toISOString(),account='4f57d4e924674cb87b33d4c884745cf6';
+ const finalEvidence={sourceSha:sha,guards:{},receipts:{},schema:{}};
+ for(const c of ['admin','security','catalogue']){
+  finalEvidence.guards[c]={account,component:c,id,origin:'private-helper-get',candidateSha:sha,observedAt,protection:'passed'};
+  finalEvidence.receipts[c]={account,component:c,id,sourceSha:sha,sourceDigest:record.sourceDigests[c],...components[c],...(c==='admin'?{assetsDigest:record.build.admin.sha256}:{}),origin:'guarded-upload',evidenceUrl:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123',observedAt};
+ }
+ for(const family of ['security','content']){const item=record.schemaSources[family];finalEvidence.schema[family]={origin:'console-metadata',databaseId:item.databaseId,reviewedAgainstSha:sha,observedAt,sourceFiles:item.source,applied:item.source.map(v=>v.name),objectsDigest:'c'.repeat(64),ddlReviewed:true};}
+ await writeFile(join(f.dir,'guard-calls.log'),'');
+ const artifactBytes=await readFile(f.path);finalEvidence.githubArtifact={origin:'owner-github-run-artifact',reviewed:true,sourceSha:sha,runId:'123',url:'https://github.com/TIMMMYYYHHHH/Customvibev3/actions/runs/123',artifactName:'release-manifest-123',runStatus:'completed',conclusion:'success',manifestSha256:hash(artifactBytes)};
+ return {...f,finalEvidence,local(extra={}){return f.run(['finish-local'],{GITHUB_ACTIONS:'false',CLOUDFLARE_API_TOKEN:'',CUSTOMVIBE_MIGRATION_SOCKET:'/synthetic-only',RELEASE_EVIDENCE_JSON:JSON.stringify(finalEvidence),...extra});}};
+}
+test('real CLI local completion verifies unchanged final component identities',async t=>{
+ const f=await completionFixture(t),result=await f.local();assert.equal(result.status,0);assert.equal(result.record.state,'verified');
+});
+for(const component of ['pages','pages-source','admin','security','catalogue'])test(`real CLI rejects ${component} replacement between initial readback and final actual guards`,async t=>{
+ const f=await completionFixture(t),result=await f.local({RACE_COMPONENT:component});
+ assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.guards.publication,'incomplete');
+ assert.equal(result.record.finalProtection.checks.length,4);
+ for(const name of ['check-deployment','check-admin-deployment','check-security-deployment','check-catalogue-deployment'])assert.match(result.calls,new RegExp(name+'[.]mjs'));
+ const check=result.record.finalProtection.checks.find(v=>v.component===(component==='pages-source'?'pages':component));
+ assert.equal(check.identityCode,'FINAL_IDENTITY_DRIFT');assert.equal(check.code,'PROTECTION_OBSERVATION_FAILED');
+ assert.equal(check.expectedId,component.startsWith('pages')?next:id);
+ assert.equal(check.observedId,component==='pages'?'11111111-1234-1234-1234-123456789abc':component==='pages-source'?next:next);
+ if(component==='pages-source')assert.equal(check.observedSourceSha,old);
+ assert.match(result.record.reasons.join('\n'),/FINAL_IDENTITY_FAILED/);assert.ok(!result.text.includes(marker));
+});
+
+
+test('passing final identities cannot erase a prior local publication failure',async t=>{
+ const f=await completionFixture(t);const record=JSON.parse(await readFile(f.path,'utf8'));
+ record.reasons.push('PUBLICATION_FAILED: prior synthetic uncertain attempt');await writeFile(f.path,JSON.stringify(record));
+ const result=await f.local();assert.equal(result.status,1);assert.equal(result.record.state,'partial');
+ assert.equal(result.record.finalProtection.status,'passed');assert.match(result.record.reasons.join('\n'),/PUBLICATION_FAILED/);
+ assert.equal(result.record.finalProtection.checks.filter(v=>v.identityStatus==='passed').length,4);
+});
+test('one failed final identity read cannot suppress the other component readbacks',async t=>{
+ const f=await completionFixture(t),result=await f.local({FAIL_FINAL_IDENTITY:'admin'});
+ assert.equal(result.status,1);assert.equal(result.record.state,'partial');
+ assert.equal(result.record.finalProtection.checks.find(v=>v.component==='admin').identityCode,'FINAL_IDENTITY_OBSERVATION_FAILED');
+ assert.equal(result.record.finalProtection.checks.filter(v=>v.identityStatus==='passed').length,3);
+ assert.match(result.record.reasons.join('\n'),/FINAL_IDENTITY_FAILED/);assert.ok(!result.text.includes(marker));
+});
+
+// Execute the installed public API with a no-network Undici dispatcher. The
+// dispatcher sees actual serialized POST bytes, not a replacement deploy stub.
+test('installed pinned Pages API receipt matches each actual submitted inner File despite randomized compiler module names',async t=>{
+ const dir=await mkdtemp(join(tmpdir(),'customvibe-pages-api-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+ const root=fileURLToPath(new URL('../',import.meta.url));
+ const script=`
+ import fs from 'node:fs/promises';import {createRequire} from 'node:module';import {createHash} from 'node:crypto';
+ import {officialPagesUpload,capturePagesUpload} from ${JSON.stringify(new URL('../scripts/release-manifest.mjs',import.meta.url).href)};
+ const require=createRequire(${JSON.stringify(new URL('../package.json',import.meta.url).href)}),{setGlobalDispatcher}=require('undici');
+ const hash=v=>createHash('sha256').update(v).digest('hex'),sha='${sha}',id='${id}';
+ await fs.mkdir('dist/client',{recursive:true});await fs.mkdir('functions');
+ await fs.writeFile('dist/client/index.html','synthetic noncustomer asset');await fs.writeFile('functions/[[path]].js','export function onRequest(){return new Response("PRIVATE_CODE_SENTINEL")}');
+ await fs.copyFile(${JSON.stringify(join(root,'wrangler.jsonc'))},'wrangler.jsonc');
+ for(const k of ['_headers','_redirects','_routes.json'])await fs.writeFile('dist/client/'+k,k==='_routes.json'?JSON.stringify({version:1,include:['/*'],exclude:[]}):k==='_headers'?'/*\\n  X-Content-Type-Options: nosniff':'/old / 302');
+ let captured=[],mode='success',postCount=0;
+ setGlobalDispatcher({dispatch(options,handler){(async()=>{
+  if(String(options.origin)!=='https://api.cloudflare.com')throw Error('Unexpected synthetic origin');
+  let chunks=[];if(options.body)for await(const c of options.body)chunks.push(Buffer.from(c));const bytes=Buffer.concat(chunks);let result;
+  if(options.path.endsWith('/upload-token'))result={jwt:'e30.'+Buffer.from('{}').toString('base64url')+'.x'};
+  else if(options.path.endsWith('/check-missing'))result=[];
+  else if(options.path.endsWith('/upsert-hashes'))result={};
+  else if(options.path.endsWith('/deployments')){
+   postCount++;const posted=await new Response(bytes,{headers:{'content-type':options.headers['content-type']}}).formData();const worker=posted.get('_worker.bundle');const raw=Buffer.from(await worker.arrayBuffer());
+   const boundary=raw.subarray(2,raw.indexOf('\\r\\n')).toString();const parts=await new Response(raw,{headers:{'content-type':'multipart/form-data; boundary='+boundary}}).formData();const metadata=JSON.parse(parts.get('metadata'));const module=parts.get(metadata.main_module);captured.push({rawHash:hash(raw),moduleHash:hash(Buffer.from(await module.arrayBuffer())),bytes:raw.length,submittedSha:posted.get('commit_hash'),outerFileType:worker.type});
+   if(mode==='lost')throw Error('PRIVATE_PROVIDER_SENTINEL');
+   result={id,environment:'production',created_on:new Date().toISOString(),deployment_trigger:{metadata:{commit_hash:sha}},diagnostic:'PRIVATE_PROVIDER_SENTINEL'};
+  }else if(options.path.endsWith('/pages/projects/customvibe-business'))result={production_branch:'main',deployment_configs:{production:{compatibility_date:'2026-06-16'}}};
+  else throw Error('Unexpected synthetic path');
+  handler.onConnect(()=>{});handler.onHeaders(200,['content-type','application/json'],()=>{},'OK');handler.onData(Buffer.from(JSON.stringify({success:true,result})));handler.onComplete([]);
+ })().catch(e=>handler.onError(e));return true;}});
+ const config=JSON.parse(await fs.readFile('wrangler.jsonc','utf8')),assetInventory=[];
+ for(const path of ['index.html','_headers','_redirects','_routes.json']){const b=await fs.readFile('dist/client/'+path);assetInventory.push({path,sha256:hash(b),bytes:b.length});}
+ const expected={sourceSha:sha,runId:'123',sourceInputDigest:'c'.repeat(64),compilerConfigDigest:hash(await fs.readFile(require.resolve('wrangler'))),configDigest:hash(await fs.readFile('wrangler.jsonc')),buildDigest:'c'.repeat(64),assetsDigest:'c'.repeat(64),config,assetInventory,controls:Object.fromEntries(assetInventory.filter(v=>v.path!=='index.html').map(({path,...v})=>[path,v]))};
+ const {unstable_pages}=require('wrangler'),proofs=[],returnedMime=[];for(let i=0;i<2;i++){const result=await unstable_pages.deploy({directory:'dist/client',accountId:'4f57d4e924674cb87b33d4c884745cf6',projectName:'customvibe-business',branch:'main',commitHash:sha,commitDirty:false,functionsDirectory:'functions',bundle:true,sourceMaps:false,args:{config:'wrangler.jsonc'}});returnedMime.push(result.formData.get('_worker.bundle').type);proofs.push(await capturePagesUpload(result,expected));}proofs.push(await officialPagesUpload(expected));
+ mode='lost';let failure='';try{await officialPagesUpload(expected)}catch(e){failure=e.message;}
+ console.log(JSON.stringify({proofs,captured,returnedMime,postCount,failure}));
+ `;
+ await writeFile(join(dir,'fixture.mjs'),script);
+ const output=execFileSync(process.execPath,[join(dir,'fixture.mjs')],{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe'],env:{PATH:process.env.PATH,TMPDIR:tmpdir(),CLOUDFLARE_API_TOKEN:'PRIVATE_TOKEN_SENTINEL',CLOUDFLARE_ACCOUNT_ID:'4f57d4e924674cb87b33d4c884745cf6',WRANGLER_SEND_METRICS:'false',WRANGLER_WRITE_LOGS:'false',WRANGLER_LOG:'none'}});
+ const result=JSON.parse(output);assert.equal(result.postCount,4);assert.equal(result.proofs.length,3);assert.deepEqual(result.returnedMime,['','']);
+ for(let i=0;i<3;i++){assert.equal(result.proofs[i].uploadedBundleDigest,result.captured[i].rawHash);assert.equal(result.proofs[i].uploadedBundleBytes,result.captured[i].bytes);assert.equal(result.proofs[i].uploadedModuleInventory[0].sha256,result.captured[i].moduleHash);assert.equal(result.captured[i].submittedSha,sha);assert.equal(result.proofs[i].acknowledgement.id,id);}
+ assert.notEqual(result.proofs[0].uploadedBundleDigest,result.proofs[1].uploadedBundleDigest);assert.notEqual(result.proofs[0].uploadedModuleInventory[0].name,result.proofs[1].uploadedModuleInventory[0].name);
+ assert.match(result.failure,/Official Pages upload or fingerprint validation failed/);assert.doesNotMatch(output,/PRIVATE_|export function|Authorization|Bearer|jwt|diagnostic/);
+});
+
+test('post-acknowledgement build failure retains the actual upload receipt and remains unconfirmed',async t=>{
+ const f=await fixture(t);await f.run(['plan']);const result=await f.run(['publish','pages'],{UPLOAD_RESULT:'success',ACK_THEN_MUTATE:'true'});
+ assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.attempts[0].outcome,'unconfirmed');assert.equal(result.record.completed.pages,undefined);assert.ok(result.record.pagesUploadEvidence);assert.equal(result.record.pagesUploadEvidence.acknowledgement.id,next);assert.equal(result.record.attempts[0].protection.checks[0].expectedId,next);assert.equal(result.record.attempts[0].protection.status,'passed');assert.match(result.calls,/check-deployment.mjs after/);assert.doesNotMatch(result.text+result.stdout+result.stderr,/PRIVATE_/);
+});
+test('same-source canonical deployment with another acknowledgement ID cannot confirm publication',async t=>{
+ const f=await fixture(t);await f.run(['plan']);const result=await f.run(['publish','pages'],{UPLOAD_RESULT:'success',WRONG_ACK_ID:'true'});
+ assert.equal(result.status,1);assert.equal(result.record.attempts[0].outcome,'unconfirmed');assert.equal(result.record.completed.pages,undefined);assert.ok(result.record.pagesUploadEvidence);assert.equal(result.record.pagesUploadEvidence.acknowledgement.id,'11111111-1234-1234-1234-123456789abc');assert.match(result.calls,/check-deployment.mjs after/);
+});
+test('private change across pre-upload snapshot interval is detected at local completion after the Pages write',async t=>{
+ const f=await completionFixture(t);await writeFile(join(f.dir,'race-on'),'catalogue');const result=await f.local();
+ assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.pagesUploadEvidence.acknowledgement.id,next);assert.equal(result.record.finalProtection.checks.length,4);assert.match(result.record.reasons.join('\n'),/LOCAL_VERIFICATION_FAILED/);
+});
+test('tampered or cross-run downloaded artifact blocks local completion while all final checks still run',async t=>{
+ for(const mutate of [f=>f.finalEvidence.githubArtifact.runId='456',f=>f.finalEvidence.githubArtifact.manifestSha256='c'.repeat(64),f=>f.finalEvidence.githubArtifact.conclusion='failure']){
+  const f=await completionFixture(t);mutate(f);const result=await f.local();assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.finalProtection.checks.length,4);assert.match(result.record.reasons.join('\n'),/LOCAL_VERIFICATION_FAILED/);
+ }
+});
+test('push and stale reviewed source inputs stop before any upload invocation',async t=>{
+ const f=await fixture(t);const pushed=await f.run(['plan'],{GITHUB_EVENT_NAME:'push'});assert.equal(pushed.status,1);assert.equal(pushed.uploads,'');
+ const evidence=structuredClone(f.evidence);evidence.activationCompatibility.sourceInputDigest='d'.repeat(64);const changed=await f.run(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(changed.status,1);assert.match(changed.record.reasons.join('\n'),/ACTIVATION_COMPATIBILITY/);assert.equal(changed.uploads,'');
+});
+
+test('local completion preserves original Node22 compiler provenance without claiming local Node24 compiler byte equality',async t=>{
+ const f=await completionFixture(t),record=JSON.parse(await readFile(f.path,'utf8'));
+ const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v),hash=v=>createHash('sha256').update(v).digest('hex');
+ record.build.compiler.runtime='v22.23.3';record.build.compiler.files[0].sha256='e'.repeat(64);
+ const {compilerConfigDigest,...compiler}=record.build.compiler;record.build.compiler.compilerConfigDigest=hash(canonical(compiler));
+ record.activationCompatibility.compilerConfigDigest=record.build.compiler.compilerConfigDigest;
+ const {integrityDigest,...proof}=record.pagesUploadEvidence;proof.compilerConfigDigest=record.build.compiler.compilerConfigDigest;record.pagesUploadEvidence={...proof,integrityDigest:hash(canonical(proof))};
+ await writeFile(f.path,JSON.stringify(record));f.finalEvidence.githubArtifact.manifestSha256=hash(await readFile(f.path));
+ const result=await f.local();assert.equal(result.status,0);assert.equal(result.record.state,'verified');assert.equal(result.record.build.compiler.runtime,'v22.23.3');assert.equal(result.record.pagesUploadEvidence.compilerConfigDigest,record.build.compiler.compilerConfigDigest);
+});
+
+test('valid acknowledgement survives actual CLI multipart or metadata failure and binds all later protection without retry',async t=>{
+ for(const payload of ['multipart','metadata']){
+  const f=await fixture(t);assert.equal((await f.run(['plan'])).status,0);
+  const result=await f.run(['publish','pages'],{UPLOAD_RESULT:'success',BAD_UPLOAD_PAYLOAD:payload});
+  assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.attempts[0].outcome,'unconfirmed');
+  assert.equal(result.record.attempts[0].acknowledgement?.id,next);assert.equal(result.record.attempts[0].acknowledgement.sourceSha,sha);
+  assert.deepEqual(Object.keys(result.record.attempts[0].acknowledgement).sort(),['createdAt','environment','id','sourceSha']);
+  assert.equal(result.record.pagesUploadEvidence,undefined);assert.equal(result.record.completed.pages,undefined);assert.equal(result.record.attempts[0].protection.status,'passed');assert.equal(result.record.attempts[0].protection.checks[0].expectedId,next);
+  assert.equal(result.uploads.trim().split('\n').length,1);assert.doesNotMatch(result.text+result.stdout+result.stderr,/PRIVATE_|export default|formData/);
+  const final=await f.run(['finish']);assert.equal(final.status,1);assert.equal(final.record.state,'partial');assert.equal(final.record.finalProtection.checks[0].expectedId,next);assert.equal(final.record.finalProtection.status,'passed');assert.equal(final.uploads.trim().split('\n').length,1);assert.match(final.record.reasons.join('\n'),/PUBLICATION_FAILED/);
+ }
+});
+
+async function archiveFixture(t){
+ const completed=await completionFixture(t),done=await completed.local();assert.equal(done.status,0);
+ const record=done.record,dir=await fixture(t),candidate='c'.repeat(40),newId='11111111-1234-1234-1234-123456789abc',archivePath='docs/releases/2026-10-20-release-M.json';
+ await mkdir(join(dir.dir,'docs/releases'),{recursive:true});await writeFile(join(dir.dir,archivePath),JSON.stringify(record,null,2)+'\n');
+ const hash=v=>createHash('sha256').update(v).digest('hex');
+ const evidence={sourceSha:candidate,baseline:{...record,reviewed:true,evidenceUrl:`https://github.com/TIMMMYYYHHHH/Customvibev3/blob/${candidate}/${archivePath}`},archivedRelease:{origin:'reviewed-complete-release-archive',reviewed:true,path:archivePath,sha256:hash(await readFile(join(dir.dir,archivePath))),sourceSha:sha,reviewedAgainstSha:candidate}};
+ const env={FIXTURE_SOURCE_SHA:candidate,FIXTURE_BASE_SHA:sha,FIXTURE_BEFORE_ID:next,FIXTURE_NEXT_ID:newId,GITHUB_SHA:candidate,REVIEWED_SHA:candidate,GITHUB_RUN_ID:'456',CHANGED_PATH:archivePath};
+ const seeded=await dir.run(['plan'],{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.ok(seeded.record.build);
+ const build=seeded.record.build;evidence.activationCompatibility={basis:'source-input-tooling-only-v1',reviewedAgainstSha:candidate,baselineSha:sha,observedAt:new Date().toISOString(),sourceInputDigest:build.sourceInputDigest,compilerConfigDigest:build.compiler.compilerConfigDigest,configDigest:build.compiler.configDigest,pagesBuildDigest:build.pages.sha256,adminAssetsDigest:build.admin.sha256,historicalFunctionsDigest:null};
+ return {...dir,record,evidence,env,candidate,newId,archivePath,async runArchive(args,extra={}){return dir.run(args,{...env,RELEASE_EVIDENCE_JSON:JSON.stringify(evidence),...extra});}};
+}
+test('real CLI completes M before genuine archive N and accepts manual N dispatch without source relabelling or archive push publication',async t=>{
+ const f=await archiveFixture(t);
+ const pushed=await f.runArchive(['plan'],{GITHUB_EVENT_NAME:'push'});assert.equal(pushed.status,1);assert.equal(pushed.uploads,'');
+ const planned=await f.runArchive(['plan']);assert.equal(planned.status,0,planned.record.reasons.join('\n'));assert.equal(planned.record.baseSha,sha);assert.equal(planned.record.beforePagesSourceSha,sha);assert.equal(planned.record.archivedRelease.sourceSha,sha);
+ const archived=JSON.parse(await readFile(join(f.dir,f.archivePath),'utf8'));assert.equal(archived.state,'verified');assert.equal(archived.sourceSha,sha);assert.equal(archived.components.pages.receipt.sourceSha,sha);assert.equal(archived.workflow.runId,'123');assert.doesNotMatch(JSON.stringify(archived),new RegExp('/blob/'+f.candidate+'/'));assert.equal(archived.pagesUploadEvidence.historicalFunctionsDigest,undefined);
+ const dispatched=await f.runArchive(['publish','pages'],{UPLOAD_RESULT:'success'});assert.equal(dispatched.status,0,dispatched.record.reasons.join('\n'));assert.equal(dispatched.record.sourceSha,f.candidate);assert.equal(dispatched.record.completed.pages.id,f.newId);assert.equal(dispatched.record.pagesUploadEvidence.runId,'456');assert.equal(dispatched.record.state,'partial');assert.equal(dispatched.uploads.trim().split('\n').length,1);
+});
+
+test('actual CLI rejects untrusted, changed, incomplete or self-referential archives before upload',async t=>{
+ const f=await archiveFixture(t),original=await readFile(join(f.dir,f.archivePath)),trusted=structuredClone(f.evidence),hash=v=>createHash('sha256').update(v).digest('hex');
+ const mutations=[
+  e=>delete e.archivedRelease,e=>e.archivedRelease.reviewed=false,e=>e.archivedRelease.sha256='e'.repeat(64),e=>e.archivedRelease.sourceSha=f.candidate,e=>e.archivedRelease.reviewedAgainstSha=sha,e=>e.archivedRelease.path='docs/releases/ordinary.json',
+ ];
+ for(const mutate of mutations){const evidence=structuredClone(trusted);mutate(evidence);const result=await f.runArchive(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(result.status,1);assert.equal(result.uploads,'');assert.match(result.record.reasons.join('\n'),/PLAN_ARCHIVE_FAILED/);}
+ for(const mutate of [r=>r.state='partial',r=>r.components.security.receipt.sourceSha=f.candidate,r=>r.components.pages.receipt.evidenceUrl=`https://github.com/TIMMMYYYHHHH/Customvibev3/blob/${f.candidate}/${f.archivePath}`,r=>r.finalProtection.checks.pop(),r=>r.finalIdentityReadbacks[0].observedId=id,r=>r.providerDiagnostics='PRIVATE_PROVIDER_SENTINEL',r=>r.evidence.body='PRIVATE_CUSTOMER_SENTINEL']){
+  const record=JSON.parse(original);mutate(record);const bytes=Buffer.from(JSON.stringify(record));await writeFile(join(f.dir,f.archivePath),bytes);const evidence=structuredClone(trusted);evidence.archivedRelease.sha256=hash(bytes);
+  const result=await f.runArchive(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(evidence)});assert.equal(result.status,1);assert.equal(result.uploads,'');assert.match(result.record.reasons.join('\n'),/PLAN_ARCHIVE_FAILED/);assert.doesNotMatch(result.text+result.stdout+result.stderr,/PRIVATE_/);
+ }
+ const malformed=Buffer.from('{\"private\":\"PRIVATE_BROKEN_JSON_SENTINEL\"');await writeFile(join(f.dir,f.archivePath),malformed);const malformedEvidence=structuredClone(trusted);malformedEvidence.archivedRelease.sha256=hash(malformed);const invalidJson=await f.runArchive(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(malformedEvidence)});assert.equal(invalidJson.status,1);assert.equal(invalidJson.uploads,'');assert.doesNotMatch(invalidJson.text+invalidJson.stdout+invalidJson.stderr,/PRIVATE_/);
+ await writeFile(join(f.dir,f.archivePath),original);
+ for(const extra of [{ARCHIVE_STATUS:'M'},{ARCHIVE_MODE:'120000'},{ARCHIVE_BLOB:'e'.repeat(40)},{CHANGED_PATH:f.archivePath+'\nsrc/App.jsx'}]){const result=await f.runArchive(['plan'],{RELEASE_EVIDENCE_JSON:JSON.stringify(trusted),...extra});assert.equal(result.status,1);assert.equal(result.uploads,'');assert.match(result.record.reasons.join('\n'),/PLAN_ARCHIVE_FAILED/);}
+});
+test('strict historical manual archive permits unknown Functions bytes and retains original private receipt sources',async t=>{
+ const f=await archiveFixture(t),{validateReleaseArchiveRecord}=await import('../scripts/release-manifest.mjs');const record=structuredClone(f.record);
+ record.pagesUploadEvidence=null;record.historicalFunctionsDigest=null;record.components.security.receipt.sourceSha=old;
+ const baseline=structuredClone(record);const result=validateReleaseArchiveRecord(record,{sourceSha:sha,candidateSha:f.candidate,baseline});assert.equal(result.sourceSha,sha);assert.match(result.receiptDigest,/^[a-f0-9]{64}$/);assert.equal(record.pagesUploadEvidence,null);assert.equal(record.components.security.receipt.sourceSha,old);
+});
+test('invalid acknowledged source, environment or time is not retained or retried after upload',async t=>{
+ for(const invalid of ['source','environment','date']){
+  const f=await fixture(t);await f.run(['plan']);const result=await f.run(['publish','pages'],{UPLOAD_RESULT:'success',INVALID_ACK:invalid,BAD_UPLOAD_PAYLOAD:'multipart'});
+  assert.equal(result.status,1);assert.equal(result.record.state,'partial');assert.equal(result.record.attempts[0].outcome,'unconfirmed');assert.equal(result.record.attempts[0].acknowledgement,undefined);assert.equal(result.record.pagesUploadEvidence,undefined);assert.equal(result.record.completed.pages,undefined);assert.equal(result.uploads.trim().split('\n').length,1);assert.equal(result.record.attempts[0].protection.checks[0].expectedId,id);assert.doesNotMatch(result.text+result.stdout+result.stderr,/PRIVATE_/);
+ }
+});
