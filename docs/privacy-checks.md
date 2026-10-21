@@ -1,5 +1,7 @@
 # Cookie and privacy checks
 
+Current customer preview rule, 21 October 2026: no separate proof email or post-order artwork approval is required. Historical review records remain private and follow original artwork expiry. See [customer preview policy](customer-preview-policy.md).
+
 17 October 2026. Scope: existing cookies, browser storage, optional map controls and factual service disclosures. Business/legal approval remains in Required business information. No emails, orders, production-record changes or provider settings changes are part of this work.
 
 ## Current implementation note, 19 October 2026
@@ -7,7 +9,7 @@
 The 17 October inventory, provider-policy observations, test counts and live checks below are historical evidence, not fresh verification of the current implementation.
 
 - The optional locker map now uses `src/LockerPicker.jsx`, `src/NearbyLockerMap.jsx` and `server/map-api.mjs`. See [the capacity and searchable-map rollout](paid-capacity-rollout.md). The old `DeliveryMap` iframe component had no runtime callers and was removed during the audit fixes. Its Show/Hide iframe counts below describe the earlier implementation only.
-- Artwork, associated artwork request records and proof review access expire 14 days after the original upload. Reduced order details, including whole-order notes, are retained for six calendar months from submission or delivered/collected completion when Fulfilled. Reopening keeps the established order-detail expiry until fulfilled again and never restarts artwork expiry. This supersedes the combined “14-day artwork/order” wording below. See [current operating policy](operating-mode.md).
+- Artwork, associated artwork request records and historical review records expire 14 days after the original upload. Reduced order details, including whole-order notes, are retained for six calendar months from submission or delivered/collected completion when Fulfilled. Reopening keeps the established order-detail expiry until fulfilled again and never restarts artwork expiry. This supersedes the combined “14-day artwork/order” wording below. See [current operating policy](operating-mode.md).
 - Current contact-delivery evidence remains tracked separately under EXT-01. Remaining privacy schedules and disclosures remain under DEC-02 and the existing launch requirements. This annotation does not establish a fresh provider retention or live mail check.
 
 20 October 2026: Public mailbox wording distinguishes the hello Google Workspace mailbox from the retained legacy W3Forms notification account. This corrects the technical route description only; it does not verify current contact forwarding or Reply-To, approve unresolved mailbox/contact/log periods, or complete the privacy notice for public launch. EXT-01 and DEC-02 remain separate.

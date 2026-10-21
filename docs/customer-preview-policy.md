@@ -1,0 +1,20 @@
+# Customer preview policy
+
+Current owner decision, 21 October 2026. Customers preview their own artwork while designing and checking out. No separate proof email or post-order artwork approval is required before printing, including for historical orders. This supersedes the mandatory exact-revision approval rule from 17 October and conflicting historical plans, fixtures and verification notes. Customer previews, permission to use photos/logos/details, and consent to the described private storage remain part of checkout.
+
+## Current requirements
+
+- Keep genuine designer and checkout previews, spelling/quantity checks and Business/Handy QR checks. Optional notes go to the team and are not automatically printed.
+- Keep internal source-quality and print checks, exact per-face quantities, latest valid replacement artwork, byte/hash integrity, authenticated private admin downloads and normal concurrency protections. Do not treat a historical customer approval flag as print or stage permission.
+- Customer updates use the existing manual Preview update and Send update controls. Saving a stage, dragging a card or replacing artwork never sends automatically. Do not send a proof invitation or create another customer approval flow.
+- The old `/proof` route explains that no response is needed. It loads no private artwork and offers no approval or change-request action. Historical records stay private and expire normally; do not rewrite them as approved.
+- Keep payment status accurate. The current site records unpaid orders, takes no payment and makes no courier booking. Preserve independent payment safeguards, the website password gate, separate admin sign-in and payments disabled. This correction grants no launch or deployment approval.
+- Artwork and associated request records expire 14 days after the original upload start. Replacement artwork does not restart that deadline. Order details and stage/email history remain for six calendar months from submission, or delivered/collected completion when Fulfilled; reopening keeps the existing expiry until fulfilled again. Original photos and unsent drafts stay in tab memory.
+
+Physical print readability and QR scanning remain owner checks. Existing supplier/legal-information placeholders and unanswered operational timings remain unresolved. This correction adds no new legal terms, production lead-time promise, provider setting or payment capability.
+
+## Stored content and verification limits
+
+FAQ questions in `src/HelpContent.jsx` and policy sections in `src/policies.mjs` are source constants. `ContentProvider` fetches saved catalogue content from `/content.json`; `server/content.mjs` preserves only pricing, images and product fields, so that store cannot override the FAQ or policy sections. Product name/description/details/contents can still contain older wording and feed public product pages and product metadata. Saved seasonal wording is a separate content source. Inspect the latest authenticated catalogue and seasonal records before claiming all deployed copy is corrected. Preserve newer owner edits and change only any offending fields, using revision-aware saves and readback. Do not replace the full live content store with fallback defaults.
+
+This local source correction does not establish deployed source parity, live content state, real inbox delivery or physical print acceptance. No provider, production customer record, email, deployment setting or Founders Hub write is part of the copy lane. The integrator owns current combined behavior checks, local browser verification, any later authorized publication and saved-content readback. Historical evidence is retained in `collections-and-approval-verification.md`, `exact-artwork-acceptance.md` and the older specs/plans with their superseded scope identified.

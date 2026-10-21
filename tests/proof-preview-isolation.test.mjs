@@ -76,14 +76,12 @@ test('gated preview middleware can verify site access but never forwards proof o
   }
 });
 
-test('production proof operations continue to their scoped private service endpoints', async () => {
+test('retired production proof operations never reach private storage', async () => {
   const {env, calls, request} = await fixture();
   for (const operation of operations) {
     calls.length = 0;
     const response = await proofAPI(request('https://customvibe.co.za', operation), env);
-    assert.equal(response.status, 200, operation.action);
-    assert.deepEqual(calls.map(call => call.path), ['/proofs/'+operation.action]);
-    if (operation.action === 'exchange') assert.match(calls[0].body.tokenHash, /^[a-f0-9]{64}$/);
-    else assert.match(calls[0].body.sessionId, /^[a-f0-9]{64}$/);
+    assert.equal(response.status, 410, operation.action);
+    assert.deepEqual(calls, []);
   }
 });

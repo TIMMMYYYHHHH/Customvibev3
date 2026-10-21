@@ -4,6 +4,6 @@ import {rehearseRecovery} from './fixtures/recovery-rehearsal.mjs';
 test('disposable paired-store restore reconciles hashes, original expiry, missing files and revoked access before serving',async()=>{
  const result=await rehearseRecovery();assert.equal(result.providerRestorePerformed,false);assert.equal(result.dec04,'OPEN');assert.equal(result.invalidFiles.length,2);assert.equal(result.fixture.lostOrders,1);assert.ok(Object.values(result.checks).every(Boolean));
 });
-test('recovery evidence detects an omitted capability and approval fence',async()=>{
- await assert.rejects(rehearseRecovery({negativeControl:true}),/revokedLinkDenied|revokedSessionDenied|approvalRequiresNewReview|productionBlocked/);
+test('recovery evidence detects omitted legacy capability invalidation',async()=>{
+ await assert.rejects(rehearseRecovery({negativeControl:true}),/legacyCapabilitiesCleared/);
 });

@@ -9,7 +9,7 @@ A non-Fulfilled customer update may be retried only after a recognized, structur
 - Retry previews require an authenticated, same-origin, CSRF-protected POST. Ordinary GET previews are read-only. Each fresh preview replaces a ten-minute capability tied to the expected failed attempt.
 - The current order version, previous attempt, rejection classification and preview capability are checked atomically. Only the winning reservation consumes the shared daily/monthly email allowance. Every attempt has a distinct stable provider idempotency key.
 - Outcomes identify the reservation, so a late outcome cannot overwrite a newer attempt. An outcome that cannot be recorded leaves the attempt locked pending verification.
-- Proof retries keep the same order version, atomically refresh the private review link and retry capability, and check the exact current proof link before sending. They do not change the order stage or version to bypass duplicate protection.
+- All retries send ordinary stage updates, including orders with historical approval state. There is no proof invitation or customer review capability dependency. Retry previews retain the exact failed attempt/version and fresh retry capability; they do not change stage or version to bypass duplicate protection.
 - Migration `0010_manual_update_attempts.sql` preserves the existing per-version summary and adds durable attempt history. Historical failures are not silently reclassified. All history and preview hashes expire with the order details. Compatibility triggers preserve older summary writes and expiry cleanup.
 - Website and admin locks, CSRF, private artwork, retention, unpaid status and disabled payments remain unchanged. Email availability does not depend on the website gate. No new paid service or recipient allowlist is introduced.
 
@@ -27,7 +27,9 @@ Do not deploy the new admin against the old security worker. A claim without an 
 
 Keep migration 0010 and all attempt history. Never delete failed rows to unlock sending. After retries exist, do not restore the old version-only security outcome writer. Keep the new reservation/marking handlers and use a compatible forward repair. An older admin UI can be restored while retaining the new security worker, but it will not expose retries and may render history with duplicate keys; refresh to the corrected UI when available.
 
-## Local validation
+## Historical local validation
+
+The exact-proof-link and review-invitation assertions in this implementation evidence are superseded by the 21 October 2026 [customer preview policy](customer-preview-policy.md). Current verification must prove ordinary manual stage preview/send and retries work without customer proof tokens while retaining all retry safeguards.
 
 At implementation handoff, the full local suite passed **352/352 tests**. Public client/SSR/prerender and admin build/preparation passed; the existing public bundle-size warning remains. Independent reviews covered the ledger and admin/preview boundaries.
 

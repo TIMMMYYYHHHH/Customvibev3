@@ -1,3 +1,5 @@
+> Historical workflow note, 21 October 2026: any customer proof email, mandatory post-order artwork approval or approval-gated production requirement below is superseded by the current customer preview policy. Customers preview in the designer and checkout; no separate artwork approval follows the order. Retain useful artwork, quantity, privacy, expiry and physical print evidence. See [customer preview policy](../../customer-preview-policy.md).
+
 # Collections and Design Approval Implementation Plan
 
 > Superseded in part by the later owner decision on 17 October: practical collections are inspiration for the existing studio, with optional order notes. Separate template and Design it for me forms are removed. Proof approval and ready-made packs remain. See docs/collections-and-approval-verification.md for current scope and evidence.

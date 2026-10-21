@@ -1,6 +1,8 @@
 # Collections and customer approval verification
 
-## Current owner decision: inspiration and studio notes
+> Superseded workflow, 21 October 2026: the customer proof approval and review invitations described below are historical evidence, not current requirements. Customers preview in the designer and checkout; no separate proof email or post-order artwork approval is required. See [current customer preview policy](customer-preview-policy.md). Preserve useful historical verification, expiry/privacy controls and physical print acceptance. This document does not verify the correction on the live site.
+
+## Historical owner decision: inspiration and studio notes
 
 17 October 2026, later correction. Business/work, QR, Wi-Fi and information collections now provide ideas and lead to the existing studio. Separate template personalisation and Design it for me forms are removed. Old design links redirect to the studio. Earlier descriptions below are historical and superseded for these entry paths; legacy server contracts remain compatible with existing records.
 

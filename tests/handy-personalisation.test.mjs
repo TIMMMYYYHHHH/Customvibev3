@@ -15,7 +15,7 @@ test('handwritten family-week details survive validation and order capture exact
  assert.match(record.items[0].name,/Family week/);assert.deepEqual(record.items[0].values,values);
  assert.equal(record.items[0].files.length,1);
  const instructions=printInstructions({reference:'LOCAL',snapshot:record,proof:{revision:1,status:'awaiting_approval',digest:'local'}});
- assert.match(instructions,/Monday: Swimming/);assert.match(instructions,/75 × 75 mm/);assert.match(instructions,/DO NOT PRINT/);
+ assert.match(instructions,/Monday: Swimming/);assert.match(instructions,/75 × 75 mm/);assert.doesNotMatch(instructions,/DO NOT PRINT|approved proof/);
 });
 test('handy templates reject unknown editions, field counts, control characters and unsupported glyphs',()=>{
  for(const v of [{...values,edition:2},{...values,handyTemplate:'missing'},{...values,entries:['Only one']},{...values,entries:['a\nb',...values.entries.slice(1)]},{...values,entries:['😀',...values.entries.slice(1)]}]) assert.throws(()=>validateTemplate('information',v));

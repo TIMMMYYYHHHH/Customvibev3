@@ -1,15 +1,14 @@
 import {recipientBinding} from '../server/mail-recipient.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
 import {random} from '../server/auth.mjs';
-import {proofCall,proofHash} from '../server/proof-api.mjs';
-import {proofUpdateEmail} from '../server/order-update-email.mjs';
+import {proofHash} from '../server/proof-api.mjs';
 import {orderUpdateEmail} from '../server/order-update-email.mjs';
 const call=(env,path,b)=>env.AUTH.fetch('https://auth.internal/orders/'+path,{method:'POST',body:JSON.stringify(b)});
 const fail=(status,error)=>Response.json({error},{status});
 async function retryPreview(env,order,mail){
  const previous=(order.updates||[]).find(u=>u.version===order.version);
  if(order.status==='fulfilled'||!previous?.retryable)return mail;
- const retryToken=random();const issued=await call(env,'preview-retry',{id:order.id,version:order.version,attempt:previous.attempt,tokenHash:await proofHash(retryToken),...(mail.proofToken?{proofTokenHash:await proofHash(mail.proofToken)}:{})});
+ const retryToken=random();const issued=await call(env,'preview-retry',{id:order.id,version:order.version,attempt:previous.attempt,tokenHash:await proofHash(retryToken)});
  if(!issued.ok)throw Error('This attempt changed. Review a fresh preview.');
  return {...mail,retryAttempt:previous.attempt,retryToken};
 }
@@ -19,7 +18,6 @@ export async function previewRetryUpdate(env,id,version){
  const detail=await call(env,'detail',{id});if(!detail.ok)return detail;const order=await detail.json();
  const previous=order.updates.find(u=>u.version===order.version);
  if(!Number.isSafeInteger(version)||version!==order.version||order.status==='fulfilled'||!previous?.retryable)return fail(409,'This attempt changed. Review its history before retrying.');
- if((order.artworkExpires??order.expires)*1000>Date.now()&&order.proof?.status==='awaiting_approval')return previewProofUpdate(env,id,version);
  try{return Response.json(await retryPreview(env,order,orderUpdateEmail(order,{googleReviewUrl:env.GOOGLE_REVIEW_URL})));}catch{return fail(409,'Order or attempt changed. Preview again.');}
 }
 // Only structured provider validation/authentication rejections prove non-acceptance.
@@ -29,7 +27,7 @@ export async function sendOrderUpdate(env,id,version,network=fetch,proofToken,re
  if(env.ADMIN_SEND_ENABLED!=='true'||!env.RESEND_API_KEY)return fail(503,'Customer email is unavailable. Check the admin email settings.');
  const detail=await call(env,'detail',{id});if(!detail.ok)return detail;const order=await detail.json();
  if(!Number.isSafeInteger(version)||version!==order.version)return fail(409,'Order changed. Review a fresh email preview.');
- let preview;if(order.status!=='fulfilled'&&(order.artworkExpires??order.expires)*1000>Date.now()&&order.proof?.status==='awaiting_approval'){if(!/^[a-f0-9]{64}$/.test(proofToken||''))return fail(409,'Preview the current review invitation first.');const check=await proofCall(env,'check-link',{id,version,tokenHash:await proofHash(proofToken)});if(!check.ok)return check;preview=proofUpdateEmail(order,proofToken);}else preview=orderUpdateEmail(order,{googleReviewUrl:env.GOOGLE_REVIEW_URL});const claim=await call(env,'claim-update',{id,version,...(retry.retryAttempt!==undefined?{retryAttempt:retry.retryAttempt,retryTokenHash:/^[a-f0-9]{64}$/.test(retry.retryToken||'')?await proofHash(retry.retryToken):null}:{})});if(!claim.ok)return claim;
+ const preview=orderUpdateEmail(order,{googleReviewUrl:env.GOOGLE_REVIEW_URL});const claim=await call(env,'claim-update',{id,version,...(retry.retryAttempt!==undefined?{retryAttempt:retry.retryAttempt,retryTokenHash:/^[a-f0-9]{64}$/.test(retry.retryToken||'')?await proofHash(retry.retryToken):null}:{})});if(!claim.ok)return claim;
  const reservation=await claim.json();if(!reservation.claimed)return fail(409,'This update was already attempted. Check its history before doing anything else.');
  if(!/^[a-f0-9-]{36}$/.test(reservation.attempt||''))return fail(503,'The email reservation could not be confirmed. Do not resend; check its history.');
  let state='uncertain',providerMessageId,binding;
@@ -38,16 +36,11 @@ export async function sendOrderUpdate(env,id,version,network=fetch,proofToken,re
  return state==='accepted'?Response.json({ok:true,state}):fail(503,state==='failed'?'The provider rejected this update. Check its settings before another attempt.':'Delivery is uncertain. Do not resend; check the provider first.');
 }
 
+// Compatibility for saved admin tabs. This returns ordinary status mail without minting a link.
 export async function previewProofUpdate(env,id,version){
- const before=await call(env,'detail',{id});if(!before.ok)return before;const current=await before.json();
- if(current.version!==version)return fail(409,'Order changed. Preview again.');
- const previous=current.updates.find(u=>u.version===version),token=random();
- if(previous){
-  if(current.status==='fulfilled'||!previous.retryable)return fail(409,'This update was already attempted. Check its history.');
-  try{return Response.json(await retryPreview(env,current,{...proofUpdateEmail(current,token),proofToken:token}));}catch{return fail(409,'Order or attempt changed. Preview again.');}
- }
- const issued=await proofCall(env,'issue',{id,version,tokenHash:await proofHash(token)});if(!issued.ok)return issued;
  const detail=await call(env,'detail',{id});if(!detail.ok)return detail;const order=await detail.json();
- if(order.version!==(await issued.json()).version)return fail(409,'Order changed. Preview again.');
- return Response.json({...proofUpdateEmail(order,token),proofToken:token});
+ if(order.version!==version)return fail(409,'Order changed. Preview again.');
+ const previous=order.updates.find(u=>u.version===version);
+ if(previous)return previewRetryUpdate(env,id,version);
+ return Response.json(await previewOrderUpdate(env,id,order));
 }

@@ -28,7 +28,7 @@ window.fetch=async(path,opts={})=>{
    const body=JSON.parse(opts.body||'{}');if(body.version!==order.version)return Response.json({error:'Order changed. Review current version.'},{status:409});
    const action=url.pathname.split('/').at(-1);
    if(action==='prepare')return Response.json({ok:true});
-   if(action==='publish'||action==='seed'){order.proof={...order.proof,revision:(order.proof?.revision||0)+1,status:'awaiting_approval',items:order.proof?.items||order.snapshot.items};order.status='new';order.version++;return Response.json({ok:true});}
+   if(action==='publish'||action==='seed'){order.proof={...order.proof,revision:(order.proof?.revision||0)+1,status:'prepared',items:order.proof?.items||order.snapshot.items};order.version++;return Response.json({ok:true});}
    if(action==='revoke'){order.version++;return Response.json({ok:true});}
    return Response.json({error:'Unsupported local proof operation'},{status:400});
   }
