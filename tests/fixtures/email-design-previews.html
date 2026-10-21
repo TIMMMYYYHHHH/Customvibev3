@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Local initial email preview checks</title><body><h1>Local email previews</h1><p>Synthetic artwork only. No messages are sent.</p><nav><a href="?width=390#gallery">390 px email view</a> · <a href="?width=full#gallery">Full-width email view</a></nav><output id="result">Preparing local fixture</output><div id="gallery"></div><script type="module">
+if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw Error('Local fixture only');
+import {preparePrivateArtwork} from '../../src/order-artwork.mjs';
+import {fitEmailDesignPreviews} from '../../src/email-design-previews.mjs';
+import {makePhoto,renderPhoto} from '../../src/artwork.js';
+import {defaultContent} from '../../src/content/model.mjs';
+import {sampleBusinessValues} from '../../src/designs/business.mjs';
+import {defaultHandyValues,handyDesigns} from '../../src/designs/handy.mjs';
+import {validateOrder,orderEmails} from '../../server/submission-model.mjs';
+const content=structuredClone(defaultContent);content.products.forEach(p=>p.status='available');
+try{
+ const canvas=document.createElement('canvas');canvas.width=900;canvas.height=700;const ctx=canvas.getContext('2d');ctx.fillStyle='#eed2bd';ctx.fillRect(0,0,900,700);ctx.fillStyle='#476967';ctx.fillRect(0,450,900,250);ctx.fillStyle='#74516c';ctx.beginPath();ctx.moveTo(0,450);ctx.lineTo(400,140);ctx.lineTo(800,450);ctx.fill();ctx.fillStyle='#e9a845';ctx.beginPath();ctx.arc(720,160,80,0,Math.PI*2);ctx.fill();
+ const photo=makePhoto(canvas.toDataURL('image/jpeg',.9),'Synthetic landscape',900,700);photo.zoom=1.2;photo.x=.65;photo.rotation=90;
+ const ordinary=await renderPhoto(photo),basket=[{id:crypto.randomUUID(),sourceId:photo.id,kind:'photo',qty:2,preview:ordinary.url}];
+ for(const gridSize of [3,5])basket.push({id:crypto.randomUUID(),sourceId:photo.id,kind:'puzzle',gridSize,qty:gridSize===3?2:1,preview:(await renderPhoto(photo,{puzzle:true,gridSize,size:240})).url});
+ for(const style of ['watercolour','gouache','paper','clay','pencil'])basket.push({id:crypto.randomUUID(),kind:'alphabet',qty:3,printVersion:1,style,designIds:['alphabet-1','alphabet-2'],designQuantities:[2,3]});
+ basket.push({id:crypto.randomUUID(),kind:'noughts-crosses',qty:1,printVersion:1});
+ basket.push({id:crypto.randomUUID(),kind:'business',qty:2,printVersion:1,designMode:'self',values:sampleBusinessValues('04-wifi')});
+ const handy=defaultHandyValues(handyDesigns[0].id);handy.entries=handy.entries.map((v,n)=>v||`Test ${n+1}`);
+ basket.push({id:crypto.randomUUID(),kind:'information',qty:1,printVersion:1,designMode:'self',values:handy});
+ const {uploads,...prepared}=await preparePrivateArtwork(basket,[photo],renderPhoto,content);
+ const payload=fitEmailDesignPreviews({...prepared,id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),referenceVersion:2,contact:{name:'Synthetic customer',email:'synthetic@example.invalid',phone:'0123456789'},locker:{name:'Synthetic locker',area:'Test only'},notes:'Fictional preview fixture',consent:true});
+ const order=validateOrder(payload,content,true),pair=orderEmails(order,true,'CV-000042');
+ const sizes={};for(const [name,mail] of Object.entries(pair)){
+  const html=mail.html.replace(/src="cid:([^"]+)"/g,(match,id)=>{const asset=mail.attachments.find(a=>a.content_id===id);return asset?`src="data:${asset.content_type};base64,${asset.content}"`:match;});
+  const frame=document.createElement('iframe');frame.title=name+' initial email';frame.style.cssText='width:'+(new URLSearchParams(location.search).get('width')==='390'?'390px':'100%')+';max-width:100%;height:4600px;border:0;display:block';frame.sandbox='';frame.srcdoc=html;document.querySelector('#gallery').append(frame);
+  sizes[name]={htmlBytes:new TextEncoder().encode(mail.html).length,payloadBytes:new TextEncoder().encode(JSON.stringify(mail)).length,previews:mail.attachments.filter(a=>a.content_id?.startsWith('cv-design-')).length};
+ }
+ window.emailPreviewFixture={payload,pair,order,result:{items:basket.length,files:uploads.length,previews:payload.items.filter(i=>i.emailPreview).length,encodedPreviewCharacters:payload.items.reduce((n,i)=>n+(i.emailPreview?.length||0),0),wireBytes:new TextEncoder().encode(JSON.stringify({payload,turnstile:'x'.repeat(2048),grant:'x'.repeat(1024),resume:'x'.repeat(1024),website:''})).length,sizes}};
+ document.querySelector('#result').textContent=JSON.stringify(window.emailPreviewFixture.result);
+}catch(error){document.querySelector('#result').textContent='Fixture failed: '+error.message;window.emailPreviewFailure=error.message;}
+</script></body></html>
