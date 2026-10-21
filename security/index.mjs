@@ -1,4 +1,5 @@
 import {observeMailDelivery,cleanMailDelivery} from './mail-delivery.mjs';
+import {inspectLockerSnapshot} from './locker-health.mjs';
 import {mapService,refreshLockerSnapshot} from './maps.mjs';
 import {proofService} from './proofs.mjs';
 import {readSelect} from './read.mjs';
@@ -19,7 +20,10 @@ export default {async fetch(request,env){let phase='security_request';try{if(req
  if(path==='/status'){const row=await readSelect(env.DB,'SELECT exp FROM revoked WHERE id=? AND exp>?',[scope+':'+jti,now],'first','customvibe_auth_status_retry');return Response.json({revoked:!!row})}
  if(path==='/revoke'&&Number.isSafeInteger(exp)&&exp>now&&exp<=now+28800){await env.DB.prepare('INSERT OR REPLACE INTO revoked (id,exp) VALUES (?,?)').bind(scope+':'+jti,exp).run();return Response.json({ok:true})}
  return new Response(null,{status:404});
- }catch(error){reportUnavailable(phase,error);return Response.json({error:'Temporarily unavailable. Keep this tab open and retry shortly.'},{status:503})}},async scheduled(event,env){try{await refreshLockerSnapshot(env);await env.DB.prepare('DELETE FROM map_usage WHERE expires<?').bind(Date.now()).run();}catch(error){reportUnavailable('scheduled_maps',error)}if(event.cron==='*/5 * * * *')return;
+ }catch(error){reportUnavailable(phase,error);return Response.json({error:'Temporarily unavailable. Keep this tab open and retry shortly.'},{status:503})}},async scheduled(event,env){try{await refreshLockerSnapshot(env);await env.DB.prepare('DELETE FROM map_usage WHERE expires<?').bind(Date.now()).run();}catch(error){reportUnavailable('scheduled_maps',error)}if(event.cron==='*/5 * * * *'){
+  if(env.LOCKER_REFRESH_ENABLED==='true'){const health=await inspectLockerSnapshot(env);if(health.state!=='healthy')console.warn({event:'customvibe_snapshot_unhealthy',...health,runbook:'docs/availability-runbook.md#locker-directory-health'});}
+  return;
+ }
  let phase='scheduled_orders';try{
   await cleanOrders(env);phase='scheduled_artwork';await cleanArtwork(env);
   phase='scheduled_mail_delivery';await cleanMailDelivery(env);phase='scheduled_auth';
