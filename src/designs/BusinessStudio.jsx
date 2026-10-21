@@ -1,3 +1,4 @@
+import {MAGNET_SIZE_CM_TEXT} from '../print-dimensions.mjs';
 import React,{useEffect,useLayoutEffect,useState,useRef} from 'react';
 import {businessTemplate,defaultBusinessValues,businessFieldError,validateBusinessValues} from './business.mjs';
 import {renderBusiness} from './business-render.mjs';
@@ -38,11 +39,11 @@ export default function BusinessStudio({selected,onSelect,drafts,setDrafts,editi
  }catch(e){setError(e.message)}finally{setBusy(false)}}
  function back(){focusRequest.current=editing?'heading':design.id;onEditing(null);onSelect('');}
  return <main className="handy-studio section" ref={studioRoot}>
- <header className="handy-heading"><p className="eyebrow">YOUR BUSINESS. ALWAYS HANDY.</p><h1 tabIndex={-1}>Business magnets.</h1><p>Choose a design and add the details that make it yours. Each magnet is 7.5 × 7.5 cm.</p></header>
+ <header className="handy-heading"><p className="eyebrow">YOUR BUSINESS. ALWAYS HANDY.</p><h1 tabIndex={-1}>Business magnets.</h1><p>Choose a design and add the details that make it yours. Each magnet is {MAGNET_SIZE_CM_TEXT}.</p></header>
  {!design?<><BusinessGallery onChoose={choose}/><p className="handy-help">Pick any individual design. Add copies or mix different designs in your basket.</p></>:<>
  <button className="button secondary handy-back" onClick={back} disabled={busy}>{editing?'Cancel editing':'Choose another design'}</button>
  <div className="handy-workbench"><figure className="handy-live-preview" aria-busy={!preview&&!invalid&&!error}>
- <MagnetPreview urls={[preview||design.image]} label={design.name+' preview'}/><figcaption>7.5 × 7.5 cm · Square magnet</figcaption>
+ <MagnetPreview urls={[preview||design.image]} label={design.name+' preview'}/><figcaption>{MAGNET_SIZE_CM_TEXT} · Square magnet</figcaption>
  {invalid&&<p role="status">Shorten the marked details to update your preview.</p>}
  </figure><form className="handy-fields" onSubmit={save}><h2 tabIndex={-1} data-studio-workbench>{design.name}</h2><p>Add your business details below. Your wording and QR code will be printed exactly as shown.</p>
  <fieldset disabled={busy}><legend className="sr-only">Your printed details</legend>{design.fields.map((field,i)=><div className="handy-field" key={field.label}><label htmlFor={'handy-field-'+i}>{field.label}</label><input id={'handy-field-'+i} value={values.entries[i]} placeholder={field.sample} required={!field.optional} maxLength={field.limit} autoComplete="off" aria-invalid={!!fieldErrors[i]} aria-describedby={'handy-hint-'+i} onChange={event=>change(i,event.target.value)}/><small id={'handy-hint-'+i}>{fieldErrors[i]||`Up to ${field.limit} characters${field.optional?' · Optional':''}`}</small></div>)}</fieldset>

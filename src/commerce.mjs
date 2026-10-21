@@ -1,6 +1,7 @@
 import {productMagnetCount,selectedPrintManifest,isTemplateProduct} from './designs/products.mjs';
 import {defaultPricing,canPurchase} from './content/model.mjs';
 import {ARTWORK_LIMITS} from './artwork-policy.mjs';
+import {MAGNET_FACE_INCHES} from './print-dimensions.mjs';
 export const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
 export function photoPrice(qty,pricing=defaultPricing){
   if(!Number.isInteger(qty)||qty<0) throw new Error('Choose a whole number of magnets.');
@@ -32,13 +33,13 @@ export function puzzleRects(r,gridSize=3){
  return Array.from({length:gridSize*gridSize},(_,i)=>({sx:r.sx+(i%gridSize)*r.sw/gridSize,sy:r.sy+Math.floor(i/gridSize)*r.sh/gridSize,sw:r.sw/gridSize,sh:r.sh/gridSize}));
 }
 
-// Assess original pixels before canvas resampling. Every tile prints at 7.5 cm.
+// Assess original pixels before canvas resampling at the shared finished face size.
 export function cropQuality(photo){
  if(!photo||![photo.w,photo.h].every(n=>Number.isFinite(n)&&n>0))return {level:'unknown',pixels:null,ppi:null};
  const rotated=(photo.rotation||0)%180!==0;
  const crop=cropRect(rotated?photo.h:photo.w,rotated?photo.w:photo.h,1,1,photo.zoom,photo.x,photo.y);
  const grid=photo.format==='puzzle'?(photo.gridSize||3):1;
- const pixels=Math.min(crop.sw,crop.sh)/grid,ppi=pixels/(7.5/2.54);
+ const pixels=Math.min(crop.sw,crop.sh)/grid,ppi=pixels/MAGNET_FACE_INCHES;
  return {level:ppi<150?'low':ppi<300?'soft':'good',pixels:Math.floor(pixels),ppi:Math.floor(ppi)};
 }
 

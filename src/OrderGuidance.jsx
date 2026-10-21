@@ -1,3 +1,4 @@
+import {MAGNET_FACE_CM} from './print-dimensions.mjs';
 import React from 'react';
 import {cropQuality,orderCapacity} from './commerce.mjs';
 import {ARTWORK_LIMITS} from './artwork-policy.mjs';
@@ -9,7 +10,7 @@ export function CropQuality({photo,compact=false}){
  return <div className={`crop-quality quality-${quality.level}`} role="status" aria-live="polite" aria-atomic="true">
   <strong>{title}</strong>
   <p>{quality.level==='unknown'?'We could not measure this photo. Check the original before ordering.':quality.level==='good'?'Resolution looks suitable. Still check that your original photo is sharp.':`Try less zoom or a higher-resolution original${puzzle?', or choose fewer puzzle tiles':''}. You can keep this crop if you are happy with it.`}</p>
-  {!compact&&<small>{quality.pixels!==null&&<>{quality.pixels} × {quality.pixels} source pixels {puzzle?'per tile':'in this crop'} · {quality.ppi} ppi at 7.5 cm. </>}Aim for 300 ppi. This checks resolution, not blur or lighting.</small>}
+  {!compact&&<small>{quality.pixels!==null&&<>{quality.pixels} × {quality.pixels} source pixels {puzzle?'per tile':'in this crop'} · {quality.ppi} ppi at {MAGNET_FACE_CM} cm. </>}Aim for 300 ppi. This checks resolution, not blur or lighting.</small>}
  </div>;
 }
 
