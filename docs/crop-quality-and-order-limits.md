@@ -1,5 +1,9 @@
 # Crop quality and order limits
 
+## Current finished size, 21 October 2026
+
+The owner confirmed a 63.5 mm / 6.35 cm / 2.5 inch square finished face. Current source guidance uses 750 source pixels per tile edge for 300 ppi and 375 for 150 ppi. The 1200 px export contract stays unchanged. Earlier 7.5 cm dimensions, 886-pixel targets and recorded PPI results below describe historical implementation and verification. They are not new print acceptance. See [confirmed magnet size](confirmed-magnet-size.md) for the current source and live-catalogue scope.
+
 ## Current entry policy, 17 October 2026
 
 The owner also removed the inherited 30-entry cap. No fixed cap remains on magnet quantities or basket entries. Retained protections: 60 artwork files, 4 MB/file, 32 MB total artwork, 150,000-byte private-order request bodies, 40,000-character serialized saved-order records, existing storage/service quotas, positive safe-integer quantities and 14-day retention. The request body is still bounded before JSON parsing. Saved-order size is also checked before artwork reservation/upload, while the private order service independently retains its own size guard.
