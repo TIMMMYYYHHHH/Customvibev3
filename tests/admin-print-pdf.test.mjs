@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {PDFDocument,PDFName,PDFRawStream,decodePDFRawStream} from 'pdf-lib';
+import {PDFDocument,PDFName,PDFRawStream,decodePDFRawStream,StandardFonts} from 'pdf-lib';
 import {createPrintJob} from '../admin/print-layout.mjs';
 import {exportPrintPdf} from '../admin/print-pdf.mjs';
 const jpeg=new Uint8Array(readFileSync('tests/fixtures/print-tile.jpg'));
@@ -20,13 +20,13 @@ test('PDF has measured A4 pages, exact 63.5 mm images and unchanged JPEG reused 
  const pdf=await PDFDocument.load(bytes);assert.equal(pdf.getPageCount(),2);
  for(const page of pdf.getPages()){const s=page.getSize();assert.ok(Math.abs(s.width-mm(210))<.00001);assert.ok(Math.abs(s.height-mm(297))<.00001);}
  const jpgs=streams(pdf).filter(v=>v.dict.get(PDFName.of('Filter'))?.toString()==='/DCTDecode');assert.equal(jpgs.length,1);assert.deepEqual(new Uint8Array(jpgs[0].contents),jpeg);
- const text=contents(pdf);assert.equal((text.match(/ Do\b/g)||[]).length,7*5);assert.equal((text.match(/<40637573746F6D76696265>/gi)||[]).length,7*4);assert.doesNotMatch(text,/mypicmag|Private customer|private@example|Private notes/);assert.match(text,new RegExp(String(mm(63.5))));
+ const text=contents(pdf);assert.equal((text.match(/ Do\b/g)||[]).length,7*5);assert.equal((text.match(/<40437573746F6D>/gi)||[]).length,7*4);assert.equal((text.match(/<56696265>/gi)||[]).length,7*4);assert.doesNotMatch(text,/mypicmag|Private customer|private@example|Private notes/);assert.match(text,new RegExp(String(mm(63.5))));
  const first=job.pages[0].placements[0];assert.match(text,new RegExp(String(mm(first.xMm))));assert.match(text,new RegExp(String(mm(297-first.yMm-63.5))));
 });
 
 test('hiding outlines retains four live back labels and logos per magnet; advanced size is explicit',async()=>{
  const {job,artwork}=await setup(1,{showGuides:false,imageMm:70});const pdf=await PDFDocument.load(await exportPrintPdf(job,artwork,{logoBytes:logo}));const text=contents(pdf);
- assert.equal((text.match(/<40637573746F6D76696265>/gi)||[]).length,4);assert.equal((text.match(/ Do\b/g)||[]).length,5);assert.equal((text.match(/^S$/gm)||[]).length,0);assert.match(text,new RegExp(String(mm(70))));
+ assert.equal((text.match(/<40437573746F6D>/gi)||[]).length,4);assert.equal((text.match(/<56696265>/gi)||[]).length,4);assert.equal((text.match(/ Do\b/g)||[]).length,5);assert.equal((text.match(/^S$/gm)||[]).length,0);assert.match(text,new RegExp(String(mm(70))));
  const guides=await setup(1);const withGuides=contents(await PDFDocument.load(await exportPrintPdf(guides.job,guides.artwork,{logoBytes:logo})));assert.equal((withGuides.match(/^S$/gm)||[]).length,8);
 });
 
@@ -48,4 +48,19 @@ test('nonsquare JPEG and expired jobs fail; every PDF requires the current logo'
 test('legacy JPEG without a recorded hash still embeds its exact bytes',async()=>{
  const {order,artwork}=await setup(1);delete order.snapshot.items[0].files[0].sha256;
  const pdf=await PDFDocument.load(await exportPrintPdf(createPrintJob(order),artwork,{logoBytes:logo}));const jpgs=streams(pdf).filter(v=>v.dict.get(PDFName.of('Filter'))?.toString()==='/DCTDecode');assert.equal(jpgs.length,1);assert.deepEqual(new Uint8Array(jpgs[0].contents),jpeg);
+});
+
+
+test('two live handle runs use exact plum and berry and meet at measured offsets in all four rotations',async()=>{
+ const {job,artwork}=await setup(1,{showGuides:false});const pdf=await PDFDocument.load(await exportPrintPdf(job,artwork,{logoBytes:logo}));
+ const blocks=[...contents(pdf).matchAll(/BT\n([\s\S]*?)\nET/g)].map(m=>m[1]);assert.equal(blocks.length,8);
+ const font=await pdf.embedFont(StandardFonts.Helvetica),advance=font.widthOfTextAtSize('@Custom',6);
+ for(const [n,brand] of job.pages[0].placements[0].branding.entries()){
+  const first=blocks[n*2],second=blocks[n*2+1];assert.match(first,/<40437573746F6D>/i);assert.match(second,/<56696265>/i);
+  const rgb=b=>b.split('\n').find(l=>l.endsWith(' rg')).split(' ').slice(0,3).map(Number);
+  for(const [actual,expected] of [[rgb(first),[41/255,20/255,56/255]],[rgb(second),[174/255,46/255,91/255]]])actual.forEach((v,i)=>assert.ok(Math.abs(v-expected[i])<1e-10));
+  const matrix=b=>b.split('\n').find(l=>l.endsWith(' Tm')).split(' ').slice(0,6).map(Number),a=matrix(first),b=matrix(second),r=brand.rotation*Math.PI/180;
+  assert.ok(Math.abs(b[4]-a[4]-advance*Math.cos(r))<1e-8);assert.ok(Math.abs(b[5]-a[5]+advance*Math.sin(r))<1e-8);
+  a.slice(0,4).forEach((v,i)=>assert.ok(Math.abs(v-b[i])<1e-10));assert.match(first,/6 Tf/);assert.match(second,/6 Tf/);
+ }
 });

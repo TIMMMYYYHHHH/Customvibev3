@@ -13,7 +13,7 @@ const job=(o,options={})=>createPrintJob(o,{now,...options});
 
 test('seven copies fill six positions then one, with centred full 63.5 mm faces',()=>{
  const j=job(order());assert.equal(j.totalCopies,7);assert.equal(j.pages.length,2);assert.deepEqual(j.pages.map(p=>p.placements.length),[6,1]);assert.equal(j.files.length,1);assert.equal(j.files[0].requestId,id);assert.equal(j.files[0].copies,7);
- const first=j.pages[0].placements[0];assert.equal(first.imageMm,63.5);assert.equal(first.xMm,7.93+(87.2-63.5)/2);assert.equal(first.yMm,5.52+(86.19-63.5)/2);assert.equal(first.outer.polygon.length,8);assert.equal(first.outer.widthMm,87.2);assert.equal(first.outer.heightMm,86.19);assert.deepEqual(first.branding.map(b=>b.rotation),[180,270,0,90]);assert.ok(first.branding.every(b=>b.text==='@customvibe'));
+ const first=j.pages[0].placements[0];assert.equal(first.imageMm,63.5);assert.equal(first.xMm,7.93+(87.2-63.5)/2);assert.equal(first.yMm,5.52+(86.19-63.5)/2);assert.equal(first.outer.polygon.length,8);assert.equal(first.outer.widthMm,87.2);assert.equal(first.outer.heightMm,86.19);assert.deepEqual(first.branding.map(b=>b.rotation),[180,270,0,90]);assert.ok(first.branding.every(b=>b.text==='@CustomVibe'));assert.ok(first.branding.every(b=>JSON.stringify(b.segments)===JSON.stringify([{text:'@Custom',color:'#291438'},{text:'Vibe',color:'#ae2e5b'}])));
  assert.deepEqual(j.pages[0].placements.map(p=>[p.outer.xMm,p.outer.yMm]),[[7.93,5.52],[114.87,5.52],[7.93,105.41],[114.87,105.41],[7.93,205.29],[114.87,205.29]]);
 });
 

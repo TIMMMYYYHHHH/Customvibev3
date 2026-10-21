@@ -42,3 +42,9 @@ Reviewed the subsequent move of dimensions to `src/print-dimensions.mjs`, all ru
 - Fresh reviewer run: **45 tests passed, 0 failed** across print layout/PDF/transport, ZIP archive, crop quality and fallback-content suites using the bundled Node v24.19.0. Root owns the final Node 22 full suite and matching build/notices run; those results are not asserted here.
 
 **Final delta verdict: review clear.** No new blocking issue in this delta. Documentation retains truthful local/publication/physical acceptance boundaries and the original operating protections.
+
+## Owner fold-branding correction, 21 October 2026
+
+The current handle is live `@CustomVibe`: `@Custom` in plum `#291438` and `Vibe` in berry `#ae2e5b`. This supersedes the original e189 all-berry `@customvibe` label described above. SVG and PDF consume the same immutable segment data. PDF uses Helvetica's measured first-run width and the existing rotation transform to position the second run contiguously. Logo, four flap rotations, 6 pt type size, placement coordinates, image/face geometry and artwork bytes are unchanged.
+
+Focused Node 22.23.3 run: 22 passed, zero failed or skipped, across the layout, PDF, SVG preview and transport tests. New assertions check both live segments and exact colours, font-metric alignment at every rotation, rendered SVG tspan order and existing byte-identical JPEG streams. A new synthetic two-page PDF and first-page/flap renders are recorded separately in `audit/fix-plan/print-fold-branding-20261021`; existing release packets and samples are preserved. This is local implementation and visual evidence, not publication or physical print acceptance.

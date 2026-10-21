@@ -12,7 +12,7 @@ Use the placement controls to move the sheet, adjust row/column spacing, or corr
 
 ## Folded-back branding
 
-Every populated octagon retains live `@customvibe` text on four correctly rotated flaps, alongside the existing two-piece puzzle logo. Text uses the established berry and outlines use plum. No logo or tag is added to the customer's front artwork. The former `@mypicmag` label and landscape placeholders are not copied into the new clean layout. Turning outlines off keeps all back branding.
+Every populated octagon retains live `@CustomVibe` text on four correctly rotated flaps, alongside the existing two-piece puzzle logo. The owner correction uses plum `#291438` for `@Custom` and berry `#ae2e5b` for `Vibe`. The two live text runs share one segment model with the SVG preview. PDF positions the second run using the existing Helvetica font metrics and local rotation transform. Outlines use plum. No logo or tag is added to the customer's front artwork. The former `@mypicmag` label and landscape placeholders are not copied into the new clean layout. Turning outlines off keeps all back branding.
 
 ## Integrity and production boundaries
 

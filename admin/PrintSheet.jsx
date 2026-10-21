@@ -11,7 +11,7 @@ function calibrationValues(values){return {...values,...Object.fromEntries(['she
 function NumberField({label,value,onChange,min=-30,max=30}){
  return <label>{label}<input type="number" min={min} max={max} step="0.1" value={value} onChange={event=>onChange(event.target.value)}/></label>;
 }
-function SheetPreview({page,urls,showGuides}){
+export function SheetPreview({page,urls,showGuides}){
  return <svg className="cv-print-paper" viewBox="0 0 210 297" role="img" aria-label={`A4 page ${page.pageIndex+1}, ${page.placements.length} magnet positions`}>
   <rect width="210" height="297" fill="white"/>
   {page.placements.map(placement=><g key={placement.slotIndex}>
@@ -19,7 +19,7 @@ function SheetPreview({page,urls,showGuides}){
    {showGuides&&<polygon points={placement.outer.polygon.map(point=>`${point.xMm},${point.yMm}`).join(' ')} fill="none" stroke="#291438" strokeWidth="0.15"/>}
    {placement.branding.map((brand,n)=><g key={n} transform={`translate(${brand.xMm} ${brand.yMm}) rotate(${brand.rotation})`}>
     <image href={logoUrl} x={brand.logoXMm} y={brand.logoYMm} width={brand.logoMm} height={brand.logoHeightMm}/>
-    <text x={brand.textXMm} y={brand.textYMm} fontFamily="Helvetica,Arial,sans-serif" fontSize={brand.fontSizePt*25.4/72} fill="#ae2e5b">{brand.text}</text>
+    <text x={brand.textXMm} y={brand.textYMm} fontFamily="Helvetica,Arial,sans-serif" fontSize={brand.fontSizePt*25.4/72}>{brand.segments.map((segment,index)=><tspan key={index} fill={segment.color}>{segment.text}</tspan>)}</text>
    </g>)}
   </g>)}
  </svg>;
@@ -77,7 +77,7 @@ export default function PrintSheet({order,disabled=false,onClose,onBusyChange,on
  }
  return <section className="cv-print-sheet" aria-labelledby="print-sheet-heading" aria-busy={busy}>
   <div className="cv-print-heading"><div><h3 id="print-sheet-heading" ref={title} tabIndex={-1}>Prepare print sheet</h3><p>A4 · Six positions · 63.5 × 63.5 mm finished faces</p></div><button type="button" className="cv-btn secondary" onClick={onClose}>Close print sheet</button></div>
-  <p>Saved artwork and exact quantities, with @customvibe on the folded backs. Preparing a sheet does not change the order or send email.</p>
+  <p>Saved artwork and exact quantities, with @CustomVibe on the folded backs. Preparing a sheet does not change the order or send email.</p>
   {status&&<p role="status" className="cv-muted">{status}</p>}{error&&<p role="alert" className="cv-error">{error}</p>}
   {changed&&<p role="alert" className="cv-error">The order changed. Prepare again to use its current artwork.</p>}
   {plan.error&&<p role="alert" className="cv-error">{plan.error}</p>}
