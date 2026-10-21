@@ -1,4 +1,4 @@
-import {MAGNET_FACE_MM} from '../src/print-dimensions.mjs';
+import {MAGNET_FACE_MM,DEFAULT_PRINT_IMAGE_MM} from '../src/print-dimensions.mjs';
 import {ARTWORK_LIMITS,artworkId,artworkHash} from '../src/artwork-policy.mjs';
 import {proofRows} from '../src/proof-manifest.mjs';
 
@@ -21,7 +21,7 @@ function numeric(value,label){if(typeof value!=='number'||!Number.isFinite(value
 function outerFor(slot,c){const row=Math.floor(slot/2),col=slot%2;return {xMm:lefts[col]+c.sheetXMm+col*c.columnSpacingMm+c.slotOffsets[slot].xMm,yMm:tops[row]+c.sheetYMm+row*c.rowSpacingMm+c.slotOffsets[slot].yMm,...PRINT_OUTER};}
 export function getPrintCalibration(options={}){
  if(!options||typeof options!=='object'||Array.isArray(options))fail('Invalid print calibration.');
- const c={sheetXMm:numeric(options.sheetXMm??0,'sheet X offset'),sheetYMm:numeric(options.sheetYMm??0,'sheet Y offset'),columnSpacingMm:numeric(options.columnSpacingMm??0,'column spacing'),rowSpacingMm:numeric(options.rowSpacingMm??0,'row spacing'),imageMm:options.imageMm??MAGNET_FACE_MM,showGuides:options.showGuides??true};
+ const c={sheetXMm:numeric(options.sheetXMm??0,'sheet X offset'),sheetYMm:numeric(options.sheetYMm??0,'sheet Y offset'),columnSpacingMm:numeric(options.columnSpacingMm??0,'column spacing'),rowSpacingMm:numeric(options.rowSpacingMm??0,'row spacing'),imageMm:options.imageMm??DEFAULT_PRINT_IMAGE_MM,showGuides:options.showGuides??true};
  if(typeof c.imageMm!=='number'||!Number.isFinite(c.imageMm)||c.imageMm<MAGNET_FACE_MM||c.imageMm>70)fail(`Image size must be between ${MAGNET_FACE_MM} and 70 mm.`);
  if(typeof c.showGuides!=='boolean')fail('Choose whether to show the fold outlines.');
  if(options.slotOffsets!==undefined&&(!Array.isArray(options.slotOffsets)||options.slotOffsets.length>6))fail('Choose offsets for up to six slots.');

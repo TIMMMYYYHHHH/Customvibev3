@@ -2,10 +2,11 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {api} from './api.mjs';
 import {adminFetch} from './session-recovery.mjs';
 import {createPrintJob,getPrintCalibration} from './print-layout.mjs';
+import {DEFAULT_PRINT_IMAGE_MM,MAGNET_FACE_MM} from '../src/print-dimensions.mjs';
 import {readPrintArtwork,assertCurrentPrintOrder} from './print-artwork.mjs';
 
 const logoUrl='/coming-soon/puzzle-logo-v2.png';
-const defaults=()=>getPrintCalibration();
+export const defaultPrintCalibration=()=>getPrintCalibration();
 const failMessage=error=>error instanceof TypeError?'The connection was interrupted. Retry preparation when connected.':error.message;
 function calibrationValues(values){return {...values,...Object.fromEntries(['sheetXMm','sheetYMm','columnSpacingMm','rowSpacingMm','imageMm'].map(key=>[key,values[key]===''?NaN:Number(values[key])])),slotOffsets:values.slotOffsets.map(slot=>({xMm:slot.xMm===''?NaN:Number(slot.xMm),yMm:slot.yMm===''?NaN:Number(slot.yMm)}))};}
 function NumberField({label,value,onChange,min=-30,max=30}){
@@ -25,7 +26,7 @@ export function SheetPreview({page,urls,showGuides}){
  </svg>;
 }
 export default function PrintSheet({order,disabled=false,onClose,onBusyChange,onOrderRead}){
- const [prepared,setPrepared]=useState(null),[values,setValues]=useState(defaults),[pageIndex,setPageIndex]=useState(0),[slotIndex,setSlotIndex]=useState(0),[error,setError]=useState(''),[status,setStatus]=useState(''),[busy,setBusy]=useState(false),[clock,setClock]=useState(Date.now);
+ const [prepared,setPrepared]=useState(null),[values,setValues]=useState(defaultPrintCalibration),[pageIndex,setPageIndex]=useState(0),[slotIndex,setSlotIndex]=useState(0),[error,setError]=useState(''),[status,setStatus]=useState(''),[busy,setBusy]=useState(false),[clock,setClock]=useState(Date.now);
  const active=useRef(true),operation=useRef(0),controller=useRef(null),resources=useRef([]),busyRef=useRef(false),title=useRef(null),callbacks=useRef({onBusyChange,onOrderRead});callbacks.current={onBusyChange,onOrderRead};
  function clearResources(){for(const url of resources.current)URL.revokeObjectURL(url);resources.current=[];}
  function working(value){busyRef.current=value;setBusy(value);callbacks.current.onBusyChange?.(value);}
@@ -78,6 +79,7 @@ export default function PrintSheet({order,disabled=false,onClose,onBusyChange,on
  return <section className="cv-print-sheet" aria-labelledby="print-sheet-heading" aria-busy={busy}>
   <div className="cv-print-heading"><div><h3 id="print-sheet-heading" ref={title} tabIndex={-1}>Prepare print sheet</h3><p>A4 · Six positions · 63.5 × 63.5 mm finished faces</p></div><button type="button" className="cv-btn secondary" onClick={onClose}>Close print sheet</button></div>
   <p>Saved artwork and exact quantities, with @CustomVibe on the folded backs. Preparing a sheet does not change the order or send email.</p>
+  <p>The default {DEFAULT_PRINT_IMAGE_MM} mm image extends {(DEFAULT_PRINT_IMAGE_MM-MAGNET_FACE_MM)/2} mm beyond each edge of the {MAGNET_FACE_MM} mm finished face for wrapping. The magnet size stays the same.</p>
   {status&&<p role="status" className="cv-muted">{status}</p>}{error&&<p role="alert" className="cv-error">{error}</p>}
   {changed&&<p role="alert" className="cv-error">The order changed. Prepare again to use its current artwork.</p>}
   {plan.error&&<p role="alert" className="cv-error">{plan.error}</p>}
@@ -85,9 +87,9 @@ export default function PrintSheet({order,disabled=false,onClose,onBusyChange,on
   {prepared&&<div className="cv-print-layout"><div className="cv-print-controls">
    {job&&<p><strong>{job.totalCopies} {job.totalCopies===1?'magnet':'magnets'} · {job.pages.length} {job.pages.length===1?'page':'pages'}</strong><br/>{job.reference}{job.revision?` · Artwork revision ${job.revision}`:''}<br/>{job.pages.length*6-job.totalCopies} unused positions</p>}
    <fieldset disabled={busy}><legend>Sheet placement in mm</legend><div className="cv-print-fields"><NumberField label="Move sheet right / left" value={values.sheetXMm} onChange={value=>field('sheetXMm',value)}/><NumberField label="Move sheet down / up" value={values.sheetYMm} onChange={value=>field('sheetYMm',value)}/><NumberField label="Column spacing adjustment" value={values.columnSpacingMm} onChange={value=>field('columnSpacingMm',value)}/><NumberField label="Row spacing adjustment" value={values.rowSpacingMm} onChange={value=>field('rowSpacingMm',value)}/></div></fieldset>
-   <details><summary>Adjust one position or image extent</summary><fieldset disabled={busy}><legend>Advanced placement</legend><label>Position<select value={slotIndex} onChange={e=>setSlotIndex(Number(e.target.value))}>{Array.from({length:6},(_,n)=><option value={n} key={n}>Row {Math.floor(n/2)+1}, {n%2?'right':'left'}</option>)}</select></label><div className="cv-print-fields"><NumberField label="Position right / left" value={values.slotOffsets[slotIndex].xMm} onChange={value=>slotField('xMm',value)}/><NumberField label="Position down / up" value={values.slotOffsets[slotIndex].yMm} onChange={value=>slotField('yMm',value)}/><NumberField label="Printed image size (mm)" min={63.5} max={70} value={values.imageMm} onChange={value=>field('imageMm',value)}/></div><p>The face stays 63.5 mm. Increasing image size puts image edges beyond that face for wrapping. The full saved image keeps its shape; check important edge details before printing.</p></fieldset></details>
+   <details><summary>Adjust one position or image extent</summary><fieldset disabled={busy}><legend>Advanced placement</legend><label>Position<select value={slotIndex} onChange={e=>setSlotIndex(Number(e.target.value))}>{Array.from({length:6},(_,n)=><option value={n} key={n}>Row {Math.floor(n/2)+1}, {n%2?'right':'left'}</option>)}</select></label><div className="cv-print-fields"><NumberField label="Position right / left" value={values.slotOffsets[slotIndex].xMm} onChange={value=>slotField('xMm',value)}/><NumberField label="Position down / up" value={values.slotOffsets[slotIndex].yMm} onChange={value=>slotField('yMm',value)}/><NumberField label="Image extent with wrap (mm)" min={MAGNET_FACE_MM} max={70} value={values.imageMm} onChange={value=>field('imageMm',value)}/></div><p>The finished face stays {MAGNET_FACE_MM} mm. The full saved image keeps its shape as its extent changes. Details beyond the face edges wrap onto the back; check important edge details before printing.</p></fieldset></details>
    <label className="cv-print-check"><input type="checkbox" checked={values.showGuides} disabled={busy} onChange={e=>field('showGuides',e.target.checked)}/>Show outer fold-template outlines</label>
-   <button type="button" className="cv-btn secondary" disabled={busy} onClick={()=>{setValues(defaults());setError('');setStatus('Placement reset to the template defaults.');}}>Reset placement</button>
+   <button type="button" className="cv-btn secondary" disabled={busy} onClick={()=>{setValues(defaultPrintCalibration());setError('');setStatus(`Placement reset to ${DEFAULT_PRINT_IMAGE_MM} mm image extent and the template defaults.`);}}>Reset placement</button>
    <p className="cv-muted">Adjustments stay in this open tab. No Canva step is needed. First use: print one plain-paper sheet at 100% before using magnet stock.</p>
   </div><div className="cv-print-preview">{page?<><label>Preview page<select value={page.pageIndex} onChange={e=>setPageIndex(Number(e.target.value))}>{job.pages.map((p,n)=><option key={n} value={n}>Page {n+1} of {job.pages.length}</option>)}</select></label><SheetPreview page={page} urls={prepared.urls} showGuides={values.showGuides}/><p className="cv-muted">Screen preview is scaled to fit. PDF pages are A4 at their specified dimensions.</p></>:<p>Correct the placement values to restore the preview.</p>}</div></div>}
  </section>;
