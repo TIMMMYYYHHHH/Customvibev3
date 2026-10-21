@@ -42,3 +42,16 @@ Reviewed the subsequent move of dimensions to `src/print-dimensions.mjs`, all ru
 - Fresh reviewer run: **45 tests passed, 0 failed** across print layout/PDF/transport, ZIP archive, crop quality and fallback-content suites using the bundled Node v24.19.0. Root owns the final Node 22 full suite and matching build/notices run; those results are not asserted here.
 
 **Final delta verdict: review clear.** No new blocking issue in this delta. Documentation retains truthful local/publication/physical acceptance boundaries and the original operating protections.
+
+## Owner fold-branding correction, 21 October 2026
+
+The current handle is live `@CustomVibe`: `@Custom` in plum `#291438` and `Vibe` in berry `#ae2e5b`. This supersedes the original e189 all-berry `@customvibe` label described above. SVG and PDF consume the same immutable segment data. PDF uses Helvetica's measured first-run width and the existing rotation transform to position the second run contiguously. Logo, four flap rotations, 6 pt type size, placement coordinates, image/face geometry and artwork bytes are unchanged.
+
+Focused Node 22.23.3 run: 22 passed, zero failed or skipped, across the layout, PDF, SVG preview and transport tests. New assertions check both live segments and exact colours, font-metric alignment at every rotation, rendered SVG tspan order and existing byte-identical JPEG streams. A new synthetic two-page PDF and first-page/flap renders are recorded separately in `audit/fix-plan/print-fold-branding-20261021`; existing release packets and samples are preserved. This is local implementation and visual evidence, not publication or physical print acceptance.
+
+
+## Owner image-edge correction, 21 October 2026
+
+Default and reset image extent are now 68 mm, reaching the owner-marked square and adding 2.25 mm of wrap beyond each edge of the unchanged 63.5 mm finished face. This supersedes the earlier 63.5 mm default. Advanced image extent remains 63.5 to 70 mm. Relative to the previous sample, image width/height increase 4.5 mm and each image's top-left moves 2.25 mm left/up. Face, fold polygons, logos, two-tone handles and all their positions are unchanged. Saved JPEG bytes remain identical and are embedded once per design without resampling or another crop. Content beyond the face wraps onto the back. No artwork-revision control was changed.
+
+Focused Node 22.23.3 result: 25 passed, zero failed/skipped, including default/reset, explicit minimum/maximum, 68 mm SVG/PDF placement, fixed-face geometry, unchanged JPEG streams and all four rotated logo/handle clearance checks. New synthetic PDF and page/edge-fold renders are separate under `audit/fix-plan/print-edge-20261021`; prior e189 and 938c801 sample evidence stays immutable. This is local implementation and rendered evidence only, not publication or physical fit acceptance.

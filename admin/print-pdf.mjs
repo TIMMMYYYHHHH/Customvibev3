@@ -6,8 +6,9 @@ import {assertPrintJob,PRINT_PAGE,PRINT_LIMITS} from './print-layout.mjs';
 // JPEG streams are embedded verbatim once per master. All geometry uses the
 // immutable model shared by the SVG preview. Logo is the existing 3:2 v2 PNG.
 export const mmToPoints=value=>value*72/25.4;
-const berry=rgb(174/255,46/255,91/255),plum=rgb(41/255,20/255,56/255);
+const plum=rgb(41/255,20/255,56/255);
 const digest=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),v=>v.toString(16).padStart(2,'0')).join('');
+const brandColor=hex=>rgb(...[1,3,5].map(at=>parseInt(hex.slice(at,at+2),16)/255));
 function localPoint(brand,x,y){const a=brand.rotation*Math.PI/180;return {x:mmToPoints(brand.xMm+x*Math.cos(a)-y*Math.sin(a)),y:mmToPoints(PRINT_PAGE.heightMm-brand.yMm-x*Math.sin(a)-y*Math.cos(a))};}
 export async function exportPrintPdf(job,artwork,{logoBytes}={}){
  assertPrintJob(job);
@@ -35,7 +36,11 @@ export async function exportPrintPdf(job,artwork,{logoBytes}={}){
    for(const brand of placement.branding){
     const rotation=degrees(-brand.rotation);
     if(logo){const p=localPoint(brand,brand.logoXMm,brand.logoYMm+brand.logoHeightMm);page.drawImage(logo,{...p,width:mmToPoints(brand.logoMm),height:mmToPoints(brand.logoHeightMm),rotate:rotation});}
-    page.drawText(brand.text,{...localPoint(brand,brand.textXMm,brand.textYMm),size:brand.fontSizePt,font,color:berry,rotate:rotation});
+    let textXMm=brand.textXMm;
+    for(const segment of brand.segments){
+     page.drawText(segment.text,{...localPoint(brand,textXMm,brand.textYMm),size:brand.fontSizePt,font,color:brandColor(segment.color),rotate:rotation});
+     textXMm+=font.widthOfTextAtSize(segment.text,brand.fontSizePt)*25.4/72;
+    }
    }
   }
  }

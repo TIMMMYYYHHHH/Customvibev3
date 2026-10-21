@@ -1,5 +1,7 @@
 # Admin print sheets and confirmed magnet size implementation plan
 
+Current owner edge-coverage correction, 21 October: default and Reset use a 68 mm printed image extent, adding 2.25 mm wrap beyond each edge of the unchanged 63.5 mm face. This supersedes the original 63.5 mm image default in this historical plan; the 63.5 to 70 mm advanced range remains.
+
 **Goal:** Prepare current private order artwork as correctly counted, branded six-position A4 sheets without Canva, and correct the product face to 63.5 mm.
 **Authority:** Tim approved the proposed Admin preview/calibration/PDF flow on 21 October. Keep @customvibe on folded backs, use existing branding, and do not require printer details or sample photos before implementation. His Samsung Chrome/Firefox/Gmail/Outlook check passed generally; repeat device checks before launch, without claiming unreported individual accessibility checks.
 **Architecture:** A pure placement/counting model feeds a small browser PDF renderer and the Admin preview. Existing authenticated downloads supply exact saved JPEGs. Shared physical-size constants feed storefront guidance and print instructions. No new backend, schema, cloud renderer or paid service.

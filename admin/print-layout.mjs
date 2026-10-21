@@ -1,4 +1,4 @@
-import {MAGNET_FACE_MM} from '../src/print-dimensions.mjs';
+import {MAGNET_FACE_MM,DEFAULT_PRINT_IMAGE_MM} from '../src/print-dimensions.mjs';
 import {ARTWORK_LIMITS,artworkId,artworkHash} from '../src/artwork-policy.mjs';
 import {proofRows} from '../src/proof-manifest.mjs';
 
@@ -10,6 +10,8 @@ import {proofRows} from '../src/proof-manifest.mjs';
 export const PRINT_LIMITS=Object.freeze({pages:500,copies:3000,files:ARTWORK_LIMITS.files,fileBytes:ARTWORK_LIMITS.fileBytes,requestBytes:ARTWORK_LIMITS.requestBytes});
 export const PRINT_PAGE=Object.freeze({widthMm:210,heightMm:297,slots:6});
 export const PRINT_OUTER=Object.freeze({widthMm:87.2,heightMm:86.19});
+// Live folded-back handle, shared by SVG and PDF. No branding is on the face.
+export const PRINT_BRANDING_SEGMENTS=freeze([{text:'@Custom',color:'#291438'},{text:'Vibe',color:'#ae2e5b'}]);
 const lefts=[7.93,114.87],tops=[5.52,105.41,205.29];
 const generated=new WeakSet();
 const fail=message=>{throw new Error(message);};
@@ -19,7 +21,7 @@ function numeric(value,label){if(typeof value!=='number'||!Number.isFinite(value
 function outerFor(slot,c){const row=Math.floor(slot/2),col=slot%2;return {xMm:lefts[col]+c.sheetXMm+col*c.columnSpacingMm+c.slotOffsets[slot].xMm,yMm:tops[row]+c.sheetYMm+row*c.rowSpacingMm+c.slotOffsets[slot].yMm,...PRINT_OUTER};}
 export function getPrintCalibration(options={}){
  if(!options||typeof options!=='object'||Array.isArray(options))fail('Invalid print calibration.');
- const c={sheetXMm:numeric(options.sheetXMm??0,'sheet X offset'),sheetYMm:numeric(options.sheetYMm??0,'sheet Y offset'),columnSpacingMm:numeric(options.columnSpacingMm??0,'column spacing'),rowSpacingMm:numeric(options.rowSpacingMm??0,'row spacing'),imageMm:options.imageMm??MAGNET_FACE_MM,showGuides:options.showGuides??true};
+ const c={sheetXMm:numeric(options.sheetXMm??0,'sheet X offset'),sheetYMm:numeric(options.sheetYMm??0,'sheet Y offset'),columnSpacingMm:numeric(options.columnSpacingMm??0,'column spacing'),rowSpacingMm:numeric(options.rowSpacingMm??0,'row spacing'),imageMm:options.imageMm??DEFAULT_PRINT_IMAGE_MM,showGuides:options.showGuides??true};
  if(typeof c.imageMm!=='number'||!Number.isFinite(c.imageMm)||c.imageMm<MAGNET_FACE_MM||c.imageMm>70)fail(`Image size must be between ${MAGNET_FACE_MM} and 70 mm.`);
  if(typeof c.showGuides!=='boolean')fail('Choose whether to show the fold outlines.');
  if(options.slotOffsets!==undefined&&(!Array.isArray(options.slotOffsets)||options.slotOffsets.length>6))fail('Choose offsets for up to six slots.');
@@ -36,7 +38,7 @@ function geometry(slot,c,file){
  // Measured template corner cuts: approximately 20.1 x 19.9 mm. The
  // centre image is deliberately consistent across all six old template slots.
  outer.polygon=[[20.1,0],[w-20.1,0],[w,19.9],[w,h-19.9],[w-20.1,h],[20.1,h],[0,h-19.9],[0,19.9]].map(([dx,dy])=>({xMm:x+dx,yMm:y+dy}));
- const branding=[[w/2,4.1,180],[w-4.1,h/2,270],[w/2,h-4.1,0],[4.1,h/2,90]].map(([dx,dy,rotation])=>({xMm:x+dx,yMm:y+dy,rotation,text:'@customvibe',fontSizePt:6,logoMm:4,logoXMm:-10,logoYMm:-4/3,logoHeightMm:8/3,textXMm:-4.5,textYMm:.75}));
+ const branding=[[w/2,4.1,180],[w-4.1,h/2,270],[w/2,h-4.1,0],[4.1,h/2,90]].map(([dx,dy,rotation])=>({xMm:x+dx,yMm:y+dy,rotation,text:PRINT_BRANDING_SEGMENTS.map(segment=>segment.text).join(''),segments:PRINT_BRANDING_SEGMENTS,fontSizePt:6,logoMm:4,logoXMm:-10,logoYMm:-4/3,logoHeightMm:8/3,textXMm:-4.5,textYMm:.75}));
  return {file,slotIndex:slot,xMm:x+(w-c.imageMm)/2,yMm:y+(h-c.imageMm)/2,imageMm:c.imageMm,face:{xMm:x+(w-MAGNET_FACE_MM)/2,yMm:y+(h-MAGNET_FACE_MM)/2,sizeMm:MAGNET_FACE_MM},outer,branding};
 }
 const filename=/^design-\d{2,}-(?:photo|proof|row-[1-5]-col-[1-5]|(?:alphabet|counting|words|colours|reminders|thanks|business|qr|wifi|information|noughts-crosses|face)-[1-9][0-9]?)\.jpg$/;

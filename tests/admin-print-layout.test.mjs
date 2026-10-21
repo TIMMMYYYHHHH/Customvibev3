@@ -13,7 +13,7 @@ const job=(o,options={})=>createPrintJob(o,{now,...options});
 
 test('seven copies fill six positions then one, with centred full 63.5 mm faces',()=>{
  const j=job(order());assert.equal(j.totalCopies,7);assert.equal(j.pages.length,2);assert.deepEqual(j.pages.map(p=>p.placements.length),[6,1]);assert.equal(j.files.length,1);assert.equal(j.files[0].requestId,id);assert.equal(j.files[0].copies,7);
- const first=j.pages[0].placements[0];assert.equal(first.imageMm,63.5);assert.equal(first.xMm,7.93+(87.2-63.5)/2);assert.equal(first.yMm,5.52+(86.19-63.5)/2);assert.equal(first.outer.polygon.length,8);assert.equal(first.outer.widthMm,87.2);assert.equal(first.outer.heightMm,86.19);assert.deepEqual(first.branding.map(b=>b.rotation),[180,270,0,90]);assert.ok(first.branding.every(b=>b.text==='@customvibe'));
+ const first=j.pages[0].placements[0];assert.equal(first.imageMm,68);assert.equal(first.xMm,7.93+(87.2-68)/2);assert.equal(first.yMm,5.52+(86.19-68)/2);assert.equal(first.face.sizeMm,63.5);assert.equal(first.outer.polygon.length,8);assert.equal(first.outer.widthMm,87.2);assert.equal(first.outer.heightMm,86.19);assert.deepEqual(first.branding.map(b=>b.rotation),[180,270,0,90]);assert.ok(first.branding.every(b=>b.text==='@CustomVibe'));assert.ok(first.branding.every(b=>JSON.stringify(b.segments)===JSON.stringify([{text:'@Custom',color:'#291438'},{text:'Vibe',color:'#ae2e5b'}])));
  assert.deepEqual(j.pages[0].placements.map(p=>[p.outer.xMm,p.outer.yMm]),[[7.93,5.52],[114.87,5.52],[7.93,105.41],[114.87,105.41],[7.93,205.29],[114.87,205.29]]);
 });
 
@@ -44,7 +44,7 @@ test('invalid quantities, unsafe identities, size/hash/expiry and totals fail cl
 });
 
 test('calibration validates six slots, finite values, bounds, overlap and explicit image extent',()=>{
- const base=getPrintCalibration();assert.equal(base.imageMm,63.5);assert.equal(base.showGuides,true);assert.equal(base.slotOffsets.length,6);
+ const base=getPrintCalibration();assert.equal(base.imageMm,68);assert.equal(base.showGuides,true);assert.equal(base.slotOffsets.length,6);
  const c=getPrintCalibration({sheetXMm:1,sheetYMm:1,columnSpacingMm:-1,rowSpacingMm:1,imageMm:70,showGuides:false,slotOffsets:[{xMm:.5,yMm:.25}]});const j=job(order(),{calibration:c});assert.equal(j.calibration.showGuides,false);assert.equal(j.pages[0].placements[0].imageMm,70);assert.equal(j.pages[0].placements[0].outer.xMm,9.43);assert.equal(j.pages[0].placements[0].branding.length,4);
  for(const opt of [{sheetXMm:NaN},{sheetXMm:Infinity},{sheetXMm:'1'},{sheetXMm:8},{sheetYMm:-6},{imageMm:63.4},{imageMm:70.1},{rowSpacingMm:3},{columnSpacingMm:-20},{slotOffsets:[{xMm:25}]},{slotOffsets:[{yMm:14}, {}, {yMm:-14}]},{showGuides:'false'},{slotOffsets:Array(7).fill({})}])assert.throws(()=>getPrintCalibration(opt));
  assert.deepEqual(getPrintCalibration(),base);
@@ -91,5 +91,16 @@ test('completed assisted and missing-source historical revisions accept actual p
   const missing=structuredClone(o);missing.proof.items[0].files=[];assert.throws(()=>job(missing),/artwork|design/i);
   const reference=structuredClone(o);reference.proof.items[0].files[0].reference=true;assert.throws(()=>job(reference),/artwork|design/i);
   const wrong=structuredClone(o);wrong.proof.items[0].files[0].name='design-01-face-99.jpg';assert.throws(()=>job(wrong),/position|manifest|match/i);
+ }
+});
+
+
+test('default and reset provide 68 mm full-image wrap with a fixed 63.5 mm face and unchanged fold geometry',()=>{
+ const o=order(),wrapped=job(o),faceOnly=job(o,{calibration:{imageMm:63.5}});
+ const reset=getPrintCalibration();assert.equal(reset.imageMm,68);assert.equal(reset.sheetXMm,0);assert.equal(reset.sheetYMm,0);assert.ok(reset.slotOffsets.every(s=>s.xMm===0&&s.yMm===0));
+ assert.equal(getPrintCalibration({imageMm:63.5}).imageMm,63.5);assert.equal(getPrintCalibration({imageMm:70}).imageMm,70);
+ for(const [n,p] of placements(wrapped).entries()){
+  const before=placements(faceOnly)[n];assert.equal(p.imageMm-before.imageMm,4.5);assert.equal(p.face.xMm-p.xMm,2.25);assert.equal(p.face.yMm-p.yMm,2.25);assert.equal(p.imageMm-p.face.sizeMm,4.5);
+  assert.deepEqual(p.face,before.face);assert.deepEqual(p.outer,before.outer);assert.deepEqual(p.branding,before.branding);assert.equal(p.file.name,before.file.name);
  }
 });
