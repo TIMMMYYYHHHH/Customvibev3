@@ -128,3 +128,19 @@ for(const finalized of [0,1])test(`absent artwork with finalized=${finalized} ca
  assert.equal((await uploadFile()).status,200);assert.equal((await finish()).status,200);assert.equal(sends,2);assert.equal(storage.sql.prepare('SELECT count(*) AS n FROM orders').get().n,1);
  assert.equal(JSON.parse(storage.sql.prepare('SELECT snapshot FROM orders').get().snapshot).paymentStatus,'unpaid');
 });
+
+test('private preview emails keep identical receipt retries and never persist thumbnail content',async()=>{
+ const storage=artworkEnv(),env={...setup(),...storage,ARTWORK_STORAGE_ENABLED:'true',ORDER_RECORDS_ENABLED:'true'};
+ env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),storage)};const context=await form(env);
+ const preview=readFileSync('tests/fixtures/email-design-preview.jpg').toString('base64');
+ const data={id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),referenceVersion:2,contact:{name:'Synthetic preview',email:'customer@example.invalid',phone:'0821234567'},locker:{name:'Synthetic locker',area:'Test'},consent:true,emailPreviewVersion:1,items:[{kind:'photo',qty:2,files:[{size:tile.length,sha256:await sha(tile)}],emailPreview:preview}]};
+ const sent=[];const network=async(url,options)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});const mail=JSON.parse(options.body);sent.push({body:options.body,key:options.headers['Idempotency-Key'],owner:mail.to[0]==='hello@customvibe.co.za'});return !sent.at(-1).owner&&sent.filter(s=>!s.owner).length===1?new Response(null,{status:503}):Response.json({id:'accepted'});};
+ const started=await submissions(post('/api/artwork/init',context,data),env,network);assert.equal(started.status,200);const {grant,resume}=await started.json();assert.ok(grant.length<=1024);assert.ok(resume.length<=1024);
+ const upload=await submissions(new Request(origin+'/api/artwork/upload',{method:'POST',headers:{origin,cookie:context.cookie,'X-CSRF-Token':context.csrf,'Content-Type':'image/jpeg','X-Artwork-Grant':grant,'X-Artwork-Index':'0'},body:tile}),env,network);assert.equal(upload.status,200);
+ const finish=()=>submissions(new Request(origin+'/api/order-request',{method:'POST',headers:{origin,cookie:context.cookie,'X-CSRF-Token':context.csrf,'CF-Connecting-IP':'192.0.2.7','Content-Type':'application/json'},body:JSON.stringify({payload:data,grant,website:''})}),env,network);
+ const first=await(await finish()).json();assert.equal(first.receiptSent,false);const retried=await(await finish()).json();assert.equal(retried.receiptSent,true);assert.equal(sent.filter(s=>s.owner).length,1);
+ const receipts=sent.filter(s=>!s.owner);assert.equal(receipts.length,2);assert.equal(receipts[0].body,receipts[1].body);assert.equal(receipts[0].key,receipts[1].key);
+ for(const {body} of sent){const mail=JSON.parse(body);assert.match(mail.html,/Design previews/);assert.equal(mail.attachments.find(a=>a.content_id==='cv-design-1').content,preview);assert.ok(Buffer.byteLength(body)<200000);}
+ const saved=storage.sql.prepare('SELECT snapshot FROM orders').get().snapshot;assert.ok(!saved.includes(preview));assert.ok(!saved.includes('emailPreview'));assert.equal(storage.objects.size,1);assert.deepEqual([...storage.objects.values()][0],new Uint8Array(tile));
+ const altered={...data,items:[{...data.items[0],emailPreview:preview.slice(0,-4)+'AAAA'}]};assert.equal((await submissions(post('/api/artwork/init',context,altered),env,network)).status,400);assert.equal(sent.length,3);
+});

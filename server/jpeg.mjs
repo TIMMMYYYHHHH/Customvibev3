@@ -1,5 +1,5 @@
 const invalid=()=>{throw new Error('Invalid JPEG')};
-export function validateJpeg(content,proof=false,maxLength=1400000){
+export function validateJpeg(content,proof=false,maxLength=1400000,edgeRange){
  let binary;
  if(typeof content==='string'){if(content.length>maxLength||content.length%4)invalid();try{binary=Uint8Array.from(atob(content),c=>c.charCodeAt(0))}catch{invalid()}}else{if(!(content instanceof Uint8Array)||content.length>maxLength)invalid();binary=content}
  const byte=i=>binary[i];
@@ -14,7 +14,7 @@ export function validateJpeg(content,proof=false,maxLength=1400000){
   if(marker===224&&(![74,70,73,70,0].every((v,i)=>byte(at+4+i)===v)||length!==16))invalid();
   if(marker===219){let p=at+4;if(p===end)invalid();while(p<end){const table=byte(p++);if(table>3||p+64>end)invalid();for(let i=0;i<64;i++)if(byte(p++)===0)invalid();quant.add(table);}if(p!==end)invalid();}
   if(marker===196){let p=at+4;if(p===end)invalid();while(p<end){const table=byte(p++);if(![0,1,2,3,16,17,18,19].includes(table)||p+16>end)invalid();let count=0,slots=1;for(let i=0;i<16;i++){const n=byte(p++);count+=n;slots=slots*2-n;if(slots<0)invalid();}if(!count||count>256||p+count>end)invalid();p+=count;huffman.add(table);}if(p!==end)invalid();}
-  if(marker===192){const h=(byte(at+5)<<8)|byte(at+6),w=(byte(at+7)<<8)|byte(at+8);components=byte(at+9);if(dimensions||byte(at+4)!==8||![1,3].includes(components)||length!==8+3*components||w!==h||w<1||(proof?w>2600:w!==1200))invalid();for(let p=at+10;p<end;p+=3){const id=byte(p),sampling=byte(p+1),table=byte(p+2);if(componentTables.has(id)||!(sampling>>4)||(sampling>>4)>4||!(sampling&15)||(sampling&15)>4||table>3)invalid();componentTables.set(id,table);}dimensions=true;}
+  if(marker===192){const h=(byte(at+5)<<8)|byte(at+6),w=(byte(at+7)<<8)|byte(at+8);components=byte(at+9);if(dimensions||byte(at+4)!==8||![1,3].includes(components)||length!==8+3*components||w!==h||w<1||(edgeRange?w<edgeRange.min||w>edgeRange.max:proof?w>2600:w!==1200))invalid();for(let p=at+10;p<end;p+=3){const id=byte(p),sampling=byte(p+1),table=byte(p+2);if(componentTables.has(id)||!(sampling>>4)||(sampling>>4)>4||!(sampling&15)||(sampling&15)>4||table>3)invalid();componentTables.set(id,table);}dimensions=true;}
   if(marker===221&&length!==4)invalid();
   if(marker===218){
    if(!dimensions||!quant.size||!huffman.size||byte(at+4)!==components||length!==6+2*components||byte(end-3)!==0||byte(end-2)!==63||byte(end-1)!==0)invalid();
