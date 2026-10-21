@@ -23,9 +23,20 @@ function manifest(files){
  const clean=files.map(f=>{if(!f||!Number.isSafeInteger(f.size)||f.size<20||f.size>limits.fileBytes||!artworkHash(f.sha256)||typeof f.proof!=='boolean'||!/^design-\d{2,}-(?:photo|proof|row-[1-5]-col-[1-5]|(?:face|alphabet|counting|words|colours|reminders|thanks|business|qr|wifi|information)-[1-9][0-9]?)\.jpg$/.test(f.name))throw Error('Invalid file');bytes+=f.size;return {size:f.size,sha256:f.sha256,proof:f.proof,name:f.name}});
  if(bytes>limits.requestBytes)throw Error('Too much artwork');return {json:JSON.stringify(clean),bytes,files:clean};
 }
-async function operation(env){
+async function operation(env,count=1){
+ if(!count)return true;
  const id='ops:'+new Date().toISOString().slice(0,7);
- return !!await env.DB.prepare('INSERT INTO artwork_usage(id,amount) VALUES (?,1) ON CONFLICT(id) DO UPDATE SET amount=amount+1 WHERE amount<? RETURNING amount').bind(id,limits.monthlyOperations).first();
+ return !!await env.DB.prepare('INSERT INTO artwork_usage(id,amount) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET amount=amount+excluded.amount WHERE amount<=? RETURNING amount').bind(id,count,limits.monthlyOperations-count).first();
+}
+function verifiedObject(object,file){
+ // R2 verifies the SHA-256 supplied by the existing upload writer. An ETag is
+ // not that checksum, and absent checksum metadata cannot establish integrity.
+ const checksum=object?.checksums?.sha256;
+ return object?.size===file.size&&checksum?.byteLength===32&&Array.from(new Uint8Array(checksum),b=>b.toString(16).padStart(2,'0')).join('')===file.sha256;
+}
+async function unexpired(env,id){
+ const row=await env.DB.prepare('SELECT expires FROM artwork_requests WHERE id=?').bind(id).first();
+ return row&&row.expires>epoch();
 }
 async function init(body,env){
  if(!artworkId(body.id)||!artworkHash(body.owner)||!artworkHash(body.key))return fail(400,'Invalid artwork request.');
@@ -49,16 +60,23 @@ async function upload(request,env){
  if(!artworkId(id)||!artworkHash(owner)||!/^\d{1,2}$/.test(raw||'')||request.headers.get('content-type')!=='image/jpeg')return fail(400,'Invalid upload.');
  const index=Number(raw);
  // Return only this immutable manifest entry, not every file in the order.
- const row=await env.DB.prepare('SELECT r.owner,r.expires,json_extract(r.manifest,?) AS file,f.ready FROM artwork_requests r LEFT JOIN artwork_files f ON f.request_id=r.id AND f.slot=? WHERE r.id=?').bind('$['+index+']',index,id).first();
+ const row=await env.DB.prepare('SELECT r.owner,r.expires,json_extract(r.manifest,?) AS file,f.ready,f.lease FROM artwork_requests r LEFT JOIN artwork_files f ON f.request_id=r.id AND f.slot=? WHERE r.id=?').bind('$['+index+']',index,id).first();
  if(!row||row.owner!==owner)return fail(403,'Artwork session not found.');if(row.expires<=epoch())return fail(410,'Artwork expired.');
  const file=row.file&&JSON.parse(row.file);if(!file)return fail(400,'Unknown artwork file.');
- if(row.ready)return Response.json({ok:true});
+ if(row.ready){
+  if(!await operation(env))return fail(429,'The storage operation allowance is full.');
+  const object=await env.ARTWORK.head(objectKey(id,index));
+  if(!await unexpired(env,id))return fail(410,'Artwork expired.');
+  if(object)return verifiedObject(object,file)?Response.json({ok:true}):fail(409,'The artwork file could not be verified.');
+  // Only confirmed absence may be repaired from the caller's validated bytes.
+  // The observed lease below fences this check against a newer upload.
+ }
  let bytes;try{bytes=await boundedBytes(request,file.size);if(bytes.length!==file.size||await artworkDigest(bytes)!==file.sha256)throw Error('Mismatch');validateJpeg(bytes,file.proof,limits.fileBytes)}catch{return fail(400,'The artwork file could not be verified.')}
  const lease=crypto.randomUUID(),now=epoch();
  // The operation belongs only to the lease acquired by this atomic batch.
  // A competing/repeated upload cannot spend quota without winning that lease.
  const claims=await env.DB.batch([
-  env.DB.prepare('UPDATE artwork_files SET tries=tries+1,lease=?,lease_until=? WHERE request_id=? AND slot=? AND ready=0 AND tries<3 AND lease_until<=? RETURNING slot').bind(lease,now+120,id,index,now),
+  env.DB.prepare('UPDATE artwork_files SET ready=0,tries=tries+1,lease=?,lease_until=? WHERE request_id=? AND slot=? AND ready=? AND lease IS ? AND tries<3 AND lease_until<=? AND EXISTS(SELECT 1 FROM artwork_requests WHERE id=? AND expires>?) RETURNING slot').bind(lease,now+120,id,index,row.ready,row.lease,now,id,now),
   env.DB.prepare('INSERT INTO artwork_usage(id,amount) SELECT ?,1 WHERE EXISTS(SELECT 1 FROM artwork_files WHERE request_id=? AND slot=? AND lease=?) ON CONFLICT(id) DO UPDATE SET amount=amount+1 WHERE amount<? RETURNING amount').bind('ops:'+new Date().toISOString().slice(0,7),id,index,lease,limits.monthlyOperations)
  ]);
  if(!claims[0].results.length)return fail(409,'An upload is still processing or its retry limit was reached.');
@@ -87,7 +105,16 @@ export async function artworkService(request,env){
   if(body.files&&JSON.stringify(body.files)!==row.manifest)return fail(409,'Artwork manifest changed.');
   const pending=await env.DB.prepare('SELECT count(*) AS n FROM artwork_files WHERE request_id=? AND ready=0').bind(body.id).first();
   if(pending.n)return fail(409,'Some artwork has not finished uploading.');
-  await env.DB.prepare('UPDATE artwork_requests SET finalized=1 WHERE id=?').bind(body.id).run();return Response.json({ok:true,expires:row.expires});
+  const files=JSON.parse(row.manifest);
+  // Reserve the whole bounded manifest before any R2 calls. Partial quota
+  // availability must not permit unaccounted reads or partial finalization.
+  if(!await operation(env,files.length))return fail(429,'The storage operation allowance is full.');
+  for(const [index,file] of files.entries()){
+   if(!verifiedObject(await env.ARTWORK.head(objectKey(body.id,index)),file))return fail(409,'Some artwork has not finished uploading.');
+  }
+  const completed=await env.DB.prepare('UPDATE artwork_requests SET finalized=1 WHERE id=? AND expires>? AND NOT EXISTS(SELECT 1 FROM artwork_files WHERE request_id=? AND ready=0) RETURNING expires').bind(body.id,epoch(),body.id).first();
+  if(completed)return Response.json({ok:true,expires:completed.expires});
+  return await unexpired(env,body.id)?fail(409,'Some artwork has not finished uploading.'):fail(410,'Artwork expired.');
  }
  if(!row.finalized)return fail(404,'These designs have not been submitted.');
  const files=JSON.parse(row.manifest);

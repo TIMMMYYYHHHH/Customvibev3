@@ -1,4 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';import {readFileSync,readdirSync} from 'node:fs';
+import {artworkEnv,tile,sha} from './helpers/artwork.mjs';
 import {submissions} from '../server/submissions.mjs';import security from '../security/index.mjs';import {defaultContent} from '../src/content/model.mjs';import {random,secure} from '../server/auth.mjs';
 function database(){const db=new DatabaseSync(':memory:');for(const f of readdirSync('migrations/security').filter(f=>f.endsWith('.sql')).sort())db.exec(readFileSync('migrations/security/'+f,'utf8'));const prepare=(sql,args=[])=>({bind(...args){return prepare(sql,args)},run:async()=>({meta:db.prepare(sql).run(...args)}),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)})});let queue=Promise.resolve();return {prepare,batch(statements){const operation=queue.then(async()=>{db.exec('BEGIN');try{const rows=[];for(const statement of statements)rows.push(await statement.all());db.exec('COMMIT');return rows}catch(e){db.exec('ROLLBACK');throw e}});queue=operation.catch(()=>{});return operation}}}
 const origin='https://customvibe.co.za';
@@ -109,4 +110,21 @@ test('submission readiness follows its sending configuration independently of th
   assert.equal((await (await submissions(new Request(origin+'/api/forms'),env)).json()).available,false);
   assert.equal((await submissions(post('/api/contact',context,payload()),env,async()=>{throw Error('Disabled sending must not call providers')})).status,503);
  }
+});
+
+
+for(const finalized of [0,1])test(`absent artwork with finalized=${finalized} cannot reserve an order or dispatch email before validated repair`,async()=>{
+ const storage=artworkEnv(),env={...setup(),...storage,ARTWORK_STORAGE_ENABLED:'true',ORDER_RECORDS_ENABLED:'true'};
+ env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),storage)};const context=await form(env);
+ const data={id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'customer@example.com',phone:'0821234567'},locker:{name:'Preferred locker',area:'Durban'},consent:true,items:[{kind:'photo',qty:1,files:[{size:tile.length,sha256:await sha(tile)}]}]};let sends=0;
+ const network=async url=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});sends++;return Response.json({id:'accepted'})};
+ const initial=await submissions(post('/api/artwork/init',context,data),env,network);assert.equal(initial.status,200);const {grant}=await initial.json();
+ const uploadFile=()=>submissions(new Request(origin+'/api/artwork/upload',{method:'POST',headers:{origin,cookie:context.cookie,'X-CSRF-Token':context.csrf,'Content-Type':'image/jpeg','X-Artwork-Grant':grant,'X-Artwork-Index':'0'},body:tile}),env,network);
+ assert.equal((await uploadFile()).status,200);
+ if(finalized){const owner=storage.sql.prepare('SELECT owner FROM artwork_requests WHERE id=?').get(data.id).owner;assert.equal((await env.AUTH.fetch('https://auth.internal/artwork/complete',{method:'POST',body:JSON.stringify({id:data.id,owner})})).status,200)}
+ storage.objects.delete(data.id+'/0.jpg');
+ const finish=()=>submissions(new Request(origin+'/api/order-request',{method:'POST',headers:{origin,cookie:context.cookie,'X-CSRF-Token':context.csrf,'CF-Connecting-IP':'192.0.2.7','Content-Type':'application/json'},body:JSON.stringify({payload:data,grant})}),env,network);
+ assert.equal((await finish()).status,409);assert.equal(sends,0);assert.equal(storage.sql.prepare('SELECT count(*) AS n FROM orders').get().n,0);assert.equal(storage.sql.prepare('SELECT count(*) AS n FROM submissions').get().n,0);
+ assert.equal((await uploadFile()).status,200);assert.equal((await finish()).status,200);assert.equal(sends,2);assert.equal(storage.sql.prepare('SELECT count(*) AS n FROM orders').get().n,1);
+ assert.equal(JSON.parse(storage.sql.prepare('SELECT snapshot FROM orders').get().snapshot).paymentStatus,'unpaid');
 });
