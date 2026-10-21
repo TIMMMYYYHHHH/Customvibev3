@@ -28,7 +28,7 @@ The runner writes sanitized actor/method/path/status traces and synthetic screen
 
 This is not Cloudflare D1 deployment/availability, transport/TLS, independent identity-provider or live authentication acceptance. SQLite cannot establish every distributed edge timing. The simultaneous API race and browser stale-save journeys are distinct evidence. Browser scope is installed desktop Chrome at1280x1000, not physical-device, cross-engine, measured performance or accessibility conformance.
 
-Calendar/time-boundary activation, public rollout, complete expired-session recovery, manual email retry journeys, proof replacement/approval and production concurrency remain separate TECH28 work. No clock, seeded setting, fixture session or database enters production. Root owns integration/current-head CI and any later publication or Hub acceptance; this tranche does not close TECH28/GAP-A06.
+Calendar/time-boundary activation, public rollout, complete expired-session recovery, manual email retry journeys, internal artwork replacement and production concurrency remain separate TECH28 work. Customer post-order proof approval is superseded by the 21 October [customer preview policy](customer-preview-policy.md). No clock, seeded setting, fixture session or database enters production. Root owns integration/current-head CI and any later publication or Hub acceptance; this tranche does not close TECH28/GAP-A06.
 
 ## Fixed-clock seasonal and preview acceptance
 

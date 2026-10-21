@@ -1,3 +1,5 @@
+> Historical workflow note, 21 October 2026: any customer proof email, mandatory post-order artwork approval or approval-gated production requirement below is superseded by the current customer preview policy. Customers preview in the designer and checkout; no separate artwork approval follows the order. Retain useful artwork, quantity, privacy, expiry and physical print evidence. See [customer preview policy](customer-preview-policy.md).
+
 # Handy at home: studio integration and release
 
 18 October 2026. The owner approved the nine original designs with fixed headings and handwritten editable entries, then authorised proceeding with the existing-studio integration. The owner subsequently approved the reviewed local integration for publication, explicitly retaining newer admin updates.

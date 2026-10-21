@@ -19,14 +19,6 @@ export function orderUpdateEmail(order,{googleReviewUrl}={}){
  return {from:'CustomVibe <orders@customvibe.co.za>',to:order.snapshot.contact.email,reply_to:'orders@customvibe.co.za',subject,text,...design,version:order.version};
 }
 
-export function proofUpdateEmail(order,token){
- if(!/^[a-f0-9]{64}$/.test(token)||order.proof?.status!=='awaiting_approval')throw Error('Proof is not ready');
- const url='https://customvibe.co.za/proof#'+token,subject=`Review your CustomVibe designs ${order.reference}`,message=`Your magnet designs are ready to review. Please check every design and quantity in revision ${order.proof.revision}, then approve it for printing or request changes.`,footer='Your link is private and expires with your artwork. Use the website access password if prompted. If the link is no longer available, reply to us for help.';
- const text=`Hi ${order.snapshot.contact.name},\n\n${message}\n\nReview your designs: ${url}\n\n${unpaid}\n\n${footer}\n\n${signoff}\nCustomVibe`;
- const design=emailLayout({subject,preheader:'Your approval is needed before printing.',kind:'new',heading:'A little look before we print.',label:'Design approval',reference:order.reference,body:paragraph(`Hi ${order.snapshot.contact.name},`)+paragraph(message)+`<p><a href="${escapeHTML(url)}" style="display:inline-block;background:#ae2e5b;color:#fff;padding:16px 24px;border-radius:8px;text-decoration:none">Review your designs</a></p>`+paragraph(unpaid),footer});
- return {from:'CustomVibe <orders@customvibe.co.za>',to:order.snapshot.contact.email,reply_to:'orders@customvibe.co.za',subject,text,...design,version:order.version};
-}
-
 function fulfilledEmail(order,reviewUrl){
  const subject=`Thank you for your CustomVibe order ${order.reference}`,message='Thank you for choosing CustomVibe. Your magnets have been delivered or collected, and we hope they bring a little joy to your space.';
  const invitation='If you have a moment to spare, we would love an honest review of your experience on Google. Your feedback helps our small business grow.';

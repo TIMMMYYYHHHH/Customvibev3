@@ -6,12 +6,14 @@ Owner decision: 16 October 2026. This supersedes historical test-only restrictio
 
 ## Required behaviour
 
+Current customer preview correction, 21 October 2026: customers preview in the designer and checkout. No separate proof email or post-order artwork approval is required for new or historical orders. Keep internal artwork checks, exact quantities and latest valid replacement files. Manual Preview update / Send update send ordinary status updates, never review invitations. See [customer preview policy](customer-preview-policy.md).
+
 - Keep the public website password gate on and separate server-side admin authentication active. This is not public-launch approval.
 - Keep payments disabled. Show accurate unpaid status; do not fabricate a payment or courier booking.
 - Intended paid production checkout: complete the order and send its confirmation only after verified successful gateway payment. No later owner-acceptance step. Payment does not imply production or dispatch. The current payment-disabled live flow remains unchanged until gateway implementation is separately approved.
 - Run implemented contact, order, artwork, catalogue and customer-email flows normally on the live domain. Do not label them as gated tests or restrict customer emails to an owner allowlist.
 - Keep status emails manual. Order details already provide Preview update and Send update for each saved stage. Stage changes never send automatically. Orders cards provide an Email update shortcut to this same flow. The approved shared email layout is applied to the existing six Resend messages; inbox checks and remaining inventory are separately tracked. See [email-design-verification.md](email-design-verification.md).
-- Retain artwork and its request records for 14 days from the original upload start. Retain order details six calendar months from submission, or from delivered/collected completion when Fulfilled. Reopening retains the established expiry until fulfilled again. Proof review access and personalised design content still expire with artwork. Hourly cleanup and the private R2 lifecycle must agree. The 0006 migration extends only active owner records and never revives expired records.
+- Retain artwork and its request records for 14 days from the original upload start. Retain order details six calendar months from submission, or from delivered/collected completion when Fulfilled. Reopening retains the established expiry until fulfilled again. Historical review records and personalised design content still expire with artwork. Hourly cleanup and the private R2 lifecycle must agree. The 0006 migration extends only active owner records and never revives expired records.
 - Retain authentication, authorization, CSRF, validation, private downloads, duplicate prevention and existing service quotas. Keep existing approved services, including Workers Paid and Google Workspace, with no additional paid features, add-ons or upgrades without explicit owner approval. Keep the Cloudflare zone Free and Geoapify Free; preserve cost controls. See the current [capacity rollout](paid-capacity-rollout.md) and historical [capacity review](cloudflare-capacity-review.md). Local fixtures and preview deployments do not send real messages or modify production records.
 
 ## Deployment and verification
@@ -56,7 +58,9 @@ Owner decision, 17 October 2026: use server-assigned sequential order numbers su
 
 Tim selected Yoco as the payment gateway to test. Founders Hub tracks account details and test-access preparation in Required business information, alongside the existing Google Business requirements and PUDO locker account setup. Live payment collection remains disabled and separately approved. PUDO account setup and live locker data are waiting for Tim to gather the registration details; no account or live data connection was completed. The independently prepared checkout layout now includes an optional OpenStreetMap area map, the official courier finder link and manual locker preference entry. A local-only sample preview demonstrates future search and selection. See docs/locker-map-readiness.md; live API integration remains blocked.
 
-## Collections and proof approval, owner approved 17 October 2026
+## Historical collections and proof approval, 17 October 2026
+
+The approval requirement and invitation flow in this section are superseded by the 21 October [customer preview policy](customer-preview-policy.md). This section records the prior implementation and deployment only.
 
 All six ready-made collections have versioned complete print definitions. Business, QR, Wi-Fi and information products support templates and assisted design, with simple design included. Every built-in magnet participates in existing quantity pricing. Customer approval is required for each exact current revision before new orders enter production or later stages. Historical snapshots retain their previous workflow. Approval does not imply payment, printing or dispatch.
 

@@ -5,7 +5,7 @@ const request=()=>({id:'22222222-2222-4222-8222-222222222222',createdAt:Math.flo
 test('order notes reach the private record, email summaries and print instructions safely',()=>{
  const notes='Please centre the logo.\nKeep <script>alert(1)</script> as literal text.';
  const order=validateOrder({...request(),notes},defaultContent,true);assert.equal(order.notes,notes);
- const snapshot=orderRecord(order,true);assert.equal(snapshot.notes,notes);assert.equal(snapshot.approvalRequired,true);
+ const snapshot=orderRecord(order,true);assert.equal(snapshot.notes,notes);assert.equal(snapshot.approvalRequired,undefined);
  const mail=orderEmails(order,true);assert.ok(mail.owner.text.includes(notes));assert.ok(mail.customer.text.includes(notes));assert.match(mail.owner.html,/&lt;script&gt;/);assert.doesNotMatch(mail.owner.html,/<script>alert/);
  assert.ok(printInstructions({reference:'CV-123456',snapshot,proof:{revision:1,status:'awaiting_approval',digest:'abc'}}).includes(notes));
 });

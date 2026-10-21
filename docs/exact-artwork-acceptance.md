@@ -1,5 +1,7 @@
 # Exact artwork acceptance
 
+> Historical acceptance evidence: the customer approval journey and approval-gated stage assertions below are superseded by the 21 October 2026 [customer preview policy](customer-preview-policy.md). They do not define current acceptance or establish that the old browser runner works after the correction. Current combined verification must cover designer/checkout previews, submitted-artwork fallback, latest internal replacements, stage/export access without customer approval and manual ordinary status updates, while retaining the byte, quantity, privacy, expiry and recovery checks. No live correction is claimed here.
+
 TECH-27 closes a local evidence gap. The reviewed starting revision is `07702ece8f3e28a623da61e9f1bbe3fe1b0ca71c`. No production application code changes are required by this preparation.
 
 ## Reproduce
