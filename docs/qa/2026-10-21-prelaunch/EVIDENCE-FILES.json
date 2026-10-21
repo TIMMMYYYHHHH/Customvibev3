@@ -1,0 +1,86 @@
+{
+  ".gitattributes": {
+    "bytes": 25,
+    "sha256": "33cca0cd52fab02925b26d1c4fe1a6ec5b2e9471b833e83c2148d760a9cce06d"
+  },
+  "README.md": {
+    "bytes": 1584,
+    "sha256": "ca3ab432d1297897c4caf7bb99c8828c96756b4a52e647f65ccc607ad3b2b0f6"
+  },
+  "artwork-rights/ASSET-REGISTER.csv": {
+    "bytes": 315592,
+    "sha256": "0cb92d651a0dda1ebf3d000d1e4135d57937d36d8248832005bb8e5b21d65478"
+  },
+  "artwork-rights/OWNER-ATTESTATION-2026-10-21.json": {
+    "bytes": 4622,
+    "sha256": "052e35bd7c4bcf823f8fdf1ea721d59bf2e859c6c47530cfecfc922d501f88ab"
+  },
+  "artwork-rights/artwork-rights-register.md": {
+    "bytes": 11093,
+    "sha256": "4d8fcd22531e11de117798155631dbfa12a7fc97c48c45cafaf0d8315ac1490a"
+  },
+  "email-auth/EMAIL-AUTH-READINESS.md": {
+    "bytes": 11683,
+    "sha256": "08f5bb19d877a8cdf6b659909f1abcd5ef30fc8581f1ee2d69e3d229b4f9fb1f"
+  },
+  "email-auth/HUB-UPDATE-PROPOSED.txt": {
+    "bytes": 1091,
+    "sha256": "cd8a28b8e2a43effb3f311f8e711b92fbf4708e6af10b50b68935438a38aa030"
+  },
+  "email-auth/dns-initial.json": {
+    "bytes": 7211,
+    "sha256": "bbeb2485194521bc505c367485259373c1ec1477d8a60ec4a89b5c1667616742"
+  },
+  "email-auth/dns-summary.json": {
+    "bytes": 2137,
+    "sha256": "64517309e62517e09d037eae74989da7610b5828938c9d1efd9de5b28bad2acc"
+  },
+  "email-auth/official-sources.json": {
+    "bytes": 1071,
+    "sha256": "8c4ce0a0ebbb51d881e47923a0210cd4fdc8b072b3060584789b1430003502e9"
+  },
+  "email-auth/source-evidence.json": {
+    "bytes": 1259,
+    "sha256": "3ad10dfbc4d8fc0dcf5bccd4499a8b196b7034a1f7416d214f5b342ffe3a2679"
+  },
+  "email-auth/spf-graph.json": {
+    "bytes": 3275,
+    "sha256": "7d23d6d95558bfac8335bb8988eec355db72499bedca95a66608622d0989a0a4"
+  },
+  "owner-tests/PHONE-AND-PRINT.md": {
+    "bytes": 11289,
+    "sha256": "7e8dc82aa9a40a0b7a04777faa6639944db407e6d6c22cb841978eb9952e130f"
+  },
+  "owner-tests/PRINT-TEMPLATE-HANDOFF.md": {
+    "bytes": 2235,
+    "sha256": "35d2d7946a90e8dd04d67299e2b359cb9beaea607a8b52447b053563f24f3a35"
+  },
+  "owner-tests/print-samples-75mm.pdf": {
+    "bytes": 1458684,
+    "sha256": "fc455e6e6a6d99a3209e37e71efe688b7a260e33ec4512fcdd8dc22ba8429715"
+  },
+  "owner-tests/print-samples-verification.json": {
+    "bytes": 4175,
+    "sha256": "ff45829bd84ae79749567e93d082d7978e8cd101365ceaf7933da3959706fc35"
+  },
+  "owner-tests/synthetic-source-results.json": {
+    "bytes": 46864,
+    "sha256": "116413ddbcda2d3158de713b442b9a993bf68e3c419b2566a3aba8d84ec7eb7f"
+  },
+  "search-console/21-property-role-summary.json": {
+    "bytes": 258,
+    "sha256": "cfb5c75ec3ec8938e8e86e92ec2db1507d311e77fe5e1c81e5872f594e64895a"
+  },
+  "search-console/SEARCH-CONSOLE-INDEPENDENT-REVIEW.md": {
+    "bytes": 4029,
+    "sha256": "1a963868f742c2b686813dd2c855cbfe9867eafd687fd2f7ade1be822fde3755"
+  },
+  "search-console/SEARCH-CONSOLE-REVIEW.md": {
+    "bytes": 7398,
+    "sha256": "8390f21576b24331cb4370dcc2dabe4ed0c9cd016ea9318133e8d5337a4e2c9c"
+  },
+  "search-console/anonymous-crawl-observations.json": {
+    "bytes": 1410,
+    "sha256": "fdb5fbf908bdf13cf212960d4ec5a748177e7efc7618873a83cbecaa64f97a7e"
+  }
+}

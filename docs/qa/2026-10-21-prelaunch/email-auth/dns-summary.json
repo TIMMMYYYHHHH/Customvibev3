@@ -1,0 +1,76 @@
+{
+  "observedAt": "2026-10-21T16:06:19.490Z",
+  "queries": 24,
+  "resolvers": [
+    "1.1.1.1",
+    "8.8.8.8"
+  ],
+  "initialQueries": 20,
+  "spfGraphQueries": 4,
+  "initialResolverAnswersAgree": true,
+  "apexSpf": {
+    "recordCount": 1,
+    "value": "v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com ~all",
+    "worstCaseLookupCausingTerms": 2,
+    "limit": 10,
+    "actualSenderIpTested": false
+  },
+  "resendReturnPathSpf": {
+    "domain": "send.customvibe.co.za",
+    "recordCount": 1,
+    "worstCaseLookupCausingTerms": 0,
+    "cname": "send.forge.rmta.net",
+    "initialCnameLookupSeparateFromSpfTermBudget": true
+  },
+  "dmarc": {
+    "recordCount": 1,
+    "value": "v=DMARC1; p=none;",
+    "policy": "none",
+    "ruaPresent": false,
+    "rufPresent": false,
+    "adkim": "r (default)",
+    "aspf": "r (default)",
+    "publishedTTLSeconds": 300
+  },
+  "mx": {
+    "provider": "Google",
+    "records": 5
+  },
+  "dkim": [
+    {
+      "selectorName": "google._domainkey.customvibe.co.za",
+      "txtRecordCount": 1,
+      "keyType": "rsa",
+      "publicKeySha256": "1d389863ded8b503dabe0efc4477460b6d666652291845f2c370d786a04baf39",
+      "type": "rsa",
+      "bits": 2048,
+      "publishedKeyParses": true,
+      "actualSignatureValidated": false
+    },
+    {
+      "selectorName": "resend._domainkey.customvibe.co.za",
+      "txtRecordCount": 1,
+      "keyType": "rsa",
+      "publicKeySha256": "63af647595a30bc8ea28f18666e20facd0af0360671208c464115817017fae6b",
+      "type": "rsa",
+      "bits": 1024,
+      "publishedKeyParses": true,
+      "actualSignatureValidated": false
+    },
+    {
+      "selectorName": "cf2024-1._domainkey.customvibe.co.za",
+      "txtRecordCount": 1,
+      "keyType": "rsa",
+      "publicKeySha256": "3893fd85802c028132f63a3058d70f48b219bb69ae4464d2101ecf0a51e81b47",
+      "type": "rsa",
+      "bits": 2048,
+      "publishedKeyParses": true,
+      "actualSignatureValidated": false
+    }
+  ],
+  "headerAuthenticationStatus": "UNVERIFIED_CURRENT_HEADERS_NOT_READ",
+  "settingsChanged": false,
+  "emailsSent": 0,
+  "customerDataRead": false,
+  "accountRecoveryOrRenewalsPerformed": false
+}

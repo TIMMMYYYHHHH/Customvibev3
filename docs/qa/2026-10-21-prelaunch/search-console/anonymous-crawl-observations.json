@@ -1,0 +1,51 @@
+{
+  "observedAt": "2026-10-21T16:09:23.126487+00:00",
+  "anonymous": true,
+  "responses": [
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "finalUrl": "https://customvibe.co.za/robots.txt",
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+        "Strict-Transport-Security": "max-age=31536000"
+      },
+      "body": "User-agent: *\nDisallow: /\n"
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 401,
+      "finalUrl": "https://customvibe.co.za/sitemap.xml",
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "X-Robots-Tag": "noindex, nofollow, noarchive",
+        "Cache-Control": "private, no-store",
+        "Strict-Transport-Security": "max-age=31536000"
+      },
+      "signals": {
+        "comingSoon": true,
+        "noindex": true,
+        "xmlUrlset": false,
+        "sitemapIndex": false
+      }
+    },
+    {
+      "path": "/",
+      "status": 401,
+      "finalUrl": "https://customvibe.co.za/",
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "X-Robots-Tag": "noindex, nofollow, noarchive",
+        "Cache-Control": "private, no-store",
+        "Strict-Transport-Security": "max-age=31536000"
+      },
+      "signals": {
+        "comingSoon": true,
+        "noindex": true,
+        "xmlUrlset": false,
+        "sitemapIndex": false
+      }
+    }
+  ]
+}

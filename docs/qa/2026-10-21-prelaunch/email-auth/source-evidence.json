@@ -1,0 +1,35 @@
+{
+  "readAt": "2026-10-21T16:11:15.160Z",
+  "checkout": "research/customvibe-locker-release",
+  "sha": "0d3009c4b19bb588bbb8260dacbfe2e34eb16f61",
+  "files": [
+    {
+      "path": "server/submission-model.mjs",
+      "sha256": "968411205080f0513c0c1ac00b389066ad0ad2a3ab888c20b47ef57d674fbc93"
+    },
+    {
+      "path": "server/submissions.mjs",
+      "sha256": "2ab5e12c4f0361fa856e665e3fa5c4ebc43bfa4179651337ae9233c3fcc24eb1"
+    },
+    {
+      "path": "server/order-update-email.mjs",
+      "sha256": "cffc3b9e491e82903c7c8aaa0f2c4c40e8b0359e91ae2a2d271ed9166b198c92"
+    },
+    {
+      "path": "admin/order-mail.mjs",
+      "sha256": "7efea654176137aee29001b1227d387cede0fb35546b5e8320d878d9300e12a9"
+    },
+    {
+      "path": "docs/workspace-email-migration.md",
+      "sha256": "92034fad6982c34a716732a72083db93ab49e1289ee6a4864f448b22d9b60be9"
+    },
+    {
+      "path": "docs/EMAIL_SETUP.md",
+      "sha256": "39d3a555e48c5c488c4139e9ed5f903f81ea188e0d015eb526f552777748171c"
+    }
+  ],
+  "currentOwnerDecision": {
+    "path": "audit/fix-plan/remaining-authorised-fixes-20261021/EXT01-REPLYTO-AND-CONTACT-RECOVERY-METADATA-20261021.md",
+    "rule": "Blank W3Forms Reply-To and manually composed customer replies accepted Done; no reopening."
+  }
+}

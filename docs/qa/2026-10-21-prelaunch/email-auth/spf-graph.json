@@ -1,0 +1,105 @@
+{
+  "observedAt": "2026-10-21T16:07:05.807Z",
+  "scope": "Bounded public DNS SPF term graph, not evaluation of any actual SMTP sender IP or envelope.",
+  "results": [
+    {
+      "name": "customvibe.co.za",
+      "observedAt": "2026-10-21T16:07:05.494Z",
+      "resolver": "1.1.1.1",
+      "status": "NOERROR",
+      "spfRecordCount": 1,
+      "spf": [
+        "v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com ~all"
+      ],
+      "terms": [
+        "include:_spf.mx.cloudflare.net",
+        "include:_spf.google.com",
+        "~all"
+      ],
+      "dnsQueryTerms": [
+        "include:_spf.mx.cloudflare.net",
+        "include:_spf.google.com"
+      ],
+      "children": [
+        "_spf.mx.cloudflare.net",
+        "_spf.google.com"
+      ],
+      "answers": [
+        "customvibe.co.za.\t3600\tIN\tTXT\t\"v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com ~all\""
+      ]
+    },
+    {
+      "name": "_spf.mx.cloudflare.net",
+      "observedAt": "2026-10-21T16:07:05.525Z",
+      "resolver": "1.1.1.1",
+      "status": "NOERROR",
+      "spfRecordCount": 1,
+      "spf": [
+        "v=spf1 ip4:104.30.0.0/19 ip6:2405:8100:c000::/38 ~all"
+      ],
+      "terms": [
+        "ip4:104.30.0.0/19",
+        "ip6:2405:8100:c000::/38",
+        "~all"
+      ],
+      "dnsQueryTerms": [],
+      "children": [],
+      "answers": [
+        "_spf.mx.cloudflare.net.\t300\tIN\tTXT\t\"v=spf1 ip4:104.30.0.0/19 ip6:2405:8100:c000::/38 ~all\""
+      ]
+    },
+    {
+      "name": "_spf.google.com",
+      "observedAt": "2026-10-21T16:07:05.761Z",
+      "resolver": "1.1.1.1",
+      "status": "NOERROR",
+      "spfRecordCount": 1,
+      "spf": [
+        "v=spf1 ip4:74.125.0.0/16 ip4:209.85.128.0/17 ip6:2001:4860:4864::/56 ip6:2404:6800:4864::/56 ip6:2607:f8b0:4864::/56 ip6:2800:3f0:4864::/56 ip6:2a00:1450:4864::/56 ip6:2c0f:fb50:4864::/56 ~all"
+      ],
+      "terms": [
+        "ip4:74.125.0.0/16",
+        "ip4:209.85.128.0/17",
+        "ip6:2001:4860:4864::/56",
+        "ip6:2404:6800:4864::/56",
+        "ip6:2607:f8b0:4864::/56",
+        "ip6:2800:3f0:4864::/56",
+        "ip6:2a00:1450:4864::/56",
+        "ip6:2c0f:fb50:4864::/56",
+        "~all"
+      ],
+      "dnsQueryTerms": [],
+      "children": [],
+      "answers": [
+        "_spf.google.com.\t300\tIN\tTXT\t\"v=spf1 ip4:74.125.0.0/16 ip4:209.85.128.0/17 ip6:2001:4860:4864::/56 ip6:2404:6800:4864::/56 ip6:2607:f8b0:4864::/56 ip6:2800:3f0:4864::/56 ip6:2a00:1450:4864::/56 ip6:2c0f:fb50:4864::/56 ~all\""
+      ]
+    },
+    {
+      "name": "send.customvibe.co.za",
+      "observedAt": "2026-10-21T16:07:05.807Z",
+      "resolver": "1.1.1.1",
+      "status": "NOERROR",
+      "spfRecordCount": 1,
+      "spf": [
+        "v=spf1 ip4:52.3.252.119 ip4:44.222.39.36 ip4:199.249.231.0/24 ~all"
+      ],
+      "terms": [
+        "ip4:52.3.252.119",
+        "ip4:44.222.39.36",
+        "ip4:199.249.231.0/24",
+        "~all"
+      ],
+      "dnsQueryTerms": [],
+      "children": [],
+      "answers": [
+        "send.customvibe.co.za.\t300\tIN\tCNAME\tsend.forge.rmta.net.",
+        "send.forge.rmta.net.\t300\tIN\tTXT\t\"v=spf1 ip4:52.3.252.119 ip4:44.222.39.36 ip4:199.249.231.0/24 ~all\""
+      ]
+    }
+  ],
+  "worstCaseDnsQueryTerms": {
+    "apex": 2,
+    "resendReturnPath": 0
+  },
+  "recordFetches": 4
+}

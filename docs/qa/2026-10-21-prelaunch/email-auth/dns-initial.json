@@ -1,0 +1,219 @@
+{
+  "observedAt": "2026-10-21T16:06:19.490Z",
+  "source": "Public DNS queries only; selectors from existing documented configuration.",
+  "results": [
+    {
+      "name": "customvibe.co.za",
+      "type": "TXT",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.930Z",
+      "status": "NOERROR",
+      "answers": [
+        "customvibe.co.za.\t3600\tIN\tTXT\t\"v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com ~all\""
+      ]
+    },
+    {
+      "name": "customvibe.co.za",
+      "type": "TXT",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.941Z",
+      "status": "NOERROR",
+      "answers": [
+        "customvibe.co.za.\t3600\tIN\tTXT\t\"v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com ~all\""
+      ]
+    },
+    {
+      "name": "customvibe.co.za",
+      "type": "MX",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.941Z",
+      "status": "NOERROR",
+      "answers": [
+        "customvibe.co.za.\t3600\tIN\tMX\t1 aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t10 alt3.aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t10 alt4.aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t5 alt1.aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t5 alt2.aspmx.l.google.com."
+      ]
+    },
+    {
+      "name": "customvibe.co.za",
+      "type": "MX",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.942Z",
+      "status": "NOERROR",
+      "answers": [
+        "customvibe.co.za.\t3600\tIN\tMX\t1 aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t5 alt1.aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t5 alt2.aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t10 alt4.aspmx.l.google.com.",
+        "customvibe.co.za.\t3600\tIN\tMX\t10 alt3.aspmx.l.google.com."
+      ]
+    },
+    {
+      "name": "_dmarc.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.948Z",
+      "status": "NOERROR",
+      "answers": [
+        "_dmarc.customvibe.co.za. 300\tIN\tTXT\t\"v=DMARC1; p=none;\""
+      ]
+    },
+    {
+      "name": "_dmarc.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.949Z",
+      "status": "NOERROR",
+      "answers": [
+        "_dmarc.customvibe.co.za. 300\tIN\tTXT\t\"v=DMARC1; p=none;\""
+      ]
+    },
+    {
+      "name": "google._domainkey.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.950Z",
+      "status": "NOERROR",
+      "answers": [
+        "google._domainkey.customvibe.co.za. 60 IN TXT [published public key omitted; see dns-summary.json key fingerprint]"
+      ]
+    },
+    {
+      "name": "google._domainkey.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.952Z",
+      "status": "NOERROR",
+      "answers": [
+        "google._domainkey.customvibe.co.za. 60 IN TXT [published public key omitted; see dns-summary.json key fingerprint]"
+      ]
+    },
+    {
+      "name": "resend._domainkey.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.953Z",
+      "status": "NOERROR",
+      "answers": [
+        "resend._domainkey.customvibe.co.za. 300\tIN TXT [published public key omitted; see dns-summary.json key fingerprint]"
+      ]
+    },
+    {
+      "name": "resend._domainkey.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.955Z",
+      "status": "NOERROR",
+      "answers": [
+        "resend._domainkey.customvibe.co.za. 300\tIN TXT [published public key omitted; see dns-summary.json key fingerprint]"
+      ]
+    },
+    {
+      "name": "cf2024-1._domainkey.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.957Z",
+      "status": "NOERROR",
+      "answers": [
+        "cf2024-1._domainkey.customvibe.co.za. 300 IN TXT [published public key omitted; see dns-summary.json key fingerprint]"
+      ]
+    },
+    {
+      "name": "cf2024-1._domainkey.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.959Z",
+      "status": "NOERROR",
+      "answers": [
+        "cf2024-1._domainkey.customvibe.co.za. 300 IN TXT [published public key omitted; see dns-summary.json key fingerprint]"
+      ]
+    },
+    {
+      "name": "send.customvibe.co.za",
+      "type": "CNAME",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.960Z",
+      "status": "NOERROR",
+      "answers": [
+        "send.customvibe.co.za.\t300\tIN\tCNAME\tsend.forge.rmta.net."
+      ]
+    },
+    {
+      "name": "send.customvibe.co.za",
+      "type": "CNAME",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.961Z",
+      "status": "NOERROR",
+      "answers": [
+        "send.customvibe.co.za.\t300\tIN\tCNAME\tsend.forge.rmta.net."
+      ]
+    },
+    {
+      "name": "send.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.962Z",
+      "status": "NOERROR",
+      "answers": [
+        "send.customvibe.co.za.\t300\tIN\tCNAME\tsend.forge.rmta.net.",
+        "send.forge.rmta.net.\t300\tIN\tTXT\t\"v=spf1 ip4:52.3.252.119 ip4:44.222.39.36 ip4:199.249.231.0/24 ~all\""
+      ]
+    },
+    {
+      "name": "send.customvibe.co.za",
+      "type": "TXT",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.962Z",
+      "status": "NOERROR",
+      "answers": [
+        "send.customvibe.co.za.\t300\tIN\tCNAME\tsend.forge.rmta.net.",
+        "send.forge.rmta.net.\t300\tIN\tTXT\t\"v=spf1 ip4:52.3.252.119 ip4:44.222.39.36 ip4:199.249.231.0/24 ~all\""
+      ]
+    },
+    {
+      "name": "send.customvibe.co.za",
+      "type": "MX",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.963Z",
+      "status": "NOERROR",
+      "answers": [
+        "send.customvibe.co.za.\t300\tIN\tCNAME\tsend.forge.rmta.net.",
+        "send.forge.rmta.net.\t300\tIN\tMX\t10 feedback.forge.rmta.net."
+      ]
+    },
+    {
+      "name": "send.customvibe.co.za",
+      "type": "MX",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.964Z",
+      "status": "NOERROR",
+      "answers": [
+        "send.customvibe.co.za.\t300\tIN\tCNAME\tsend.forge.rmta.net.",
+        "send.forge.rmta.net.\t300\tIN\tMX\t10 feedback.forge.rmta.net."
+      ]
+    },
+    {
+      "name": "rsend.customvibe.co.za",
+      "type": "CNAME",
+      "resolver": "1.1.1.1",
+      "startedAt": "2026-10-21T16:06:18.966Z",
+      "status": "NOERROR",
+      "answers": [
+        "rsend.customvibe.co.za.\t300\tIN\tCNAME\trsend-euw1.forge.rmta.net."
+      ]
+    },
+    {
+      "name": "rsend.customvibe.co.za",
+      "type": "CNAME",
+      "resolver": "8.8.8.8",
+      "startedAt": "2026-10-21T16:06:18.969Z",
+      "status": "NOERROR",
+      "answers": [
+        "rsend.customvibe.co.za.\t300\tIN\tCNAME\trsend-euw1.forge.rmta.net."
+      ]
+    }
+  ],
+  "note": "Public key material and unrelated verification TXT omitted after analysis; only public DNS metadata retained."
+}

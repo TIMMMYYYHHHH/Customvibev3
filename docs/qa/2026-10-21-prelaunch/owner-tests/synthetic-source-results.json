@@ -1,0 +1,1226 @@
+{
+  "source": "2916aea033770727a56d8dc6634c528c39840b46",
+  "node": "v22.23.3",
+  "browser": "155.0.8059.86",
+  "initial": {
+    "exports": [
+      "15d34df4b7eeed03e18121334240bb3f2d956973a5d33e2e7443a87c4f740fd4",
+      "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+      "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+      "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+      "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+      "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+      "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+      "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+      "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+      "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+      "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+      "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+      "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+      "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+      "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+      "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+      "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac"
+    ],
+    "result": {
+      "id": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+      "magnetQty": 36,
+      "files": [
+        {
+          "size": 40028,
+          "sha256": "15d34df4b7eeed03e18121334240bb3f2d956973a5d33e2e7443a87c4f740fd4",
+          "proof": false,
+          "name": "design-01-photo.jpg"
+        },
+        {
+          "size": 70226,
+          "sha256": "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+          "proof": true,
+          "name": "design-02-proof.jpg"
+        },
+        {
+          "size": 21401,
+          "sha256": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+          "proof": false,
+          "name": "design-02-row-1-col-1.jpg"
+        },
+        {
+          "size": 21334,
+          "sha256": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+          "proof": false,
+          "name": "design-02-row-1-col-2.jpg"
+        },
+        {
+          "size": 21418,
+          "sha256": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+          "proof": false,
+          "name": "design-02-row-1-col-3.jpg"
+        },
+        {
+          "size": 21267,
+          "sha256": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+          "proof": false,
+          "name": "design-02-row-2-col-1.jpg"
+        },
+        {
+          "size": 21127,
+          "sha256": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+          "proof": false,
+          "name": "design-02-row-2-col-2.jpg"
+        },
+        {
+          "size": 21220,
+          "sha256": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+          "proof": false,
+          "name": "design-02-row-2-col-3.jpg"
+        },
+        {
+          "size": 21487,
+          "sha256": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+          "proof": false,
+          "name": "design-02-row-3-col-1.jpg"
+        },
+        {
+          "size": 21367,
+          "sha256": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+          "proof": false,
+          "name": "design-02-row-3-col-2.jpg"
+        },
+        {
+          "size": 21427,
+          "sha256": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+          "proof": false,
+          "name": "design-02-row-3-col-3.jpg"
+        },
+        {
+          "size": 267655,
+          "sha256": "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+          "proof": false,
+          "name": "design-03-alphabet-1.jpg"
+        },
+        {
+          "size": 302000,
+          "sha256": "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+          "proof": false,
+          "name": "design-03-alphabet-2.jpg"
+        },
+        {
+          "size": 282329,
+          "sha256": "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+          "proof": false,
+          "name": "design-04-counting-1.jpg"
+        },
+        {
+          "size": 422338,
+          "sha256": "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+          "proof": false,
+          "name": "design-04-counting-2.jpg"
+        },
+        {
+          "size": 454715,
+          "sha256": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+          "proof": false,
+          "name": "design-05-business-1.jpg"
+        },
+        {
+          "size": 515624,
+          "sha256": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac",
+          "proof": false,
+          "name": "design-06-information-1.jpg"
+        }
+      ],
+      "proof": {
+        "status": "prepared",
+        "revision": 1,
+        "digest": "b04b9aaefb56900d5c4e201085a631ed2f329fd2392d16065277f3f5f1ad93e7",
+        "approvedAt": null,
+        "items": [
+          {
+            "id": "item-1",
+            "name": "Your photo magnets",
+            "kind": "photo",
+            "qty": 2,
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 0,
+                "name": "design-01-photo.jpg",
+                "size": 40028,
+                "sha256": "15d34df4b7eeed03e18121334240bb3f2d956973a5d33e2e7443a87c4f740fd4",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "item-2",
+            "name": "Your picture puzzle",
+            "kind": "puzzle",
+            "qty": 2,
+            "gridSize": 3,
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 1,
+                "name": "design-02-proof.jpg",
+                "size": 70226,
+                "sha256": "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+                "proof": true,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 2,
+                "name": "design-02-row-1-col-1.jpg",
+                "size": 21401,
+                "sha256": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 3,
+                "name": "design-02-row-1-col-2.jpg",
+                "size": 21334,
+                "sha256": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 4,
+                "name": "design-02-row-1-col-3.jpg",
+                "size": 21418,
+                "sha256": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 5,
+                "name": "design-02-row-2-col-1.jpg",
+                "size": 21267,
+                "sha256": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 6,
+                "name": "design-02-row-2-col-2.jpg",
+                "size": 21127,
+                "sha256": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 7,
+                "name": "design-02-row-2-col-3.jpg",
+                "size": 21220,
+                "sha256": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 8,
+                "name": "design-02-row-3-col-1.jpg",
+                "size": 21487,
+                "sha256": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 9,
+                "name": "design-02-row-3-col-2.jpg",
+                "size": 21367,
+                "sha256": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 10,
+                "name": "design-02-row-3-col-3.jpg",
+                "size": 21427,
+                "sha256": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "a7655b93-dcce-4390-9783-216830c377a7",
+            "name": "The alphabet club · Watercolour storybook · A × 2, Z",
+            "kind": "alphabet",
+            "qty": 2,
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 11,
+                "name": "design-03-alphabet-1.jpg",
+                "size": 267655,
+                "sha256": "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+                "proof": false,
+                "copies": 4
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 12,
+                "name": "design-03-alphabet-2.jpg",
+                "size": 302000,
+                "sha256": "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "502d69c1-32d3-40e0-91a3-31dcc94bfda5",
+            "name": "Count on a little fun · Bold painted gouache · 2 × 3, 10 × 2",
+            "kind": "counting",
+            "qty": 1,
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 13,
+                "name": "design-04-counting-1.jpg",
+                "size": 282329,
+                "sha256": "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+                "proof": false,
+                "copies": 3
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 14,
+                "name": "design-04-counting-2.jpg",
+                "size": 422338,
+                "sha256": "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "acfebfa6-6497-42e9-bc15-b10d9e7dbca9",
+            "name": "Business magnets · Book a visit",
+            "kind": "business",
+            "qty": 3,
+            "values": {
+              "businessTemplate": "02-salon",
+              "edition": 1,
+              "entries": [
+                "SYNTHETIC"
+              ],
+              "qr": {
+                "mode": "url",
+                "url": "https://example.invalid/synthetic-review"
+              }
+            },
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 15,
+                "name": "design-05-business-1.jpg",
+                "size": 454715,
+                "sha256": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+                "proof": false,
+                "copies": 3
+              }
+            ]
+          },
+          {
+            "id": "2d42edc7-eaab-44ec-a1e6-5edbe5fe24be",
+            "name": "Handy at home · Family week",
+            "kind": "information",
+            "qty": 2,
+            "values": {
+              "handyTemplate": "07-family-week",
+              "edition": 1,
+              "entries": [
+                "Swimming",
+                "Library",
+                "Soccer",
+                "Music",
+                "Family time"
+              ]
+            },
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 16,
+                "name": "design-06-information-1.jpg",
+                "size": 515624,
+                "sha256": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          }
+        ],
+        "events": [
+          {
+            "revision": 1,
+            "kind": "published",
+            "created": 1792543262,
+            "message": ""
+          }
+        ]
+      },
+      "artworkExpires": 1793752862
+    },
+    "orientation": true,
+    "rowMajorTiles": true,
+    "stalePreviewRegenerated": true
+  },
+  "replacement": {
+    "checks": {
+      "oldLinkRejected": true,
+      "oldApprovalRejected": true,
+      "oldDownloadRejected": true,
+      "savedStagePreserved": true,
+      "currentArchiveHasNoApprovalGate": true
+    },
+    "revision": 2,
+    "sha256": "9571e090e39c32bb731c6d80c52a41a4ec8c0e3ff6332ddaacab0a154947ebaf",
+    "proof": {
+      "status": "prepared",
+      "revision": 2,
+      "digest": "c57e5f32d91fc1da2e8fa918a089d863dafb72e265cde96acf43086b5eac8aa5",
+      "approvedAt": null,
+      "items": [
+        {
+          "id": "item-1",
+          "name": "Your photo magnets",
+          "kind": "photo",
+          "qty": 2,
+          "files": [
+            {
+              "requestId": "fc84416f-b2a5-49da-8754-05c5de719024",
+              "index": 0,
+              "name": "design-01-photo.jpg",
+              "size": 39949,
+              "sha256": "9571e090e39c32bb731c6d80c52a41a4ec8c0e3ff6332ddaacab0a154947ebaf",
+              "proof": false,
+              "copies": 2
+            }
+          ]
+        },
+        {
+          "id": "item-2",
+          "name": "Your picture puzzle",
+          "kind": "puzzle",
+          "qty": 2,
+          "gridSize": 3,
+          "files": [
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 1,
+              "name": "design-02-proof.jpg",
+              "size": 70226,
+              "sha256": "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+              "proof": true,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 2,
+              "name": "design-02-row-1-col-1.jpg",
+              "size": 21401,
+              "sha256": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 3,
+              "name": "design-02-row-1-col-2.jpg",
+              "size": 21334,
+              "sha256": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 4,
+              "name": "design-02-row-1-col-3.jpg",
+              "size": 21418,
+              "sha256": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 5,
+              "name": "design-02-row-2-col-1.jpg",
+              "size": 21267,
+              "sha256": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 6,
+              "name": "design-02-row-2-col-2.jpg",
+              "size": 21127,
+              "sha256": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 7,
+              "name": "design-02-row-2-col-3.jpg",
+              "size": 21220,
+              "sha256": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 8,
+              "name": "design-02-row-3-col-1.jpg",
+              "size": 21487,
+              "sha256": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 9,
+              "name": "design-02-row-3-col-2.jpg",
+              "size": 21367,
+              "sha256": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+              "proof": false,
+              "copies": 2
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 10,
+              "name": "design-02-row-3-col-3.jpg",
+              "size": 21427,
+              "sha256": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+              "proof": false,
+              "copies": 2
+            }
+          ]
+        },
+        {
+          "id": "a7655b93-dcce-4390-9783-216830c377a7",
+          "name": "The alphabet club · Watercolour storybook · A × 2, Z",
+          "kind": "alphabet",
+          "qty": 2,
+          "files": [
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 11,
+              "name": "design-03-alphabet-1.jpg",
+              "size": 267655,
+              "sha256": "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+              "proof": false,
+              "copies": 4
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 12,
+              "name": "design-03-alphabet-2.jpg",
+              "size": 302000,
+              "sha256": "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+              "proof": false,
+              "copies": 2
+            }
+          ]
+        },
+        {
+          "id": "502d69c1-32d3-40e0-91a3-31dcc94bfda5",
+          "name": "Count on a little fun · Bold painted gouache · 2 × 3, 10 × 2",
+          "kind": "counting",
+          "qty": 1,
+          "files": [
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 13,
+              "name": "design-04-counting-1.jpg",
+              "size": 282329,
+              "sha256": "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+              "proof": false,
+              "copies": 3
+            },
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 14,
+              "name": "design-04-counting-2.jpg",
+              "size": 422338,
+              "sha256": "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+              "proof": false,
+              "copies": 2
+            }
+          ]
+        },
+        {
+          "id": "acfebfa6-6497-42e9-bc15-b10d9e7dbca9",
+          "name": "Business magnets · Book a visit",
+          "kind": "business",
+          "qty": 3,
+          "values": {
+            "businessTemplate": "02-salon",
+            "edition": 1,
+            "entries": [
+              "SYNTHETIC"
+            ],
+            "qr": {
+              "mode": "url",
+              "url": "https://example.invalid/synthetic-review"
+            }
+          },
+          "files": [
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 15,
+              "name": "design-05-business-1.jpg",
+              "size": 454715,
+              "sha256": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+              "proof": false,
+              "copies": 3
+            }
+          ]
+        },
+        {
+          "id": "2d42edc7-eaab-44ec-a1e6-5edbe5fe24be",
+          "name": "Handy at home · Family week",
+          "kind": "information",
+          "qty": 2,
+          "values": {
+            "handyTemplate": "07-family-week",
+            "edition": 1,
+            "entries": [
+              "Swimming",
+              "Library",
+              "Soccer",
+              "Music",
+              "Family time"
+            ]
+          },
+          "files": [
+            {
+              "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+              "index": 16,
+              "name": "design-06-information-1.jpg",
+              "size": 515624,
+              "sha256": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac",
+              "proof": false,
+              "copies": 2
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "revision": 2,
+          "kind": "published",
+          "created": 1792543262,
+          "message": ""
+        },
+        {
+          "revision": 1,
+          "kind": "published",
+          "created": 1792543262,
+          "message": ""
+        }
+      ]
+    }
+  },
+  "result": {
+    "checks": {
+      "oldLinkRejected": true,
+      "oldApprovalRejected": true,
+      "oldDownloadRejected": true,
+      "savedStagePreserved": true,
+      "currentArchiveHasNoApprovalGate": true
+    },
+    "order": {
+      "id": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+      "reference": "CV-000001",
+      "status": "ready_to_ship",
+      "version": 4,
+      "created": 1792543262,
+      "expires": 1808268062,
+      "artworkExpires": 1793752862,
+      "fulfilledAt": null,
+      "ownerSent": false,
+      "receiptSent": false,
+      "snapshot": {
+        "referenceVersion": 2,
+        "contact": {
+          "name": "Synthetic fixture",
+          "email": "synthetic@example.invalid",
+          "phone": "0000000000"
+        },
+        "locker": {
+          "name": "Synthetic locker",
+          "area": "Synthetic area"
+        },
+        "notes": "SYNTHETIC: check selected quantities. Do not print these notes.",
+        "items": [
+          {
+            "id": "item-1",
+            "kind": "photo",
+            "name": "Your photo magnets",
+            "qty": 2,
+            "faceCount": 1,
+            "lineCents": 8000,
+            "files": [
+              {
+                "index": 0,
+                "name": "design-01-photo.jpg",
+                "size": 40028,
+                "sha256": "15d34df4b7eeed03e18121334240bb3f2d956973a5d33e2e7443a87c4f740fd4",
+                "proof": false,
+                "reference": false
+              }
+            ]
+          },
+          {
+            "id": "item-2",
+            "kind": "puzzle",
+            "name": "Your picture puzzle",
+            "qty": 2,
+            "faceCount": 9,
+            "lineCents": 72000,
+            "gridSize": 3,
+            "files": [
+              {
+                "index": 1,
+                "name": "design-02-proof.jpg",
+                "size": 70226,
+                "sha256": "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+                "proof": true,
+                "reference": false
+              },
+              {
+                "index": 2,
+                "name": "design-02-row-1-col-1.jpg",
+                "size": 21401,
+                "sha256": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 3,
+                "name": "design-02-row-1-col-2.jpg",
+                "size": 21334,
+                "sha256": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 4,
+                "name": "design-02-row-1-col-3.jpg",
+                "size": 21418,
+                "sha256": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 5,
+                "name": "design-02-row-2-col-1.jpg",
+                "size": 21267,
+                "sha256": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 6,
+                "name": "design-02-row-2-col-2.jpg",
+                "size": 21127,
+                "sha256": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 7,
+                "name": "design-02-row-2-col-3.jpg",
+                "size": 21220,
+                "sha256": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 8,
+                "name": "design-02-row-3-col-1.jpg",
+                "size": 21487,
+                "sha256": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 9,
+                "name": "design-02-row-3-col-2.jpg",
+                "size": 21367,
+                "sha256": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 10,
+                "name": "design-02-row-3-col-3.jpg",
+                "size": 21427,
+                "sha256": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+                "proof": false,
+                "reference": false
+              }
+            ]
+          },
+          {
+            "id": "a7655b93-dcce-4390-9783-216830c377a7",
+            "printVersion": 1,
+            "designIds": [
+              "alphabet-1",
+              "alphabet-26"
+            ],
+            "designQuantities": [
+              2,
+              1
+            ],
+            "style": "watercolour",
+            "kind": "alphabet",
+            "name": "The alphabet club · Watercolour storybook · A × 2, Z",
+            "qty": 2,
+            "faceCount": 2,
+            "lineCents": 24000,
+            "files": [
+              {
+                "index": 11,
+                "name": "design-03-alphabet-1.jpg",
+                "size": 267655,
+                "sha256": "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 12,
+                "name": "design-03-alphabet-2.jpg",
+                "size": 302000,
+                "sha256": "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+                "proof": false,
+                "reference": false
+              }
+            ]
+          },
+          {
+            "id": "502d69c1-32d3-40e0-91a3-31dcc94bfda5",
+            "printVersion": 1,
+            "designIds": [
+              "counting-2",
+              "counting-10"
+            ],
+            "designQuantities": [
+              3,
+              2
+            ],
+            "style": "gouache",
+            "kind": "counting",
+            "name": "Count on a little fun · Bold painted gouache · 2 × 3, 10 × 2",
+            "qty": 1,
+            "faceCount": 2,
+            "lineCents": 20000,
+            "files": [
+              {
+                "index": 13,
+                "name": "design-04-counting-1.jpg",
+                "size": 282329,
+                "sha256": "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+                "proof": false,
+                "reference": false
+              },
+              {
+                "index": 14,
+                "name": "design-04-counting-2.jpg",
+                "size": 422338,
+                "sha256": "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+                "proof": false,
+                "reference": false
+              }
+            ]
+          },
+          {
+            "id": "acfebfa6-6497-42e9-bc15-b10d9e7dbca9",
+            "printVersion": 1,
+            "designMode": "self",
+            "values": {
+              "businessTemplate": "02-salon",
+              "edition": 1,
+              "entries": [
+                "SYNTHETIC"
+              ],
+              "qr": {
+                "mode": "url",
+                "url": "https://example.invalid/synthetic-review"
+              }
+            },
+            "hasReference": false,
+            "kind": "business",
+            "name": "Business magnets · Book a visit",
+            "qty": 3,
+            "faceCount": 1,
+            "lineCents": 12000,
+            "files": [
+              {
+                "index": 15,
+                "name": "design-05-business-1.jpg",
+                "size": 454715,
+                "sha256": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+                "proof": false,
+                "reference": false
+              }
+            ]
+          },
+          {
+            "id": "2d42edc7-eaab-44ec-a1e6-5edbe5fe24be",
+            "printVersion": 1,
+            "designMode": "self",
+            "values": {
+              "handyTemplate": "07-family-week",
+              "edition": 1,
+              "entries": [
+                "Swimming",
+                "Library",
+                "Soccer",
+                "Music",
+                "Family time"
+              ]
+            },
+            "hasReference": false,
+            "kind": "information",
+            "name": "Handy at home · Family week",
+            "qty": 2,
+            "faceCount": 1,
+            "lineCents": 8000,
+            "files": [
+              {
+                "index": 16,
+                "name": "design-06-information-1.jpg",
+                "size": 515624,
+                "sha256": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac",
+                "proof": false,
+                "reference": false
+              }
+            ]
+          }
+        ],
+        "magnetQty": 36,
+        "subtotalCents": 144000,
+        "paymentStatus": "unpaid"
+      },
+      "mailDelivery": [],
+      "proof": {
+        "status": "prepared",
+        "revision": 2,
+        "digest": "c57e5f32d91fc1da2e8fa918a089d863dafb72e265cde96acf43086b5eac8aa5",
+        "approvedAt": null,
+        "items": [
+          {
+            "id": "item-1",
+            "name": "Your photo magnets",
+            "kind": "photo",
+            "qty": 2,
+            "files": [
+              {
+                "requestId": "fc84416f-b2a5-49da-8754-05c5de719024",
+                "index": 0,
+                "name": "design-01-photo.jpg",
+                "size": 39949,
+                "sha256": "9571e090e39c32bb731c6d80c52a41a4ec8c0e3ff6332ddaacab0a154947ebaf",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "item-2",
+            "name": "Your picture puzzle",
+            "kind": "puzzle",
+            "qty": 2,
+            "gridSize": 3,
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 1,
+                "name": "design-02-proof.jpg",
+                "size": 70226,
+                "sha256": "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+                "proof": true,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 2,
+                "name": "design-02-row-1-col-1.jpg",
+                "size": 21401,
+                "sha256": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 3,
+                "name": "design-02-row-1-col-2.jpg",
+                "size": 21334,
+                "sha256": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 4,
+                "name": "design-02-row-1-col-3.jpg",
+                "size": 21418,
+                "sha256": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 5,
+                "name": "design-02-row-2-col-1.jpg",
+                "size": 21267,
+                "sha256": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 6,
+                "name": "design-02-row-2-col-2.jpg",
+                "size": 21127,
+                "sha256": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 7,
+                "name": "design-02-row-2-col-3.jpg",
+                "size": 21220,
+                "sha256": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 8,
+                "name": "design-02-row-3-col-1.jpg",
+                "size": 21487,
+                "sha256": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 9,
+                "name": "design-02-row-3-col-2.jpg",
+                "size": 21367,
+                "sha256": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+                "proof": false,
+                "copies": 2
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 10,
+                "name": "design-02-row-3-col-3.jpg",
+                "size": 21427,
+                "sha256": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "a7655b93-dcce-4390-9783-216830c377a7",
+            "name": "The alphabet club · Watercolour storybook · A × 2, Z",
+            "kind": "alphabet",
+            "qty": 2,
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 11,
+                "name": "design-03-alphabet-1.jpg",
+                "size": 267655,
+                "sha256": "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+                "proof": false,
+                "copies": 4
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 12,
+                "name": "design-03-alphabet-2.jpg",
+                "size": 302000,
+                "sha256": "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "502d69c1-32d3-40e0-91a3-31dcc94bfda5",
+            "name": "Count on a little fun · Bold painted gouache · 2 × 3, 10 × 2",
+            "kind": "counting",
+            "qty": 1,
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 13,
+                "name": "design-04-counting-1.jpg",
+                "size": 282329,
+                "sha256": "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+                "proof": false,
+                "copies": 3
+              },
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 14,
+                "name": "design-04-counting-2.jpg",
+                "size": 422338,
+                "sha256": "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          },
+          {
+            "id": "acfebfa6-6497-42e9-bc15-b10d9e7dbca9",
+            "name": "Business magnets · Book a visit",
+            "kind": "business",
+            "qty": 3,
+            "values": {
+              "businessTemplate": "02-salon",
+              "edition": 1,
+              "entries": [
+                "SYNTHETIC"
+              ],
+              "qr": {
+                "mode": "url",
+                "url": "https://example.invalid/synthetic-review"
+              }
+            },
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 15,
+                "name": "design-05-business-1.jpg",
+                "size": 454715,
+                "sha256": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+                "proof": false,
+                "copies": 3
+              }
+            ]
+          },
+          {
+            "id": "2d42edc7-eaab-44ec-a1e6-5edbe5fe24be",
+            "name": "Handy at home · Family week",
+            "kind": "information",
+            "qty": 2,
+            "values": {
+              "handyTemplate": "07-family-week",
+              "edition": 1,
+              "entries": [
+                "Swimming",
+                "Library",
+                "Soccer",
+                "Music",
+                "Family time"
+              ]
+            },
+            "files": [
+              {
+                "requestId": "80265d25-fe12-4139-bcbb-306b04ffbfea",
+                "index": 16,
+                "name": "design-06-information-1.jpg",
+                "size": 515624,
+                "sha256": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac",
+                "proof": false,
+                "copies": 2
+              }
+            ]
+          }
+        ],
+        "events": [
+          {
+            "revision": 2,
+            "kind": "published",
+            "created": 1792543262,
+            "message": ""
+          },
+          {
+            "revision": 1,
+            "kind": "published",
+            "created": 1792543262,
+            "message": ""
+          }
+        ]
+      },
+      "history": [
+        {
+          "version": 4,
+          "status": "ready_to_ship",
+          "created": 1792543263
+        },
+        {
+          "version": 1,
+          "status": "in_progress",
+          "created": 1792543262
+        }
+      ],
+      "updates": []
+    },
+    "uploaded": {
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/0": "15d34df4b7eeed03e18121334240bb3f2d956973a5d33e2e7443a87c4f740fd4",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/1": "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/2": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/3": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/4": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/5": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/6": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/7": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/8": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/9": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/10": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/11": "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/12": "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/13": "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/14": "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/15": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+      "80265d25-fe12-4139-bcbb-306b04ffbfea/16": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac",
+      "fc84416f-b2a5-49da-8754-05c5de719024/0": "9571e090e39c32bb731c6d80c52a41a4ec8c0e3ff6332ddaacab0a154947ebaf"
+    },
+    "providerWrites": 0
+  },
+  "archive": {
+    "bad": null,
+    "hashes": {
+      "design-01-photo.jpg": "9571e090e39c32bb731c6d80c52a41a4ec8c0e3ff6332ddaacab0a154947ebaf",
+      "design-02-proof.jpg": "3dd686def50cf0fcbde7a829ff97a7b8d3bfb0fc4d4cb1dde9b0097492666bb8",
+      "design-02-row-1-col-1.jpg": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+      "design-02-row-1-col-2.jpg": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+      "design-02-row-1-col-3.jpg": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+      "design-02-row-2-col-1.jpg": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+      "design-02-row-2-col-2.jpg": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+      "design-02-row-2-col-3.jpg": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+      "design-02-row-3-col-1.jpg": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+      "design-02-row-3-col-2.jpg": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+      "design-02-row-3-col-3.jpg": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+      "design-03-alphabet-1.jpg": "7739ccef9f47eb4a014be0824b840b33a6e1731d5ea5d42bcd3f4349b566b1c2",
+      "design-03-alphabet-2.jpg": "22da0850457f13a6bf6e1d32a5fa8ddd47d503192388545df3819a8a045b91cf",
+      "design-04-counting-1.jpg": "bd84712885334e4b1f85668cb14215eea941620e5da4564a971a93343305b16c",
+      "design-04-counting-2.jpg": "ab46d6073fa1f9ccc43beae209d20d1f18ad1aa3f4ff2fd6a1af787be68f177b",
+      "design-05-business-1.jpg": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+      "design-06-information-1.jpg": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac"
+    },
+    "instructions": "CustomVibe CV-000001\nArtwork revision 2\nManifest digest: c57e5f32d91fc1da2e8fa918a089d863dafb72e265cde96acf43086b5eac8aa5\n36 magnets. Payment status: Unpaid.\n\nDesign 1: Your photo magnets\nPrint each design in the quantity listed below.\ndesign-01-photo.jpg - Print 2 copies.\n\nDesign 2: Your picture puzzle\n2 sets, 9 pieces per set. Print 2 copies of each tile.\ndesign-02-proof.jpg - Preview only. Do not print as a tile.\ndesign-02-row-1-col-1.jpg - Print 2 copies.\ndesign-02-row-1-col-2.jpg - Print 2 copies.\ndesign-02-row-1-col-3.jpg - Print 2 copies.\ndesign-02-row-2-col-1.jpg - Print 2 copies.\ndesign-02-row-2-col-2.jpg - Print 2 copies.\ndesign-02-row-2-col-3.jpg - Print 2 copies.\ndesign-02-row-3-col-1.jpg - Print 2 copies.\ndesign-02-row-3-col-2.jpg - Print 2 copies.\ndesign-02-row-3-col-3.jpg - Print 2 copies.\n\nDesign 3: The alphabet club · Watercolour storybook · A × 2, Z\nPrint each design in the quantity listed below.\ndesign-03-alphabet-1.jpg - Print 4 copies.\ndesign-03-alphabet-2.jpg - Print 2 copies.\n\nDesign 4: Count on a little fun · Bold painted gouache · 2 × 3, 10 × 2\nPrint each design in the quantity listed below.\ndesign-04-counting-1.jpg - Print 3 copies.\ndesign-04-counting-2.jpg - Print 2 copies.\n\nDesign 5: Business magnets · Book a visit\nFinished size: 75 × 75 mm.\nSubmitted details below. Check current artwork for any later revisions.\nBusiness name: SYNTHETIC\nQR link: https://example.invalid/synthetic-review\nPrint each design in the quantity listed below.\ndesign-05-business-1.jpg - Print 3 copies.\n\nDesign 6: Handy at home · Family week\nFinished size: 75 × 75 mm.\nSubmitted details below. Check current artwork for any later revisions.\nMonday: Swimming\nTuesday: Library\nWednesday: Soccer\nThursday: Music\nFriday: Family time\nPrint each design in the quantity listed below.\ndesign-06-information-1.jpg - Print 2 copies.\n\nCUSTOMER NOTES (not printed on magnets):\nSYNTHETIC: check selected quantities. Do not print these notes.\n\nCheck crop and source quality before production."
+  },
+  "blockedExternalRequests": [],
+  "errors": [],
+  "requestCount": 51
+}

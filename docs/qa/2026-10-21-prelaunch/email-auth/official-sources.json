@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-21T16:11:15.191Z",
+  "sources": [
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc7208.html#section-4.6.4",
+      "usedFor": "SPF lookup-causing term limit and IP-only leaf mechanics."
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc9989.html",
+      "published": "May 2026",
+      "usedFor": "Current DMARC specification, alignment, obsolete percentage sampling and mixed-use domain interoperability."
+    },
+    {
+      "url": "https://knowledge.workspace.google.com/admin/security/recommended-dmarc-rollout",
+      "usedFor": "Official provider rollout context; percentage example conflicts with current RFC and is not relied on as a containment guard."
+    },
+    {
+      "url": "https://resend.com/changelog/custom-return-path",
+      "usedFor": "Resend Return-Path role and default send subdomain; actual envelope is not inferred as verified from documentation."
+    },
+    {
+      "url": "https://resend.com/docs/dashboard/domains/introduction",
+      "usedFor": "Verified domains and Return-Path context."
+    }
+  ]
+}

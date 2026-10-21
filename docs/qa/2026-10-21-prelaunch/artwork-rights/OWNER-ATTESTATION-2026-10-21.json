@@ -1,0 +1,66 @@
+{
+  "recordType": "owner-attestation-artwork-rights-and-production",
+  "recordedDate": "2026-10-21",
+  "owner": "Tim",
+  "authority": "Fresh owner answers supplied in this conversation, relayed by root agent; summaries below are not invented verbatim quotations.",
+  "evidenceLevel": "owner attestation, not independently verified physical/legal proof or signed releases",
+  "assertions": [
+    {
+      "id": "OA1",
+      "scope": "Five homepage photo magnet examples, their display derivatives and existing four gate copies, plus coast demo permission covered by the original question",
+      "namedOriginals": [
+        "01-restaurant-square.png",
+        "05-sunglasses-square.png",
+        "03-beach-square.png",
+        "02-wedding-square.png",
+        "04-pink-group-square.png"
+      ],
+      "shippingFiles": "Corresponding basenames in public/assets/cutouts/*.webp; display derivatives mapped by existing manifest. Naming correspondence is not original-PNG byte proof.",
+      "summary": "Owner reports full permission covering advertising, editing and all uses in response to the original question including the homepage examples and coast demo.",
+      "status": "OWNER_ATTESTED",
+      "limit": "No signed release, named photographer contract or independent rights adjudication was supplied. Do not repeat the settled permission question."
+    },
+    {
+      "id": "OA2",
+      "scope": "Logo, collections, Business and Handy artwork",
+      "summary": "Owner says these were created here in Codex, with no other people's photographs, logos or reference artwork.",
+      "status": "OWNER_ATTESTED",
+      "limit": "No per-asset generation-session document or exclusivity/copyrightability opinion is inferred. The separate global no-external-input statement applies across reviewed families."
+    },
+    {
+      "id": "OA3",
+      "scope": "Making and inspection process; Handmade in Durban wording",
+      "summary": "Owner confirms making magnets from scratch using hands and machines and inspecting them before they leave. In the context of the question about Durban manufacture, his affirmative answer is recorded as owner confirmation of that location.",
+      "status": "OWNER_ATTESTED",
+      "limit": "Not a workshop visit, independent manufacturing audit or physical print acceptance."
+    },
+    {
+      "id": "OA4",
+      "scope": "The same five named homepage magnet images",
+      "summary": "Owner confirms these show actual finished magnets.",
+      "status": "OWNER_ATTESTED",
+      "limit": "Does not assert that generated gate scenery, tray/social imagery or every packaged mockup depicts actual manufacture."
+    },
+    {
+      "id": "OA5",
+      "scope": "All reviewed artwork families, including gate scenery, Christmas, tray/social composition and decorative branding",
+      "summary": "Owner states nothing uses anyone else's photographs, logos or reference artwork.",
+      "status": "OWNER_ATTESTED",
+      "limit": "This records the owner's global input-origin assurance. It does not manufacture exact original-file mappings, documentary releases, independent legal proof or physical-product evidence."
+    }
+  ],
+  "remainingBoundaries": [
+    "Original creator identity or per-asset file/generation lineage is not located for every file; no contradictory evidence was established.",
+    "Actual-finished-product assertion remains limited to the five specifically named homepage images; coast demo and generated scenes do not gain that claim.",
+    "Current customer-marketing permission procedure was not separately described; no customer files or records were inspected.",
+    "No further owner permission request is warranted by unlocated technical mapping alone; reasonable audit review completion is distinct from independent physical/legal proof."
+  ],
+  "scopeClarification": {
+    "date": "2026-10-21",
+    "basis": "Root adjudication of the original owner question and fresh answers",
+    "coastDemo": "The original permission question explicitly included the coast demo; owner's affirmative full-permission answer covers it. Creator identity and exact original-file lineage remain unlocated.",
+    "globalInputStatement": "Owner states that nothing uses anyone else's photos, logos or reference artwork. This applies as an owner attestation across the reviewed artwork families, including the previously limited gate/Christmas/tray/social/decorative scope.",
+    "contradictoryEvidenceFound": false,
+    "remainingNature": "Unlocated per-asset original source/mapping or documentary support, not established contradictory evidence or unanswered permission requests."
+  }
+}

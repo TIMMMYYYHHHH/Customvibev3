@@ -1,0 +1,7 @@
+Existing task: Stage DMARC reporting and enforcement
+Suggested status: In progress for verified preparation; do not mark Done.
+
+21 Oct, 18:06–18:07 SAST: public DNS checked through two resolvers; matching answers showed one apex SPF, Google MX, documented DKIM keys and a single p=none DMARC record without aggregate reporting. Current SPF graph uses 2 of the 10 lookup-causing terms. Published DNS is verified; current message headers/alignment were not inspected. Sender matrix, reporting-first plan, advancement criteria and rollback are ready. RFC 9989 supersedes percentage sampling; reject is not a default recommendation for this mixed Workspace/transactional domain. No settings, emails, customer data, recovery or renewals touched. Existing accepted manual contact replies stay Done. Reporting observation and any later enforcement remain open.
+
+Evidence: audit/fix-plan/github-wait-execution-20261021/email-auth/EMAIL-AUTH-READINESS.md and dns-summary.json.
+No duplicate task or service record needed. This text is a proposal only; root must read current activity before saving.

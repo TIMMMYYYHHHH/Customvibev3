@@ -1,0 +1,114 @@
+{
+  "pdf": "print-samples-75mm.pdf",
+  "pages": 2,
+  "pageSize": "A4, within 0.0001 point serialization tolerance",
+  "pdfBytes": 1458684,
+  "pdfSha256": "fc455e6e6a6d99a3209e37e71efe688b7a260e33ec4512fcdd8dc22ba8429715",
+  "sourceArchive": "audit/fix-plan/customer-review-integration-sol61/exact-artwork/synthetic-order.zip",
+  "sourceArchiveSha256": "18f89ac64a21909ec7a3417e313d1a5f2e164ccd9ff417037881c6b8159d0c44",
+  "embeddedSamples": [
+    {
+      "file": "design-02-row-1-col-1.jpg",
+      "sha256": "f266d58e8b97a001e33cf9cdf189cb23735a11d3accaff9a6d01f90a751011c0",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-1-col-2.jpg",
+      "sha256": "1b85782077184703e0fd2650a948f56b9ed4fedd4e804de1d094b5b57c293b50",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-1-col-3.jpg",
+      "sha256": "efeda4daed09f331510efc4e8503b2de3ab8fe62a1ec7ec4f131ad824734cf84",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-2-col-1.jpg",
+      "sha256": "acc9e9e578c56bd0861da4f983a02c3d2c7bb72942dc1bb371ab68fd110c3076",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-2-col-2.jpg",
+      "sha256": "04a0e89d4d24abedbb7a04fc917b7b23dc3f4138efcdeffa4195dc7032281e1d",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-2-col-3.jpg",
+      "sha256": "b1f593d2c68afc06b56ab41bcb02907fe64728b0d3a794054313f3429aeb8bb4",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-3-col-1.jpg",
+      "sha256": "6c66c20b249862d840333c7a289d6be6ff2fb5a3b3c5b449dbf2a706a47652a4",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-3-col-2.jpg",
+      "sha256": "f6e23d4c1c4c82e8f4a70a2f838891f5524f73cc7867b99680b5a3e38f02e7b4",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-02-row-3-col-3.jpg",
+      "sha256": "69835a9d8399161d5672b0dfc3b9e1467f42cc300355ea931318a05108c83e3c",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-05-business-1.jpg",
+      "sha256": "022c13b72a31dd18963aaea0ad342d9a82dec3425de71ac40b36c0ce7dc0bfa1",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    },
+    {
+      "file": "design-06-information-1.jpg",
+      "sha256": "8d31ba19b45a7d43c0ac354b6480891d45d8dbf7214908d3e8708906c19df2ac",
+      "widthPixels": 1200,
+      "heightPixels": 1200,
+      "widthMm": 74.9999911111111,
+      "heightMm": 74.9999911111111,
+      "jpegBytesPreserved": true
+    }
+  ],
+  "visualReview": "Both 100 dpi rendered pages inspected: readable labels, no overlap or clipping, guides outside artwork, only synthetic content.",
+  "renderer": "Bundled Poppler pdftoppm, exit 0. Fontconfig emitted cache/config warnings; final rendered labels are visible and legible.",
+  "physicalPrinting": "Not tested; owner ruler/material/QR check required",
+  "privacy": "Existing synthetic source assets only; no customer data"
+}
