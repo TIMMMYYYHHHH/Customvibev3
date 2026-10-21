@@ -1,7 +1,7 @@
 import {artworkService,cleanArtwork} from '../security/artwork.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import security from '../security/index.mjs';
-import {artworkEnv,manifest,tile} from './helpers/artwork.mjs';
+import {artworkEnv,manifest,tile,sha} from './helpers/artwork.mjs';
 const call=(env,path,data)=>security.fetch(new Request('https://auth.internal/artwork/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}),env);
 const upload=(env,m,bytes=tile)=>security.fetch(new Request('https://auth.internal/artwork/upload',{method:'POST',headers:{'X-Artwork-Id':m.id,'X-Artwork-Owner':m.owner,'X-Artwork-Index':'0','Content-Type':'image/jpeg'},body:bytes}),env);
 test('private artwork is immutable, session-owned, finalized only after complete upload, and expires after fourteen days',async()=>{
@@ -108,9 +108,9 @@ test('healthy ready retries and repeated completion use bounded checksummed meta
 });
 for(const invalid of ['wrong size','wrong checksum','untrusted metadata'])test(`ready retry and completion reject ${invalid} without replacing the object`,async()=>{
  const {env,m,key}=await ready();
- if(invalid==='wrong size')await env.ARTWORK.put(key,tile.subarray(1));
- if(invalid==='wrong checksum'){const corrupted=Buffer.from(tile);corrupted[100]^=1;await env.ARTWORK.put(key,corrupted)}
- if(invalid==='untrusted metadata'){const head=env.ARTWORK.head;env.ARTWORK.head=async key=>({...await head(key),checksums:{},etag:m.files[0].sha256})}
+ if(invalid==='wrong size')await env.ARTWORK.put(key,tile.subarray(1),{sha256:await sha(tile.subarray(1))});
+ if(invalid==='wrong checksum'){const corrupted=Buffer.from(tile);corrupted[100]^=1;const checksum=await sha(corrupted);assert.notEqual(checksum,m.files[0].sha256);await env.ARTWORK.put(key,corrupted,{sha256:checksum})}
+ if(invalid==='untrusted metadata'){await env.ARTWORK.put(key,tile);assert.equal((await env.ARTWORK.head(key)).checksums.sha256,undefined);const head=env.ARTWORK.head;env.ARTWORK.head=async key=>({...await head(key),etag:m.files[0].sha256})}
  const preserved=Buffer.from(env.objects.get(key));env.ARTWORK.put=async()=>{throw Error('Invalid existing object must not be replaced')};
  assert.equal((await upload(env,m)).status,409);assert.equal((await call(env,'complete',m)).status,409);
  assert.equal(state(env,m).finalized,0);assert.deepEqual(Buffer.from(env.objects.get(key)),preserved);
