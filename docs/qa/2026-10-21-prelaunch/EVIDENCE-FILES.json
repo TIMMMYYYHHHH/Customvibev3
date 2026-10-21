@@ -4,8 +4,8 @@
     "sha256": "33cca0cd52fab02925b26d1c4fe1a6ec5b2e9471b833e83c2148d760a9cce06d"
   },
   "README.md": {
-    "bytes": 1584,
-    "sha256": "ca3ab432d1297897c4caf7bb99c8828c96756b4a52e647f65ccc607ad3b2b0f6"
+    "bytes": 2158,
+    "sha256": "d3eb3071cfd451b6dd8198203c137c3c25494610d941aaacdaaf3485a4dd99a2"
   },
   "artwork-rights/ASSET-REGISTER.csv": {
     "bytes": 315592,
@@ -48,12 +48,24 @@
     "sha256": "7d23d6d95558bfac8335bb8988eec355db72499bedca95a66608622d0989a0a4"
   },
   "owner-tests/PHONE-AND-PRINT.md": {
-    "bytes": 11289,
-    "sha256": "7e8dc82aa9a40a0b7a04777faa6639944db407e6d6c22cb841978eb9952e130f"
+    "bytes": 8682,
+    "sha256": "f810247e38bc63e305e3e89be5add94fa603a5cb953ea96d29de4b31eadeb650"
   },
   "owner-tests/PRINT-TEMPLATE-HANDOFF.md": {
-    "bytes": 2235,
-    "sha256": "35d2d7946a90e8dd04d67299e2b359cb9beaea607a8b52447b053563f24f3a35"
+    "bytes": 1877,
+    "sha256": "ea9ddce05298b45ae8cf51d38029e9b6086afeb36102e05e36dd9c9ea662ea08"
+  },
+  "owner-tests/PRINT-TEMPLATE-REVIEW.md": {
+    "bytes": 7965,
+    "sha256": "2716a158621d0f6ad3fa6b456ebe68a203b7b203ff40f1aece46c38bd338cc71"
+  },
+  "owner-tests/SIZE-CORRECTION-SCOPE.md": {
+    "bytes": 11011,
+    "sha256": "91fa1ee16bc31cf525fba8c904ab07f1e81423c542ad2bfa1f03d329e32c50d3"
+  },
+  "owner-tests/TEST-CHECKLIST.md": {
+    "bytes": 6459,
+    "sha256": "b6afcceffc4f2fddd3bc167d76c6da4eb3fdf42f157164b1221ac3ad0e567395"
   },
   "owner-tests/print-samples-75mm.pdf": {
     "bytes": 1458684,

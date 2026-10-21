@@ -1,17 +1,11 @@
 # Tim's production print template
 
-21 October 2026. **Waiting for the actual template file.** Tim wants production artwork arranged in the established template and may want a button that fills it from an order's images. No template is attached yet. No implementation or new layout generation should begin until it has been inspected.
+21 October 2026. The supplied Canva PDF was received, measured and visually inspected. Tim then measured a finished magnet and confirmed **2.5 x 2.5 inches / 63.5 x 63.5 mm**, with octagons as fold guides. The A4 layout has six positions, five image placeholders and one blank position. Image frames differ, and one label uses older branding. The source file is unchanged.
 
-Please provide:
+Tim prints from a laptop or Mac through Canva today and wants Canva removed. The recommended Admin flow is Prepare print sheet, preview/calibrate, download an A4 PDF, then print at 100%. See the [measured proposal](PRINT-TEMPLATE-REVIEW.md) and [owner checklist](TEST-CHECKLIST.md). No button, package or production profile has been implemented.
 
-1. The actual blank template file, retaining its original format and dimensions.
-2. The print software name/version, if the file does not make that clear.
-3. A brief description or synthetic example of how images are placed now: one image per slot, required copies, puzzle tile ordering, and any manual crop/scale step. No customer artwork, order details, credentials or account keys are needed.
+Remaining inputs are agreement on this flow, one sample showing the image-to-fold relationship, and the printer model for calibration. Finished face size and guide purpose are no longer open questions. The existing Hub subtask **Prepare order artwork in the production print template** tracks this work. The website's 75 mm claims need correction; they are not a reason to resize the actual product.
 
-The first bounded review will establish page/slot dimensions, safe margins/cut or bleed areas, intended image fitting, quantity handling, puzzle ordering, editable format and current export/print path. It will then distinguish a usable existing function from a missing prefill feature. A prefill button is a requested possibility to assess, not an implemented or verified capability.
+Preserve exact saved crops, quantities, private unexpired artwork, Unpaid state and manual emails. Any bleed must be established from the real wrapping process. Original artwork retention is unchanged.
 
-Production size/readability/QR acceptance must use that reviewed template and the intended material/finish. The existing `print-samples-75mm.pdf` is **optional generic test artwork only**. Do not ask Tim to print it in place of the real workflow or mark the production template accepted from its result. Preserve it as synthetic evidence, without rebuilding images.
-
-Reuse existing Hub print/artwork acceptance coverage, including the physical checks beneath Business/Handy personalisation and the broader exact-artwork/print work. Root will read the latest entries, record this template dependency on the appropriate existing task/subtask and assess whether a distinct prefill deliverable is needed after inspection. No duplicate print task or feature completion is claimed here.
-
-Phone checks are independent: Samsung S25 Ultra in Chrome and Firefox, and existing current email in Gmail and Outlook where already available. Drafts stay unsent. Fresh email delivery still requires separate authorisation; template inspection does not authorise sends, production orders, provider changes or printing.
+The earlier `print-samples-75mm.pdf` is retained historical synthetic evidence only. **Do not use it for production sizing or acceptance.** Its file and verification receipt remain intact to preserve the evidence history. Current testing uses the supplied A4 template for paper calibration and the confirmed 63.5 mm finished face. Phone checks remain available now on Samsung S25 Ultra in Chrome/Firefox, and Gmail/Outlook where the existing current message is already available. No fresh email or order is required.
