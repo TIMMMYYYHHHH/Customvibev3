@@ -1,4 +1,8 @@
-# Signed delivery ingress: inactive local tranche
+# Signed delivery ingress runbook
+
+**Current status, 21 October 2026:** the owner-approved hook, encrypted signing-secret installation and Production activation are complete on source `648868b66fa3ab80a334c3f555e7dc5b237489d5`, canonical Pages deployment `7fb97a6b-61f7-4f0c-9656-5ec207155366`. The one unsigned check returned 400; valid signed-event correlation and owner mailbox acceptance remain open. See the [activation record](releases/2026-10-21-delivery-webhook-activation.md) for exact identities, configuration, evidence hashes and limits. The inactive, pending-0012 and Security56 statements below describe the historical preparation tranche, not current production. Do not repeat migrations, hook creation or deployment from those historical steps.
+
+## Historical local tranche
 
 This implementation is inactive. The local current-main candidate combines independently cleared Lane A R2 and Lane B R2 source on `f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9`. No provider endpoint, secret, production configuration, deployment, email, API message-read permission or new paid service was created. TECH03 and EXT01 remain open. Combined independent review and explicit approval of the new endpoint/signing-secret capability remain required before activation.
 
