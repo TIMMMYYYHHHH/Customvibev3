@@ -10,12 +10,12 @@ const file={size:2000,sha256:'a'.repeat(64)};
 const chosen={id:'11111111-1111-4111-8111-111111111111',kind:'alphabet',qty:2,printVersion:1,designIds:['alphabet-1','alphabet-3','alphabet-26'],files:[file,file,file]};
 const payload=items=>({id:'22222222-2222-4222-8222-222222222222',createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'test@example.com',phone:'0123456789'},locker:{name:'Locker',area:'Durban'},consent:true,items});
 test('chosen letters price their actual magnets and copies reuse the selected files',()=>{
- const sum=summarize([chosen],content);assert.equal(sum.magnetQty,6);assert.equal(sum.knownCents,25000);assert.equal(orderCapacity([chosen],content).files,3);
- assert.equal(summarize([{kind:'counting',qty:1,designIds:['counting-2','counting-10']},{kind:'photo',qty:4}],content).knownCents,25000);
+ const sum=summarize([chosen],content);assert.equal(sum.magnetQty,6);assert.equal(sum.knownCents,27000);assert.equal(orderCapacity([chosen],content).files,3);
+ assert.equal(summarize([{kind:'counting',qty:1,designIds:['counting-2','counting-10']},{kind:'photo',qty:4}],content).knownCents,27000);
 });
 test('chosen letters retain their identities and exact face count through order and proof records',()=>{
  const order=validateOrder(payload([chosen]),content,true),record=orderRecord(order,true);
- assert.equal(order.subtotalCents,25000);assert.equal(order.items[0].faceCount,3);assert.deepEqual(record.items[0].designIds,chosen.designIds);assert.match(record.items[0].name,/A, C, Z/);assert.equal(proofRows(record).length,3);assert.match(emailOrderSummary(order).text,/A, C, Z/);
+ assert.equal(order.subtotalCents,27000);assert.equal(order.items[0].faceCount,3);assert.deepEqual(record.items[0].designIds,chosen.designIds);assert.match(record.items[0].name,/A, C, Z/);assert.equal(proofRows(record).length,3);assert.match(emailOrderSummary(order).text,/A, C, Z/);
 });
 test('invalid selections cannot buy empty, duplicate, unrelated or missing faces',()=>{
  for(const designIds of [[],['alphabet-1','alphabet-1'],['counting-1'],['alphabet-27'],'alphabet-1',null])assert.throws(()=>validateOrder(payload([{...chosen,designIds,files:Array(26).fill(file)}]),content,true));

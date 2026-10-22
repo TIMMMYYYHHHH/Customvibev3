@@ -6,8 +6,9 @@ export const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
 export function photoPrice(qty,pricing=defaultPricing){
   if(!Number.isInteger(qty)||qty<0) throw new Error('Choose a whole number of magnets.');
   if(qty<6)return qty*pricing.single;
-  if(qty===6)return pricing.six;
-  if(qty<10)return Math.round(qty*pricing.six/6/100)*100;
+  // Saved legacy six-magnet totals may imply fractional cents per magnet.
+  // Round only the basket total to cents; current rates divide exactly.
+  if(qty<10)return Math.round(qty*pricing.six/6);
   return qty*pricing.ten/10;
 }
 export const money=cents=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR',minimumFractionDigits:0,maximumFractionDigits:2}).format(cents/100);
@@ -51,7 +52,7 @@ export function orderCapacity(items,content){
  return {magnets,files,entries:items.length,issues,allowed:issues.length===0};
 }
 
-// Personalised magnets share bundle pricing, including every square puzzle piece.
+// All per-magnet items share the rate selected by the whole basket quantity.
 export function nextPhotoTier(qty,pricing=defaultPricing){
  const current=photoPrice(qty,pricing);
  if(qty===0||qty>=10)return null;

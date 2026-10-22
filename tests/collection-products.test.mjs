@@ -7,7 +7,7 @@ test('pack contents participate in shared quantity discounts, including copies a
  assert.equal(summarize([{kind:'alphabet',qty:1},{kind:'words',qty:1}],content).knownCents,140000);
  assert.equal(summarize([{kind:'alphabet',qty:2}],content).knownCents,208000);
  assert.equal(summarize([{kind:'words',qty:1},{kind:'business',qty:2}],content).knownCents,44000);
- assert.equal(summarize([{kind:'words',qty:1}],content).knownCents,37500);
+ assert.equal(summarize([{kind:'words',qty:1}],content).knownCents,40500);
  assert.equal(summarize([{kind:'wifi',qty:1},{kind:'puzzle',qty:1,gridSize:3}],content).knownCents,40000);
 });
 test('available built-in packs require matching complete versioned print manifests',()=>{

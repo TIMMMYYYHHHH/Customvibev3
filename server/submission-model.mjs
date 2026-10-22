@@ -40,8 +40,8 @@ export function validateOrder(x,catalogue,privateArtwork=false){
   return {...contract,...(item.emailPreview!==undefined?{emailPreview:item.emailPreview}:{}),kind:item.kind,name:collectionItemName(product,contract),qty:item.qty,faceCount:item.kind==='puzzle'?gridSize**2:contract.designIds?contract.designIds.length:productMagnetCount(product,contract),...(gridSize?{gridSize}:{}),files};
  });
  const sum=summarize(items,catalogue);if(sum.unpriced||!Number.isSafeInteger(sum.magnetQty)||!Number.isSafeInteger(sum.knownCents)||sum.knownCents<=0)invalid();
- // Allocate the shared personalised bundle total proportionally, rounding cumulative cents.
- // This preserves the submitted line prices without changing the overall bundle price.
+ // Allocate the whole-basket quantity rate across every per-magnet item.
+ // Cumulative cent rounding preserves legacy custom tier totals and the exact subtotal.
  let pieces=0,allocated=0;const personalTotal=photoPrice(sum.pricedQty,catalogue.pricing);
  for(const item of items){if(['photo','puzzle'].includes(item.kind)||catalogue.products.find(p=>p.id===item.kind)?.pricingMode==='per-magnet'){pieces+=item.qty*(item.kind==='puzzle'?item.gridSize**2:item.kind==='photo'?1:productMagnetCount(catalogue.products.find(p=>p.id===item.kind),item));const total=Math.round(personalTotal*pieces/sum.pricedQty);item.lineCents=total-allocated;allocated=total;}else item.lineCents=catalogue.products.find(p=>p.id===item.kind).priceCents*item.qty;}
  return {...base,contact,locker,items,magnetQty:sum.magnetQty,subtotalCents:sum.knownCents,deliveryCents:null,paymentStatus:'unpaid',consent:true};

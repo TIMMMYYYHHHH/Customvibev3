@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as c from '../src/commerce.mjs';
 
-test('bundle price applies to combined photo quantities and rejects invalid counts', () => {
+test('one basket quantity selects the per-magnet rate for every magnet and rejects invalid counts', () => {
   assert.equal(typeof c.photoPrice, 'function');
-  for (const [qty, cents] of [[0,0],[1,5000],[5,25000],[6,25000],[7,29200],[8,33300],[9,37500],[10,40000],[12,48000]]) assert.equal(c.photoPrice(qty),cents);
+  for (const [qty, cents] of [[0,0],[1,5000],[5,25000],[6,27000],[7,31500],[8,36000],[9,40500],[10,40000],[11,44000],[12,48000]]) assert.equal(c.photoPrice(qty),cents);
   assert.throws(()=>c.photoPrice(-1)); assert.throws(()=>c.photoPrice(1.5));
 });
 test('unknown pack pricing cannot become a misleading complete total', () => {
   assert.equal(typeof c.summarize, 'function');
-  assert.deepEqual(c.summarize([{kind:'photo',qty:3},{kind:'photo',qty:3},{kind:'alphabet',qty:1}]),{photoQty:6,puzzleQty:0,pricedQty:6,knownCents:25000,unpriced:true,magnetQty:32});
+  assert.deepEqual(c.summarize([{kind:'photo',qty:3},{kind:'photo',qty:3},{kind:'alphabet',qty:1}]),{photoQty:6,puzzleQty:0,pricedQty:6,knownCents:27000,unpriced:true,magnetQty:32});
   assert.equal(c.summarize([{kind:'puzzle',gridSize:3,qty:1}]).unpriced,false);
 });
 test('crop fills output without blank edges at extremes', () => {
@@ -36,10 +36,10 @@ test('basket totals count every square in multiple puzzle packs',()=>{
 
 test('photo tier nudges reflect the actual extra cost at each boundary',()=>{
  assert.equal(c.nextPhotoTier(0),null);
- assert.deepEqual(c.nextPhotoTier(1),{target:6,remaining:5,total:25000,extra:20000,saving:5000});
- assert.deepEqual(c.nextPhotoTier(5),{target:6,remaining:1,total:25000,extra:0,saving:5000});
- assert.deepEqual(c.nextPhotoTier(6),{target:10,remaining:4,total:40000,extra:15000,saving:10000});
- assert.equal(c.nextPhotoTier(9).extra,2500);
+ assert.deepEqual(c.nextPhotoTier(1),{target:6,remaining:5,total:27000,extra:22000,saving:3000});
+ assert.deepEqual(c.nextPhotoTier(5),{target:6,remaining:1,total:27000,extra:2000,saving:3000});
+ assert.deepEqual(c.nextPhotoTier(6),{target:10,remaining:4,total:40000,extra:13000,saving:10000});
+ assert.equal(c.nextPhotoTier(9).extra,-500);
  assert.equal(c.nextPhotoTier(10),null);
  assert.equal(c.nextPhotoTier(25),null);
  assert.throws(()=>c.nextPhotoTier(-1));
@@ -52,6 +52,6 @@ test('photo magnets and puzzle pieces share tiers, excluding premade packs',()=>
  assert.equal(withPack.magnetQty,36);assert.equal(withPack.pricedQty,10);assert.equal(withPack.knownCents,40000);assert.equal(withPack.unpriced,true);
  assert.equal(c.nextPhotoTier(withPack.pricedQty),null);
  const puzzle=c.summarize([{kind:'puzzle',gridSize:3,qty:1}]);
- assert.equal(puzzle.knownCents,37500);assert.equal(c.nextPhotoTier(puzzle.pricedQty).remaining,1);
+ assert.equal(puzzle.knownCents,40500);assert.equal(c.nextPhotoTier(puzzle.pricedQty).remaining,1);
  assert.equal(c.summarize([{kind:'puzzle',gridSize:5,qty:2}]).knownCents,200000);
 });
