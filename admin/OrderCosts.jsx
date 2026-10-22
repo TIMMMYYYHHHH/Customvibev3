@@ -1,7 +1,6 @@
 import React,{useMemo,useState,useEffect,useSyncExternalStore} from 'react';
 import CostEntryFields,{CostEditorFeedback} from './CostEntryFields';
 import {createCostEditor,costStatus,previewCosts,money} from './finance-client.mjs';
-import './finance.css';
 export function OrderCostsEditor({order,editor}){
  const state=useSyncExternalStore(editor.subscribe,editor.getSnapshot,editor.getSnapshot),expired=order.expires*1000<=Date.now(),totals=previewCosts(state.draft);
  useEffect(()=>{editor.load();},[editor]);

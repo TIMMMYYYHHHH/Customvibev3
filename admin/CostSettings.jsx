@@ -1,7 +1,6 @@
 import React,{useEffect,useMemo,useSyncExternalStore} from 'react';
 import CostEntryFields,{CostEditorFeedback} from './CostEntryFields';
 import {createCostEditor} from './finance-client.mjs';
-import './finance.css';
 export default function CostSettings({editor:provided}){
  const editor=useMemo(()=>provided||createCostEditor({path:'/api/finance/settings',settings:true}),[provided]),state=useSyncExternalStore(editor.subscribe,editor.getSnapshot,editor.getSnapshot);
  useEffect(()=>{editor.load();},[editor]);

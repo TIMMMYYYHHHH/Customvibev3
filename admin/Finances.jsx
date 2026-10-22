@@ -4,7 +4,6 @@ import {api} from './api.mjs';
 import {money,currentFinanceMonth,exportFinanceMonth} from './finance-client.mjs';
 import {statusLabels} from '../server/order-update-email.mjs';
 import {adminDate} from './time.mjs';
-import './finance.css';
 const known=value=>value===null?'To confirm':money(value);
 export function FinanceReport({report}){
  const s=report.summary;

@@ -8,6 +8,7 @@ import {summarizeFinanceRows,monthRange} from '../../shared/finance-report.mjs';
 import {currentFinanceMonth} from '../../admin/finance-client.mjs';
 import {sessionRecovery} from '../../admin/session-recovery.mjs';
 import '../../src/fonts.css';
+import '../../admin/finance.css';
 const params=new URLSearchParams(location.search),scenario=params.get('scenario')||'normal',orderView=params.get('view')==='order';
 const now=Math.floor(Date.now()/1000),month=currentFinanceMonth(),[start]=monthRange(month),id=n=>`11111111-1111-4111-8111-${String(n).padStart(12,'0')}`;
 const base=(n,name,category,price,qty,unit,basis,usage,yieldCount=null)=>({id:id(n),name,category,packCents:price,packQuantity:qty,unit,basis,usageMilli:usage,magnetsPerSheet:yieldCount,active:true});
