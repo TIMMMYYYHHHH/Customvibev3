@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/shop.css"
+        ],
+        "createdAt": "2026-10-22T11:01:59.840Z",
+        "reason": "Agent review: the only finding is the existing designer navigation selection underline, byte-identical to released d5684ae; it is not a rounded card accent. The new shipping banner has no accent border."
+      }
+    ]
+  }
+}

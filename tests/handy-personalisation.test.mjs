@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validateTemplate} from '../src/designs/templates.mjs';
@@ -10,7 +11,7 @@ const content=structuredClone(defaultContent);content.products.find(p=>p.id==='i
 const payload=v=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Local fixture',email:'test@example.com',phone:'0821234567'},locker:{name:'Test locker',area:'Durban'},consent:true,items:[{id:crypto.randomUUID(),kind:'information',qty:2,printVersion:1,designMode:'self',values:v,files:[{size:2000,sha256:'a'.repeat(64)}]}]});
 test('handwritten family-week details survive validation and order capture exactly',()=>{
  assert.deepEqual(validateTemplate('information',values),values);
- const order=validateOrder(payload(values),content,true),record=orderRecord(order,true);
+ const order=validateOrder(withShippingAgreement(payload(values),content),content,true),record=orderRecord(order,true);
  assert.equal(order.magnetQty,2);assert.equal(record.items[0].faceCount,1);
  assert.match(record.items[0].name,/Family week/);assert.deepEqual(record.items[0].values,values);
  assert.equal(record.items[0].files.length,1);

@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {artworkEnv} from './helpers/artwork.mjs';
@@ -103,7 +104,7 @@ async function recoveryFixture({partial=false,current=false}={}){
  const env={...artworkEnv(),ORDER_RECORDS_ENABLED:'true',SUBMISSIONS_ENABLED:'true',RESEND_API_KEY:'synthetic',TURNSTILE_SECRET_KEY:'synthetic',TURNSTILE_SITE_KEY:'synthetic',SESSION_SECRET:'a'.repeat(64),CATALOGUE:{fetch:async()=>Response.json(defaultContent)}};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};
  const origin='https://customvibe.co.za',form=await currentSender(new Request(origin+'/api/forms'),env),config=await form.json(),cookie=form.headers.get('set-cookie').split(';')[0];
  const payload={id:crypto.randomUUID(),createdAt:time(),contact:{name:'Synthetic recovery',email:'customer@example.test',phone:'0821234567'},locker:{name:'Fictional',area:'Durban'},consent:true,items:[{kind:'photo',qty:1,files:[tile.toString('base64')]}]};
- const request=()=>new Request(origin+'/api/order-request',{method:'POST',headers:{origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.7',cookie,'X-CSRF-Token':config.csrf},body:JSON.stringify({payload,turnstile:'synthetic'})});
+ const request=()=>new Request(origin+'/api/order-request',{method:'POST',headers:{origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.7',cookie,'X-CSRF-Token':config.csrf},body:JSON.stringify({payload:withShippingAgreement(payload),turnstile:'synthetic'})});
  const sends=[];let failCustomer=partial;const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});const outgoing=JSON.parse(init.body);sends.push({to:outgoing.to[0],key:init.headers['Idempotency-Key']});if(failCustomer&&outgoing.to[0]!=='hello@customvibe.co.za')return new Response(null,{status:503});return Response.json({id:'recovery-provider-'+sends.length})};
  const sender=current?currentSender:await releasedSender(),first=await sender(request(),env,network);assert.equal(first.status,200);const firstResult=await first.json();assert.equal(firstResult.receiptSent,!partial);
  return {env,request,network,sends,firstResult,recover:()=>{failCustomer=false},source:()=>env.sql.prepare('SELECT * FROM submissions').get(),record:()=>env.sql.prepare('SELECT * FROM orders').get()};

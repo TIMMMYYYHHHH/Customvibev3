@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import security from '../security/index.mjs';
@@ -22,12 +23,12 @@ test('expiry erases contact records and both histories without touching current 
 test('stored item prices preserve submitted bundle allocation after catalogue changes',async()=>{
  const {validateOrder}=await import('../server/submission-model.mjs');const {orderRecord}=await import('../server/order-record.mjs');const {defaultContent}=await import('../src/content/model.mjs');const catalogue=structuredClone(defaultContent);
  const m=await manifest();const input={id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'owner@example.com',phone:'0821234567'},locker:{name:'Test',area:'Test'},consent:true,items:[{kind:'photo',qty:2,files:m.files},{kind:'puzzle',qty:1,gridSize:3,files:Array.from({length:10},()=>m.files[0])}]};
- const order=validateOrder(input,catalogue,true),snapshot=orderRecord(order,true),env=artworkEnv();
+ const order=validateOrder(withShippingAgreement(input,catalogue),catalogue,true),snapshot=orderRecord(order,true),env=artworkEnv();
  assert.ok(Number.isSafeInteger(snapshot.items[0].lineCents));assert.equal(snapshot.items.reduce((n,i)=>n+i.lineCents,0),snapshot.subtotalCents);
  catalogue.pricing.single+=1000;catalogue.pricing.ten+=1000;
  const b={id:order.id,fingerprint:'a'.repeat(64),snapshot,privateArtwork:false};await call(env,'create',b);
  assert.deepEqual((await(await call(env,'detail',{id:b.id})).json()).snapshot.items,snapshot.items);
- assert.notEqual(validateOrder(input,catalogue,true).subtotalCents,snapshot.subtotalCents);
+ assert.notEqual(validateOrder(withShippingAgreement(input,catalogue),catalogue,true).subtotalCents,snapshot.subtotalCents);
 });
 
 test('order records preserve quantities above 100 without weakening numeric validation',async()=>{

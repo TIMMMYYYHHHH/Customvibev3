@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import security from '../security/index.mjs';import {artworkEnv,manifest} from './helpers/artwork.mjs';
 const call=(env,path,b)=>security.fetch(new Request('https://internal/'+path,{method:'POST',body:JSON.stringify(b)}),env);
 export async function setupProof(){const env=artworkEnv(),m=await manifest(),time=Math.floor(Date.now()/1000);env.sql.prepare('INSERT INTO artwork_requests(id,owner,manifest,bytes,created,expires,finalized,reservation) VALUES (?,?,?,?,?,?,1,?)').run(m.id,m.owner,JSON.stringify(m.files),m.files[0].size,time,time+500,'seed');const snapshot={approvalRequired:true,contact:{name:'Test',email:'test@example.com',phone:'0123456789'},locker:{name:'Locker',area:'Durban'},items:[{id:'item-1',kind:'photo',name:'Photo',qty:2,files:[{...m.files[0],index:0}]}],magnetQty:2,subtotalCents:10000,paymentStatus:'unpaid'};assert.equal((await call(env,'orders/create',{id:m.id,fingerprint:'a'.repeat(64),snapshot,privateArtwork:true})).status,200);return {env,id:m.id};}
@@ -44,7 +45,7 @@ test('all alphabet quantities fit the saved-order name contract',async()=>{
  const {defaultContent}=await import('../src/content/model.mjs'),{validateOrder}=await import('../server/submission-model.mjs'),{orderRecord}=await import('../server/order-record.mjs');
  const content=structuredClone(defaultContent);content.products.forEach(p=>p.status='available');
  const id=crypto.randomUUID(),item={id:crypto.randomUUID(),kind:'alphabet',qty:1,printVersion:1,designIds:Array.from({length:26},(_,i)=>`alphabet-${i+1}`),designQuantities:[10,...Array(25).fill(2)],files:Array(26).fill({size:2000,sha256:'a'.repeat(64)})};
- const order=validateOrder({id,createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'test@example.com',phone:'0123456789'},locker:{name:'Locker',area:'Durban'},consent:true,items:[item]},content,true),snapshot=orderRecord(order,false);
+ const order=validateOrder(withShippingAgreement({id,createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'test@example.com',phone:'0123456789'},locker:{name:'Locker',area:'Durban'},consent:true,items:[item]},content),content,true),snapshot=orderRecord(order,false);
  assert.ok(snapshot.items[0].name.length>200);assert.equal((await call(env,'orders/create',{id,fingerprint:'b'.repeat(64),snapshot,privateArtwork:false})).status,200);
 });
 
