@@ -14,10 +14,10 @@ test('temporary network failure is not reported as an expired session',async()=>
 test('session timer warns before expiry and expires without a network request',async()=>{
  let now=0;const s=createSessionRecovery({fetcher:async()=>Response.json({csrf:'secret',expiresAt:100}),now:()=>now});await s.check();assert.equal(s.getSnapshot().status,'active');now=45000;s.tick();assert.equal(s.getSnapshot().status,'expiring');now=100000;s.tick();assert.equal(s.getSnapshot().status,'expired');assert.ok(!JSON.stringify(s.getSnapshot()).includes('secret'));
 });
-test('confirmation distinguishes replacing approval, first proof and revoking links',()=>{
+test('confirmation describes internal replacement and historical link revocation',()=>{
  const order={reference:'CV-1',proof:{revision:2,status:'approved'}};
- assert.match(proofConfirmation('publish',order).body,/approval.*cleared/i);assert.match(proofConfirmation('publish',order).body,/revision 3/i);assert.match(proofConfirmation('publish',order).body,/No email/i);
- assert.match(proofConfirmation('revoke',order).body,/links/i);assert.match(proofConfirmation('seed',{reference:'CV-1'}).body,/approval/i);
+ assert.match(proofConfirmation('publish',order).body,/saved order stage stays the same/i);assert.match(proofConfirmation('publish',order).body,/revision 3/i);assert.match(proofConfirmation('publish',order).body,/No email/i);
+ assert.match(proofConfirmation('revoke',order).body,/links/i);assert.match(proofConfirmation('seed',{reference:'CV-1'}).body,/design previews/i);
 });
 test('admin dates stay on South African time across browser timezones and date boundaries',()=>{
  const stamp=Date.parse('2026-12-31T23:30:00Z')/1000;
@@ -25,7 +25,7 @@ test('admin dates stay on South African time across browser timezones and date b
 });
 
 test('revoking an approved proof does not claim to clear recorded approval',()=>{
- const c=proofConfirmation('revoke',{reference:'CV-1',proof:{revision:3,status:'approved'}});assert.match(c.body,/approval remain unchanged/);assert.doesNotMatch(c.body,/approval is cleared/);
+ const c=proofConfirmation('revoke',{reference:'CV-1',proof:{revision:3,status:'approved'}});assert.match(c.body,/recorded history stay unchanged/);assert.doesNotMatch(c.body,/approval is cleared/);
 });
 test('expiry on a write preflight prevents the protected write entirely',async()=>{
  const {api}=await import('../admin/api.mjs');const previous=globalThis.fetch;const calls=[];

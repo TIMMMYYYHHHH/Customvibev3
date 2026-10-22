@@ -371,7 +371,7 @@ const INACTIVE_DELIVERY_POLICY=Object.freeze(
  "catalogue": {
   "id": "92f3472a-3153-447d-a8be-c79db9498407",
   "sourceSha": "3a16bff91fdab22715450e201f9c874885931d36",
-  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a1ac2c60cb3930087adfd5018f373",
+  "sourceDigest": "33e4c7ce5545c7db61633546fc61a3bc239a5ac2c60cb3930087adfd5018f373",
   "runtimeDigest": "f8d7429fb2f1b2a81a387465e90099d70ac0868ef263e81899285f1957c8a1e3",
   "configDigest": "fc8a86ac35832ca9308105784fe648d10b1a8ac45bbe516d5d16c25b0715ac17",
   "evidenceUrl": "https://github.com/TIMMMYYYHHHH/Customvibev3/blob/431a4814c6fa717e38d81f64a54c50dd846000e5/docs/releases/2026-10-20-release-K-catalogue-upload-receipt.json"

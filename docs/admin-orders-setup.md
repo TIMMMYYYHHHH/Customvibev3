@@ -16,7 +16,9 @@ Email availability is independent of the website gate. Local fixtures and previe
 
 ## Artwork and request records
 
-Artwork, associated contact/request details, submitted prices, stages and update history expire after 14 days. For requests with artwork, the earlier artwork upload time controls expiry. Hourly cleanup deletes expired data; the private R2 bucket has a matching 14-day lifecycle rule. Stage changes do not extend retention. Original photos and unsent drafts remain in browser memory.
+Customers preview in the designer and checkout. No separate customer proof approval is required before stage changes or print downloads. Internal preparation/replacement checks remain, and customer status updates stay manual. See [current customer preview policy](customer-preview-policy.md).
+
+Artwork and associated artwork request records expire after 14 days. Order details, submitted prices, stages and email-update history remain for six calendar months from submission, or delivered/collected completion when Fulfilled. Reopening keeps the established detail expiry until fulfilled again. For requests with artwork, the earlier artwork upload time controls expiry. Hourly cleanup deletes expired data; the private R2 bucket has a matching 14-day lifecycle rule. Stage changes do not extend retention. Original photos and unsent drafts remain in browser memory.
 
 Migration 0006 extends still-active seven-day owner records to the new period without reviving expired data or altering order stages/history. Set the bucket lifecycle to 14 days before applying that migration and deploying the security Worker.
 

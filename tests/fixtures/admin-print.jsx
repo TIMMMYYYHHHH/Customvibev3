@@ -1,0 +1,22 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import AdminShell from '../../admin/AdminShell';
+import OrderDetail from '../../admin/OrderDetail';
+import '../../admin/orders.css';
+import '../../src/fonts.css';
+const realFetch=window.fetch.bind(window),jpeg=new Uint8Array(await (await realFetch('/tests/fixtures/print-tile.jpg')).arrayBuffer());
+const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',jpeg)),v=>v.toString(16).padStart(2,'0')).join('');
+const time=Math.floor(Date.now()/1000),id='11111111-1111-4111-8111-111111111111';
+const order={id,reference:'CV-SYNTHETIC',version:1,status:'new',created:time,expires:time+3600,artworkExpires:time+3600,history:[],updates:[],ownerSent:false,receiptSent:false,snapshot:{contact:{name:'Synthetic print check',email:'synthetic@example.invalid',phone:'000'},locker:{name:'Synthetic locker',area:'Durban'},paymentStatus:'unpaid',magnetQty:7,subtotalCents:0,items:[3,2,2].map((qty,n)=>({name:`Synthetic design ${n+1}`,kind:'photo',qty,files:[{index:n,name:`design-0${n+1}-photo.jpg`,size:jpeg.length,sha256,proof:false}]}))}};
+let broken=false;
+window.fetch=async(path,options={})=>{
+ const url=new URL(typeof path==='string'?path:path.url,location.href);
+ if(url.origin!==location.origin)throw Error('External requests disabled in the synthetic print fixture.');
+ if(options.method&&options.method!=='GET')throw Error('Writes and email disabled in the synthetic print fixture.');
+ if(url.pathname==='/api/session')return Response.json({expiresAt:time+3600});
+ if(url.pathname==='/api/orders/'+id)return Response.json(structuredClone(order));
+ if(url.pathname.startsWith('/api/artwork/'))return broken?new Response('expired',{status:410}):new Response(jpeg,{headers:{'Content-Type':'image/jpeg'}});
+ if(url.pathname.startsWith('/api/'))throw Error('Unknown synthetic API.');
+ return realFetch(path,options);
+};
+createRoot(document.getElementById('root')).render(<><aside style={{padding:12,font:'14px sans-serif',background:'#fffdf8'}}>Local synthetic fixture. No live order, email or payment.<button onClick={()=>{order.version++;}}>Simulate changed order</button><button onClick={()=>{broken=!broken;}}>Toggle missing artwork</button></aside><AdminShell logout={()=>{}}><div className="cv-orders"><OrderDetail order={structuredClone(order)} onChange={async()=>{}}/></div></AdminShell></>);

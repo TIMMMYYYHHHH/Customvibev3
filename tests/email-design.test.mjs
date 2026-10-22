@@ -40,7 +40,7 @@ test('catalogue quantities cannot be misrepresented as individual magnets',()=>{
  const order={...fixture(),items:[{kind:'alphabet',name:'Alphabet pack',qty:2,files:[]}],magnetQty:52};
  const mail=orderEmails(order,true).customer;
  assert.doesNotMatch(mail.text,/Alphabet pack:.*= 2 magnets/);
- assert.match(mail.text,/Alphabet pack: 2 units/);assert.match(mail.text,/52 magnets in total/);
+ assert.match(mail.text,/Alphabet pack: 2 units · magnet count not recorded/);assert.match(mail.text,/1 order item · 52 magnets/);
  assert.doesNotMatch(mail.html,/>2<\/td>/);
 });
 test('essential email headings and branding remain readable without image loading',()=>{
@@ -58,7 +58,7 @@ test('one magnet is singular in customer and owner HTML and plain text',()=>{
  const one={...fixture(),items:[{kind:'photo',name:'Photo magnet',qty:1,files:[]}],magnetQty:1};
  for(const mail of Object.values(orderEmails(one,true))){
   assert.doesNotMatch(mail.text,/\b1 magnets\b/);assert.doesNotMatch(mail.html,/\b1 magnets\b/);
-  assert.match(mail.text,/1 magnet in total/);assert.match(mail.html,/1 magnet in total/);
+  assert.match(mail.text,/1 order item · 1 magnet/);assert.match(mail.html,/1 order item · 1 magnet/);
  }
 });
 test('puzzle icon is embedded separately from live two-colour branding',()=>{

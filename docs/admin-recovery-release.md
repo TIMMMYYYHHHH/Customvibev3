@@ -1,3 +1,5 @@
+> Historical release evidence: customer approval and review-link consequences described here are superseded by the 21 October 2026 [customer preview policy](customer-preview-policy.md). Consequential internal artwork replacements still require accurate confirmation; session recovery never replays writes or email.
+
 # Admin confirmations, sign-in recovery and South African time
 
 Owner approved implementation, testing and live publication on 18 October 2026. No order, catalogue or occasion data migration is required.

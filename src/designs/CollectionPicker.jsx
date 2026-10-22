@@ -1,3 +1,4 @@
+import {MAGNET_SIZE_CM_TEXT} from '../print-dimensions.mjs';
 import React,{useState} from 'react';
 import {useContent} from '../content/ContentProvider';
 import {money,photoPrice} from '../commerce.mjs';
@@ -38,7 +39,7 @@ export default function CollectionPicker({product,onAdd,initialItem}){
    {error&&<p role="alert">{error}</p>}
    <button className="button action" disabled={!count||product.status!=='available'} onClick={()=>onAdd(product.id,mode==='choose'?ids:undefined,mode==='choose'?quantities:undefined,style)}>{initialItem?'Save selection':mode==='all'?'Add full set to basket':'Add selection to basket'}</button>
    <a href="/basket" className="collection-picker-basket">View basket</a>
-   <div className="collection-about"><h4>About this collection</h4><p>{product.description}</p><p>Each magnet is a 7.5 × 7.5 cm square.</p></div>
+   <div className="collection-about"><h4>About this collection</h4><p>{product.description}</p><p>Each magnet is a {MAGNET_SIZE_CM_TEXT} square.</p></div>
   </aside>
   <div className="collection-picker-art" tabIndex="0" role="region" aria-label="Browse all magnets">
    <p>{mode==='all'?`One of every design in ${artworkStyleName(style)}.`:`Choose your ${noun}, then set how many of each you need.`}</p>

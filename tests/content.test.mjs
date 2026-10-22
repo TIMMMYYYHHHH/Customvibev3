@@ -23,11 +23,30 @@ test('configured prices drive mixed totals, pack counts and nudges',()=>{
  assert.equal(nextPhotoTier(9,c.pricing).extra,3000);
  c.products[0].status='coming-soon';assert.equal(summarize([{kind:'alphabet',qty:1}],c).unpriced,true);
 });
-test('pricing cannot go backwards at bundle boundaries',()=>{
+test('pricing rejects a ten-magnet total below the six-magnet total',()=>{
  const c=copy();c.pricing.ten=100;assert.throws(()=>validateContent(c),/pricing/i);
 });
 test('the six-magnet price stays exact when admin uses cents',()=>{
  const pricing={single:5000,six:25050,ten:40000};
  assert.equal(photoPrice(6,pricing),25050);
  assert.equal(nextPhotoTier(5,pricing).extra,50);
+});
+
+
+test('approved pricing accepts the deliberate nine-to-ten reduction in both content validators',async()=>{
+ const {validateStoredContent}=await import('../server/content.mjs');
+ const c=copy();c.pricing={single:5000,six:27000,ten:40000};
+ assert.equal(validateContent(c),c);assert.deepEqual(validateStoredContent(c).pricing,c.pricing);
+ assert.equal(photoPrice(9,c.pricing),40500);assert.equal(photoPrice(10,c.pricing),40000);
+});
+test('legacy saved custom pack totals remain valid and are never reset to defaults',async()=>{
+ const {readContent}=await import('../server/content.mjs');
+ for(const pricing of [{single:5000,six:25000,ten:40000},{single:5000,six:25050,ten:40000},{single:6000,six:30000,ten:48000}]){
+  const c=copy();c.pricing=pricing;c.revision=87;c.products[0].name='Saved owner catalogue';
+  const db={prepare(){return {first:async()=>({body:JSON.stringify(c)})}}};
+  assert.equal(validateContent(c),c);const loaded=await readContent(db,defaultContent);
+  assert.deepEqual(loaded.pricing,pricing);assert.equal(loaded.revision,87);assert.equal(loaded.products[0].name,'Saved owner catalogue');
+ }
+ assert.equal(photoPrice(7,{single:5000,six:25000,ten:40000}),29167);
+ assert.equal(photoPrice(8,{single:5000,six:25050,ten:40000}),33400);
 });

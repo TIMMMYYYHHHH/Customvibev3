@@ -98,7 +98,7 @@ test('actual CLI reports the fixed module-relative fallback with network, writes
  const hashes=await Promise.all(files.map(async path=>createHash('sha256').update(await readFile(join(root,path))).digest('hex')));
  const guard="import http from 'node:http';import https from 'node:https';import net from 'node:net';const fail=()=>{throw Error('Network forbidden')};http.request=http.get=https.request=https.get=net.connect=net.createConnection=globalThis.fetch=fail;";
  const script=join(root,files[0]);
- const args=['--permission',...['scripts/check-fallback-content.mjs','src/','server/content.mjs','node_modules/','data/site-content.json'].map(path=>'--allow-fs-read='+join(root,path)),'--import','data:text/javascript,'+encodeURIComponent(guard),script];
+ const args=['--permission',...['scripts/check-fallback-content.mjs','src/','src/print-dimensions.mjs','server/content.mjs','node_modules/','data/site-content.json'].map(path=>'--allow-fs-read='+join(root,path)),'--import','data:text/javascript,'+encodeURIComponent(guard),script];
  const {stdout}=await promisify(execFile)(process.execPath,args,{cwd:tmpdir(),env:{PATH:'/usr/bin:/bin'},maxBuffer:1024*1024});
  const report=JSON.parse(stdout);assert.equal(report.valid,true);assert.deepEqual(report.structuralDrift,[]);assert.ok(report.defaultDifferences.includes('/revision'));
  assert.deepEqual(await Promise.all(files.map(async path=>createHash('sha256').update(await readFile(join(root,path))).digest('hex'))),hashes);

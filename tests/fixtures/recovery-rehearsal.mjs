@@ -31,7 +31,9 @@ async function seed(env,now,label){
  const snapshot={approvalRequired:true,contact:{name:'Synthetic '+label,email:'synthetic@example.invalid',phone:'0000000000'},locker:{name:'Synthetic',area:'Synthetic'},notes:'Synthetic recovery instructions',items:[{id:'item-1',kind:'photo',name:'Synthetic '+label,qty:1,files:[{...file,index:0}]}],magnetQty:1,subtotalCents:5000,paymentStatus:'unpaid'};
  await json(env,'orders/create',{id:m.id,fingerprint:'f'.repeat(64),snapshot,privateArtwork:true});await json(env,'proofs/seed',{id:m.id,version:0});
  const tokenHash=await sha(new TextEncoder().encode(label)),sessionId=await sha(new TextEncoder().encode(label+'session'));
- await json(env,'proofs/issue',{id:m.id,version:1,tokenHash});await json(env,'proofs/exchange',{tokenHash,sessionId});const proof=await json(env,'proofs/read',{sessionId});await json(env,'proofs/approve',{sessionId,revision:1,digest:proof.digest});
+ // Seed historical records directly to model a snapshot taken before retirement.
+ env.sql.prepare("UPDATE proof_state SET token_hash=?,status='approved',approved_at=? WHERE order_id=?").run(tokenHash,now,m.id);
+ env.sql.prepare('INSERT INTO proof_sessions(id,order_id,revision,token_hash,expires) VALUES(?,?,1,?,?)').run(sessionId,m.id,tokenHash,now+1800);
  return {...m,tokenHash,sessionId,created:now,expires:now+1209600};
 }
 
@@ -42,7 +44,7 @@ export async function rehearseRecovery({negativeControl=false}={}){
  try{
   // Actual service writes establish six-month order details and fourteen-day files.
   const active=await seed(source,clock.seconds,'active'),missing=await seed(source,clock.seconds,'missing'),corrupt=await seed(source,clock.seconds,'corrupt'),fulfilled=await seed(source,clock.seconds,'fulfilled');
-  await json(source,'orders/status',{id:fulfilled.id,version:3,status:'fulfilled'});const fulfilledBefore=source.sql.prepare('SELECT expires,fulfilled_at,artwork_expires FROM orders WHERE id=?').get(fulfilled.id);
+  await json(source,'orders/status',{id:fulfilled.id,version:1,status:'fulfilled'});const fulfilledBefore=source.sql.prepare('SELECT expires,fulfilled_at,artwork_expires FROM orders WHERE id=?').get(fulfilled.id);
   clock.seconds=base-1209500;const expiring=await seed(source,clock.seconds,'expires-during-outage');
   clock.seconds=base-200*86400;const old=await seed(source,clock.seconds,'expired-order');clock.seconds=base;
   const oldAdmin=await signToken({scope:'admin',jti:'a'.repeat(64),csrf:'b'.repeat(64),exp:base+600},'c'.repeat(64));assert.ok(await verifyToken(oldAdmin,'c'.repeat(64),'admin'));
@@ -50,7 +52,7 @@ export async function rehearseRecovery({negativeControl=false}={}){
   let start=performance.now();await backup(source.sql,join(folder,'security.sqlite'));const objectSnapshot=new Map([...source.objects].map(([key,value])=>[key,new Uint8Array(value)]));timings.snapshotMs=performance.now()-start;
   contentSource=new DatabaseSync(':memory:');for(const f of readdirSync('migrations/content').filter(f=>f.endsWith('.sql')).sort())contentSource.exec(readFileSync('migrations/content/'+f,'utf8'));
   const catalogue={...structuredClone(defaultContent),revision:7};contentSource.prepare('INSERT INTO content(id,revision,body) VALUES(1,?,?)').run(7,JSON.stringify(catalogue));const seasons={...seedState(),revision:9,mode:'off'};validateSeasonState(seasons);contentSource.exec('CREATE TABLE seasonal_settings(id INTEGER PRIMARY KEY CHECK(id=1),revision INTEGER NOT NULL,body TEXT NOT NULL)');contentSource.prepare('INSERT INTO seasonal_settings(id,revision,body) VALUES(1,?,?)').run(9,JSON.stringify(seasons));await backup(contentSource,join(folder,'content.sqlite'));const seasonHash=await sha(new TextEncoder().encode(JSON.stringify(seasons)));const contentHash=await sha(new TextEncoder().encode(contentSource.prepare('SELECT body FROM content').get().body));
-  clock.seconds=base+20;await json(source,'proofs/revoke',{id:active.id,version:3});
+  clock.seconds=base+20;await json(source,'proofs/revoke',{id:active.id,version:1});
   clock.seconds=base+60;const afterSnapshot=await seed(source,clock.seconds,'after-snapshot');
   // Simulate loss and corruption. An object with no request row is an orphan.
   objectSnapshot.delete(missing.id+'/0.jpg');objectSnapshot.get(corrupt.id+'/0.jpg')[100]^=1;const orphan=crypto.randomUUID()+'/0.jpg';objectSnapshot.set(orphan,new Uint8Array(tile));
@@ -59,11 +61,11 @@ export async function rehearseRecovery({negativeControl=false}={}){
   contentRestored=new DatabaseSync(join(folder,'content.sqlite'));timings.openSnapshotMs=performance.now()-start;
   // This internal quarantine probe proves why restoring an old revocation table
   // alone is unsafe. Nothing is exposed to a browser before the fence below.
-  checks.preFenceSnapshotWouldReviveRevokedSession=(await call(restored,'proofs/read',{sessionId:active.sessionId})).status===200;assert.ok(checks.preFenceSnapshotWouldReviveRevokedSession);
+  checks.retiredEndpointDeniesRestoredSession=(await call(restored,'proofs/read',{sessionId:active.sessionId})).status===410;assert.ok(checks.retiredEndpointDeniesRestoredSession);
   start=performance.now();
   if(!negativeControl){
    // Fail closed when post-snapshot revocations or replacement decisions are lost.
-   restored.sql.exec("DELETE FROM proof_sessions; UPDATE proof_state SET token_hash=NULL,approved_at=NULL,status='awaiting_approval'; UPDATE orders SET status='new',version=version+1 WHERE status<>'fulfilled';");
+   restored.sql.exec("DELETE FROM proof_sessions; UPDATE proof_state SET token_hash=NULL;");
   }
   checks.rotatedAdminSigningKeyRejectsOldSession=await verifyToken(oldAdmin,'d'.repeat(64),'admin')===null;
   await cleanOrders(restored);await cleanArtwork(restored);
@@ -85,11 +87,12 @@ export async function rehearseRecovery({negativeControl=false}={}){
   checks.expiredOrderRemoved=!restored.sql.prepare('SELECT id FROM orders WHERE id=?').get(old.id);
   const retained=JSON.parse(restored.sql.prepare('SELECT snapshot FROM orders WHERE id=?').get(expiring.id).snapshot);checks.expiredOrderArtworkReferencesRemoved=retained.artworkRemoved===true&&retained.items.every(i=>i.files.length===0&&!i.values&&!i.brief);
   checks.originalDeadlineUnchanged=restored.sql.prepare('SELECT expires FROM artwork_requests WHERE id=?').get(active.id).expires===active.expires;
-  checks.revokedLinkDenied=(await call(restored,'proofs/exchange',{tokenHash:active.tokenHash,sessionId:'9'.repeat(64)})).status===403;
-  checks.revokedSessionDenied=(await call(restored,'proofs/read',{sessionId:active.sessionId})).status===403;
-  checks.expiredSessionDenied=(await call(restored,'proofs/read',{sessionId:expiring.sessionId})).status===403;
-  const current=await json(restored,'orders/detail',{id:active.id});checks.approvalRequiresNewReview=current.proof.status==='awaiting_approval';
-  checks.productionBlocked=(await call(restored,'orders/status',{id:active.id,version:current.version,status:'in_progress'})).status===409;
+  checks.revokedLinkDenied=(await call(restored,'proofs/exchange',{tokenHash:active.tokenHash,sessionId:'9'.repeat(64)})).status===410;
+  checks.revokedSessionDenied=(await call(restored,'proofs/read',{sessionId:active.sessionId})).status===410;
+  checks.expiredSessionDenied=(await call(restored,'proofs/read',{sessionId:expiring.sessionId})).status===410;
+  const current=await json(restored,'orders/detail',{id:active.id});checks.historyPreserved=current.proof.status==='approved';
+  checks.legacyCapabilitiesCleared=!restored.sql.prepare('SELECT id FROM proof_sessions').get()&&!restored.sql.prepare('SELECT token_hash FROM proof_state WHERE token_hash IS NOT NULL').get();
+  checks.productionDoesNotRequireApproval=(await call(restored,'orders/status',{id:active.id,version:current.version,status:'in_progress'})).status===200;
   const missingOrder=await json(restored,'orders/detail',{id:missing.id});let archiveFailed=false;try{await downloadOrderArchive(missingOrder,(_i,f)=>call(restored,'artwork/download',{id:f.requestId,index:f.index}))}catch{archiveFailed=true}checks.missingArtworkFailsArchive=archiveFailed;
   checks.twoUnrecoverableFilesDetected=invalid.length===2;checks.orphanObjectRemoved=orphans.includes(orphan)&&!restored.objects.has(orphan);
   checks.currentGoodHashMatches=await sha(restored.objects.get(active.id+'/0.jpg'))===active.files[0].sha256;
@@ -103,6 +106,6 @@ export async function rehearseRecovery({negativeControl=false}={}){
   for(const [name,value] of Object.entries(checks))assert.equal(value,true,name);
   const migrations=await Promise.all(readdirSync('migrations/security').filter(f=>f.endsWith('.sql')).sort().map(async file=>({file,sha256:await sha(await readFile('migrations/security/'+file))})));
   const configuration=await Promise.all(['wrangler.jsonc','wrangler.security.jsonc','wrangler.catalogue.jsonc','wrangler.admin.jsonc','package-lock.json'].map(async file=>({file,sha256:await sha(await readFile(file))})));
-  return {configuration,sourceRevision:'07702ece8f3e28a623da61e9f1bbe3fe1b0ca71c',node:process.version,sqlite:restored.sql.prepare('SELECT sqlite_version() version').get().version,migrations,fixture:{snapshotEpoch:base,restoreEpoch:clock.seconds,engineeredSnapshotAgeSeconds:120,latestLostWriteSecondsAfterSnapshot:60,lostOrders:1,sourceOrders:source.sql.prepare('SELECT COUNT(*) n FROM orders').get().n,restoredRetainedOrders:restored.sql.prepare('SELECT COUNT(*) n FROM orders').get().n},timings,checks,invalidFiles:invalid.map(f=>({index:f.index,reason:f.reason})),matchedRetainedObjects:restored.objects.size,localOnly:true,providerRestorePerformed:false,providerRestoreTiming:null,dec04:'OPEN',targetsApproved:false};
+  return {configuration,sourceBaseline:'2113ecdfd6c7c4a5e6992cd2c3561b184617bfa8',node:process.version,sqlite:restored.sql.prepare('SELECT sqlite_version() version').get().version,migrations,fixture:{snapshotEpoch:base,restoreEpoch:clock.seconds,engineeredSnapshotAgeSeconds:120,latestLostWriteSecondsAfterSnapshot:60,lostOrders:1,sourceOrders:source.sql.prepare('SELECT COUNT(*) n FROM orders').get().n,restoredRetainedOrders:restored.sql.prepare('SELECT COUNT(*) n FROM orders').get().n},timings,checks,invalidFiles:invalid.map(f=>({index:f.index,reason:f.reason})),matchedRetainedObjects:restored.objects.size,localOnly:true,providerRestorePerformed:false,providerRestoreTiming:null,dec04:'OPEN',targetsApproved:false};
  }finally{Date.now=originalNow;globalThis.fetch=originalFetch;restored?.sql.close();source.sql.close();contentSource?.close();contentRestored?.close();await rm(folder,{recursive:true,force:true})}
 }

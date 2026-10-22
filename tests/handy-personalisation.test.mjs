@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validateTemplate} from '../src/designs/templates.mjs';
@@ -10,12 +11,12 @@ const content=structuredClone(defaultContent);content.products.find(p=>p.id==='i
 const payload=v=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Local fixture',email:'test@example.com',phone:'0821234567'},locker:{name:'Test locker',area:'Durban'},consent:true,items:[{id:crypto.randomUUID(),kind:'information',qty:2,printVersion:1,designMode:'self',values:v,files:[{size:2000,sha256:'a'.repeat(64)}]}]});
 test('handwritten family-week details survive validation and order capture exactly',()=>{
  assert.deepEqual(validateTemplate('information',values),values);
- const order=validateOrder(payload(values),content,true),record=orderRecord(order,true);
+ const order=validateOrder(withShippingAgreement(payload(values),content),content,true),record=orderRecord(order,true);
  assert.equal(order.magnetQty,2);assert.equal(record.items[0].faceCount,1);
  assert.match(record.items[0].name,/Family week/);assert.deepEqual(record.items[0].values,values);
  assert.equal(record.items[0].files.length,1);
  const instructions=printInstructions({reference:'LOCAL',snapshot:record,proof:{revision:1,status:'awaiting_approval',digest:'local'}});
- assert.match(instructions,/Monday: Swimming/);assert.match(instructions,/75 × 75 mm/);assert.match(instructions,/DO NOT PRINT/);
+ assert.match(instructions,/Monday: Swimming/);assert.match(instructions,/Finished size: 63\.5 × 63\.5 mm/);assert.doesNotMatch(instructions,/DO NOT PRINT|approved proof/);
 });
 test('handy templates reject unknown editions, field counts, control characters and unsupported glyphs',()=>{
  for(const v of [{...values,edition:2},{...values,handyTemplate:'missing'},{...values,entries:['Only one']},{...values,entries:['a\nb',...values.entries.slice(1)]},{...values,entries:['😀',...values.entries.slice(1)]}]) assert.throws(()=>validateTemplate('information',v));

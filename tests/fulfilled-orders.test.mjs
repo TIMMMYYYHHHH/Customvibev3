@@ -17,7 +17,7 @@ test('artwork expiry keeps details and approval audit, blocks proof access, and 
  env.sql.prepare("INSERT INTO proof_state(order_id,revision,digest,status,token_hash,approved_at) VALUES (?,1,?,'approved',?,?)").run(id,'a'.repeat(64),'b'.repeat(64),time-20);
  env.sql.prepare('INSERT INTO proof_revisions(order_id,revision,digest,manifest,created) VALUES (?,1,?,?,?)').run(id,'a'.repeat(64),'[]',time-30);
  const proof=(path,body)=>proofService(new Request('https://internal/proofs/'+path,{method:'POST',body:JSON.stringify(body)}),env);
- assert.equal((await proof('exchange',{tokenHash:'b'.repeat(64),sessionId:'c'.repeat(64)})).status,403);
+ assert.equal((await proof('exchange',{tokenHash:'b'.repeat(64),sessionId:'c'.repeat(64)})).status,410);
  assert.equal((await proof('seed',{id,version:0})).status,410);
  await cleanOrders(env);const d=await(await call(env,'detail',{id})).json();assert.equal(d.snapshot.contact.name,'Customer');assert.equal(env.sql.prepare('SELECT count(*) n FROM proof_revisions').get().n,0);assert.equal(env.sql.prepare('SELECT status FROM proof_state').get().status,'approved');
  assert.equal((await call(env,'status',{id,status:'fulfilled',version:0})).status,200);
