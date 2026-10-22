@@ -19,11 +19,21 @@ const cells=(text)=>{
 const csvRecord=(value)=>{const [head,data]=cells(value);return Object.fromEntries(head.map((name,index)=>[name,data[index]]));};
 
 test('Johannesburg month bounds are exact exclusive UTC seconds',()=>{
- const november=monthRange('2026-11'),december=monthRange('2026-12');
+ const october=monthRange('2026-10'),november=monthRange('2026-11'),december=monthRange('2026-12');
  assert.equal(new Date(november[0]*1000).toISOString(),'2026-10-31T22:00:00.000Z');
  assert.equal(new Date(november[1]*1000).toISOString(),'2026-11-30T22:00:00.000Z');
+ assert.equal(october[1],november[0]);
  assert.equal(november[1],december[0]);
- assert.ok(november[1]-1<november[1]);
+ const orders=[
+  {id:'before-start',created:Date.parse('2026-10-31T21:59:59Z')/1000},
+  {id:'at-start',created:Date.parse('2026-10-31T22:00:00Z')/1000},
+  {id:'before-end',created:Date.parse('2026-11-30T21:59:59Z')/1000},
+  {id:'at-end',created:Date.parse('2026-11-30T22:00:00Z')/1000}
+ ];
+ const members=([start,end])=>orders.filter(order=>order.created>=start&&order.created<end).map(order=>order.id);
+ assert.deepEqual(members(october),['before-start']);
+ assert.deepEqual(members(november),['at-start','before-end']);
+ assert.deepEqual(members(december),['at-end']);
  assert.equal(new Date(monthRange('2028-02')[1]*1000).toISOString(),'2028-02-29T22:00:00.000Z');
  assert.equal(new Date(monthRange('0099-01')[0]*1000).toISOString(),'0098-12-31T22:00:00.000Z');
 });
