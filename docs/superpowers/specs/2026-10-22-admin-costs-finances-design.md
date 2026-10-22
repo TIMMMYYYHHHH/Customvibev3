@@ -1,6 +1,6 @@
 # Admin costs and finances: first-stage design
 
-Date: 22 October 2026. Status: owner approved the written design and build plan. Locally implemented at runtime ee48900 with synthetic tests and browser evidence. Whole-branch review and the focused release-input fix/re-review are complete with no remaining Critical or Important issues. A separately reviewed finance publication contract, owner CSV acceptance, production migration/release and live acceptance remain pending. See [verification and handoff](../../admin-finances-verification.md) for evidence and boundaries.
+Date: 22 October 2026. Status: owner approved the written design and build plan. Locally implemented at runtime ee48900 with synthetic tests and browser evidence. Whole-branch review and the focused release-input fix/re-review are complete with no remaining Critical or Important issues. Tim accepted the local preview/calculations and CSV download/opening in Sheets and Excel. A separately reviewed finite finance publication packet, production migration/release and live acceptance remain pending. See [verification and handoff](../../admin-finances-verification.md) for evidence and boundaries.
 
 ## Purpose and delivery order
 
