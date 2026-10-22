@@ -1,3 +1,4 @@
+import {SHIPPING_POLICY_VERSION,deliveryPrice,orderTotal} from '../src/shipping.mjs';
 import {validateEmailDesignPreviews,emailDesignPreviews} from './email-design-previews.mjs';
 import {validateOrderNotes} from '../src/order-notes.mjs';
 import {designContract} from '../src/designs/state.mjs';
@@ -44,12 +45,17 @@ export function validateOrder(x,catalogue,privateArtwork=false){
  // Cumulative cent rounding preserves legacy custom tier totals and the exact subtotal.
  let pieces=0,allocated=0;const personalTotal=photoPrice(sum.pricedQty,catalogue.pricing);
  for(const item of items){if(['photo','puzzle'].includes(item.kind)||catalogue.products.find(p=>p.id===item.kind)?.pricingMode==='per-magnet'){pieces+=item.qty*(item.kind==='puzzle'?item.gridSize**2:item.kind==='photo'?1:productMagnetCount(catalogue.products.find(p=>p.id===item.kind),item));const total=Math.round(personalTotal*pieces/sum.pricedQty);item.lineCents=total-allocated;allocated=total;}else item.lineCents=catalogue.products.find(p=>p.id===item.kind).priceCents*item.qty;}
- return {...base,contact,locker,items,magnetQty:sum.magnetQty,subtotalCents:sum.knownCents,deliveryCents:null,paymentStatus:'unpaid',consent:true};
+ const deliveryCents=deliveryPrice(sum.knownCents),totalCents=orderTotal(sum.knownCents);
+ // The frozen browser attempt must agree with the server's current delivery terms.
+ // Older or changed terms require review before grants, records or email sends.
+ if(x.shippingPolicyVersion!==SHIPPING_POLICY_VERSION||x.deliveryCents!==deliveryCents||x.totalCents!==totalCents)throw Object.assign(new Error('Delivery terms changed.'),{code:'SHIPPING_TERMS_CHANGED'});
+ return {...base,contact,locker,items,magnetQty:sum.magnetQty,subtotalCents:sum.knownCents,shippingPolicyVersion:SHIPPING_POLICY_VERSION,deliveryCents,totalCents,paymentStatus:'unpaid',consent:true};
 }
 export function orderEmails(order,privateArtwork=false,assignedReference){
  if(order.referenceVersion===2&&!/^CV-[0-9]{6,}$/.test(assignedReference||''))throw Error('Order number has not been assigned');
  const reference=order.referenceVersion===2?assignedReference:requestReference(order),summary=emailOrderSummary(order),previews=emailDesignPreviews(order);
- const next='We will check your artwork and confirm production timing, delivery cost and next steps.';
+ const knownDelivery=Number.isSafeInteger(order.deliveryCents)&&order.deliveryCents>=0&&Number.isSafeInteger(order.totalCents)&&order.totalCents===order.subtotalCents+order.deliveryCents;
+ const next=knownDelivery?'We will check your artwork and confirm production timing, PUDO locker availability and next steps.':'We will check your artwork and confirm production timing, delivery cost and next steps.';
  const customerSubject=`Your CustomVibe order ${reference}`,ownerSubject=`New unpaid order ${reference}`;
  const customerFooter='Need to change something? Reply to this email and keep your reference handy. Please do not submit the same order again.';
  const ownerFooter='Internal notification. Reply to this email to contact the customer. Customer updates remain manual in Orders.';
@@ -67,5 +73,6 @@ export function orderEmails(order,privateArtwork=false,assignedReference){
 
 export function artworkManifest(order){return order.items.flatMap((item,i)=>item.files.map((f,j)=>({...f,proof:item.kind==='puzzle'&&j===0,name:`design-${String(i+1).padStart(2,'0')}-${item.kind==='puzzle'?(j===0?'proof':`row-${Math.floor((j-1)/item.gridSize)+1}-col-${(j-1)%item.gridSize+1}`):item.kind==='photo'?'photo':`${item.kind}-${j+1}`}.jpg`})))}
 
-// Keep signed grants and retry identities compatible with requests begun before price snapshots.
+// Keep legacy item-price identity compatibility, but retain explicit shipping terms.
+// A pre-shipping grant or retry must not acquire a new delivery charge silently.
 export function fingerprintPayload(submission){return JSON.stringify(Array.isArray(submission.items)?{...submission,items:submission.items.map(({lineCents,...item})=>item)}:submission)}

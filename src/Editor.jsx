@@ -68,7 +68,7 @@ export function Editor({studio,dispatchStudio,photos,setPhotos,basket=[],setBask
    </aside>
   </div>
   <OrderCapacity items={orderItems} content={content}/>
-  <div className="studio-review-bar"><div className="studio-review-summary"><SquaresFour size={34} weight="fill"/><div><strong>{magnetCount?`${magnetCount} ${magnetCount===1?'magnet':'magnets'} in your basket`:'Your basket starts here'}</strong><small>{qty} photo {qty===1?'magnet':'magnets'}{puzzleCount?` · ${puzzleCount} ${puzzleCount===1?'puzzle':'puzzles'}`:''}</small></div></div><div className="studio-price"><span className="studio-mobile-count">{magnetCount} {magnetCount===1?'magnet':'magnets'}</span><strong>{magnetCount?money(photoPrice(magnetCount,content.pricing)):'No photos yet'}</strong><small>Delivery additional</small></div><button className="button" disabled={working||!photo||!rendered} onClick={()=>go('basket')}>View basket</button></div>
+  <div className="studio-review-bar"><div className="studio-review-summary"><SquaresFour size={34} weight="fill"/><div><strong>{magnetCount?`${magnetCount} ${magnetCount===1?'magnet':'magnets'} in your basket`:'Your basket starts here'}</strong><small>{qty} photo {qty===1?'magnet':'magnets'}{puzzleCount?` · ${puzzleCount} ${puzzleCount===1?'puzzle':'puzzles'}`:''}</small></div></div><div className="studio-price"><span className="studio-mobile-count">{magnetCount} {magnetCount===1?'magnet':'magnets'}</span><strong>{magnetCount?money(photoPrice(magnetCount,content.pricing)):'No photos yet'}</strong><small>R69 delivery · Free from R1,000</small></div><button className="button" disabled={working||!photo||!rendered} onClick={()=>go('basket')}>View basket</button></div>
 
  </main>;
 }

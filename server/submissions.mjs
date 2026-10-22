@@ -47,7 +47,7 @@ export async function submissions(request,env,network=fetch,lockerSource){
    if(kind==='contact')submission=validateContact(body.payload);
    else{const r=await env.CATALOGUE.fetch('https://catalogue.internal/content.json');if(!r.ok)throw new Error('Unavailable');submission=validateOrder(body.payload,await r.json(),privateArtwork);}
    if(kind==='order'&&env.ORDER_RECORDS_ENABLED==='true'&&JSON.stringify(orderRecord(submission,privateArtwork)).length>ORDER_LIMITS.recordCharacters)throw new Error('Order details too large');
-  }catch{return fail(400,'Check your details, products and artwork. Check the artwork and order-detail size limits.');}
+  }catch(error){return fail(400,error?.code==='SHIPPING_TERMS_CHANGED'?'Please refresh checkout and review the delivery charge and total before submitting. If you already tried to place this order, keep your reference and contact CustomVibe before starting again.':'Check your details, products and artwork. Check the artwork and order-detail size limits.');}
   if(kind==='order'&&submission.locker.id){
    if(!privateArtwork)return fail(400,'Enter the locker name and area as a manual preference before sending this order.');
    if(finishing||body.resume){

@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -31,7 +32,7 @@ test('selected design quantities and set copies share one basket rate with photo
   [[{kind:'photo',qty:1,files:[file]},{kind:'puzzle',qty:1,gridSize:3,files:Array(10).fill(file)}],10,40000,[4000,36000]],
   [[{kind:'photo',qty:2,files:[file]},{kind:'puzzle',qty:1,gridSize:3,files:Array(10).fill(file)},selected],17,68000,[8000,36000,24000]]
  ]){
-  const raw=payload(items),before=structuredClone(raw),order=validateOrder(raw,defaultContent,true),saved=orderRecord(order,true);
+  const raw=payload(items),before=structuredClone(raw),order=validateOrder(withShippingAgreement(raw,defaultContent),defaultContent,true),saved=orderRecord(order,true);
   assert.equal(order.magnetQty,qty);assert.equal(order.subtotalCents,total);assert.deepEqual(order.items.map(i=>i.lineCents),lines);
   assert.deepEqual(saved.items.map(i=>i.lineCents),lines);assert.equal(saved.subtotalCents,total);assert.equal(order.paymentStatus,'unpaid');
   assert.deepEqual(raw,before,'pricing must not add magnets, alter selections or rewrite the browser submission');
