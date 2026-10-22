@@ -1,4 +1,10 @@
-# Signed delivery ingress: inactive local tranche
+# Signed delivery ingress runbook
+
+**Current status, 22 October 2026:** signed delivery ingress is active. The [21 October activation and single manual-update record](releases/2026-10-21-delivery-webhook-activation.md) preserves that operation's exact source, canonical deployment and one signed delivery/Inbox result. Later owner-approved CV-000009 and CV-000010 initial customer/owner notifications were correlated through checked webhooks and accepted in the owner's phone Inbox with previews and readable light/dark appearance. CV-000010 also has owner acceptance of the corrected quantities, R2,400 total, Free delivery and Unpaid facts. These are scoped observed journeys, not blanket verification of every template, failure, complaint, replay or expiry branch. See the [22 October mail and recovery status](releases/2026-10-22-mail-and-recovery-status.md) for acceptance boundaries and recovery/access gaps. W3Forms keeps the accepted blank Reply-To/manual customer-address workflow; do not reopen automatic template work.
+
+The inactive, pending-0012 and Security56 statements below describe the historical preparation tranche, not current production. Do not repeat migrations, hook creation or deployment from those historical steps. The website password gate and separate Admin authentication remain enabled; payments remain off, stages never send email, and ordinary status updates use manual Preview update / Send update.
+
+## Historical local tranche
 
 This implementation is inactive. The local current-main candidate combines independently cleared Lane A R2 and Lane B R2 source on `f3900766a8546fb1c23d107cf8a8e1c9cf12f9b9`. No provider endpoint, secret, production configuration, deployment, email, API message-read permission or new paid service was created. TECH03 and EXT01 remain open. Combined independent review and explicit approval of the new endpoint/signing-secret capability remain required before activation.
 
