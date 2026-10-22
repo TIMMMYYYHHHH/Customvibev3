@@ -1,6 +1,6 @@
 # Admin costs and finances: first-stage design
 
-Date: 22 October 2026. Status: proposed design for owner review, not implemented.
+Date: 22 October 2026. Status: owner approved the written design on 22 October 2026; not implemented. Build plan requested.
 
 ## Purpose and delivery order
 
@@ -77,4 +77,4 @@ Use additive schema and a release order that leaves existing Admin operational d
 2. Simple stock receipts and stocktake, low-stock banner and CSV. Record production usage once on explicit **Materials used** confirmation; neither stage moves nor archive/reopen deduct or replenish stock. Reversals require their own recorded action.
 3. Longer-term finance retention and any manual payment recording, only after their separate decisions. No waste model, full accounting suite, FIFO/batch valuation engine, invoice generation or automatic purchasing in this design.
 
-This document is ready for owner review. Implementation planning and code changes follow that review.
+The owner approved this design and requested a simple build plan. Implementation follows review of that plan; this document does not claim the feature exists.
