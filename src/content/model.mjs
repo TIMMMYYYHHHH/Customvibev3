@@ -1,5 +1,5 @@
 import {hasPrintContract,isTemplateProduct,upgradeCollections} from '../designs/products.mjs';
-export const defaultPricing={single:5000,six:25000,ten:40000};
+export const defaultPricing={single:5000,six:27000,ten:40000};
 export const groups = ['All collections', 'Learning & play', 'Everyday favourites', 'Gifts & occasions', 'Your photos', 'Business & work', 'Home & handy'];
 const products = [
   {id:'alphabet', name:'The alphabet club', group:groups[1], image:'cutouts/alphabet-pack-glossy.webp', description:'Little letters. Big discoveries.', details:'An A–Z collection for spelling names, finding letters and playing with words.', tags:'abc letters preschool school'},
@@ -22,7 +22,7 @@ export function validateContent(c){
  const fail=m=>{throw new Error(m)};
  if(!c||c.version!==1||!Number.isSafeInteger(c.revision)||c.revision<0)fail('Unsupported content file.');
  const p=c.pricing;
- if(!p||![p.single,p.six,p.ten].every(v=>Number.isSafeInteger(v)&&v>0&&v<=10000000)||p.six<5*p.single||p.six>6*p.single||p.ten<Math.round(p.six*1.5/100)*100||p.ten>p.six*10/6||p.ten%10)fail('Pricing must stay consistent: six cost between five and six singles; ten cost between nine and ten magnets at the six-pack rate. The ten-pack total must divide into whole cents.');
+ if(!p||![p.single,p.six,p.ten].every(v=>Number.isSafeInteger(v)&&v>0&&v<=10000000)||p.six<5*p.single||p.six>6*p.single||p.ten<p.six||p.ten>p.six*10/6||p.ten%10)fail('Pricing must stay consistent: the six-magnet total is between five and six single prices; the ten-magnet total is at least the six-magnet total, with an equal or lower price per magnet. The ten-magnet total must divide into whole cents. A lower total at ten than at nine is allowed.');
  if(!c.images||Object.keys(defaultContent.images).some(k=>!c.images[k]||!validImage(c.images[k])))fail('Choose a valid image for every website slot.');
  if(!Array.isArray(c.products)||c.products.length>100)fail('Use a catalogue of up to 100 products.');
  const ids=new Set();

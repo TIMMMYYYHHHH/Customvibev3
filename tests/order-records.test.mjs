@@ -44,3 +44,16 @@ test('saved orders accept over 30 entries but retain the exact record-size bound
  const detail=await(await call(env,'detail',{id:b.id})).json();assert.equal(detail.snapshot.items.length,60);
  const oversized=structuredClone(b);oversized.id=crypto.randomUUID();oversized.snapshot.padding+='x';assert.equal((await call(env,'create',oversized)).status,400);
 });
+
+
+test('historical six- and nine-magnet snapshots keep their original prices after the tier change',async()=>{
+ const env=artworkEnv();
+ for(const [qty,subtotal] of [[6,25000],[9,37500]]){
+  const b=record();b.snapshot.items[0].qty=qty;b.snapshot.items[0].lineCents=subtotal;b.snapshot.magnetQty=qty;b.snapshot.subtotalCents=subtotal;
+  const original=structuredClone(b.snapshot);
+  assert.equal((await call(env,'create',b)).status,200);
+  const detail=await(await call(env,'detail',{id:b.id})).json();assert.deepEqual(detail.snapshot,original);
+  assert.equal((await call(env,'status',{id:b.id,status:'in_progress',version:0})).status,200);
+  const changed=await(await call(env,'detail',{id:b.id})).json();assert.deepEqual(changed.snapshot,original);
+ }
+});

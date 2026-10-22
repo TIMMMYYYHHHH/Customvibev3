@@ -1,0 +1,11 @@
+# Email quantity clarity
+
+Updated locally on 22 October 2026. Initial owner and customer notifications use the same saved-order summary. Its caption distinguishes order items from physical magnets, for example **2 order items · 8 magnets**. The Magnets column shows each line's numeric count when the saved facts support it.
+
+The shared formatter in `server/email-item-quantity.mjs` also supplies the chosen-design preview captions. Selected quantities are summed before multiplying by basket set copies. Alphabet A × 2 and B × 1, ordered as two sets, therefore shows **2 sets · 3 magnets per set · A: 4 copies; B: 2 copies**, with **6** in the Magnets column. Two photo copies contribute the other two magnets.
+
+Photo copies, puzzle grids, saved collection face counts, selected designs and single-magnet templates use their recorded facts. Selected historical designs without a separate per-design quantity retain one copy of each selected design per set. Missing or invalid per-line count facts show **magnet count not recorded** and **Not recorded** instead of guessing from today's catalogue. Saved order-level magnet count and subtotal remain authoritative and are never recalculated by email rendering.
+
+CV-000009's eight-magnet historical subtotal stays **R333**. The revised quantity pricing applies to new orders; a new eight-magnet subtotal of **R360** remains R360 when rendered. Email rendering does not infer an old unit rate or alter snapshots. The compact manual status email continues to use the saved magnet count. Its Preview update and Send update behavior is unchanged.
+
+Verification: four new quantity regression tests failed against the previous behavior, then passed after implementation. The focused email suite passes 20 tests, covering the exact mixed basket, duplicate selected-copy quantities, full sets, historical default selections, photo/puzzle/template/fixed-pack counts, explicit unknowns, HTML escaping, singular wording, saved subtotal preservation and manual update counts. No real email was sent. No browser, inbox, phone or dark-mode verification is claimed for this local text change. Release verification and Founders Hub maintenance are handled by the coordinating task.
