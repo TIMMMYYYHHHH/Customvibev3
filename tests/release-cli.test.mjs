@@ -155,6 +155,43 @@ test('required private/schema and shared Admin staged evidence fail closed befor
   const upload=await f.run(['publish','pages']);assert.equal(upload.status,1);assert.equal(upload.uploads,'');assert.ok(!upload.requests.includes('/workers/'));
  }
 });
+async function financeSourceFixture(t){
+ const f=await fixture(t),repo=join(f.dir,'finance-git');await mkdir(repo);
+ const git=(...args)=>execFileSync('git',args,{cwd:repo,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+ git('init','-q');git('config','user.name','Release fixture');git('config','user.email','release-fixture@example.invalid');git('config','commit.gpgsign','false');git('config','core.hooksPath','/dev/null');
+ const inputs={'security/index.mjs':"import '../shared/finance-costs.mjs';import '../shared/finance-report.mjs';",'catalogue/index.mjs':'export default {};','admin/main.jsx':'export default {};'};
+ for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs'])inputs[path]=await readFile(join(root,path),'utf8');
+ for(const [path,text]of Object.entries(inputs)){await mkdir(join(repo,path,'..'),{recursive:true});await writeFile(join(repo,path),text);}
+ git('add','.');git('commit','-qm','Synthetic finance source baseline');const base=git('rev-parse','HEAD');
+ // Keep the reported path tooling-only to exercise the independent source hash
+ // guard against an incomplete path report, without extending release authority.
+ f.extraEnv={PRESENTATION_GIT:repo,PRESENTATION_BASE:base,PRESENTATION_SOURCE:base,CHANGED_PATH:'docs/release-process.md'};
+ return {...f,async change(path){await writeFile(join(repo,path),inputs[path]+'\n// shared-only source change\n');git('add',path);git('commit','-qm','Change one shared finance input');f.extraEnv.PRESENTATION_SOURCE=git('rev-parse','HEAD');assert.equal(git('diff','--name-only',base,f.extraEnv.PRESENTATION_SOURCE),path);}};
+}
+for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs']){
+ test(`${path} alone changes paired source fingerprints and its actual private import closure`,async t=>{
+  const f=await financeSourceFixture(t),before=await f.run(['fingerprints',sha]);assert.equal(before.status,0,before.stderr);
+  await f.change(path);const after=await f.run(['fingerprints',sha]);assert.equal(after.status,0,after.stderr);
+  const prior=JSON.parse(before.stdout),current=JSON.parse(after.stdout);
+  for(const component of ['pages','admin','security'])assert.notEqual(current[component],prior[component],component+' must include '+path);
+  assert.equal(current.catalogue,prior.catalogue,'Catalogue does not import the finance modules');
+ });
+ test(`${path} alone changes the source inventory and cannot pass tooling-only compatibility`,async t=>{
+  const f=await financeSourceFixture(t),before=await f.run(['plan']);assert.ok(before.record.build,before.record.reasons.join('\n'));
+  f.evidence.activationCompatibility.sourceInputDigest=before.record.build.sourceInputDigest;
+  const baseline=await f.run(['plan']);assert.equal(baseline.status,0,baseline.record.reasons.join('\n'));
+  await f.change(path);const after=await f.run(['plan']);assert.ok(after.record.build,after.record.reasons.join('\n'));
+  assert.notEqual(after.record.build.sourceInputDigest,before.record.build.sourceInputDigest);
+  f.evidence.activationCompatibility.sourceInputDigest=after.record.build.sourceInputDigest;
+  const blocked=await f.run(['plan']);assert.equal(blocked.status,1);assert.match(blocked.record.reasons.join('\n'),/PLAN_ACTIVATION_COMPATIBILITY_FAILED/);assert.equal(blocked.uploads,'');
+ });
+}
+test('finance paths remain rejected by the closed archive publication policy after classification',async t=>{
+ const f=await fixture(t);
+ for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs','security/finance.mjs','migrations/security/0013_admin_finance.sql']){
+  const result=await f.run(['plan'],{CHANGED_PATH:path});assert.equal(result.status,1);assert.equal(result.record.state,'blocked');assert.equal(result.record.planComplete,false);assert.match(result.record.reasons.join('\n'),/PLAN_ARCHIVE_FAILED/);assert.equal(result.uploads,'');
+ }
+});
 test('missing baseline or source drift never uploads and stores only sanitized stage errors',async t=>{
  for(const extra of [{RELEASE_EVIDENCE_JSON:''},{DRIFT:'true'},{FAIL_CONTEXT:'true'}]){
   const f=await fixture(t);const result=await f.run(['plan'],extra);assert.equal(result.status,1);assert.equal(result.record.state,'blocked');assert.equal(result.uploads,'');
