@@ -49,12 +49,14 @@ test('missing and exactly expired orders reject finance reads and writes without
  assert.equal(env.sql.prepare('SELECT count(*) n FROM order_costs').get().n,0);assert.equal(env.sql.prepare('SELECT count(*) n FROM finance_changes').get().n,0);
 }));
 
-test('audit insertion failure rolls back settings and cost mutations with their revision',()=>fixture(async env=>{
+test('audit insertion failure rolls back settings and cost mutations with their revision',t=>fixture(async env=>{
+ const errors=[];t.mock.method(console,'error',value=>errors.push(value));
  const id=order(env),revision=env.sql.prepare('SELECT revision FROM finance_report_state').get().revision;
  env.sql.exec("CREATE TRIGGER reject_finance_audit BEFORE INSERT ON finance_changes BEGIN SELECT RAISE(ABORT,'synthetic audit failure'); END");
  assert.equal((await call(env,'settings-save',{version:0,entries:[entry()]})).status,503);assert.equal((await ok(env,'settings-read')).version,0);
  assert.equal((await call(env,'order-save',{id,version:0,orderVersion:0,lines:[line()]})).status,503);assert.equal((await ok(env,'order-read',{id})).cost,null);
  assert.equal(env.sql.prepare('SELECT revision FROM finance_report_state').get().revision,revision);
+ assert.deepEqual(errors,[{event:'customvibe_unavailable',step:'security_finance',reason:'unknown'},{event:'customvibe_unavailable',step:'security_finance',reason:'unknown'}]);
 }));
 
 test('monthly scalar pages reconcile full-month totals, private omissions and Johannesburg bounds',()=>fixture(async env=>{
@@ -134,4 +136,50 @@ test('settings audit records the exact prior version even when another write arr
  env.DB.batch=async statements=>{if(!concurrent){concurrent=true;env.sql.prepare('INSERT INTO finance_settings(id,version,payload,updated_at) VALUES(1,1,?,1)').run(JSON.stringify([entry({packCents:500})]));}return batch(statements)};
  assert.equal((await call(env,'settings-save',{version:1,entries:[entry({packCents:2000})]})).status,409);
  assert.equal(env.sql.prepare('SELECT count(*) n FROM finance_changes').get().n,0);
+}));
+
+test('SQLite fixture current-time overload follows the request clock without changing dated unixepoch calls',()=>fixture(async env=>{
+ const realNow=Date.now;let clock=1792670400;Date.now=()=>clock*1000;
+ try{
+  const statement=env.sql.prepare("SELECT unixepoch() current,unixepoch('2026-10-22T00:00:00Z') dated");
+  assert.deepEqual({...statement.get()},{current:1792670400,dated:1792627200});
+  clock++;assert.deepEqual({...statement.get()},{current:1792670401,dated:1792627200});
+ }finally{Date.now=realNow}
+}));
+
+test('order finance detail denies saved costs when its unchanged deadline arrives during the cost lookup',()=>fixture(async env=>{
+ const realNow=Date.now;let clock=1792670400;Date.now=()=>clock*1000;
+ try{
+  const id=order(env,{expires:clock+1});await ok(env,'order-save',{id,version:0,orderVersion:0,lines:[line()]});
+  const prepare=env.DB.prepare;env.DB.prepare=(sql,...args)=>{const statement=prepare(sql,...args);if(!sql.startsWith('SELECT * FROM order_costs'))return statement;return {...statement,bind(...values){const bound=statement.bind(...values);return {...bound,async first(){const row=await bound.first();clock++;return row}}}}};
+  const response=await call(env,'order-read',{id});assert.equal(response.status,410);assert.equal((await response.json()).cost,undefined);
+  assert.equal(env.sql.prepare('SELECT expires FROM orders WHERE id=?').get(id).expires,1792670401);
+ }finally{Date.now=realNow}
+}));
+
+for(const action of ['first-save','edit-save','confirm'])test(`${action} rejects natural unchanged expiry inside the batch before the SQL mutation`,()=>fixture(async env=>{
+ const realNow=Date.now;let clock=1792670400;Date.now=()=>clock*1000;
+ try{
+  const id=order(env,{expires:clock+1});if(action!=='first-save')await ok(env,'order-save',{id,version:0,orderVersion:0,lines:[line()]});
+  const before={cost:env.sql.prepare('SELECT * FROM order_costs').all(),audit:env.sql.prepare('SELECT * FROM finance_changes').all(),revision:env.sql.prepare('SELECT revision FROM finance_report_state').get().revision};
+  const batch=env.DB.batch.bind(env.DB);env.DB.batch=statements=>batch(statements.map((statement,index)=>index===0?{async all(){clock++;return statement.all()}}:statement));
+  const response=await call(env,action==='confirm'?'order-confirm':'order-save',{id,version:action==='first-save'?0:1,orderVersion:0,...(action==='confirm'?{}:{lines:[line({packCents:2000})]})});
+  assert.equal(response.status,410);assert.equal((await response.json()).cost,undefined);
+  assert.deepEqual(env.sql.prepare('SELECT * FROM order_costs').all(),before.cost);assert.deepEqual(env.sql.prepare('SELECT * FROM finance_changes').all(),before.audit);assert.equal(env.sql.prepare('SELECT revision FROM finance_report_state').get().revision,before.revision);
+  assert.equal(env.sql.prepare('SELECT expires FROM orders WHERE id=?').get(id).expires,1792670401);
+ }finally{Date.now=realNow}
+}));
+
+for(const action of ['first-save','confirm'])test(`${action} with a live SQL mutation withholds its response if the unchanged deadline arrives before the batch resolves`,()=>fixture(async env=>{
+ const realNow=Date.now;let clock=1792670400;Date.now=()=>clock*1000;
+ try{
+  const id=order(env,{expires:clock+1});if(action==='confirm')await ok(env,'order-save',{id,version:0,orderVersion:0,lines:[line()]});
+  const batch=env.DB.batch.bind(env.DB);env.DB.batch=async statements=>{const result=await batch(statements);clock++;return result};
+  const response=await call(env,action==='confirm'?'order-confirm':'order-save',{id,version:action==='confirm'?1:0,orderVersion:0,...(action==='confirm'?{}:{lines:[line()]})});
+  assert.equal(response.status,410);assert.equal((await response.json()).cost,undefined);
+  // The mutation was authorized at its live SQL boundary. Its matching audit remains atomic.
+  assert.equal(env.sql.prepare('SELECT version FROM order_costs WHERE order_id=?').get(id).version,action==='confirm'?2:1);
+  assert.equal(env.sql.prepare('SELECT count(*) n FROM finance_changes WHERE order_id=?').get(id).n,action==='confirm'?2:1);
+  assert.equal(env.sql.prepare('SELECT expires FROM orders WHERE id=?').get(id).expires,1792670401);
+ }finally{Date.now=realNow}
 }));

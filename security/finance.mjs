@@ -54,8 +54,9 @@ export async function financeService(request,env){
  if(path==='month')return month(db,b,time);
  if(!uuid(b.id))return fail(400,'Invalid order reference.');
  const order=await db.prepare('SELECT id,version,expires FROM orders WHERE id=?').bind(b.id).first();
- if(!order)return fail(404,'Order not found.');if(order.expires<=time)return fail(410,'This order has expired.');
+ if(!order)return fail(404,'Order not found.');if(order.expires<=now())return fail(410,'This order has expired.');
  const stored=await db.prepare('SELECT * FROM order_costs WHERE order_id=?').bind(b.id).first();
+ if(order.expires<=now())return fail(410,'This order has expired.');
  if(path==='order-read')return costResponse(b.id,order.version,costView(stored));
  if(!integer(b.version)||!integer(b.version+1,1)||!integer(b.orderVersion))return fail(400,'Invalid finance version.');
  let payload;
@@ -63,8 +64,10 @@ export async function financeService(request,env){
  else{if(!stored||!JSON.parse(stored.payload).complete)return fail(409,'Save complete costs before confirming.');payload=JSON.parse(stored.payload);}
  if(order.version!==b.orderVersion||(stored?.version??0)!==b.version)return fail(409,'Order or costs changed. Reload before saving.');
  const status=path==='order-save'?'estimated':'confirmed',after={orderId:b.id,version:b.version+1,orderVersion:b.orderVersion,status,...payload,updatedAt:time};
- const statement=b.version===0?db.prepare('INSERT INTO order_costs(order_id,version,order_version,status,payload,updated_at) SELECT id,1,version,?,?,? FROM orders WHERE id=? AND version=? AND expires>? ON CONFLICT(order_id) DO NOTHING RETURNING *').bind(status,JSON.stringify(payload),time,b.id,b.orderVersion,time):db.prepare('UPDATE order_costs SET version=version+1,order_version=?,status=?,payload=?,updated_at=? WHERE order_id=? AND version=? AND EXISTS(SELECT 1 FROM orders WHERE id=? AND version=? AND expires>?) RETURNING *').bind(b.orderVersion,status,JSON.stringify(payload),time,b.id,b.version,b.id,b.orderVersion,time);
+ const statement=b.version===0?db.prepare('INSERT INTO order_costs(order_id,version,order_version,status,payload,updated_at) SELECT id,1,version,?,?,? FROM orders WHERE id=? AND version=? AND expires>unixepoch() ON CONFLICT(order_id) DO NOTHING RETURNING *').bind(status,JSON.stringify(payload),time,b.id,b.orderVersion):db.prepare('UPDATE order_costs SET version=version+1,order_version=?,status=?,payload=?,updated_at=? WHERE order_id=? AND version=? AND EXISTS(SELECT 1 FROM orders WHERE id=? AND version=? AND expires>unixepoch()) RETURNING *').bind(b.orderVersion,status,JSON.stringify(payload),time,b.id,b.version,b.id,b.orderVersion);
+ // Database time authorizes the mutation when it executes, including time spent queued.
  const result=await db.batch([statement,audit(db,b.id,path==='order-save'?'save':'confirm',costView(stored),after,time)]);
+ if(order.expires<=now())return fail(410,'This order has expired.');
  return result[0].results.length?costResponse(b.id,b.orderVersion,costView(result[0].results[0])):fail(409,'Order or costs changed. Reload before saving.');
 }
 
