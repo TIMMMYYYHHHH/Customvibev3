@@ -23,8 +23,29 @@ test('mixed saved order distinguishes order items, set copies and exact magnets 
  assert.match(previews.text,/2 sets · 3 magnets per set · A: 4 copies; B: 2 copies/);
  for(const mail of Object.values(orderEmails(order,true))){
   assert.match(mail.text,/2 order items · 8 magnets/);assert.match(mail.text,/A: 4 copies; B: 2 copies/);
+  assert.match(mail.text,/Total magnets: 8\b/);
+  assert.match(mail.html.replace(/<[^>]*>/g,' '),/Total magnets\s+8\b/);
   assert.ok(mail.text.includes(`Magnet subtotal: ${money(33300)}`));assert.match(mail.text,/No payment has been taken/);
  }
+});
+
+test('both initial recipients get a separate total for sixty magnets across three collection items',()=>{
+ const order={...mixed(),referenceVersion:2,items:[
+  {kind:'alphabet',name:'The alphabet club · Watercolour storybook',qty:1,faceCount:26,files:[]},
+  {kind:'alphabet',name:'The alphabet club · Bold painted gouache',qty:1,faceCount:26,files:[]},
+  {kind:'counting',name:'Count on a little fun · Bold painted gouache',qty:1,faceCount:8,designIds:['counting-1','counting-2','counting-3','counting-4','counting-5','counting-6','counting-7','counting-8'],files:[]}
+ ],magnetQty:60,subtotalCents:240000,shippingPolicyVersion:1,deliveryCents:0,totalCents:240000},before=structuredClone(order);
+ for(const mail of Object.values(orderEmails(order,true,'CV-000010'))){
+  assert.match(mail.text,/Total magnets: 60\b/);
+  assert.match(mail.html.replace(/<[^>]*>/g,' '),/Total magnets\s+60\b/);
+  assert.match(mail.text,/3 order items · 60 magnets/);
+  assert.match(mail.text,/1 set · 26 magnets per set = 26 magnets/);
+  assert.match(mail.text,/1: 1 copy; 2: 1 copy; 3: 1 copy; 4: 1 copy; 5: 1 copy; 6: 1 copy; 7: 1 copy; 8: 1 copy = 8 magnets/);
+  assert.match(mail.text,/PUDO locker delivery: Free/);
+  assert.ok(mail.text.includes(`Order total: ${money(240000)}`));
+  assert.match(mail.text,/No payment has been taken/);
+ }
+ assert.deepEqual(order,before);
 });
 
 test('full sets, selected single designs, puzzles, photos and saved fixed packs retain numeric counts',()=>{
@@ -54,6 +75,8 @@ test('legacy missing or invalid per-item facts remain explicitly unknown in summ
  const order={...mixed(),items:[{kind:'alphabet',name:'Legacy alphabet',qty:2,emailPreview:'preview'}, {kind:'alphabet',name:'Incomplete selection',qty:2,faceCount:2,designIds:['alphabet-1','alphabet-2'],designQuantities:[3],emailPreview:'preview'}],magnetQty:52};
  const summary=emailOrderSummary(order),previews=emailDesignPreviews(order);
  assert.match(summary.text,/2 order items · 52 magnets/);
+ assert.match(summary.text,/Total magnets: 52\b/);
+ assert.match(summary.html.replace(/<[^>]*>/g,' '),/Total magnets\s+52\b/);
  assert.equal((summary.text.match(/magnet count not recorded/g)||[]).length,2);
  assert.equal((summary.html.match(/>Not recorded<\/td>/g)||[]).length,2);
  assert.equal((previews.text.match(/magnet count not recorded/g)||[]).length,2);
