@@ -1,14 +1,12 @@
 # Admin costs and finances verification
 
-Implementation is local. This note records synthetic local checks only. No live settings, order costs, provider requests or customer emails were used. Deployment and live costing writes remain separate approval steps.
+22 October 2026. Built locally at runtime source `ee48900c552e4940ce58d207de65403cbb1661a0`. Not released or owner accepted. All local data is synthetic. No live cost settings, order costs, provider requests or customer emails were used. The website gate, separate Admin authentication and disabled payments remain required.
 
 ## Automated checks
 
-Node 22.23.3. Focused command:
+The controller reports completed frozen-source verification: Node 22.23.3, 907/907 Node tests with zero failures/skips, 7/7 Python tests, storefront/SSR build with 27 prerendered pages, Admin build and dependency notices passed. Receipt: `.superpowers/sdd/2026-10-22-admin-costs-finances/final-verification.log`. These results apply to the source above, not later fixes.
 
-`node --test tests/finance-ui.test.mjs tests/finance-costs.test.mjs tests/finance-report.test.mjs tests/finance-api.test.mjs`
-
-Tests exercise the state used by the real editor, render the real components, and test authenticated routing. Coverage includes missing versus explicit zero prices, exact decimal conversion, fractional/whole-sheet validation, retained saved snapshots, edited confirmation status, stage-version confirmation, lost response and stale/session recovery, all-page CSV traversal, saved-line exports, revision/expiry/navigation cancellation, and safe finance return links. Current final counts are recorded in the task report after verification.
+Tasks 1 and 2 have independent scoped approval. Task 3's original implementation and integration fixes have scoped reviews. The completed independent whole-branch review (`.superpowers/sdd/2026-10-22-admin-costs-finances/final-review.md`) found no Critical issues and one Important issue: shared finance runtime classification and source-fingerprint coverage. The narrow recognition/fingerprint correction was committed as `4c3d983` and independently re-reviewed with no remaining Critical or Important issue. Its two release-file regression suites passed 137/137 with zero failures/skips; the nine new focused tests first exposed seven meaningful failures and then passed. No application runtime changed after the full 907-test run. The closed archive/activation guards remain unchanged and continue rejecting finance publication. This handoff does not claim final release readiness. Required commands and release rules remain in `docs/release-process.md` and current CI.
 
 ## Safe local browser fixture
 
@@ -27,6 +25,45 @@ The synthetic stage button changes only fixture stage/version and lets the revie
 
 ## Browser acceptance record
 
-The controller owns actual 1440 px and 375 px browser acceptance and safe screenshots. These checks were not performed by the UI implementer. Do not interpret the automated tests as desktop, phone or live acceptance.
+Receipt: workspace `audit/fix-plan/admin-finances-20261022/browser/RESULT.json`, with ten safe PNGs beside it. The controller used the existing in-app browser at the frozen runtime source above. Requests and writes were synthetic and in memory.
 
-Pending controller checks: navigation and month pages; all-page and cost-detail downloads; settings add/edit/deactivate; order overrides/zero/missing/fractional and whole-sheet validation; visible keyboard focus and first error focus; empty/loading states; 409 read/compare; lost response without replay; restored sign-in with preserved draft; draft preserved on synthetic stage change; no horizontal page overflow at 375 px.
+- At 1440 × 900, settings layout was checked. At 375 × 812, settings and monthly layout were checked. Document width matched the viewport. This is viewport emulation, not physical phone acceptance.
+- A R200.00 settings draft survived switching tabs. Pack quantity zero showed the positive-whole-number error and focused the invalid field. Correcting to 100 saved synthetic version 2 and displayed approximately R2.0000 per blank. Empty settings accepted a synthetic packaging entry at R20/100, then deactivation saved version 3.
+- A saved order's Costs opened despite expired fixture artwork and retained its override rather than current defaults. Usage 10 changed to 12, survived stage version 3 to 4, saved R69.00 direct costs and R151.00 projected margin, then explicitly confirmed.
+- Keyboard Tab showed a solid 3px focus outline. Lost-response usage 13 survived, further saves stayed blocked until explicit read/compare, and Use saved version adopted accepted data without replay. Expired-session usage 14 survived synthetic sign-in restoration, required explicit read/keep-draft, then accepted a manual save.
+- Empty-month and unsaved historic-order states were also checked in the local browser, as recorded by the controller.
+- The 52-order report's second page showed only CV-LOCAL-051 and CV-LOCAL-052 while totals remained all-month. Both export actions reached export-ready status. A changing report rejected export with a fresh-export message.
+
+One native browser download attempt was made for each CSV. No expected file was confirmed in Downloads. Browser file arrival and opening in Excel remain **unverified**. This ambiguity is not attributed to a website defect. Actual 409 read/compare and delayed-loading browser acceptance are not evidenced by this receipt, although covered by the synthetic fixture and automated checks. Physical Samsung, Chrome/Firefox engines, real owner material entry and live costing saves remain unverified.
+
+The controller showed local preview tab 87 to the owner and requested an optional real pack-cost/order-override test. No answer or owner acceptance is recorded.
+
+## Synthetic CSV for owner inspection
+
+Workspace `audit/fix-plan/admin-finances-20261022/` contains `synthetic-summary.csv`, `synthetic-cost-details.csv`, `sample-evidence.json` and reproducible `generate-samples.mjs`. These are **source-generated samples from the actual `financeCsv` function**, not native browser downloads or real business records. No extra workbook, dependency or changed serializer was introduced.
+
+Independent CSV parsing verified four summary records in the exact 14-column allowlist and four saved-line records in the exact 18-column allowlist. BOM, CRLF records, blank unknown delivery/total/margin, explicit zero, numeric -5.00 margin, formula-text protection, quotes and an embedded newline were checked. No contact, locker, artwork or secret fields appear. All order and line labels are synthetic. Summary controls: 24 magnets, R230.00 known order value, R82.50 recorded costs, one missing cost/total and R147.50 projected margin covering three orders. All are Unpaid. The first order illustrates free customer delivery and a separate courier expense; the unsaved order produces no detail lines. Excel acceptance remains an owner check.
+
+## Migration and bounded capacity estimate
+
+Exact additive source: `migrations/security/0013_admin_finance.sql`, 2,158 bytes, SHA256 `b83adfcb8880eb0e6d55a39df4a1f85577a6c55055e082e618ca654a9361f6f1`. Destination configuration names existing Security D1 `customvibe-security` (`25fb2dda-2ce9-4f8c-b49d-e6480218a5cf`) in the existing business account. This identifies intended configuration only. Fresh account identity, installed schema/ledger, D1 size and read/write headroom have not been verified by this handoff.
+
+The migration adds settings, per-order snapshots, audit and revision tables, order/date and audit/order indexes, and six revision triggers. No existing order is rewritten and no price is seeded. Its order-delete trigger removes associated costs and order-linked audit even if an older cleaner runs after rollback; settings survive. Normal cleanup deletes linked records before orders. Expired reads and mutation-time predicates deny access before cleanup.
+
+Measured from the actual two-line local fixture shape: cost JSON is 598 bytes; an audit before/after cost view is 720 bytes. One initial save plus confirmation retains 2,758 JSON bytes per order: current payload, first-save after, confirmation before and confirmation after. Budget roughly 6 KiB/order for this small two-line scenario after row fields, indexes and page overhead. At an assumed 100 costed orders/month and six months retained, roughly 3.5 MiB is a planning allowance, not a measured D1 allocation or quota guarantee. Extra edits add before/after audit snapshots. Larger lines, UTF-8 names, fragmentation and real edit rates increase storage; 100 lines and the 64 KiB write-body bound are limits, not typical usage. Settings audit has no order expiry and needs separate headroom monitoring.
+
+Each accepted order save/confirm mutates a cost row, revision row and audit row, plus relevant indexes; first save plus confirmation means six logical row mutations before index accounting. Settings saves mutate settings plus audit. Each month request uses two revision reads, a bounded page (up to 51 rows internally), a full-month aggregate and retained-date minimum. Summary export reads all pages and rechecks; detail adds two primary-key lookups per saved order. Aggregates repeat per page and the retained-date lookup may scan retained orders, so indexed paging does not make all reads constant. These are source-derived estimates, not provider-billed row counts. No polling, images, subscription or extra provider is added. Preserve existing approved Workers Paid/Workspace and cost controls; no upgrade is authorised.
+
+## Rollout order and remaining gates
+
+1. Whole-branch review and the focused release-input fix/re-review are complete locally. Integrate the exact reviewed source through a concrete draft PR and require its current GitHub check. Refresh GitHub status, main, release dependencies and existing Cloudflare identity/schema/usage read-only. No exact finance PR, merged release source or matched release identity exists in this handoff.
+2. Prepare a concise finance runtime/schema publication contract for separate review within the existing guarded release process. The reviewer verified that `releaseArchive` and `validateActivationCompatibility` enforce closed historical contracts and reject finance runtime/schema changes. Correcting generic input recognition/fingerprints does not grant publication authority. Review the later concrete source/build/config hashes, migration through 0013 and compatible rollback, then obtain required approval for the actual migration and production release artifacts. Do not widen historical exceptions, add a fallback or relax manifest protections.
+3. After approval, apply only reviewed 0013 to the verified existing Security D1 target and read back schema/ledger. Deploy compatible Security before exposing finance Admin calls. Publish matching website/Admin source as required for shared preview parity, with genuine guarded receipts and final protection checks. Never seed production from fixtures or samples.
+4. Verify signed-in live settings/report reads and existing orders, catalogue, artwork/email controls, expiry, website/admin gates and payments off. A real cost-setting/order save requires the owner's feature-specific approval and target. General build/read acceptance does not approve it. Owner material/CSV inspection and physical/device checks remain distinct.
+5. If publication checks fail, restore previously reviewed compatible clients/runtime under existing rollback guards. Keep additive schema, costs/audit and customer orders. Never drop tables, delete orders, disable authentication or extend retention to make rollback work. Verify private costs remain inaccessible to public/customer routes and expired orders.
+
+The controller maintains Founders Hub and leaves the parent incomplete until required release and acceptance steps are verified. This handoff performs no production operation.
+
+## Project tracking
+
+Founders Hub revision 2444 was verified by reopening the changed records: UI/export remains In progress pending owner/native-file acceptance, review/release is In progress with four remaining release checks, and the parent remains incomplete. One short UI milestone links this note. Stock tracking and artwork buttons remain deferred. The official GitHub status check later reported degraded Pull Requests and Actions on 22 October; a successful local build is not a remote validation result.

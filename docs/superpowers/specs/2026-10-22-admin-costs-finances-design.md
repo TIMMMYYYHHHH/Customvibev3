@@ -1,6 +1,6 @@
 # Admin costs and finances: first-stage design
 
-Date: 22 October 2026. Status: owner approved the written design on 22 October 2026; not implemented. Build plan requested.
+Date: 22 October 2026. Status: owner approved the written design and build plan. Locally implemented at runtime ee48900 with synthetic tests and browser evidence. Whole-branch review and the focused release-input fix/re-review are complete with no remaining Critical or Important issues. A separately reviewed finance publication contract, owner CSV acceptance, production migration/release and live acceptance remain pending. See [verification and handoff](../../admin-finances-verification.md) for evidence and boundaries.
 
 ## Purpose and delivery order
 
@@ -77,4 +77,4 @@ Use additive schema and a release order that leaves existing Admin operational d
 2. Simple stock receipts and stocktake, low-stock banner and CSV. Record production usage once on explicit **Materials used** confirmation; neither stage moves nor archive/reopen deduct or replenish stock. Reversals require their own recorded action.
 3. Longer-term finance retention and any manual payment recording, only after their separate decisions. No waste model, full accounting suite, FIFO/batch valuation engine, invoice generation or automatic purchasing in this design.
 
-The owner approved this design and requested a simple build plan. Implementation follows review of that plan; this document does not claim the feature exists.
+The owner approved this design and its build plan. Local implementation does not establish a live feature: production migration, exact-source release approval and feature-specific live costing-save acceptance remain separate. Stock and archive/reopen are still planned follow-ups.
