@@ -24,7 +24,7 @@ function adminReturn(value){
  if(typeof value!=='string')return '/';
  const pathname=value.split('?')[0];
  if(pathname==='/themes.html'||pathname==='/preview.html')value=pathname.slice(0,-5)+value.slice(pathname.length);
- if(/^\/(?:orders(?:\?order=[a-f0-9-]{36})?|artwork(?:\?request=[a-f0-9-]{36})?|content|themes(?:\?view=occasions)?|preview)$/.test(value))return value;
+ if(/^\/(?:orders(?:\?order=[a-f0-9-]{36})?|artwork(?:\?request=[a-f0-9-]{36})?|content|finances|themes(?:\?view=occasions)?|preview)$/.test(value))return value;
  if(!value.startsWith('/preview?')||value.includes('#'))return '/';
  const params=new Map();
  try{

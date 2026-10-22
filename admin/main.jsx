@@ -1,3 +1,4 @@
+import Finances from './Finances';
 import Artwork from './Artwork';
 import AdminShell from './AdminShell';
 import Orders from './Orders';
@@ -5,6 +6,6 @@ import {saveAdminContent} from './save.mjs';
 import React from 'react';import {createRoot} from 'react-dom/client';import Admin from '../src/content/Admin';import {ContentProvider} from '../src/content/ContentProvider';import '../src/fonts.css';
 import {logout} from './logout.mjs';
 import './workroom.css';
-const section=location.pathname==='/content'?'content':location.pathname==='/artwork'?'artwork':'orders';
-document.title=({orders:'Orders',content:'Store content',artwork:'Order artwork'}[section])+' | CustomVibe admin';
-createRoot(document.getElementById('root')).render(<AdminShell section={section} logout={logout}>{section==='content'?<ContentProvider onSave={saveAdminContent}><Admin/></ContentProvider>:section==='artwork'?<Artwork/>:<Orders/>}</AdminShell>);
+const section=location.pathname==='/finances'?'finances':location.pathname==='/content'?'content':location.pathname==='/artwork'?'artwork':'orders';
+document.title=({finances:'Finances',orders:'Orders',content:'Store content',artwork:'Order artwork'}[section])+' | CustomVibe admin';
+createRoot(document.getElementById('root')).render(<AdminShell section={section} logout={logout}>{section==='finances'?<Finances/>:section==='content'?<ContentProvider onSave={saveAdminContent}><Admin/></ContentProvider>:section==='artwork'?<Artwork/>:<Orders/>}</AdminShell>);

@@ -44,5 +44,5 @@ export default {async fetch(request,env){let phase='admin_request';try{const url
   const headers=new Headers(asset.headers);headers.delete('Content-Length');headers.delete('ETag');
   return reply(new Response(request.method==='HEAD'?null:html,{status:asset.status,headers}));
  }
- const target={'/artwork':'/','/orders':'/','/content':'/'}[url.pathname];return reply(await env.ASSETS.fetch(target?new Request(url.origin+target,request):request));
+ const target={'/finances':'/','/artwork':'/','/orders':'/','/content':'/'}[url.pathname];return reply(await env.ASSETS.fetch(target?new Request(url.origin+target,request):request));
  }catch(error){reportUnavailable(phase,error);return secure(unavailable(),{admin:true})}}};
