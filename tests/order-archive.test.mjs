@@ -18,3 +18,10 @@ test('approved archive prints each letter using its final proof quantity',async(
  const instructions=execFileSync('python3',['-c','import io,sys,zipfile;print(zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())).read("print-instructions.txt").decode())'],{input:Buffer.from(zip)}).toString();
  assert.match(instructions,/design-01-alphabet-1.jpg - Print 4 copies/);assert.match(instructions,/design-01-alphabet-2.jpg - Print 2 copies/);
 });
+
+test('archive supports canonical game masters and completed assisted face files',async()=>{
+ const current={reference:'CV-SYNTHETIC',snapshot:{magnetQty:12,items:[{kind:'noughts-crosses',name:'Game',qty:1,files:Array.from({length:10},(_,n)=>({index:n,name:`design-01-noughts-crosses-${n+1}.jpg`,size:3,copies:1}))},{kind:'photo',name:'Completed assisted design',qty:2,files:[{index:10,name:'design-02-face-1.jpg',size:3,copies:2}]}]}};
+ const bytes=await downloadOrderArchive(current,async()=>new Response(new Uint8Array([1,2,3]),{headers:{'Content-Type':'image/jpeg'}}));
+ const names=JSON.parse(execFileSync('python3',['-c','import io,sys,json,zipfile;print(json.dumps(zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())).namelist()))'],{input:Buffer.from(bytes)}));
+ assert.ok(names.includes('design-01-noughts-crosses-10.jpg'));assert.ok(names.includes('design-02-face-1.jpg'));assert.equal(names.length,12);
+});

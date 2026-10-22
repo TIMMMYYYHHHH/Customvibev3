@@ -1,3 +1,4 @@
+import {fitEmailDesignPreviews} from './email-design-previews.mjs';
 import React,{createContext,useContext,useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {createSubmissionState} from './submission-state.mjs';
 const SubmissionContext=createContext(null);
@@ -59,7 +60,7 @@ export function useFormService(kind){
   if(window.__CV_ADMIN_PREVIEW__||state.getSnapshot().busy||state.getSnapshot().result||state.getSnapshot().manualReview||!config?.available||!token)return;
   state.update({busy:true,error:''});let sent=false;
   try{
-   if(!state.getSnapshot().attempt){const {uploads,...payload}=await build();state.update({uploads,resume:null,attempt:{...payload,...(kind==='order'?{referenceVersion:config.orderRecords?2:1}:{}),id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000)},pending:true});}
+   if(!state.getSnapshot().attempt){const {uploads,...payload}=await build();state.update({uploads,resume:null,attempt:fitEmailDesignPreviews({...payload,...(kind==='order'?{referenceVersion:config.orderRecords?2:1}:{}),id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000)}),pending:true});}
    let grant;
    if(kind==='order'&&config.artworkStorage){
     const check=async response=>{if(response.status===401||response.status===403)refreshSecurity();const body=await response.json();if(!response.ok||!body.ok){if(response.status===400)state.rejected(400,body.error||'Check your order details.');throw new Error(body.error||'Artwork upload could not finish. Keep this tab open and retry.')}return body};
@@ -82,6 +83,7 @@ export function useFormService(kind){
 }
 export function FormSecurity({service,kind}){
  const container=useRef();const {config,cycle,setToken,setSecurityError}=service;
+ const showRecovery=!service.busy&&!service.result;
  useEffect(()=>{
   if(!config?.available||!container.current)return;
   let active=true,widget,api;
@@ -100,9 +102,9 @@ export function FormSecurity({service,kind}){
   {config?.preview&&<p role="status">Website preview. Sending is unavailable here.</p>}
   {config&&!config.available&&!config.preview&&<p role="status">This form is getting ready. Email <a href="mailto:hello@customvibe.co.za">hello@customvibe.co.za</a> for help.</p>}
   <div ref={container}/>
-  {service.securityError&&<p className="error" role="alert">{service.securityError}</p>}
-  {service.needsSignIn&&<p><a href="/auth/login" target="_blank" rel="noopener noreferrer">Sign in in a new tab</a>, then return here and retry the security check. Your details stay in this tab.</p>}
-  {!config?.preview&&!service.result&&(service.securityError||config?.available===false)&&<button className="button secondary" type="button" disabled={service.busy||service.configLoading} onClick={service.retrySecurityCheck}>Retry security check</button>}
+  {showRecovery&&service.securityError&&<p className="error" role="alert">{service.securityError}</p>}
+  {showRecovery&&service.needsSignIn&&<p><a href="/auth/login" target="_blank" rel="noopener noreferrer">Sign in in a new tab</a>, then return here and retry the security check. Your details stay in this tab.</p>}
+  {showRecovery&&!config?.preview&&(service.securityError||config?.available===false)&&<button className="button secondary" type="button" disabled={service.busy||service.configLoading} onClick={service.retrySecurityCheck}>Retry security check</button>}
   {service.error&&<p className="error" role="alert">{service.error}</p>}
  </div>;
 }

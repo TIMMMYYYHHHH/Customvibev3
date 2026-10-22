@@ -1,3 +1,4 @@
+import {MAGNET_FACE_CM} from '../print-dimensions.mjs';
 import QRCode from 'qrcode';
 const field=(label,x,y,size,width,limit,sample,color,extra={})=>({label,x,y,size,width,limit,sample,color,weight:600,...extra});
 // Edition 1 layouts use the original 1254 px square coordinates. Never shrink text to fit.
@@ -39,7 +40,7 @@ function qrValues(design,input,incomplete){
 }
 const escapeWifi=text=>text.replace(/[\\;:,\"]/g,'\\$&');
 export function businessPayload(values){const q=values.qr;if(!q)return '';return q.mode==='url'?q.url:`WIFI:T:${q.security};S:${escapeWifi(q.network)};P:${escapeWifi(q.password)};;`;}
-export function businessMatrix(values){const payload=businessPayload(values);if(!payload)return null;const modules=QRCode.create(payload,{errorCorrectionLevel:'M'}).modules;if(modules.size>49)throw Error('This QR code has too much detail for a 7.5 cm magnet. Please use a shorter link or shorter Wi-Fi details.');return modules;}
+export function businessMatrix(values){const payload=businessPayload(values);if(!payload)return null;const modules=QRCode.create(payload,{errorCorrectionLevel:'M'}).modules;if(modules.size>49)throw Error(`This QR code has too much detail for a ${MAGNET_FACE_CM} cm magnet. Please use a shorter link or shorter Wi-Fi details.`);return modules;}
 export function validateBusinessValues(input,{incomplete=false}={}){
  const design=businessTemplate(input?.businessTemplate);
  if(!design||input.edition!==1)throw Error('Choose a current business magnet design.');

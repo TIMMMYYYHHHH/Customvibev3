@@ -26,9 +26,11 @@ The owner explicitly accepted blank W3Forms Reply-To with manual replies to the 
 
 No new provider query, email, settings change or implementation was used to record this decision. Separate contact-data retention and recovery checks remain open; this acceptance does not close them.
 
-## Remaining service work
+## Current acceptance and remaining service work, 22 October 2026
 
-Separate contact-data retention and recovery checks; Google billing contact; any verified service notification contacts. Account login changes may need owner verification and must not be claimed from a contact edit. Founders Hub numeric cost currently rejects saves; EUR/ZAR estimates are in saved notes.
+Owner-approved CV-000009 and CV-000010 initial customer/owner notifications have checked webhook delivery and owner-confirmed phone Inbox arrival, previews and light/dark readability. CV-000010 also verifies the corrected quantity presentation, R2,400 total, Free delivery and accurate Unpaid facts. Preserve the accepted messages and historical prices; do not retrospectively reprice or resend. The [dated mail and recovery summary](releases/2026-10-22-mail-and-recovery-status.md) distinguishes these observations from untested failure/replay/expiry branches and exact-artwork restoration. The accepted blank W3Forms Reply-To/manual reply workflow above remains normal; automatic template configuration is not a remaining requirement.
+
+Separate contact-data retention/recovery and any still-unverified Google billing/service notification contacts remain follow-ups. Confirm their latest board/service records before acting; a contact edit does not verify account sign-in ownership. The earlier Founders Hub numeric-cost save failure and saved EUR/ZAR estimates describe a dated observation, not a newly verified current defect. This documentation update does not change provider settings, retention, transactional Reply-To, services or costs.
 
 ## Historical handoff correction, 19 October 2026
 

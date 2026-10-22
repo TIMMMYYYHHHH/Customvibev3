@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync,readdirSync} from 'node:fs';
@@ -11,7 +12,7 @@ const origin='https://customvibe.co.za';
 const internal=(env,path,body)=>env.AUTH.fetch('https://internal/'+path,{method:'POST',body:JSON.stringify(body)});
 function setup(){const env={...artworkEnv(),SUBMISSIONS_ENABLED:'true',RESEND_API_KEY:'synthetic',TURNSTILE_SECRET_KEY:'synthetic',TURNSTILE_SITE_KEY:'synthetic',SESSION_SECRET:'a'.repeat(64),ADMIN_SEND_ENABLED:'true',CATALOGUE:{fetch:async()=>Response.json(defaultContent)}};env.AUTH={fetch:(url,init)=>security.fetch(new Request(url,init),env)};return env;}
 async function form(env){const r=await submissions(new Request(origin+'/api/forms'),env),config=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],csrf:config.csrf};}
-const order=()=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Synthetic',email:'customer@example.com',phone:'0821234567'},locker:{name:'Fictional',area:'Durban'},consent:true,items:[{kind:'photo',qty:1,files:[tile.toString('base64')]}]});
+const order=()=>withShippingAgreement({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Synthetic',email:'customer@example.com',phone:'0821234567'},locker:{name:'Fictional',area:'Durban'},consent:true,items:[{kind:'photo',qty:1,files:[tile.toString('base64')]}]});
 const post=(context,payload)=>new Request(origin+'/api/order-request',{method:'POST',headers:{origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.7',cookie:context.cookie,'X-CSRF-Token':context.csrf},body:JSON.stringify({payload,turnstile:'synthetic'})});
 function network(ids,seen=[]){return async(url,init)=>{if(url==='https://challenges.cloudflare.com/turnstile/v0/siteverify')return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});assert.equal(url,'https://api.resend.com/emails');seen.push(JSON.parse(init.body));return Response.json({id:ids[seen.length-1]});};}
 async function manual(env){const id=crypto.randomUUID();const snapshot={contact:{name:'Synthetic',email:'customer@example.com',phone:'1234567'},locker:{name:'Fictional',area:'Durban'},items:[{kind:'photo',name:'Photo',qty:1,files:[]}],magnetQty:1,subtotalCents:4000,paymentStatus:'unpaid'};assert.equal((await internal(env,'orders/create',{id,fingerprint:'b'.repeat(64),snapshot})).status,200);return id;}

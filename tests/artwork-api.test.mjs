@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {artworkEnv,tile,sha} from './helpers/artwork.mjs';
 import {submissions} from '../server/submissions.mjs';import security from '../security/index.mjs';import admin from '../admin/worker.mjs';
@@ -6,8 +7,8 @@ const tileHash=await sha(tile);
 const origin='https://customvibe.co.za';
 function setup(){const storage={...artworkEnv(),ADMIN_LOCKOUT:{get:async()=>null},SITE_LOCKOUT:{get:async()=>null}};return {...storage,SITE_GATE_ENABLED:'true',SUBMISSIONS_ENABLED:'true',ARTWORK_STORAGE_ENABLED:'true',RESEND_API_KEY:'test',TURNSTILE_SECRET_KEY:'test',TURNSTILE_SITE_KEY:'test',SESSION_SECRET:random(),AUTH:{fetch:(url,init)=>security.fetch(new Request(url,init),storage)},CATALOGUE:{fetch:async()=>Response.json(defaultContent)}}}
 async function form(env){const r=await submissions(new Request(origin+'/api/forms'),env);return {...await r.json(),cookie:r.headers.get('set-cookie').split(';')[0]}}
-const payload=()=>({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'customer@example.com',phone:'0821234567'},locker:{name:'Test locker',area:'Durban'},consent:true,items:[{kind:'puzzle',qty:1,gridSize:3,files:Array.from({length:10},()=>({size:tile.length,sha256:tileHash}))}]});
-function post(path,c,body,headers={}){return new Request(origin+path,{method:'POST',headers:{origin,cookie:c.cookie,'X-CSRF-Token':c.csrf,'CF-Connecting-IP':'192.0.2.1','Content-Type':'application/json',...headers},body:typeof body==='string'||body instanceof Uint8Array?body:JSON.stringify(body)})}
+const payload=()=>withShippingAgreement({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Test',email:'customer@example.com',phone:'0821234567'},locker:{name:'Test locker',area:'Durban'},consent:true,items:[{kind:'puzzle',qty:1,gridSize:3,files:Array.from({length:10},()=>({size:tile.length,sha256:tileHash}))}]});
+function post(path,c,body,headers={},catalogue=defaultContent){if(body?.payload)body={...body,payload:withShippingAgreement(body.payload,catalogue)};return new Request(origin+path,{method:'POST',headers:{origin,cookie:c.cookie,'X-CSRF-Token':c.csrf,'CF-Connecting-IP':'192.0.2.1','Content-Type':'application/json',...headers},body:typeof body==='string'||body instanceof Uint8Array?body:JSON.stringify(body)})}
 test('private puzzle submission requires verified uploads, keeps customer artwork out of attachments and retries safely',async()=>{
  const env=setup(),c=await form(env),data=payload(),mails=[];assert.equal(c.artworkStorage,true);
  const network=async(url,init)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'customvibe.co.za',action:'order'});mails.push(JSON.parse(init.body));return Response.json({id:'accepted'})};
@@ -68,7 +69,7 @@ test('new board captures one mixed order before mail and keeps quantities on ret
 });
 
 test('pre-dashboard artwork grants and recovery tokens survive added price snapshots',async()=>{
- const {validateOrder}=await import('../server/submission-model.mjs');const {initArtwork,verifyArtworkGrant}=await import('../server/artwork-api.mjs');const env=setup(),data=payload(),order=validateOrder(data,defaultContent,true),legacy={...order,items:order.items.map(({lineCents,...i})=>i)};const session={jti:random(),csrf:random(),exp:Math.floor(Date.now()/1000)+3600};
+ const {validateOrder}=await import('../server/submission-model.mjs');const {initArtwork,verifyArtworkGrant}=await import('../server/artwork-api.mjs');const env=setup(),data=payload(),order=validateOrder(withShippingAgreement(data,defaultContent),defaultContent,true),legacy={...order,items:order.items.map(({lineCents,...i})=>i)};const session={jti:random(),csrf:random(),exp:Math.floor(Date.now()/1000)+3600};
  const oldHash=Buffer.from(await crypto.subtle.sign('HMAC',await crypto.subtle.importKey('raw',new TextEncoder().encode(env.SESSION_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']),new TextEncoder().encode(JSON.stringify(legacy)))).toString('hex');
  const first=await(await initArtwork(env,session,legacy,'192.0.2.1')).json();
  const {verifyToken}=await import('../server/auth.mjs');const claims=await verifyToken(first.grant,env.SESSION_SECRET,'artwork');
@@ -98,7 +99,7 @@ test('oversized saved order details reject before reserving artwork or sending m
  data.items=Array.from({length:150},()=>({kind:'alphabet',qty:1,files:[]}));data.items.push({kind:'photo',qty:1,files:[{size:tile.length,sha256:tileHash}]});
  let storageCalls=0;const auth=env.AUTH;env.AUTH={fetch:async(...args)=>{storageCalls++;return auth.fetch(...args)}};
  const network=async url=>{assert.ok(url.includes('siteverify'));return Response.json({success:true,hostname:'customvibe.co.za',action:'order'})};
- assert.equal((await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network)).status,400);assert.equal(storageCalls,0);assert.equal(env.objects.size,0);
+ assert.equal((await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'},{},catalogue),env,network)).status,400);assert.equal(storageCalls,0);assert.equal(env.objects.size,0);
 });
 
 test('artwork after 100 file-free entries keeps its matching design number',async()=>{
@@ -106,7 +107,7 @@ test('artwork after 100 file-free entries keeps its matching design number',asyn
  const pack=catalogue.products.find(p=>p.id==='alphabet');pack.status='available';pack.pricingMode='fixed';pack.priceCents=10000;env.CATALOGUE={fetch:async()=>Response.json(catalogue)};
  data.items=Array.from({length:100},()=>({kind:'alphabet',qty:1,files:[]}));data.items.push({kind:'photo',qty:1,files:[{size:tile.length,sha256:tileHash}]});
  const network=async()=>Response.json({success:true,hostname:'customvibe.co.za',action:'order'});
- const initial=await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'}),env,network);assert.equal(initial.status,200);
+ const initial=await submissions(post('/api/artwork/init',c,{payload:data,turnstile:'test'},{},catalogue),env,network);assert.equal(initial.status,200);
  const row=env.sql.prepare('SELECT manifest FROM artwork_requests WHERE id=?').get(data.id);assert.equal(JSON.parse(row.manifest)[0].name,'design-101-photo.jpg');
 });
 test('selected locker is validated once and signed recovery survives directory outages without duplicate orders',async()=>{

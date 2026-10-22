@@ -124,6 +124,359 @@
         "start": "/**\n * QRCode for JavaScript",
         "end": "\n\n/**\n * Add finder patterns"
       }
+    },
+    {
+      "id": "pdf-lib",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "MIT",
+      "source": "node_modules/pdf-lib/LICENSE.md",
+      "sourceSha256": "f2c9fc00fdb66eb99ac156ba52d734af66d8d309f65753ae809ad34ee2883bcb"
+    },
+    {
+      "id": "@pdf-lib/standard-fonts",
+      "distribution": "@pdf-lib/standard-fonts",
+      "version": "1.0.0",
+      "licence": "MIT",
+      "source": "node_modules/@pdf-lib/standard-fonts/LICENSE.md",
+      "sourceSha256": "45cc2bb9957ed43f5c7f5eb1912f9f670730394d614079510477cae626194649"
+    },
+    {
+      "id": "@pdf-lib/upng",
+      "distribution": "@pdf-lib/upng",
+      "version": "1.0.1",
+      "licence": "MIT",
+      "source": "node_modules/@pdf-lib/upng/LICENSE",
+      "sourceSha256": "c1fb8861eca211bf5aea574358aba7039396c0c1824c2a1477cc126d398efd89"
+    },
+    {
+      "id": "pako",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "MIT AND Zlib",
+      "source": "node_modules/pako/LICENSE",
+      "sourceSha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539"
+    },
+    {
+      "id": "tslib",
+      "distribution": "tslib",
+      "version": "2.8.1",
+      "licence": "0BSD",
+      "source": "node_modules/tslib/LICENSE.txt",
+      "sourceSha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751",
+      "provenance": "Installed root distribution retained for completeness. The measured public and Admin bundles currently render no module from this root distribution."
+    },
+    {
+      "id": "pdf-lib/node_modules/tslib",
+      "distribution": "pdf-lib/node_modules/tslib",
+      "version": "1.14.1",
+      "licence": "0BSD",
+      "source": "node_modules/pdf-lib/node_modules/tslib/LICENSE.txt",
+      "sourceSha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751",
+      "provenance": "The Admin rendered tslib/tslib.es6.js module resolves to this nested distribution, not root tslib 2.8.1."
+    },
+    {
+      "id": "pako-zlib-upstream-terms",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/README",
+      "sourceSha256": "d8b499598e43d755ea8918448128259ff01820c50d94d5a48c8883d0a594ddb1",
+      "provenance": "Original zlib-port attribution and licence terms shipped with pako. Original headers remain unchanged in installed source."
+    },
+    {
+      "id": "pako-lib-zlib-adler32-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/adler32.js",
+      "sourceSha256": "99618eb68a96858148e2dd56f478aa7e4321c434f5f2ee6c57f59c0c568f0596",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nfunction adler32(adler, buf, len, pos)"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-constants-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/constants.js",
+      "sourceSha256": "e0c4148ed267a27f03aba9f9a34cba4bade2090c0f12905907539e38c842abbc",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nmodule.exports = {\n\n  /* Allowed flush"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-crc32-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/crc32.js",
+      "sourceSha256": "213f85e8b2e52e2cf6f7634897197400f7ddaed587274f160045f0b548ec21da",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\n// Use ordinary array, since untyped m"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-deflate-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/deflate.js",
+      "sourceSha256": "4b9b71ae7f42e506fe1fb134f1c21b944ef2b7ef79667ba1fe59eb963c353d22",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nvar utils   = require('../utils/common"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-gzheader-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/gzheader.js",
+      "sourceSha256": "8fa0b4995cea477be96b8783a7d6c7cf5fec96765c2108c3bd52e77104bfdbd3",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nfunction GZheader() {\n  /* true if com"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-inffast-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/inffast.js",
+      "sourceSha256": "b1beb3b55270e8338f23fc397132d179942d5866153ca4e9be264200b00c0d44",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\n// See state defs from inflate.js\nvar "
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-inflate-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/inflate.js",
+      "sourceSha256": "d31799a23f2ae87f0c52d21241c92278b41d23bb5365b452f2706d41b00c4245",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nvar utils         = require('../utils/"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-inftrees-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/inftrees.js",
+      "sourceSha256": "75f75d8ae4a7bed86f90a4a38f70c5d95e807515e9326801f9a073a7f2bf8bc7",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nvar utils = require('../utils/common')"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-messages-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/messages.js",
+      "sourceSha256": "eec5f5d6b8120ada9cd48a3ca0a253c64777906e835477b090e053434d38cf6c",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nmodule.exports = {\n  2:      'need dic"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-trees-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/trees.js",
+      "sourceSha256": "718adbbf68f4343bf17d61edffd9d0788a96a93e4e191d857459d95257e614cf",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\n/* eslint-disable space-unary-ops */\n\n"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pako-lib-zlib-zstream-upstream-notice-1",
+      "distribution": "pako",
+      "version": "1.0.11",
+      "licence": "Zlib",
+      "source": "node_modules/pako/lib/zlib/zstream.js",
+      "sourceSha256": "5fa10c7a59ca99113cf92d1260e56cbd6282e15afa85dc8a0eb8e8d6d2321298",
+      "extract": {
+        "start": "// (C) 1995-2013 Jean-loup Gailly and Mark Adler\n// (C) 2014-2017 Vitaly Puzrin ",
+        "end": "\n\nfunction ZStream() {\n  /* next input b"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-api-svgPath-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "MIT",
+      "source": "node_modules/pdf-lib/es/api/svgPath.js",
+      "sourceSha256": "1e4420c38fa42963e110ea2d5300328c098eec3743bd3e0b311afef6d7d3cfb9",
+      "extract": {
+        "start": "// Originated from pdfkit Copyright (c) 2014 Devon Govett\n// https://github.com/",
+        "end": "\nimport { appendBezierCurve, appendQuadr"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-Ascii85Stream-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/Ascii85Stream.js",
+      "sourceSha256": "48d4f773e99c18732798f591b2eddde99d799f44bb4f25f3b69acc15349f9eca",
+      "extract": {
+        "start": "/*\n * Copyright 2012 Mozilla Foundation\n *\n * The Ascii85Stream class contained ",
+        "end": "\nimport { __extends } from \"tslib\";\nimpo"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-AsciiHexStream-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/AsciiHexStream.js",
+      "sourceSha256": "d1dffdf6c01d776abd2e7cc169f7b95757b41e50cf9f3ed7003eb115c0cc2cc1",
+      "extract": {
+        "start": "/*\n * Copyright 2012 Mozilla Foundation\n *\n * The AsciiHexStream class contained",
+        "end": "\nimport { __extends } from \"tslib\";\nimpo"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-DecodeStream-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/DecodeStream.js",
+      "sourceSha256": "8fc3de152661a751f94fb060146049a99b11bad9b86ac158650cffe611b989a9",
+      "extract": {
+        "start": "/*\n * Copyright 2012 Mozilla Foundation\n *\n * The DecodeStream class contained i",
+        "end": "\n// Lots of DecodeStreams are created wh"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-FlateStream-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/FlateStream.js",
+      "sourceSha256": "be168ba9842de2af1b42e8216f6943968a034bc7b023800837476e7bd7722455",
+      "extract": {
+        "start": "/*\n * Copyright 1996-2003 Glyph & Cog, LLC\n *\n * The flate stream implementation",
+        "end": "\nimport { __extends } from \"tslib\";\n/*\n "
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-FlateStream-upstream-notice-2",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/FlateStream.js",
+      "sourceSha256": "be168ba9842de2af1b42e8216f6943968a034bc7b023800837476e7bd7722455",
+      "extract": {
+        "start": "/*\n * Copyright 2012 Mozilla Foundation\n *\n * The FlateStream class contained in",
+        "end": "\n/* tslint:disable  no-conditional-assig"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-LZWStream-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/LZWStream.js",
+      "sourceSha256": "a4fe561fdad957eeb6806a31841ce474d4d4bae41f34a32af414a444d500461e",
+      "extract": {
+        "start": "/*\n * Copyright 2012 Mozilla Foundation\n *\n * The LZWStream class contained in t",
+        "end": "\nimport { __extends } from \"tslib\";\nimpo"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-RunLengthStream-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/RunLengthStream.js",
+      "sourceSha256": "cb69105deb0a34a689f364dece0606b699afd36d52ec5d0ea6edf7808f8650c9",
+      "extract": {
+        "start": "/*\n * Copyright 2012 Mozilla Foundation\n *\n * The RunLengthStream class containe",
+        "end": "\nimport { __extends } from \"tslib\";\nimpo"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-core-streams-Stream-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "Apache-2.0",
+      "source": "node_modules/pdf-lib/es/core/streams/Stream.js",
+      "sourceSha256": "e36d4286007e84967f1a5b5c8ac29e4d54454726c024b435221a2a3742609074",
+      "extract": {
+        "start": "/*\n * Copyright 2012 Mozilla Foundation\n *\n * The Stream class contained in this",
+        "end": "\nvar Stream = /** @class */ (function ()"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-es-utils-base64-upstream-notice-1",
+      "distribution": "pdf-lib",
+      "version": "1.17.1",
+      "licence": "MIT",
+      "source": "node_modules/pdf-lib/es/utils/base64.js",
+      "sourceSha256": "5ac09ebb79669e0c7eadc5db5d6e2159cf7f7204ae55a1c5ac85f07a3ff06d5c",
+      "extract": {
+        "start": "/*\n * The `chars`, `lookup`, `encode`, and `decode` members of this file are\n * ",
+        "end": "\nvar chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "@pdf-lib-standard-fonts-es-utils-upstream-notice-1",
+      "distribution": "@pdf-lib/standard-fonts",
+      "version": "1.0.0",
+      "licence": "MIT",
+      "source": "node_modules/@pdf-lib/standard-fonts/es/utils.js",
+      "sourceSha256": "dbd0352f9210373b1621123e91d417b45b56e47034549ffec5deda649d98afd0",
+      "extract": {
+        "start": "/*\n * The `chars`, `lookup`, and `decodeFromBase64` members of this file are\n * ",
+        "end": "\nimport pako from 'pako';\nvar chars = 'A"
+      },
+      "provenance": "Original embedded upstream notice in a measured browser-shipped module. Full source hash pins the distributed header."
+    },
+    {
+      "id": "pdf-lib-embedded-apache-2.0-terms",
+      "version": "2.0",
+      "licence": "Apache-2.0",
+      "source": "node_modules/jsqr/LICENSE",
+      "sourceSha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+      "provenance": "Full Apache 2.0 terms for the Mozilla/Glyph & Cog stream ports whose exact original headers are retained above. Generic licence text reproduced unchanged from the installed jsqr licence file; jsqr code remains test-only and is not classified as browser-shipped."
     }
   ],
   "fonts": [
@@ -349,6 +702,29 @@
           "@fontsource-variable/fredoka/files/fredoka-latin-ext-wght-normal.woff2?inline",
           "@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2?inline"
         ],
+        "@pdf-lib/standard-fonts": [
+          "@pdf-lib/standard-fonts/es/Courier-Bold.compressed.json",
+          "@pdf-lib/standard-fonts/es/Courier-BoldOblique.compressed.json",
+          "@pdf-lib/standard-fonts/es/Courier-Oblique.compressed.json",
+          "@pdf-lib/standard-fonts/es/Courier.compressed.json",
+          "@pdf-lib/standard-fonts/es/Encoding.js",
+          "@pdf-lib/standard-fonts/es/Font.js",
+          "@pdf-lib/standard-fonts/es/Helvetica-Bold.compressed.json",
+          "@pdf-lib/standard-fonts/es/Helvetica-BoldOblique.compressed.json",
+          "@pdf-lib/standard-fonts/es/Helvetica-Oblique.compressed.json",
+          "@pdf-lib/standard-fonts/es/Helvetica.compressed.json",
+          "@pdf-lib/standard-fonts/es/Symbol.compressed.json",
+          "@pdf-lib/standard-fonts/es/Times-Bold.compressed.json",
+          "@pdf-lib/standard-fonts/es/Times-BoldItalic.compressed.json",
+          "@pdf-lib/standard-fonts/es/Times-Italic.compressed.json",
+          "@pdf-lib/standard-fonts/es/Times-Roman.compressed.json",
+          "@pdf-lib/standard-fonts/es/ZapfDingbats.compressed.json",
+          "@pdf-lib/standard-fonts/es/all-encodings.compressed.json",
+          "@pdf-lib/standard-fonts/es/utils.js"
+        ],
+        "@pdf-lib/upng": [
+          "@pdf-lib/upng/UPNG.js"
+        ],
         "@phosphor-icons/react": [
           "@phosphor-icons/react/dist/csr/ArrowClockwise.es.js",
           "@phosphor-icons/react/dist/csr/ArrowCounterClockwise.es.js",
@@ -409,6 +785,160 @@
           "leaflet/dist/leaflet-src.js",
           "leaflet/dist/leaflet-src.js?commonjs-es-import",
           "leaflet/dist/leaflet-src.js?commonjs-module"
+        ],
+        "pako": [
+          "pako/index.js",
+          "pako/index.js?commonjs-es-import",
+          "pako/lib/deflate.js",
+          "pako/lib/deflate.js?commonjs-exports",
+          "pako/lib/inflate.js",
+          "pako/lib/inflate.js?commonjs-exports",
+          "pako/lib/utils/common.js",
+          "pako/lib/utils/common.js?commonjs-exports",
+          "pako/lib/utils/strings.js",
+          "pako/lib/utils/strings.js?commonjs-exports",
+          "pako/lib/zlib/adler32.js",
+          "pako/lib/zlib/constants.js",
+          "pako/lib/zlib/crc32.js",
+          "pako/lib/zlib/deflate.js",
+          "pako/lib/zlib/deflate.js?commonjs-exports",
+          "pako/lib/zlib/gzheader.js",
+          "pako/lib/zlib/inffast.js",
+          "pako/lib/zlib/inflate.js",
+          "pako/lib/zlib/inflate.js?commonjs-exports",
+          "pako/lib/zlib/inftrees.js",
+          "pako/lib/zlib/messages.js",
+          "pako/lib/zlib/trees.js",
+          "pako/lib/zlib/trees.js?commonjs-exports",
+          "pako/lib/zlib/zstream.js"
+        ],
+        "pdf-lib": [
+          "pdf-lib/es/api/PDFDocument.js",
+          "pdf-lib/es/api/PDFDocumentOptions.js",
+          "pdf-lib/es/api/PDFEmbeddedFile.js",
+          "pdf-lib/es/api/PDFEmbeddedPage.js",
+          "pdf-lib/es/api/PDFFont.js",
+          "pdf-lib/es/api/PDFImage.js",
+          "pdf-lib/es/api/PDFJavaScript.js",
+          "pdf-lib/es/api/PDFPage.js",
+          "pdf-lib/es/api/PDFPageOptions.js",
+          "pdf-lib/es/api/StandardFonts.js",
+          "pdf-lib/es/api/colors.js",
+          "pdf-lib/es/api/errors.js",
+          "pdf-lib/es/api/form/PDFButton.js",
+          "pdf-lib/es/api/form/PDFCheckBox.js",
+          "pdf-lib/es/api/form/PDFDropdown.js",
+          "pdf-lib/es/api/form/PDFField.js",
+          "pdf-lib/es/api/form/PDFForm.js",
+          "pdf-lib/es/api/form/PDFOptionList.js",
+          "pdf-lib/es/api/form/PDFRadioGroup.js",
+          "pdf-lib/es/api/form/PDFSignature.js",
+          "pdf-lib/es/api/form/PDFTextField.js",
+          "pdf-lib/es/api/form/appearances.js",
+          "pdf-lib/es/api/image/alignment.js",
+          "pdf-lib/es/api/objects.js",
+          "pdf-lib/es/api/operations.js",
+          "pdf-lib/es/api/operators.js",
+          "pdf-lib/es/api/rotations.js",
+          "pdf-lib/es/api/sizes.js",
+          "pdf-lib/es/api/svgPath.js",
+          "pdf-lib/es/api/text/alignment.js",
+          "pdf-lib/es/api/text/layout.js",
+          "pdf-lib/es/core/PDFContext.js",
+          "pdf-lib/es/core/PDFObjectCopier.js",
+          "pdf-lib/es/core/acroform/PDFAcroButton.js",
+          "pdf-lib/es/core/acroform/PDFAcroCheckBox.js",
+          "pdf-lib/es/core/acroform/PDFAcroChoice.js",
+          "pdf-lib/es/core/acroform/PDFAcroComboBox.js",
+          "pdf-lib/es/core/acroform/PDFAcroField.js",
+          "pdf-lib/es/core/acroform/PDFAcroForm.js",
+          "pdf-lib/es/core/acroform/PDFAcroListBox.js",
+          "pdf-lib/es/core/acroform/PDFAcroNonTerminal.js",
+          "pdf-lib/es/core/acroform/PDFAcroPushButton.js",
+          "pdf-lib/es/core/acroform/PDFAcroRadioButton.js",
+          "pdf-lib/es/core/acroform/PDFAcroSignature.js",
+          "pdf-lib/es/core/acroform/PDFAcroTerminal.js",
+          "pdf-lib/es/core/acroform/PDFAcroText.js",
+          "pdf-lib/es/core/acroform/flags.js",
+          "pdf-lib/es/core/acroform/utils.js",
+          "pdf-lib/es/core/annotation/AppearanceCharacteristics.js",
+          "pdf-lib/es/core/annotation/BorderStyle.js",
+          "pdf-lib/es/core/annotation/PDFAnnotation.js",
+          "pdf-lib/es/core/annotation/PDFWidgetAnnotation.js",
+          "pdf-lib/es/core/annotation/flags.js",
+          "pdf-lib/es/core/document/PDFCrossRefSection.js",
+          "pdf-lib/es/core/document/PDFHeader.js",
+          "pdf-lib/es/core/document/PDFTrailer.js",
+          "pdf-lib/es/core/document/PDFTrailerDict.js",
+          "pdf-lib/es/core/embedders/CMap.js",
+          "pdf-lib/es/core/embedders/CustomFontEmbedder.js",
+          "pdf-lib/es/core/embedders/CustomFontSubsetEmbedder.js",
+          "pdf-lib/es/core/embedders/FileEmbedder.js",
+          "pdf-lib/es/core/embedders/FontFlags.js",
+          "pdf-lib/es/core/embedders/JavaScriptEmbedder.js",
+          "pdf-lib/es/core/embedders/JpegEmbedder.js",
+          "pdf-lib/es/core/embedders/PDFPageEmbedder.js",
+          "pdf-lib/es/core/embedders/PngEmbedder.js",
+          "pdf-lib/es/core/embedders/StandardFontEmbedder.js",
+          "pdf-lib/es/core/errors.js",
+          "pdf-lib/es/core/interactive/ViewerPreferences.js",
+          "pdf-lib/es/core/objects/PDFArray.js",
+          "pdf-lib/es/core/objects/PDFBool.js",
+          "pdf-lib/es/core/objects/PDFDict.js",
+          "pdf-lib/es/core/objects/PDFHexString.js",
+          "pdf-lib/es/core/objects/PDFInvalidObject.js",
+          "pdf-lib/es/core/objects/PDFName.js",
+          "pdf-lib/es/core/objects/PDFNull.js",
+          "pdf-lib/es/core/objects/PDFNumber.js",
+          "pdf-lib/es/core/objects/PDFObject.js",
+          "pdf-lib/es/core/objects/PDFRawStream.js",
+          "pdf-lib/es/core/objects/PDFRef.js",
+          "pdf-lib/es/core/objects/PDFStream.js",
+          "pdf-lib/es/core/objects/PDFString.js",
+          "pdf-lib/es/core/operators/PDFOperator.js",
+          "pdf-lib/es/core/operators/PDFOperatorNames.js",
+          "pdf-lib/es/core/parser/BaseParser.js",
+          "pdf-lib/es/core/parser/ByteStream.js",
+          "pdf-lib/es/core/parser/PDFObjectParser.js",
+          "pdf-lib/es/core/parser/PDFObjectStreamParser.js",
+          "pdf-lib/es/core/parser/PDFParser.js",
+          "pdf-lib/es/core/parser/PDFXRefStreamParser.js",
+          "pdf-lib/es/core/streams/Ascii85Stream.js",
+          "pdf-lib/es/core/streams/AsciiHexStream.js",
+          "pdf-lib/es/core/streams/DecodeStream.js",
+          "pdf-lib/es/core/streams/FlateStream.js",
+          "pdf-lib/es/core/streams/LZWStream.js",
+          "pdf-lib/es/core/streams/RunLengthStream.js",
+          "pdf-lib/es/core/streams/Stream.js",
+          "pdf-lib/es/core/streams/decode.js",
+          "pdf-lib/es/core/structures/PDFCatalog.js",
+          "pdf-lib/es/core/structures/PDFContentStream.js",
+          "pdf-lib/es/core/structures/PDFCrossRefStream.js",
+          "pdf-lib/es/core/structures/PDFFlateStream.js",
+          "pdf-lib/es/core/structures/PDFObjectStream.js",
+          "pdf-lib/es/core/structures/PDFPageLeaf.js",
+          "pdf-lib/es/core/structures/PDFPageTree.js",
+          "pdf-lib/es/core/syntax/CharCodes.js",
+          "pdf-lib/es/core/syntax/Delimiters.js",
+          "pdf-lib/es/core/syntax/Irregular.js",
+          "pdf-lib/es/core/syntax/Keywords.js",
+          "pdf-lib/es/core/syntax/Numeric.js",
+          "pdf-lib/es/core/syntax/Whitespace.js",
+          "pdf-lib/es/core/writers/PDFStreamWriter.js",
+          "pdf-lib/es/core/writers/PDFWriter.js",
+          "pdf-lib/es/utils/Cache.js",
+          "pdf-lib/es/utils/arrays.js",
+          "pdf-lib/es/utils/async.js",
+          "pdf-lib/es/utils/base64.js",
+          "pdf-lib/es/utils/errors.js",
+          "pdf-lib/es/utils/numbers.js",
+          "pdf-lib/es/utils/objects.js",
+          "pdf-lib/es/utils/pdfDocEncoding.js",
+          "pdf-lib/es/utils/png.js",
+          "pdf-lib/es/utils/rng.js",
+          "pdf-lib/es/utils/strings.js",
+          "pdf-lib/es/utils/unicode.js",
+          "pdf-lib/es/utils/validators.js"
         ],
         "qrcode": [
           "qrcode/lib/browser.js",
@@ -488,13 +1018,23 @@
           "scheduler/cjs/scheduler.production.js?commonjs-exports",
           "scheduler/index.js",
           "scheduler/index.js?commonjs-module"
+        ],
+        "tslib": [
+          "tslib/tslib.es6.js"
         ]
       },
       "generatedModules": [
         "\u0000commonjsHelpers.js",
         "\u0000vite/modulepreload-polyfill.js",
         "\u0000vite/preload-helper.js"
-      ]
+      ],
+      "moduleProvenance": {
+        "tslib/tslib.es6.js": {
+          "distribution": "pdf-lib/node_modules/tslib",
+          "version": "1.14.1",
+          "source": "node_modules/pdf-lib/node_modules/tslib/tslib.es6.js"
+        }
+      }
     }
   },
   "notBrowserShipped": [
@@ -505,5 +1045,10 @@
   "unknowns": [
     "The separate upstream version of Vite-vendored CommonJS helpers is not independently pinned. Exact Vite 6.4.4 distribution, source and notice are identified.",
     "Dijkstrajs 1.0.3 provides an MIT-labelled copyright/disclaimer and licence URL rather than restating the permission grant. Its complete distributed notice is reproduced without paraphrase."
-  ]
+  ],
+  "measurement": {
+    "date": "2026-10-21",
+    "method": "Vite build with build.write=false; only chunk modules with renderedLength > 0, measured independently for vite.config.mjs and vite.admin.config.mjs.",
+    "note": "The Admin print-sheet feature adds five rendered package names. Package-name normalization maps nested tslib to tslib; moduleProvenance identifies its exact installed distribution. Existing font bytes and provenance records are unchanged."
+  }
 }

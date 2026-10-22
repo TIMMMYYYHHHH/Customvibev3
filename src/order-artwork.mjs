@@ -1,3 +1,4 @@
+import {createEmailDesignPreview,EMAIL_PREVIEW_LIMITS} from './email-design-previews.mjs';
 import {renderBusiness} from './designs/business-render.mjs';
 import {renderHandy} from './designs/handy-render.mjs';
 import {designContract} from './designs/state.mjs';
@@ -22,9 +23,10 @@ export async function prepareOrderItems(basket,photos,render,privateArtwork=fals
   else if(isTemplateProduct(product))images=[item.preview];
   else if(selectedPrintManifest(product,item.designIds))images=await Promise.all(selectedPrintManifest(product,item.designIds).designs.map(async d=>(await renderDesign({...d,style:item.style})).url));
    for(const image of images){if(!image.startsWith('data:image/jpeg;base64,'))throw new Error('A design could not be prepared. Please try another JPG or PNG.');const base64=printJpeg(image.slice('data:image/jpeg;base64,'.length));if(privateArtwork){const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));length+=bytes.length;count++;if(bytes.length>limits.fileBytes||length>limits.requestBytes||count>limits.files)throw new Error('This order exceeds the artwork limit: 4 MB per file, 32 MB in total and 60 files. Keep your designs and contact us for help.');const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');files.push({size:bytes.length,sha256});uploads.push(bytes);continue;}length+=base64.length;count++;if(length>2000000||count>60||base64.length>1400000)throw new Error('These designs are too large for one email. Please reduce the number of designs in this order.');files.push(base64);}
-  items.push({...contract,kind:item.kind,qty:item.qty,...(item.kind==='puzzle'?{gridSize:item.gridSize}:{}),files});
+  const emailPreview=privateArtwork&&items.length<EMAIL_PREVIEW_LIMITS.items&&contract.designMode!=='assisted'?await createEmailDesignPreview(item.kind==='puzzle'?images.slice(0,1):images):undefined;
+  items.push({...contract,...(emailPreview?{emailPreview}:{}),kind:item.kind,qty:item.qty,...(item.kind==='puzzle'?{gridSize:item.gridSize}:{}),files});
  }
- return privateArtwork?{items,uploads}:items;
+ return privateArtwork?{items,uploads,emailPreviewVersion:1}:items;
 }
 
 export const preparePrivateArtwork=(basket,photos,render,content)=>prepareOrderItems(basket,photos,render,true,content);

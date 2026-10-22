@@ -12,7 +12,12 @@ const fail=(status,error)=>Response.json({error},{status});
 const reference=row=>'CV-'+String(row.seq).padStart(6,'0');
 const previousReference=row=>{const snapshot=JSON.parse(row.snapshot);return snapshot.referenceVersion===2?undefined:snapshot.reference||'CV-'+row.id;};
 const view=row=>({id:row.id,reference:reference(row),...(previousReference(row)?{previousReference:previousReference(row)}:{}),status:row.status,version:row.version,created:row.created,expires:row.expires,artworkExpires:artworkExpiry(row),fulfilledAt:row.fulfilled_at??null,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent,snapshot:artworkExpiry(row)<=now()?retainedSnapshot(JSON.parse(row.snapshot)):JSON.parse(row.snapshot)});
-function validSnapshot(s){return s&&typeof s.contact?.name==='string'&&s.contact.name.length<=100&&typeof s.contact.email==='string'&&/^[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+$/.test(s.contact.email)&&s.contact.email.length<=254&&typeof s.contact.phone==='string'&&s.contact.phone.length<=30&&typeof s.locker?.name==='string'&&s.locker.name.length<=140&&typeof s.locker.area==='string'&&s.locker.area.length<=140&&s.paymentStatus==='unpaid'&&Number.isSafeInteger(s.magnetQty)&&s.magnetQty>0&&Number.isSafeInteger(s.subtotalCents)&&s.subtotalCents>0&&Array.isArray(s.items)&&s.items.length>0&&s.items.every(i=>typeof i.kind==='string'&&typeof i.name==='string'&&i.name.length<=(i.kind==='alphabet'||i.kind==='counting'?800:200)&&Number.isSafeInteger(i.qty)&&i.qty>0&&Array.isArray(i.files)&&i.files.length<=26);}
+function validShipping(s){
+ if(s.shippingPolicyVersion!==undefined&&s.shippingPolicyVersion!==1)return false;
+ if(s.deliveryCents==null)return s.shippingPolicyVersion===undefined&&s.totalCents==null;
+ return Number.isSafeInteger(s.deliveryCents)&&s.deliveryCents>=0&&Number.isSafeInteger(s.totalCents)&&s.totalCents===s.subtotalCents+s.deliveryCents;
+}
+function validSnapshot(s){return s&&typeof s.contact?.name==='string'&&s.contact.name.length<=100&&typeof s.contact.email==='string'&&/^[^\s<>@,;]+@[^\s<>@,;]+\.[^\s<>@,;]+$/.test(s.contact.email)&&s.contact.email.length<=254&&typeof s.contact.phone==='string'&&s.contact.phone.length<=30&&typeof s.locker?.name==='string'&&s.locker.name.length<=140&&typeof s.locker.area==='string'&&s.locker.area.length<=140&&s.paymentStatus==='unpaid'&&Number.isSafeInteger(s.magnetQty)&&s.magnetQty>0&&Number.isSafeInteger(s.subtotalCents)&&s.subtotalCents>0&&validShipping(s)&&Array.isArray(s.items)&&s.items.length>0&&s.items.every(i=>typeof i.kind==='string'&&typeof i.name==='string'&&i.name.length<=(i.kind==='alphabet'||i.kind==='counting'?800:200)&&Number.isSafeInteger(i.qty)&&i.qty>0&&Array.isArray(i.files)&&i.files.length<=26);}
 export async function orderService(request,env){
  const b=await request.json(),path=new URL(request.url).pathname.slice('/orders/'.length),time=now();
  if(!env.DB||!b||typeof b!=='object')return fail(400,'Invalid request.');
@@ -24,7 +29,7 @@ export async function orderService(request,env){
   if(b.stage&&b.stage!=='all'){where.push('status=?');args.push(b.stage)}
   const grouped=!q&&(!b.stage||['all','fulfilled'].includes(b.stage));
   if(b.fulfilledBefore!==undefined&&(!grouped||b.stage!=='fulfilled'||!/^\d+:\d+$/.test(b.fulfilledBefore)))return fail(400,'Invalid fulfilled page.');
-  const summary=r=>{const v=view(r);return {...v,snapshot:{contact:{name:v.snapshot.contact.name},magnetQty:v.snapshot.magnetQty,subtotalCents:v.snapshot.subtotalCents,paymentStatus:'unpaid'}}};
+  const summary=r=>{const v=view(r);return {...v,snapshot:{contact:{name:v.snapshot.contact.name},magnetQty:v.snapshot.magnetQty,subtotalCents:v.snapshot.subtotalCents,...Object.fromEntries(['shippingPolicyVersion','deliveryCents','totalCents'].filter(k=>Object.hasOwn(v.snapshot,k)).map(k=>[k,v.snapshot[k]])),paymentStatus:'unpaid'}}};
   let rows=[],completed=[],fulfilledCount=0,fulfilledNext=null;
   if(grouped){
    fulfilledCount=(await readSelect(env.DB,"SELECT count(*) n FROM orders WHERE expires>? AND status='fulfilled'",[time])).n;

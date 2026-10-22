@@ -1,3 +1,4 @@
+import {withShippingAgreement} from './helpers/shipping.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {businessDesigns,sampleBusinessValues,validateBusinessValues,businessPayload,businessMatrix} from '../src/designs/business.mjs';
@@ -11,10 +12,10 @@ test('all nine business designs validate and keep exact print details through pr
  assert.equal(businessDesigns.length,9);
  for(const design of businessDesigns){
  const values=sampleBusinessValues(design.id);assert.deepEqual(validateTemplate('business',values),values);
- const order=validateOrder({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Local fixture',email:'test@example.com',phone:'0821234567'},locker:{name:'Test locker',area:'Durban'},consent:true,items:[{id:crypto.randomUUID(),kind:'business',qty:3,printVersion:1,designMode:'self',values,files:[{size:2000,sha256:'a'.repeat(64)}]}]},content,true);
+ const order=validateOrder(withShippingAgreement({id:crypto.randomUUID(),createdAt:Math.floor(Date.now()/1000),contact:{name:'Local fixture',email:'test@example.com',phone:'0821234567'},locker:{name:'Test locker',area:'Durban'},consent:true,items:[{id:crypto.randomUUID(),kind:'business',qty:3,printVersion:1,designMode:'self',values,files:[{size:2000,sha256:'a'.repeat(64)}]}]},content),content,true);
  const record=orderRecord(order,true);assert.deepEqual(record.items[0].values,values);assert.equal(record.magnetQty,3);assert.match(record.items[0].name,new RegExp(design.name));
  const instructions=printInstructions({reference:'LOCAL',snapshot:record,proof:{revision:1,status:'awaiting_approval',digest:'local'}});
- assert.ok(instructions.includes(values.entries[0]));assert.match(instructions,/75 × 75 mm/);assert.doesNotMatch(instructions,/DO NOT PRINT|approved proof/);
+ assert.ok(instructions.includes(values.entries[0]));assert.match(instructions,/Finished size: 63\.5 × 63\.5 mm/);assert.doesNotMatch(instructions,/DO NOT PRINT|approved proof/);
  }
 });
 test('business QR rejects unsafe links, excessive density and mismatched QR modes',()=>{
