@@ -63,3 +63,14 @@ test('pack unit-cost guidance uses chosen unit without changing order line round
 test('editable decimal drafts preserve every safe cent and usage thousandth',async()=>{
  const {entryDraft,parseEntries,money,currentFinanceMonth}=await client();const draft=entryDraft({...entry,packCents:9007199254740991,usageMilli:9007199254740991});assert.equal(draft.packPrice,'90071992547409.91');assert.equal(draft.usage,'9007199254740.991');assert.equal(parseEntries([draft])[0].packCents,9007199254740991);assert.equal(money(-9007199254740991),'R -90071992547409.91');assert.equal(currentFinanceMonth(new Date('2026-09-30T22:01:00Z')),'2026-10');
 });
+test('stage change preserves draft and saves against the current observed order version',async()=>{
+ const {createCostEditor}=await client();let currentOrderVersion=3,remote=structuredClone(wrapper),submitted;
+ const editor=createCostEditor({path:'/api/finance/orders/'+id,magnetQty:2,request:async(path,body)=>{
+  if(!body)return structuredClone(remote);
+  submitted=body;if(body.orderVersion!==currentOrderVersion||body.version!==remote.cost.version)throw Object.assign(Error('Changed order or costs'),{status:409});
+  remote={orderId:id,orderVersion:currentOrderVersion,cost:{...cost,version:remote.cost.version+1,orderVersion:currentOrderVersion,status:path.endsWith('/confirm')?'confirmed':'estimated',lines:body.lines??remote.cost.lines,complete:true,totalCents:600,knownCostCents:600}};return structuredClone(remote);
+ }});
+ await editor.load();editor.edit(0,{usage:'12'});currentOrderVersion=4;
+ await editor.save(4);assert.equal(editor.getSnapshot().needsRead,false);assert.equal(editor.getSnapshot().saved.version,3);assert.equal(editor.getSnapshot().saved.status,'estimated');assert.equal(editor.getSnapshot().draft[0].usage,'12');assert.equal(submitted.orderVersion,4);assert.equal(submitted.version,2);
+ currentOrderVersion=5;remote.orderVersion=5;await editor.readCurrent();editor.keepDraft();await editor.save(4);assert.equal(editor.getSnapshot().needsRead,false);assert.equal(submitted.orderVersion,5);assert.equal(submitted.version,3);await editor.confirm(4);assert.equal(editor.getSnapshot().saved.status,'confirmed');assert.equal(submitted.orderVersion,5);
+});
