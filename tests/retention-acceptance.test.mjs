@@ -81,3 +81,44 @@ test('cleanup drains bounded expired batches, preserves a live request and relea
  await cleanArtwork(env);await cleanArtwork(env);assert.equal(env.sql.prepare('SELECT COUNT(*) n FROM artwork_requests').get().n,1);assert.equal(env.sql.prepare('SELECT COUNT(*) n FROM artwork_files').get().n,1);assert.equal(env.objects.size,1);
  assert.deepEqual(Buffer.from(env.objects.get(live.id+'/0.jpg')),tile);assert.equal(env.sql.prepare("SELECT amount FROM artwork_usage WHERE id='retained'").get().amount,size);assert.equal((await call(env,'artwork/download',{id:live.id,index:0})).status,200);
 }));
+
+test('finance costs expire with exact order deadline and cleanup removes linked audit before orders while settings survive',()=>controlled(async(env,clock)=>{
+ const expired=crypto.randomUUID(),live=crypto.randomUUID();await create(env,expired);await create(env,live);
+ const entry={id:crypto.randomUUID(),name:'Synthetic cost',category:'materials',unit:'piece',packCents:500,packQuantity:10,basis:'per_order',usageMilli:1000,magnetsPerSheet:null,active:true};
+ await json(env,'finance/settings-save',{version:0,entries:[entry]});
+ for(const id of [expired,live])await json(env,'finance/order-save',{id,version:0,orderVersion:0,lines:[{...entry,excluded:false}]});
+ const artworkDeadline=env.sql.prepare('SELECT artwork_expires FROM orders WHERE id=?').get(expired).artwork_expires;
+ env.sql.prepare('UPDATE orders SET expires=? WHERE id=?').run(clock.seconds,expired);
+ for(const action of ['order-read','order-save','order-confirm'])assert.equal((await call(env,'finance/'+action,{id:expired,...(action==='order-read'?{}:{version:1,orderVersion:0}),...(action==='order-save'?{lines:[{...entry,excluded:false}]}:{})})).status,410);
+ assert.equal(env.sql.prepare('SELECT artwork_expires FROM orders WHERE id=?').get(expired).artwork_expires,artworkDeadline);
+ // Enforce the cleanup order with foreign keys disabled, matching deployments that do not enforce them.
+ env.sql.exec("CREATE TRIGGER finance_cleanup_order BEFORE DELETE ON orders WHEN EXISTS(SELECT 1 FROM order_costs WHERE order_id=old.id) OR EXISTS(SELECT 1 FROM finance_changes WHERE order_id=old.id) BEGIN SELECT RAISE(ABORT,'finance must be removed first'); END");
+ await cleanOrders(env);
+ assert.equal(env.sql.prepare('SELECT count(*) n FROM order_costs WHERE order_id=?').get(expired).n,0);assert.equal(env.sql.prepare('SELECT count(*) n FROM finance_changes WHERE order_id=?').get(expired).n,0);
+ assert.equal((await json(env,'finance/order-read',{id:live})).cost.totalCents,50);assert.equal((await json(env,'finance/settings-read',{})).version,1);
+ assert.equal(env.sql.prepare('SELECT count(*) n FROM finance_changes WHERE order_id IS NULL').get().n,1);
+}));
+
+test('additive finance migration preserves old-schema orders and agrees with fresh schema',async()=>{
+ const {DatabaseSync}=await import('node:sqlite'),{readFileSync,readdirSync}=await import('node:fs');const old=new DatabaseSync(':memory:'),fresh=artworkEnv();
+ try{
+  for(const file of readdirSync('migrations/security').filter(f=>f.endsWith('.sql')&&f<'0013').sort())old.exec(readFileSync('migrations/security/'+file,'utf8'));
+  const id=crypto.randomUUID();old.prepare('INSERT INTO orders(id,fingerprint,snapshot,created,expires,artwork_expires) VALUES(?,?,?,?,?,?)').run(id,'a'.repeat(64),JSON.stringify(snapshot()),123,9999999999,456);
+  const before=old.prepare('SELECT * FROM orders').get();old.exec(readFileSync('migrations/security/0013_admin_finance.sql','utf8'));assert.deepEqual(old.prepare('SELECT * FROM orders').get(),before);
+  for(const table of ['finance_settings','order_costs','finance_changes','finance_report_state'])assert.deepEqual(old.prepare('PRAGMA table_info('+table+')').all(),fresh.sql.prepare('PRAGMA table_info('+table+')').all());
+  assert.equal(old.prepare('SELECT revision FROM finance_report_state').get().revision,0);
+  assert.equal(old.prepare("SELECT count(*) n FROM sqlite_master WHERE type='trigger' AND name LIKE 'finance_revision_%'").get().n,6);
+ }finally{old.close();fresh.sql.close()}
+});
+
+test('migrated schema prevents orphan finance records when an older cleanup deletes only orders',()=>controlled(async(env,clock)=>{
+ const expired=crypto.randomUUID(),live=crypto.randomUUID();await create(env,expired);await create(env,live);
+ const line={id:crypto.randomUUID(),name:'Synthetic legacy cleanup',category:'courier',unit:'parcel',packCents:0,packQuantity:1,basis:'per_order',usageMilli:1000,magnetsPerSheet:null,active:true,excluded:false};
+ await json(env,'finance/settings-save',{version:0,entries:[]});
+ for(const id of [expired,live])await json(env,'finance/order-save',{id,version:0,orderVersion:0,lines:[line]});
+ env.sql.prepare('UPDATE orders SET expires=? WHERE id=?').run(clock.seconds,expired);
+ env.sql.prepare('DELETE FROM orders WHERE expires<=?').run(clock.seconds);
+ assert.equal(env.sql.prepare('SELECT count(*) n FROM order_costs WHERE order_id=?').get(expired).n,0);
+ assert.equal(env.sql.prepare('SELECT count(*) n FROM finance_changes WHERE order_id=?').get(expired).n,0);
+ assert.equal((await json(env,'finance/order-read',{id:live})).cost.totalCents,0);assert.equal((await json(env,'finance/settings-read',{})).version,1);
+}));
