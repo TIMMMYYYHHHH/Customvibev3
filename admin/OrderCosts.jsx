@@ -1,4 +1,5 @@
 import React,{useMemo,useState,useEffect,useSyncExternalStore} from 'react';
+import OrderStock from './OrderStock';
 import CostEntryFields,{CostEditorFeedback} from './CostEntryFields';
 import {createCostEditor,costStatus,previewCosts,money} from './finance-client.mjs';
 export function OrderCostsEditor({order,editor}){
@@ -9,5 +10,5 @@ export function OrderCostsEditor({order,editor}){
 }
 export default function OrderCosts({order}){
  const [opened,setOpened]=useState(false),editor=useMemo(()=>createCostEditor({path:'/api/finance/orders/'+order.id,magnetQty:order.snapshot.magnetQty}),[order.id]);
- return <section className="cv-order-costs" aria-label="Order costs"><details onToggle={e=>{if(e.currentTarget.open)setOpened(true);}}><summary><h2>Costs</h2><span>Review this order’s direct costs</span></summary>{opened&&<OrderCostsEditor order={order} editor={editor}/>}</details></section>;
+ return <section className="cv-order-costs" aria-label="Order costs"><details onToggle={e=>{if(e.currentTarget.open)setOpened(true);}}><summary><h2>Costs</h2><span>Review this order’s direct costs</span></summary>{opened&&<><OrderCostsEditor order={order} editor={editor}/><OrderStock order={order}/></>}</details></section>;
 }
