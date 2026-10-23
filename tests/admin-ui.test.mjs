@@ -30,3 +30,26 @@ test('replacement proof individual downloads use current source files and exact 
  const expired=renderToStaticMarkup(React.createElement(module.exports.default,{order,onChange:()=>{}}));
  assert.doesNotMatch(expired,/>Download image</);
 });
+
+test('order artwork is read only while submitted briefs, history and production actions remain available',async()=>{
+ const built=await build({entryPoints:['admin/OrderDetail.jsx'],bundle:true,write:false,format:'cjs',platform:'node',external:['react'],logLevel:'silent'});
+ const module={exports:{}};new Function('require','module','exports',built.outputFiles[0].text)(createRequire(import.meta.url),module,module.exports);
+ const file={index:0,name:'design-01-photo.jpg',size:10};
+ const order={id:'11111111-1111-4111-8111-111111111111',reference:'CV-000001',version:0,status:'new',expires:Math.floor(Date.now()/1000)+300,history:[],updates:[],snapshot:{contact:{name:'Sample',email:'sample@example.com',phone:'0000000'},locker:{name:'Locker',area:'Durban'},magnetQty:2,subtotalCents:10000,items:[{id:'photo',kind:'photo',name:'Photo',qty:2,brief:'Keep the supplied wording.',files:[file]}]}};
+ const render=()=>renderToStaticMarkup(React.createElement(module.exports.default,{order,onChange:()=>{}}));
+ const checkReadOnly=html=>{
+  for(const label of ['Prepare revision from submitted artwork','Prepare the final design set','Prepare a replacement revision','Publish artwork revision','Revoke historical review links'])assert.equal(html.includes(label),false,`${label} must not be offered`);
+  assert.equal(/<input[^>]+type="file"/.test(html),false,'artwork upload must not be offered');
+  assert.match(html,/Keep the supplied wording\./);
+  assert.match(html,/Preview update/);assert.match(html,/Unpaid/);
+ };
+ let html=render();checkReadOnly(html);
+ for(const label of ['Prepare print sheet','Download all','Hide previews','Download image','Print 2 copies'])assert.ok(html.includes(label),label);
+ order.snapshot.items[0].designMode='assisted';order.snapshot.items[0].files=[];
+ checkReadOnly(render());
+ order.proof={revision:2,status:'changes_requested',events:[{kind:'changes',revision:1,message:'Historical wording correction.'}],items:[{kind:'photo',name:'Photo',qty:2,files:[{...file,requestId:'22222222-2222-4222-8222-222222222222',index:7,copies:2}]}]};
+ html=render();checkReadOnly(html);
+ assert.match(html,/Historical wording correction\./);assert.match(html,/Revision 2/);
+ assert.match(html,/href="\/api\/artwork\/22222222-2222-4222-8222-222222222222\/7"/);
+ for(const label of ['Prepare print sheet','Download all','Hide previews','Download image','Print 2 copies'])assert.ok(html.includes(label),label);
+});
