@@ -1,3 +1,4 @@
+import {financeAPI} from './finance-api.mjs';
 import manifest from '../dist/admin/.vite/manifest.json' with {type:'json'};
 import {routeStyleCatalogue,composeRouteStyles} from '../shared/route-styles.mjs';
 import {previewPath} from '../src/seasons/preview-routing.mjs';
@@ -19,6 +20,7 @@ export default {async fetch(request,env){let phase='admin_request';try{const url
  if(url.pathname==='/preview-content.json'&&request.method==='GET')return reply(Response.json(publicContent(await readContent(env.CONTENT_DB,fallback))));
  if(url.pathname==='/api/forms'&&request.method==='GET')return reply(Response.json({available:false,preview:true}));
 
+ if(url.pathname==='/api/finance'||url.pathname.startsWith('/api/finance/'))return reply(await financeAPI(request,env,auth.session));
  if(url.pathname==='/api/orders'||url.pathname.startsWith('/api/orders/'))return reply(await ordersAPI(request,env,auth.session));
  const artwork=url.pathname.match(/^\/api\/artwork\/([a-f0-9-]{36})(?:\/(\d{1,2}))?$/);
  if(artwork){if(request.method!=='GET')return reply(new Response('Method not allowed',{status:405}));return reply(await env.AUTH.fetch('https://auth.internal/artwork/'+(artwork[2]===undefined?'detail':'download'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:artwork[1],...(artwork[2]===undefined?{}:{index:Number(artwork[2])})})}));}
@@ -42,5 +44,5 @@ export default {async fetch(request,env){let phase='admin_request';try{const url
   const headers=new Headers(asset.headers);headers.delete('Content-Length');headers.delete('ETag');
   return reply(new Response(request.method==='HEAD'?null:html,{status:asset.status,headers}));
  }
- const target={'/artwork':'/','/orders':'/','/content':'/'}[url.pathname];return reply(await env.ASSETS.fetch(target?new Request(url.origin+target,request):request));
+ const target={'/finances':'/','/artwork':'/','/orders':'/','/content':'/'}[url.pathname];return reply(await env.ASSETS.fetch(target?new Request(url.origin+target,request):request));
  }catch(error){reportUnavailable(phase,error);return secure(unavailable(),{admin:true})}}};

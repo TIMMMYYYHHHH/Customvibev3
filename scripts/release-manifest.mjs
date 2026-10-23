@@ -114,6 +114,8 @@ export async function readMandatoryValidation(selector,local,{phase='plan'}={}){
 
 // Hash the actual inner multipart File, never a separate prebuild or a rewritten module.
 const TOOLING_PATHS=new Set(['.github/workflows/publish.yml','docs/release-process.md','docs/releases/README.md','scripts/check-admin-deployment.mjs','scripts/check-catalogue-deployment.mjs','scripts/check-deployment.mjs','scripts/check-security-deployment.mjs','scripts/release-manifest.mjs','tests/deployment-safety.test.mjs','tests/release-cli.test.mjs','tests/release-manifest.test.mjs']);
+// Source recognition confers no publication authority on these shared modules.
+const SHARED_RUNTIME_PATHS=new Set(['shared/finance-costs.mjs','shared/finance-report.mjs']);
 // Independently reviewed M/S to corrected PR47 content, including its separate
 // nonshipping print regression. Suffixes and operator lists confer no authority.
 const PRESENTATION_ENTRIES=[
@@ -823,7 +825,7 @@ export function validateActivationCompatibility(value,expected){
  for(const k of ['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'])ensure(DIGEST.test(expected[k]||'')&&value[k]===expected[k],'Activation source/compiler/config/assets comparison differs.');
  return {basis:value.basis,reviewedAgainstSha:value.reviewedAgainstSha,baselineSha:value.baselineSha,observedAt:freshTime(value.observedAt,expected.now??Date.now()),...Object.fromEntries(['sourceInputDigest','compilerConfigDigest','configDigest','pagesBuildDigest','adminAssetsDigest'].map(k=>[k,value[k]])),...(delivery?{baselineSourceInputDigest:value.baselineSourceInputDigest,inactiveDelivery:structuredClone(value.inactiveDelivery)}:{}),...(presentation?{baselineSourceInputDigest:value.baselineSourceInputDigest,presentation:structuredClone(value.presentation),...(value.adminAssetManifest?{adminAssetManifest:structuredClone(value.adminAssetManifest)}:{})}:{}),historicalFunctionsDigest:null,privateSnapshotGap:'Final reads detect drift after the write; no distributed lock or autonomous runtime/schema safety is claimed.'};
 }
-function isSourceInput(path){return /^(src\/|public\/|data\/|server\/|functions\/|admin\/|security\/|catalogue\/|migrations\/|scripts\/|package(-lock)?[.]json$|vite[.]|wrangler.*[.]jsonc$|index[.]html$)/.test(path)&&!TOOLING_PATHS.has(path);}
+function isSourceInput(path){return (SHARED_RUNTIME_PATHS.has(path)||/^(src\/|public\/|data\/|server\/|functions\/|admin\/|security\/|catalogue\/|migrations\/|scripts\/|package(-lock)?[.]json$|vite[.]|wrangler.*[.]jsonc$|index[.]html$)/.test(path))&&!TOOLING_PATHS.has(path);}
 function sourceInputs(sha){
  const files=git('ls-tree','-r','--name-only',sha).split('\n').filter(isSourceInput);
  ensure(files.length>0,'Missing source inputs.');return hash(files.sort().map(p=>`${p}\0${git('rev-parse',`${sha}:${p}`)}`).join('\n'));
@@ -897,7 +899,7 @@ export function classifyChanges(paths,dependencies={}){
  const components=new Set(['pages']),schemas=new Set();
  for(const path of paths){
   if(/^(docs\/|tests\/|[.]github\/|[^/]+[.]md$|[.]gitignore$)/.test(path))continue;
-  if(/^(src\/|public\/|data\/|admin\/|server\/)/.test(path)){
+  if(SHARED_RUNTIME_PATHS.has(path)||/^(src\/|public\/|data\/|admin\/|server\/)/.test(path)){
    if(!/^server\/proof-api[.]mjs$/.test(path))components.add('admin');
   }else if(/^functions\//.test(path)){}
   else if(/^security\//.test(path)){components.add('security');components.add('admin');}
@@ -1028,7 +1030,7 @@ function dependencies(sha){return {security:dependencyFiles(sha,'security/index.
 export function fingerprint(sha,component){
  const privateFiles=component==='security'||component==='catalogue'?dependencyFiles(sha,`${component}/index.mjs`):null;
  const dep=dependencies(sha);
- const files=git('ls-tree','-r','--name-only',sha).split('\n').filter(path=>privateFiles?privateFiles.includes(path)||path===`wrangler.${component}.jsonc`||/^package(-lock)?[.]json$/.test(path):/^(src\/|public\/|data\/|server\/|scripts\/|functions\/|admin\/|package|vite|wrangler|index[.]html)/.test(path)&&classifyChanges([path],dep).components.includes(component));
+ const files=git('ls-tree','-r','--name-only',sha).split('\n').filter(path=>privateFiles?privateFiles.includes(path)||path===`wrangler.${component}.jsonc`||/^package(-lock)?[.]json$/.test(path):(SHARED_RUNTIME_PATHS.has(path)||/^(src\/|public\/|data\/|server\/|scripts\/|functions\/|admin\/|package|vite|wrangler|index[.]html)/.test(path))&&classifyChanges([path],dep).components.includes(component));
  return hash(files.map(path=>`${path}\0${git('rev-parse',`${sha}:${path}`)}`).join('\n'));
 }
 async function bundleDigest(directory,{runtimeOnly=false}={}){

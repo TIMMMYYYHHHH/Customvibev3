@@ -11,6 +11,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 const cli=fileURLToPath(new URL('../scripts/release-manifest.mjs',import.meta.url));
 const sha='a'.repeat(40),old='b'.repeat(40),id='12345678-1234-1234-1234-123456789abc',next='87654321-1234-1234-1234-123456789abc';
 const marker='PRIVATE_SENTINEL_MUST_NOT_PERSIST';
+const fixtureRuntime='v22.23.3';
 function mandatoryCliFixture(){
  const candidate=sha,head='e'.repeat(40),base=old,merge='bc4e80b61dd30338e62f1b922dded516cd250d30',tree='d9ebd59f26e2fea7ef82e5e2831cb66851a5ae1a';
  const repo={full_name:'TIMMMYYYHHHH/Customvibev3',id:1269416306,private:false};
@@ -28,7 +29,8 @@ function mandatoryCliFixture(){
 
 const preload=`
 const cp=require('node:child_process'),fs=require('node:fs'),originalExec=cp.execFileSync;
-const actualVersion=process.version;Object.defineProperty(process,'version',{get:()=>process.env.PUBLISHER_RUNTIME||(process.env.COMPILER_RUNTIME&&global.__apiCalls>=13?process.env.COMPILER_RUNTIME:actualVersion)});
+// Match the synthetic CI evidence above, independently of the test host runtime.
+const fixtureRuntime=${JSON.stringify(fixtureRuntime)};Object.defineProperty(process,'version',{get:()=>process.env.PUBLISHER_RUNTIME||(process.env.COMPILER_RUNTIME&&global.__apiCalls>=13?process.env.COMPILER_RUNTIME:fixtureRuntime)});
 const RealDate=Date;global.__clockShift=Number(process.env.CLOCK_SHIFT_MS||0);global.Date=class extends RealDate{constructor(...args){if(!args.length&&global.__delayNextDate){global.__delayNextDate=false;global.__clockShift+=Number(process.env.POST_VALIDATION_DELAY_MS||0);}super(...(args.length?args:[RealDate.now()+global.__clockShift]));}static now(){return RealDate.now()+global.__clockShift;}toISOString(){const result=super.toISOString();if(global.__apiCalls===13&&process.env.PARSE_DELAY_MS&&!global.__parseDelayed){global.__parseDelayed=true;global.__clockShift+=Number(process.env.PARSE_DELAY_MS);}if(global.__afterValidationClock){global.__afterValidationClock=false;global.__delayNextDate=true;}return result;}};
 const sha=process.env.FIXTURE_SOURCE_SHA||'${sha}',old=process.env.FIXTURE_BASE_SHA||'${old}',id=process.env.FIXTURE_BEFORE_ID||'${id}',next=process.env.FIXTURE_NEXT_ID||'${next}';
 cp.execFileSync=(program,args)=>{
@@ -153,6 +155,43 @@ test('required private/schema and shared Admin staged evidence fail closed befor
  for(const path of ['security/orders.mjs','catalogue/index.mjs','src/App.jsx']){
   const f=await fixture(t);const plan=await f.run(['plan'],{CHANGED_PATH:path});assert.equal(plan.status,1);assert.equal(plan.record.state,'blocked');
   const upload=await f.run(['publish','pages']);assert.equal(upload.status,1);assert.equal(upload.uploads,'');assert.ok(!upload.requests.includes('/workers/'));
+ }
+});
+async function financeSourceFixture(t){
+ const f=await fixture(t),repo=join(f.dir,'finance-git');await mkdir(repo);
+ const git=(...args)=>execFileSync('git',args,{cwd:repo,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+ git('init','-q');git('config','user.name','Release fixture');git('config','user.email','release-fixture@example.invalid');git('config','commit.gpgsign','false');git('config','core.hooksPath','/dev/null');
+ const inputs={'security/index.mjs':"import '../shared/finance-costs.mjs';import '../shared/finance-report.mjs';",'catalogue/index.mjs':'export default {};','admin/main.jsx':'export default {};'};
+ for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs'])inputs[path]=await readFile(join(root,path),'utf8');
+ for(const [path,text]of Object.entries(inputs)){await mkdir(join(repo,path,'..'),{recursive:true});await writeFile(join(repo,path),text);}
+ git('add','.');git('commit','-qm','Synthetic finance source baseline');const base=git('rev-parse','HEAD');
+ // Keep the reported path tooling-only to exercise the independent source hash
+ // guard against an incomplete path report, without extending release authority.
+ f.extraEnv={PRESENTATION_GIT:repo,PRESENTATION_BASE:base,PRESENTATION_SOURCE:base,CHANGED_PATH:'docs/release-process.md'};
+ return {...f,async change(path){await writeFile(join(repo,path),inputs[path]+'\n// shared-only source change\n');git('add',path);git('commit','-qm','Change one shared finance input');f.extraEnv.PRESENTATION_SOURCE=git('rev-parse','HEAD');assert.equal(git('diff','--name-only',base,f.extraEnv.PRESENTATION_SOURCE),path);}};
+}
+for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs']){
+ test(`${path} alone changes paired source fingerprints and its actual private import closure`,async t=>{
+  const f=await financeSourceFixture(t),before=await f.run(['fingerprints',sha]);assert.equal(before.status,0,before.stderr);
+  await f.change(path);const after=await f.run(['fingerprints',sha]);assert.equal(after.status,0,after.stderr);
+  const prior=JSON.parse(before.stdout),current=JSON.parse(after.stdout);
+  for(const component of ['pages','admin','security'])assert.notEqual(current[component],prior[component],component+' must include '+path);
+  assert.equal(current.catalogue,prior.catalogue,'Catalogue does not import the finance modules');
+ });
+ test(`${path} alone changes the source inventory and cannot pass tooling-only compatibility`,async t=>{
+  const f=await financeSourceFixture(t),before=await f.run(['plan']);assert.ok(before.record.build,before.record.reasons.join('\n'));
+  f.evidence.activationCompatibility.sourceInputDigest=before.record.build.sourceInputDigest;
+  const baseline=await f.run(['plan']);assert.equal(baseline.status,0,baseline.record.reasons.join('\n'));
+  await f.change(path);const after=await f.run(['plan']);assert.ok(after.record.build,after.record.reasons.join('\n'));
+  assert.notEqual(after.record.build.sourceInputDigest,before.record.build.sourceInputDigest);
+  f.evidence.activationCompatibility.sourceInputDigest=after.record.build.sourceInputDigest;
+  const blocked=await f.run(['plan']);assert.equal(blocked.status,1);assert.match(blocked.record.reasons.join('\n'),/PLAN_ACTIVATION_COMPATIBILITY_FAILED/);assert.equal(blocked.uploads,'');
+ });
+}
+test('finance paths remain rejected by the closed archive publication policy after classification',async t=>{
+ const f=await fixture(t);
+ for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs','security/finance.mjs','migrations/security/0013_admin_finance.sql']){
+  const result=await f.run(['plan'],{CHANGED_PATH:path});assert.equal(result.status,1);assert.equal(result.record.state,'blocked');assert.equal(result.record.planComplete,false);assert.match(result.record.reasons.join('\n'),/PLAN_ARCHIVE_FAILED/);assert.equal(result.uploads,'');
  }
 });
 test('missing baseline or source drift never uploads and stores only sanitized stage errors',async t=>{
@@ -853,7 +892,7 @@ async function recoveryFixture(t){
  const failedResult=await f.local({FAIL_GUARD_INVOCATION:'true'});assert.equal(failedResult.status,1);assert.deepEqual(failedResult.record.reasons,['FINAL_GUARD_FAILED: One or more local component protections failed.']);
  const failed=await readFile(f.path),admin=Buffer.from(JSON.stringify(f.finalEvidence.receipts.admin)),zip=Buffer.from('synthetic original immutable ZIP');
  for(const [name,bytes]of [['original.json',original],['failed.json',failed],['admin.json',admin],['original.zip',zip]])await writeFile(join(f.dir,name),bytes);
- const policy={sourceSha:sha,original:{bytes:original.length,sha256:hash(original),canonicalSha256:hash(canonical(originalRecord))},failed:{bytes:failed.length,sha256:hash(failed),canonicalSha256:hash(canonical(failedResult.record))},admin:{bytes:admin.length,sha256:hash(admin),canonicalSha256:hash(canonical(f.finalEvidence.receipts.admin))},zipSha256:hash(zip),artifactCanonicalSha256:hash(canonical({...f.finalEvidence.githubArtifact,zipSha256:hash(zip)})),stampVersion:2,leasePath:join(f.dir,'synthetic-recovery.lease'),nodeRuntime:process.version,nodeSha256:hash(await readFile(process.execPath)),compilerRoot:'coordinator/node_modules',installedInputs:await (await import(pathToFileURL(f.cli))).installedInputDigest(join(f.dir,'coordinator/node_modules')),docChanges:[]};
+ const policy={sourceSha:sha,original:{bytes:original.length,sha256:hash(original),canonicalSha256:hash(canonical(originalRecord))},failed:{bytes:failed.length,sha256:hash(failed),canonicalSha256:hash(canonical(failedResult.record))},admin:{bytes:admin.length,sha256:hash(admin),canonicalSha256:hash(canonical(f.finalEvidence.receipts.admin))},zipSha256:hash(zip),artifactCanonicalSha256:hash(canonical({...f.finalEvidence.githubArtifact,zipSha256:hash(zip)})),stampVersion:2,leasePath:join(f.dir,'synthetic-recovery.lease'),nodeRuntime:fixtureRuntime,nodeSha256:hash(await readFile(process.execPath)),compilerRoot:'coordinator/node_modules',installedInputs:await (await import(pathToFileURL(f.cli))).installedInputDigest(join(f.dir,'coordinator/node_modules')),docChanges:[]};
  let text=await readFile(f.cli,'utf8');const start='const PAIRED_RECOVERY_POLICY=Object.freeze(',end='\n});';assert.equal(text.split(start).length,2);const a=text.indexOf(start)+start.length,b=text.indexOf(end,a)+2;assert.ok(b>a);text=text.slice(0,a)+JSON.stringify(policy,null,2)+text.slice(b);await writeFile(f.cli,text);
  const artifact={...f.finalEvidence.githubArtifact,zipSha256:hash(zip)},input={version:1,originalPath:join(f.dir,'original.json'),failedPath:join(f.dir,'failed.json'),adminReceiptPath:join(f.dir,'admin.json'),zipPath:join(f.dir,'original.zip'),artifact,evidence:f.finalEvidence,supportStartedAt:new Date().toISOString(),verifier:{reviewed:true,revision:sha,tree:'d9ebd59f26e2fea7ef82e5e2831cb66851a5ae1a',changes:[]}};
  const out=join(f.dir,'new-recovery.json');await writeFile(join(f.dir,'recovery-input.json'),JSON.stringify(input));

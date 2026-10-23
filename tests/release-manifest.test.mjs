@@ -7,8 +7,18 @@ const receipt={account:'4f57d4e924674cb87b33d4c884745cf6',component:'security',i
 test('shared storefront and authentication require paired clients',()=>{for(const path of ['src/App.jsx','public/image.png','server/auth.mjs'])assert.deepEqual(classifyChanges([path]).components,['pages','admin']);});
 test('proof isolation and admin changes do not invent private releases',()=>{assert.deepEqual(classifyChanges(['server/proof-api.mjs']).components,['pages']);assert.deepEqual(classifyChanges(['admin/main.jsx']).components,['pages','admin']);});
 test('private transitive import changes require service and its clients',()=>{assert.deepEqual(classifyChanges(['server/helper.mjs'],{security:['server/helper.mjs']}).components,['pages','admin','security']);});
+for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs'])test(`${path} requires paired clients and only its dependent private services`,()=>{
+ assert.deepEqual(classifyChanges([path]),{components:['pages','admin'],schemas:[]});
+ assert.deepEqual(classifyChanges([path],{security:[path]}).components,['pages','admin','security']);
+ assert.deepEqual(classifyChanges([path],{catalogue:[path]}).components,['pages','admin','catalogue']);
+ assert.deepEqual(classifyChanges([path],{security:[path],catalogue:[path]}).components,['pages','admin','security','catalogue']);
+ assert.deepEqual(classifyChanges([path],{security:['shared/unrelated.mjs'],catalogue:['shared/unrelated.mjs']}).components,['pages','admin']);
+});
 test('migration requires schema prerequisite and compatible private service',()=>{const p=classifyChanges(['migrations/security/0010_mail.sql']);assert.deepEqual(p.components,['pages','admin','security']);assert.deepEqual(p.schemas,['security']);});
 test('unknown runtime file blocks rather than silently narrowing scope',()=>assert.throws(()=>classifyChanges(['new-backend/worker.mjs']),/Unclassified/));
+test('unknown shared runtime paths fail closed even when a private service imports them',()=>{
+ for(const path of ['shared/unknown.mjs','shared/finance-costs-extra.mjs','shared/nested/finance-report.mjs'])assert.throws(()=>classifyChanges([path],{security:[path],catalogue:[path]}),/Unclassified release path/);
+});
 test('docs retain existing Pages publication without private service requirements',()=>assert.deepEqual(classifyChanges(['docs/note.md','tests/new.test.mjs']).components,['pages']));
 test('manual revision must be exact reviewed event, checkout and latest main',()=>{assert.equal(validateRevision({reviewed:sha,event:sha,checkout:sha,latest:sha}),sha);for(const field of ['reviewed','event','checkout','latest'])assert.throws(()=>validateRevision({reviewed:sha,event:sha,checkout:sha,latest:sha,[field]:old}),/revision|SHA/);assert.throws(()=>validateRevision({reviewed:'main',event:sha,checkout:sha,latest:sha}),/SHA/);});
 test('receipt needs exact observed version, account, source fingerprint and evidence',()=>{assert.equal(validateReceipt(receipt,{component:'security',id,sourceDigest:digest}).sourceSha,sha);for(const patch of [{account:'wrong'},{id:'wrong'},{sourceDigest:'d'.repeat(64)},{origin:'version-tag'},{evidenceUrl:''},{sourceSha:'main'}])assert.throws(()=>validateReceipt({...receipt,...patch},{component:'security',id,sourceDigest:digest}));});
@@ -195,6 +205,14 @@ test('activation compatibility compares actual source inputs and full client ass
  assert.equal(validateActivationCompatibility(evidence,f).historicalFunctionsDigest,null);
  for(const mutate of [v=>v.paths=['src/App.jsx'],v=>v.baselineSourceInputDigest='e'.repeat(64),v=>v.pagesBuildDigest='e'.repeat(64)]){const v=structuredClone(f);mutate(v);assert.throws(()=>validateActivationCompatibility(evidence,v));}
  for(const patch of [{baselineSha:sha},{historicalFunctionsDigest:digest},{basis:'byte-identical'}, {observedAt:'2026-10-19T00:00:00.000Z'}])assert.throws(()=>validateActivationCompatibility({...evidence,...patch},f));
+});
+test('finance source recognition does not authorize runtime or schema activation',async()=>{
+ const {validateActivationCompatibility}=await import('../scripts/release-manifest.mjs');
+ const expected={sourceSha:sha,baseSha:old,beforePagesSourceSha:old,sourceInputDigest:digest,baselineSourceInputDigest:digest,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,now};
+ const evidence={basis:'source-input-tooling-only-v1',reviewedAgainstSha:sha,baselineSha:old,observedAt:fresh,sourceInputDigest:digest,compilerConfigDigest:digest,configDigest:digest,pagesBuildDigest:digest,adminAssetsDigest:digest,historicalFunctionsDigest:null};
+ for(const path of ['shared/finance-costs.mjs','shared/finance-report.mjs','security/finance.mjs','migrations/security/0013_admin_finance.sql']){
+  assert.throws(()=>validateActivationCompatibility(evidence,{...expected,paths:[path]}),/Activation changes application\/runtime\/build inputs/);
+ }
 });
 test('workflow activation is manual only and immutable archive cannot recurse through push',async()=>{
  const workflow=await (await import('node:fs/promises')).readFile(new URL('../.github/workflows/publish.yml',import.meta.url),'utf8');assert.doesNotMatch(workflow,/^  push:/m);assert.match(workflow,/workflow_dispatch:/);
