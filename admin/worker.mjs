@@ -1,3 +1,4 @@
+import {stockAPI} from './stock-api.mjs';
 import {financeAPI} from './finance-api.mjs';
 import manifest from '../dist/admin/.vite/manifest.json' with {type:'json'};
 import {routeStyleCatalogue,composeRouteStyles} from '../shared/route-styles.mjs';
@@ -11,7 +12,14 @@ import {readContent,saveContent,publicContent} from '../server/content.mjs';
 import fallback from '../data/site-content.json' with {type:'json'};
 export default {async fetch(request,env){let phase='admin_request';try{const url=new URL(request.url);if(url.protocol!=='https:')return secure(Response.redirect('https://'+url.host+url.pathname+url.search,308),{admin:true});// Only public brand files are available before sign-in, never application assets or data.
  if(['/favicon.png','/icon-180.png','/admin-brand/puzzle-logo-v2.png','/admin-brand/fonts.css','/admin-brand/fredoka.woff2','/admin-brand/dm-sans.woff2'].includes(url.pathname))return secure(['GET','HEAD'].includes(request.method)?await env.ASSETS.fetch(request):new Response('Method not allowed',{status:405}),{admin:true});
- const auth=await gate(request,env,'admin');if(auth.response)return secure(auth.response,{admin:true});const reply=r=>{const response=secure(r,{admin:true});
+ const auth=await gate(request,env,'admin');if(auth.response){
+  // Keep the gate's decision and session headers, with stock's documented error envelope.
+  if((url.pathname==='/api/stock'||url.pathname.startsWith('/api/stock/'))&&[401,403,503].includes(auth.response.status)){
+   const status=auth.response.status,headers=new Headers(auth.response.headers);headers.set('Content-Type','application/json');
+   return secure(new Response(JSON.stringify({error:status===401?'Sign in to continue.':status===403?'Forbidden.':'Stock is temporarily unavailable.',code:status===401?'UNAUTHORIZED':status===403?'FORBIDDEN':'UNAVAILABLE'}),{status,headers}),{admin:true});
+  }
+  return secure(auth.response,{admin:true});
+ }const reply=r=>{const response=secure(r,{admin:true});
  // Only authenticated preview documents may be framed, and only by this same admin origin.
  if(['/themes','/themes.html'].includes(url.pathname))response.headers.set('Content-Security-Policy',response.headers.get('Content-Security-Policy').replace('frame-src https://www.openstreetmap.org',"frame-src 'self' https://www.openstreetmap.org"));
  if(['/preview','/preview.html'].includes(url.pathname)){response.headers.set('X-Frame-Options','SAMEORIGIN');response.headers.set('Content-Security-Policy',response.headers.get('Content-Security-Policy').replace("frame-ancestors 'none'","frame-ancestors 'self'").replace("form-action 'self'","form-action 'none'"));}
@@ -20,6 +28,7 @@ export default {async fetch(request,env){let phase='admin_request';try{const url
  if(url.pathname==='/preview-content.json'&&request.method==='GET')return reply(Response.json(publicContent(await readContent(env.CONTENT_DB,fallback))));
  if(url.pathname==='/api/forms'&&request.method==='GET')return reply(Response.json({available:false,preview:true}));
 
+ if(url.pathname==='/api/stock'||url.pathname.startsWith('/api/stock/'))return reply(await stockAPI(request,env,auth.session));
  if(url.pathname==='/api/finance'||url.pathname.startsWith('/api/finance/'))return reply(await financeAPI(request,env,auth.session));
  if(url.pathname==='/api/orders'||url.pathname.startsWith('/api/orders/'))return reply(await ordersAPI(request,env,auth.session));
  const artwork=url.pathname.match(/^\/api\/artwork\/([a-f0-9-]{36})(?:\/(\d{1,2}))?$/);

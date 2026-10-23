@@ -1,23 +1,13 @@
-import ProofConfirmation from './ProofConfirmation';
-import {proofConfirmation} from './proof-confirmation.mjs';
-import {adminFetch} from './session-recovery.mjs';
-import {proofRows,reusableProofFiles} from '../src/proof-manifest.mjs';
-import {createProofUpload,submitProofUpload} from './proof-upload.mjs';
-import React,{useState,useRef,useEffect} from 'react';import {api} from './api.mjs';import {printJpeg} from '../src/designs/jpeg.mjs';
+import React from 'react';
+
 const labels={awaiting_design:'Submitted artwork',prepared:'Prepared artwork',awaiting_approval:'Prepared artwork',changes_requested:'Historical change request',approved:'Prepared artwork'};
-const hash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
-export default function OrderProof({order,onChange}){
- const [draft,setDraft]=useState({}),[busy,setBusy]=useState(false),[error,setError]=useState('');const root='/api/orders/'+order.id+'/proof/';
- const [confirmation,setConfirmation]=useState(null);
- useEffect(()=>{const warn=e=>{if(Object.keys(draft).length||uploadSession.current){e.preventDefault();e.returnValue=''}};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn)},[draft]);
- const rows=proofRows(order.snapshot),reusable=reusableProofFiles(order),uploadSession=useRef(null);
- async function choose(row,file){if(!file)return;setError('');try{if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>20*1024*1024)throw Error('Choose a square JPG, PNG or WebP under 20 MB.');const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();if(img.width!==img.height)throw Error('Final artwork must be square. Export it without cropping.');const c=document.createElement('canvas');c.width=1200;c.height=1200;const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,1200,1200);ctx.drawImage(img,0,0,1200,1200);const data=printJpeg(c.toDataURL('image/jpeg',.94).split(',')[1]),bytes=Uint8Array.from(atob(data),c=>c.charCodeAt(0));if(bytes.length>4*1024*1024)throw Error('Artwork exceeds 4 MB.');setDraft(d=>({...d,[row.key]:{bytes,url:'data:image/jpeg;base64,'+data,size:bytes.length}}));}finally{URL.revokeObjectURL(url)}}catch(e){setError(e.message)}}
- async function run(action){setBusy(true);setError('');try{await action();await onChange();setDraft({});uploadSession.current=null;}catch(e){setError(e.message)}finally{setBusy(false)}}
- async function publish(){
-  if(!uploadSession.current)uploadSession.current=await createProofUpload({rows,draft,reusable,version:order.version,hash});
-  await submitProofUpload(uploadSession.current,{prepare:b=>api(root+'prepare',b),publish:b=>api(root+'publish',b),upload:async(b,i,bytes)=>{
-   const {csrf}=await api('/api/session');const r=await adminFetch(root+'upload',{method:'POST',headers:{'Content-Type':'image/jpeg','X-CSRF-Token':csrf,'X-Artwork-Id':b.requestId,'X-Artwork-Owner':b.owner,'X-Artwork-Index':String(i)},body:bytes});if(!r.ok)throw Error((await r.json()).error||'Upload failed.');
-  }});
- }
- return <section className="cv-proof"><h2>Artwork preparation</h2><strong>{labels[order.proof?.status]||'Submitted artwork'}{order.proof?.revision?` · Revision ${order.proof.revision}`:''}</strong><p>Check crop and source quality before production. Publishing or uploading does not send email.</p>{order.proof?.events?.filter(e=>e.kind==='changes').map((e,i)=><p key={i}><strong>Revision {e.revision} changes:</strong> {e.message}</p>)}{order.snapshot.items.filter(i=>i.brief).map(i=><p key={i.id}><strong>{i.name} brief:</strong> {i.brief}</p>)}{error&&<p className="cv-error" role="alert">{error}</p>}{!order.proof?.revision&&!order.snapshot.items.some(i=>i.designMode==='assisted'||!i.files.length)&&<button className="cv-btn" disabled={busy} onClick={()=>setConfirmation('seed')}>Prepare revision from submitted artwork</button>}<details><summary>Prepare {order.proof?.revision?'a replacement revision':'the final design set'}</summary><p>Choose artwork for missing or changed faces. Unchanged faces are reused in the complete revision. Keep this page open if an upload needs retrying. Publishing replaces the current artwork revision without changing the saved order stage. Files expire with the original order.</p>{rows.map(row=><label style={{display:'block',margin:'20px 0'}} key={row.key}>{row.item.name}: {row.proof?'puzzle layout':`${row.name} · ${row.copies} ${row.copies===1?'copy':'copies'}`}<input disabled={busy||!!uploadSession.current} type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{choose(row,e.target.files[0]);e.target.value=''}}/>{!draft[row.key]&&reusable[rows.indexOf(row)]&&<small>Current artwork will be reused.</small>}{draft[row.key]&&<img style={{width:120,display:'block'}} src={draft[row.key].url} alt="Prepared final artwork"/>}</label>)}<button className="cv-btn" disabled={busy||rows.some((r,i)=>!draft[r.key]&&!reusable[i])} onClick={()=>setConfirmation('publish')}>{busy?'Preparing…':uploadSession.current?'Retry this revision':'Publish artwork revision'}</button></details>{order.proof?.revision>0&&<button className="cv-btn secondary" disabled={busy} onClick={()=>setConfirmation('revoke')}>Revoke historical review links</button>}{confirmation&&<ProofConfirmation confirmation={proofConfirmation(confirmation,order)} onCancel={()=>setConfirmation(null)} onConfirm={()=>{const action=confirmation;setConfirmation(null);run(action==='publish'?publish:()=>api(root+action,{version:order.version}))}}/>}</section>;
+
+export default function OrderProof({order}){
+ return <section className="cv-proof">
+  <h2>Artwork information</h2>
+  <strong>{labels[order.proof?.status]||'Submitted artwork'}{order.proof?.revision?` · Revision ${order.proof.revision}`:''}</strong>
+  <p>Check crop and source quality before production.</p>
+  {order.proof?.events?.filter(e=>e.kind==='changes').map((e,i)=><p key={i}><strong>Revision {e.revision} changes:</strong> {e.message}</p>)}
+  {order.snapshot.items.filter(i=>i.brief).map(i=><p key={i.id}><strong>{i.name} brief:</strong> {i.brief}</p>)}
+ </section>;
 }
