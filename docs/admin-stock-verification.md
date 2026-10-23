@@ -6,7 +6,11 @@
 
 The approved specification is `docs/superpowers/specs/2026-10-23-admin-stock-design.md`; implementation plan is `docs/superpowers/plans/2026-10-23-admin-stock.md`. The owner-facing operation guide is `docs/admin-stock-runbook.md`.
 
-Local evidence is being collected under `.superpowers/sdd/2026-10-23-admin-stock/`. Backend, Admin controls and independent review are separate gates. Focused reports do not establish a passed final integrated suite or live acceptance.
+Local evidence is retained under `.superpowers/sdd/2026-10-23-admin-stock/`. Backend and UI task reviews, scoped fix reviews and the combined stock/artwork review passed. Review corrected D1 parameter growth at 100 materials and refreshed quantity suggestions after the first saved order costs. Focused reports do not establish live acceptance.
+
+At application candidate `dc9a63b4cfb36a6a65ba1d506dc4f155680da41c`, public, SSR/prerender and Admin builds plus shipped dependency-notice checks passed on Node 22.23.3. The integrated Node run passed 961 of 962 checks. Its sole failure was the existing permission-isolated fallback CLI fixture resolving dependencies through an ignored shared symlink outside its allowed directory. Replacing that symlink with an identical local APFS dependency clone, without an install, version or source change, passed all 14 fallback checks. Seven Python helper checks passed. The initial failure is retained in the evidence, not relabelled as a clean full run. Exact-head hosted validation remains required before merge.
+
+Focused stock evidence: 23 backend checks and 22 UI/client checks passed. The D1-sensitive cases exercise 100-material use, reverse and reconfirmation with at most 17 bound values per query, stale versions, shortage and transaction rollback. A real loopback lost-response case confirms one deduction after a committed response is lost. Synthetic browser checks at 1280 px and 390 px cover purchases, mismatched quantities, reversal and reconciliation with visible keyboard focus and no horizontal overflow. These are local results, not live provider or owner stock-transaction acceptance.
 
 Required cases include initial stocktake, receipts and prospective prices, whole sheets, cost/stock unit mismatch, per-order overrides, all-or-nothing shortages, concurrent versions, lost success response, exact once-only reversal, later-stocktake reversal blocking, temporary order-link expiry, stable bounded CSV and keyboard/phone layout. Fixtures use synthetic data without production writes or email.
 
