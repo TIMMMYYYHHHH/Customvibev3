@@ -93,3 +93,33 @@ test('order suggestions use only included tracked saved costs; no costs means no
 test('courier saved cost lines never become physical stock suggestions after a finance category edit',()=>fixture(async e=>{
  const entries=await setup(e),id=order(e,entries);e.sql.prepare('UPDATE order_costs SET payload=? WHERE order_id=?').run(JSON.stringify({lines:[{...entries[0],category:'courier',excluded:false}]}),id);assert.equal((await ok(e,'order-read',{id})).lines.length,0);
 }));
+// D1 admits at most 100 bound parameters in each individual prepared statement.
+// The SQLite engine supports more, so enforce the hosted admission limit explicitly.
+function enforceD1ParameterLimit(e){
+ const prepare=e.DB.prepare,bindings=[];
+ const wrap=(statement,sql)=>({...statement,bind(...values){bindings.push({sql,count:values.length});if(values.length>100)throw Error('D1 maximum bound parameters per query is 100');return wrap(statement.bind(...values),sql)}});
+ e.DB.prepare=(sql,...args)=>wrap(prepare(sql,...args),sql);return bindings;
+}
+const reverseBody=view=>({operationId:crypto.randomUUID(),orderVersion:view.orderVersion,usageVersion:view.usageVersion,lines:view.usage.lines.map(({itemId,version,stocktakeGeneration})=>({itemId,version,stocktakeGeneration})),reason:'Correct exact original use'});
+test('100-material use, reversal and reconfirmation fit every D1 parameter admission limit',t=>fixture(async e=>{
+ const bindings=enforceD1ParameterLimit(e),entries=await setup(e,100),id=order(e,entries);
+ await ok(e,'order-use',{id,...useBody(await ok(e,'order-read',{id}))});assert.ok(state(e).items.every(i=>i.balance_milli===8000));
+ await ok(e,'order-reverse',{id,...reverseBody(await ok(e,'order-read',{id}))});assert.ok(state(e).items.every(i=>i.balance_milli===10000));
+ await ok(e,'order-use',{id,...useBody(await ok(e,'order-read',{id}))});assert.ok(state(e).items.every(i=>i.balance_milli===8000));
+ const headers=bindings.filter(b=>b.sql.startsWith('INSERT INTO stock_movements'));assert.equal(headers.length,203);assert.ok(bindings.every(b=>b.count<=100));
+ assert.equal(state(e).journal.length,203);assert.equal(state(e).links[0].version,3);assert.equal(state(e).links[0].status,'active');t.diagnostic('Maximum observed bound parameters per individual query: '+Math.max(...bindings.map(b=>b.count)));
+}));
+test('100-material shortages, execution-time stale guards and mid-batch failures keep every balance, link and journal atomic under D1 admission',()=>fixture(async e=>{
+ const bindings=enforceD1ParameterLimit(e),entries=await setup(e,100),id=order(e,entries),body=useBody(await ok(e,'order-read',{id}));
+ const before=state(e),short={...body,lines:body.lines.map((l,n)=>({...l,quantityMilli:n===99?11000:l.quantityMilli}))};const shortage=await call(e,'order-use',{id,...short});assert.equal((await shortage.json()).code,'SHORTAGE');assert.deepEqual(state(e),before);
+ const batch=e.DB.batch.bind(e.DB);let raceState;
+ e.DB.batch=ss=>batch(ss.map((s,n)=>n?s:{async all(){e.sql.prepare('UPDATE stock_items SET version=version+1 WHERE id=?').run(entries[99].id);raceState=state(e);return s.all()}}));
+ assert.equal((await call(e,'order-use',{id,...body})).status,409);assert.deepEqual(state(e),raceState);e.DB.batch=batch;
+ const retry=useBody(await ok(e,'order-read',{id})),beforeFailure=state(e);e.sql.exec(`CREATE TRIGGER fail_last_stock BEFORE UPDATE ON stock_items WHEN new.id='${entries[99].id}' BEGIN SELECT RAISE(ABORT,'last stock update failed'); END`);
+ assert.equal((await call(e,'order-use',{id,...retry})).status,503);assert.deepEqual(state(e),beforeFailure);e.sql.exec('DROP TRIGGER fail_last_stock');
+ await ok(e,'order-use',{id,...retry});const reversal=reverseBody(await ok(e,'order-read',{id}));
+ e.DB.batch=ss=>batch(ss.map((s,n)=>n?s:{async all(){e.sql.prepare('UPDATE stock_items SET version=version+1 WHERE id=?').run(entries[50].id);raceState=state(e);return s.all()}}));assert.equal((await call(e,'order-reverse',{id,...reversal})).status,409);assert.deepEqual(state(e),raceState);e.DB.batch=batch;
+ await ok(e,'order-reverse',{id,...reverseBody(await ok(e,'order-read',{id}))});const correction=useBody(await ok(e,'order-read',{id}));
+ e.DB.batch=ss=>batch(ss.map((s,n)=>n?s:{async all(){e.sql.prepare('UPDATE stock_items SET version=version+1 WHERE id=?').run(entries[25].id);raceState=state(e);return s.all()}}));assert.equal((await call(e,'order-use',{id,...correction})).status,409);assert.deepEqual(state(e),raceState);
+ assert.ok(bindings.every(b=>b.count<=100));
+}));

@@ -62,9 +62,9 @@ export async function stockService(request,env){
  const link=order?await db.prepare('SELECT * FROM order_stock_use WHERE order_id=?').bind(b.id).first():null;
  if(order)await orderRecord(db,b.id);
  if(path==='order-read')return Response.json({orderId:b.id,orderVersion:order.version,costVersion:cost?.version??0,usageVersion:link?.version??0,usage:usageView(link,items),lines:preview(cost,items)});
- const conditions=[],params=[],add=(condition,...args)=>{conditions.push(condition);params.push(...args)},updates=[],time=now();let affected=[],kind,reason='',price=null,reverses=null,usage=null;
+ const conditions=[],params=[],versionGuards=[],add=(condition,...args)=>{conditions.push(condition);params.push(...args)},updates=[],time=now();let affected=[],kind,reason='',price=null,reverses=null,usage=null;
  const gate='EXISTS(SELECT 1 FROM stock_movements WHERE operation_id=? AND result IS NULL)',gateArgs=[b.operationId];
- const versionGuard=item=>add('EXISTS(SELECT 1 FROM stock_items WHERE id=? AND version=? AND stocktake_generation=?)',item.id,item.version,item.stocktakeGeneration);
+ const versionGuard=item=>versionGuards.push({id:item.id,version:item.version,stocktakeGeneration:item.stocktakeGeneration});
  const checkVersion=(id,version)=>{if(!uuid(id)||!integer(version)||version===MAX)invalid('Invalid material or version.');const item=byId.get(id);if(!item)throw new StockError(404,'NOT_FOUND','Stock material not found.');if(item.version!==version)conflict();versionGuard(item);return item};
  const updateItem=item=>updates.push(db.prepare('UPDATE stock_items SET name=?,unit=?,whole_units=?,balance_milli=?,initialized=?,low_milli=?,version=?,stocktake_generation=? WHERE id=? AND '+gate).bind(item.name,item.unit,Number(item.wholeUnits),item.balanceMilli,Number(item.initialized),item.lowMilli,item.version,item.stocktakeGeneration,item.id,...gateArgs));
  if(path==='items'){
@@ -112,6 +112,12 @@ export async function stockService(request,env){
  const lines=affected.map(item=>({itemId:item.id,name:item.name,unit:item.unit,deltaMilli:item.balanceMilli-(byId.get(item.id)?.balanceMilli??0),balanceMilli:item.balanceMilli,stocktakeGeneration:item.stocktakeGeneration}));
  // Only this conditional insert authorizes the entire batch. Its guards execute after D1 queuing.
  // Every mutation depends on the pending header, finalized before commit. A completed retry cannot re-enter.
+ // One bounded JSON parameter checks every affected material at execution time.
+ // Per-material placeholders would exceed D1's 100-parameter limit at the approved 100 materials.
+ if(versionGuards.length)add(`NOT EXISTS(SELECT 1 FROM json_each(?) expected WHERE NOT EXISTS(
+  SELECT 1 FROM stock_items i WHERE i.id=json_extract(expected.value,'$.id')
+  AND i.version=json_extract(expected.value,'$.version')
+  AND i.stocktake_generation=json_extract(expected.value,'$.stocktakeGeneration')))`,JSON.stringify(versionGuards));
  const header=db.prepare('INSERT INTO stock_movements(operation_id,request_digest,kind,created,reason,lines,price,reverses,result) SELECT ?,?,?,?,?,?,?,?,NULL WHERE '+(conditions.join(' AND ')||'1')+' ON CONFLICT(operation_id) DO NOTHING RETURNING seq').bind(b.operationId,requestDigest,kind,time,reason,JSON.stringify(lines),price===null?null:JSON.stringify(price),reverses,...params);
  const result={operationId:b.operationId,revision:0,items:affected,usage};
  await db.batch([header,...updates,db.prepare("UPDATE stock_movements SET result=json_set(?,'$.revision',seq) WHERE operation_id=? AND result IS NULL").bind(JSON.stringify(result),b.operationId)]);
