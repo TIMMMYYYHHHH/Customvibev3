@@ -17,6 +17,9 @@ function fixture(t,failAt){
  t.mock.method(console,'error',(...args)=>events.push(args));
  const error=new Error('D1_ERROR: private-sql private-customer@example.invalid private-token');
  error.cause={headers:{authorization:'private-header'},body:{nested:'private-body'},url:'https://private.invalid/?id=private-id'};
+ error.code='private-code';error.context={customer:'private-customer',token:'private-context-token'};
+ Object.defineProperty(error,'details',{value:'private-hidden-details'});
+ error[Symbol('private-property')]='private-symbol-value';
  env.sql.prepare('INSERT INTO map_usage(id,amount,expires) VALUES(?,?,?)').run('fixture-map',1,1);
  env.sql.prepare('INSERT INTO orders(id,fingerprint,snapshot,created,expires) VALUES(?,?,?,?,?)').run('fixture-order','a'.repeat(64),'{}',1,1);
  env.sql.prepare('INSERT INTO artwork_requests(id,owner,manifest,bytes,created,expires,finalized,reservation) VALUES(?,?,?,?,?,?,?,?)').run('fixture-artwork','b'.repeat(64),'[{}]',4,1,1,1,'fixture');
@@ -54,13 +57,25 @@ function fixture(t,failAt){
  return {env,error,events,operations,count,assertOffline(){assert.equal(networkCalls,0);assert.equal(senderCalls,0)}};
 }
 
-// Missing reporting, swallowed/replaced exceptions, retries or stage reordering must fail these actual-handler cases.
+function assertPrivateRejection(error,original){
+ assert.ok(error instanceof Error);
+ assert.notEqual(error,original);
+ assert.equal(error.name,'Error');
+ assert.equal(error.message,'Scheduled cleanup failed');
+ assert.deepEqual(Reflect.ownKeys(error).sort(),['message','stack']);
+ for(const key of Reflect.ownKeys(original))if(key!=='message'&&key!=='stack')assert.equal(Object.hasOwn(error,key),false);
+ for(const key of Reflect.ownKeys(error))assert.doesNotMatch(JSON.stringify(error[key])??'',/private-/);
+ assert.doesNotMatch(error.stack,/private-/);
+ return true;
+}
+
+// Missing reporting, leaked original exceptions, retries or stage reordering must fail these actual-handler cases.
 for(const [failed,step] of [
  ['orders_proofs','scheduled_orders'],['artwork_select','scheduled_artwork'],
  ['mail_state','scheduled_mail_delivery'],['auth','scheduled_auth']
-])test('hourly '+step+' failure keeps original rejection, stops and reports only its safe category',async t=>{
+])test('hourly '+step+' failure rejects privately, stops and reports only its safe category',async t=>{
  const f=fixture(t,failed);
- await assert.rejects(security.scheduled(hourly,f.env),error=>{assert.equal(error,f.error);return true});
+ await assert.rejects(security.scheduled(hourly,f.env),error=>assertPrivateRejection(error,f.error));
  assert.deepEqual(f.operations,allWork.slice(0,allWork.indexOf(failed)+1));
  assert.equal(f.count('attempts'),1);
  if(failed!=='orders_proofs')assert.equal(f.count('orders'),0);
@@ -70,9 +85,9 @@ for(const [failed,step] of [
  assert.deepEqual(f.events,[[{event:'customvibe_unavailable',step,reason:'database'}]]);
 });
 
-test('mail event cleanup failure preserves partial cleanup and skips auth without retry',async t=>{
+test('mail event cleanup failure rejects privately, preserves partial cleanup and skips auth without retry',async t=>{
  const f=fixture(t,'mail_events');
- await assert.rejects(security.scheduled(hourly,f.env),error=>error===f.error);
+ await assert.rejects(security.scheduled(hourly,f.env),error=>assertPrivateRejection(error,f.error));
  assert.deepEqual(f.operations,allWork.slice(0,-1));
  assert.equal(f.count('mail_delivery_state'),0);assert.equal(f.count('mail_delivery_events'),0);
  assert.equal(f.count('attempts'),1);f.assertOffline();

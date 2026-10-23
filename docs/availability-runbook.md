@@ -44,9 +44,11 @@ Rollback is the catalogue import/catch addition and its tests/documentation toge
 
 ## Hourly cleanup failures
 
-The Security scheduled handler reports one `customvibe_unavailable` record for a failed hourly phase: `scheduled_orders`, `scheduled_artwork`, `scheduled_mail_delivery` or `scheduled_auth`. The existing sanitizer records only the fixed phase and reason category. Added application diagnostics exclude exception text, SQL, identifiers, request data and nested exception details. This does not make a privacy claim about uncaught platform payloads.
+The Security scheduled handler reports one `customvibe_unavailable` record for a failed hourly phase: `scheduled_orders`, `scheduled_artwork`, `scheduled_mail_delivery` or `scheduled_auth`. The existing sanitizer records only the fixed phase and reason category. Added application diagnostics exclude exception text, SQL, identifiers, request data and nested exception details.
 
-The handler rethrows the original exception, stops later phases and adds no retry. Earlier cleanup may already have succeeded. Mail delivery cleanup retains its existing position between artwork and auth cleanup. The five-minute path retains its early return and existing caught `scheduled_maps` reporting; a caught maps failure still allows the same scheduled continuation, including the read-only locker health check described below.
+The handler rejects with a fresh `Error` whose fixed message is `Scheduled cleanup failed`, without the original cause or custom properties. This intentionally changes exception identity and removes the original message and stack from the rejection handed to platform capture while retaining a failed invocation. Platform-enriched context and uncaught platform payloads remain unverified; this boundary does not establish complete platform privacy or monitoring.
+
+The handler stops later phases and adds no retry. Earlier cleanup may already have succeeded. Mail delivery cleanup retains its existing position between artwork and auth cleanup. The five-minute path retains its early return and existing caught `scheduled_maps` reporting; a caught maps failure still allows the same scheduled continuation, including the read-only locker health check described below.
 
 Investigate the reported category against the matching deployed revision and schema, then use the existing release and recovery process. Do not assume a successful bounded invocation cleared the expired backlog. Order snapshot cleanup remains limited to 50 rows and artwork request cleanup to 20 rows per invocation. No success or completion marker is produced. These records do not detect a missed invocation, send an alert, establish recovery or close operational monitoring acceptance.
 
