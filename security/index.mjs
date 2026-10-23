@@ -30,5 +30,5 @@ export default {async fetch(request,env){let phase='security_request';try{if(req
   await cleanOrders(env);phase='scheduled_artwork';await cleanArtwork(env);
   phase='scheduled_mail_delivery';await cleanMailDelivery(env);phase='scheduled_auth';
   const now=Math.floor(Date.now()/1000);await env.DB.batch([env.DB.prepare('DELETE FROM attempts WHERE until<?').bind(now-900),env.DB.prepare('DELETE FROM revoked WHERE exp<?').bind(now),env.DB.prepare('DELETE FROM submissions WHERE expires<?').bind(now)]);
- }catch(error){reportUnavailable(phase,error);throw error}
+ }catch(error){reportUnavailable(phase,error);throw new Error('Scheduled cleanup failed')}
 }};

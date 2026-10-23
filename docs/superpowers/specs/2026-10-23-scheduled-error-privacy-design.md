@@ -1,0 +1,7 @@
+# Scheduled failure privacy boundary
+
+Remove the original hourly cleanup exception from the rejection handed to platform capture. Current code logs a sanitized category then rethrows the sensitive original exception. Preserve the failed scheduled invocation using a fresh Error with fixed message `Scheduled cleanup failed`, without cause or original properties. Keep the existing sanitized category, stage order, partial cleanup, stop-on-failure and no-retry behavior. Successful hourly work and caught five-minute/maps continuation remain unchanged.
+
+This is a narrow privacy prerequisite for monitoring. Retaining the original error preserves unnecessary private context; swallowing it would incorrectly report success. A fresh fixed rejection preserves the useful failure signal. This decision follows the existing production privacy rule and authorized routine launch fixes. No producers, capture/sampling, sender, service, configuration or telemetry expansion is included. Platform-enriched context and native missed-job detection remain unverified. Do not describe this change as complete monitoring or deploy it without the established release checks.
+
+Actual-handler regression cases must include each hourly phase and partial mail cleanup, with sensitive message, nested cause and custom properties. Verify fresh fixed rejection and sanitized event, exact operations and no network/sender. Existing success/maps/five-minute tests must still pass. Document the intentional exception-identity change and remaining platform privacy limits.
