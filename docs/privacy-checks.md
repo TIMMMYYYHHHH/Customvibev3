@@ -1,5 +1,10 @@
 # Cookie and privacy checks
 
+## 24 October audit qualification
+
+The general W3Forms policy statement below is historical provider-policy evidence, not verified effective retention for this account. The 21 October Free dashboard showed a disabled 30-day submission-retention selector; the 23 October public policy described active-account retention, backup roll-off after source deletion and technical logs. Automatic expiry and person-scoped early-deletion controls remain unverified. Preserve the approved Tim-led monthly correspondence review, original 14-day artwork expiry and six-calendar-month reduced order rule. The public wording should attribute the general statement to W3Forms’ published policy and distinguish account-specific settings. See the independent privacy review under audit/fix-plan/final-independent-20261024/ in the project workspace. This annotation changes no provider control or retention setting.
+
+
 Current customer preview rule, 21 October 2026: no separate proof email or post-order artwork approval is required. Historical review records remain private and follow original artwork expiry. See [customer preview policy](customer-preview-policy.md).
 
 17 October 2026. Scope: existing cookies, browser storage, optional map controls and factual service disclosures. Business/legal approval remains in Required business information. No emails, orders, production-record changes or provider settings changes are part of this work.
