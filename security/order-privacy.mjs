@@ -34,7 +34,7 @@ export async function privacyState(env,id,kind='order'){
  return null;
 }
 export const privacyConflict=()=>fail(409,'This order is being erased or has been erased. Read its privacy status before continuing.');
-export const redactedOrder=(row,state)=>({id:row.id,reference:reference(row),version:row.version,privacy:{state:'erasing',operationId:state.operationId}});
+export const redactedOrder=(row,state)=>({id:row.id,reference:row.reference??reference(row),version:row.version,privacy:{state:'erasing',operationId:state.operationId}});
 async function operation(db,id){return db.prepare('SELECT * FROM order_privacy_operations WHERE order_id=?').bind(id).first();}
 async function graph(env,id){
  const db=env.DB;

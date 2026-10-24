@@ -10,13 +10,23 @@ const session={scope:'admin',jti:'a'.repeat(64),csrf:'b'.repeat(64),exp:Math.flo
 let env,mode='normal',detailFails=false,sendRequests=0,providerCalls=0,audit=[];
 const call=(path,body)=>security.fetch(new Request('https://internal/'+path,{method:'POST',body:JSON.stringify(body)}),env);
 async function reset(){env={...artworkEnv(),ADMIN_SESSION_SECRET:'c'.repeat(64)};env.AUTH={fetch:(url,opts)=>security.fetch(new Request(url,opts),env)};const m=await manifest(id),snapshot={referenceVersion:2,contact:{name:'Synthetic Person',email:'synthetic@example.invalid',phone:'0821234567'},locker:{name:'Synthetic locker',area:'Fixture'},items:[{kind:'photo',name:'Synthetic artwork',qty:1,files:[{index:0,...m.files[0]}]}],magnetQty:1,subtotalCents:5000,paymentStatus:'unpaid'};await call('artwork/init',m);await env.ARTWORK.put(id+'/0.jpg',tile,{sha256:m.files[0].sha256});env.sql.prepare('UPDATE artwork_files SET ready=1 WHERE request_id=?').run(id);env.sql.prepare('UPDATE artwork_requests SET finalized=1 WHERE id=?').run(id);const created=await call('orders/create',{id,fingerprint:'f'.repeat(64),snapshot,privateArtwork:true});if(!created.ok)throw Error('Synthetic seed failed');env.sql.prepare('UPDATE orders SET owner_sent=1,receipt_sent=1 WHERE id=?').run(id);mode='normal';detailFails=false;sendRequests=0;providerCalls=0;audit=[];}
+async function otherTabErasure(){
+ const row=env.sql.prepare('SELECT version FROM orders WHERE id=?').get(id),scope=await(await call('privacy/preview-erasure',{id,version:row.version})).json();
+ env.ARTWORK.delete=async()=>{throw Error('Synthetic other-tab R2 failure')};
+ const result=await call('privacy/erase',{id,version:scope.version,expectedDigest:scope.digest,operationId:crypto.randomUUID(),confirmation:scope.reference,acknowledged:true});
+ audit.push({method:'FIXTURE',path:'/privacy/erase (synthetic other tab)',status:result.status});
+ if(result.status!==503)throw Error('Synthetic redaction transition did not become incomplete');
+ // Leave explicit status/resume usable. Nothing resumes until the product UI asks.
+ env.ARTWORK.delete=async keys=>{for(const key of Array.isArray(keys)?keys:[keys])env.objects.delete(key)};
+ mode='normal';
+}
 await reset();
 const vite=await createViteServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
 createServer(async(req,res)=>{try{
  const url=new URL(req.url,'http://127.0.0.1'),path=url.pathname;
  const reply=async r=>{res.writeHead(r.status,{'Content-Type':r.headers.get('content-type')||'application/json','Cache-Control':'no-store'});res.end(Buffer.from(await r.arrayBuffer()));};
  if(path==='/__privacy/state'){await reply(Response.json({mode,detailFails,sendRequests,providerCalls,audit}));return;}
- if(path==='/__privacy/control'&&req.method==='POST'){let chunks=[];for await(const c of req)chunks.push(c);const input=JSON.parse(Buffer.concat(chunks).toString());if(input.mode==='reset')await reset();else{mode=input.mode;detailFails=false;}await reply(Response.json({ok:true,mode}));return;}
+ if(path==='/__privacy/control'&&req.method==='POST'){let chunks=[];for await(const c of req)chunks.push(c);const input=JSON.parse(Buffer.concat(chunks).toString());if(input.mode==='reset')await reset();else if(input.mode==='other-tab-erasure')await otherTabErasure();else{mode=input.mode;detailFails=false;}await reply(Response.json({ok:true,mode}));return;}
  if(path==='/api/session'){await reply(Response.json({csrf:session.csrf}));return;}
  if(path.startsWith('/api/')){
   const action=path.split('/').at(-1),privacy=path.includes('/privacy/');let r;

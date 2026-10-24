@@ -4,3 +4,11 @@ const now=Math.floor(Date.now()/1000);const order={id:'11111111-1111-4111-8111-1
 test('actual order detail exposes privacy controls beside ordinary manual update controls without sending',()=>{const previous=globalThis.fetch;let calls=0;globalThis.fetch=()=>{calls++;throw Error('External request forbidden')};try{const html=render(order);assert.match(html,/>Correct contact details</);assert.match(html,/>Preview early erasure</);assert.match(html,/>Preview update</);assert.match(html,/Payments|unpaid/);assert.equal(calls,0);}finally{globalThis.fetch=previous}});
 test('actual minimal erasing DTO renders a safe resume surface without stale customer or artwork controls',()=>{const html=render({id:order.id,reference:order.reference,version:0,privacy:{state:'erasing',operationId:'22222222-2222-4222-8222-222222222222'}});assert.match(html,/Erasure is incomplete|Erasure in progress/);assert.match(html,/Check erasure status/);assert.match(html,/Review erasure to resume/);assert.doesNotMatch(html,/Download|synthetic@example|Preview update|22222222/);});
 test('archive final read rejects contact change or erasing state before returning prepared bytes',async()=>{for(const fresh of [{...order,contactRevision:1},{id:order.id,reference:order.reference,version:0,privacy:{state:'erasing'}},{...order,version:1}]){let reads=0;await assert.rejects(()=>mod.exports.prepareOrderArchive(async()=>++reads===1?order:fresh,async()=>new Uint8Array([1,2,3])),/changed|privacy/i);}let reads=0;const bytes=await mod.exports.prepareOrderArchive(async()=>{reads++;return order},async()=>new Uint8Array([1,2,3]));assert.deepEqual(bytes,new Uint8Array([1,2,3]));assert.equal(reads,2);});
+test('archive adopts authoritative erasure before rejecting bytes, at either read boundary',async()=>{
+ const minimal={id:order.id,reference:order.reference,version:0,privacy:{state:'erasing',operationId:'22222222-2222-4222-8222-222222222222'}};
+ for(const boundary of [1,2]){
+  let reads=0,builds=0,adopted;
+  await assert.rejects(()=>mod.exports.prepareOrderArchive(async()=>++reads===boundary?minimal:order,async()=>{builds++;return new Uint8Array([1,2,3])},fresh=>{adopted=fresh}),/privacy|changed/i);
+  assert.deepEqual(adopted,minimal);assert.equal(builds,boundary===1?0:1);
+ }
+});

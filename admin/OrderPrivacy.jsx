@@ -13,12 +13,12 @@ export default function OrderPrivacy({order,locked=false,onInvalidate,onFence,on
  const [operationId,setOperationId]=useState(order.privacy?.operationId||null),[outcome,setOutcome]=useState(order.privacy?'erasing':'');
  const correctionButton=useRef(null),erasureButton=useRef(null),working=useRef(false),clock=useRef(0),unreconciledErasure=useRef(null);
  const root='/api/orders/'+order.id,redacted=!!order.privacy||!!operationId;
- useEffect(()=>{clock.current++;setPreview(null);setFinal(false);if(!editing&&!redacted)setDraft({...order.snapshot?.contact});},[order.version,order.contactRevision]);
+ useEffect(()=>{clock.current++;if(!redacted){setPreview(null);setFinal(false);if(!editing)setDraft({...order.snapshot?.contact});}},[order.version,order.contactRevision]);
  // A fresh authoritative DTO may arrive without remounting this controller.
  // This tab's own provisional DTO must await its explicit status read instead.
  useEffect(()=>{
   const privacy=order.privacy;
-  if(privacy?.state!=='erasing'||!privacy.operationId||privacy.operationId===unreconciledErasure.current)return;
+  if(privacy?.state!=='erasing'||!privacy.operationId||privacy.operationId===unreconciledErasure.current||privacy.operationId===operationId&&outcome==='erasing')return;
   clock.current++;setOperationId(privacy.operationId);setOutcome('erasing');setDraft({});setEditing(false);setCorrectionCheck(false);close();setError('');setMessage('');
  },[order.privacy?.state,order.privacy?.operationId]);
  useEffect(()=>{if(!preview)return;const timer=setTimeout(()=>{setPreview(null);setFinal(false);setError('This preview expired. Review a fresh preview before confirming.');},600000);return()=>clearTimeout(timer)},[preview]);
@@ -31,7 +31,12 @@ export default function OrderPrivacy({order,locked=false,onInvalidate,onFence,on
   try{const fresh=await reread();setCorrectionCheck(false);if(!resultError&&!fresh.privacy){setEditing(false);setDraft({...fresh.snapshot.contact});setMessage('Contact correction saved. No email was sent.');}}catch{throw Error('The saved result needs checking. Your draft is preserved. Reload current details before another action.');}
   if(resultError)throw Error(resultError.message+' Current details have been reloaded. Your draft is preserved; review it before another action.');
  }
- async function erasurePreview(){const generation=clock.current,p=await api(root+'/privacy/preview-erasure',{version:order.version});if(generation!==clock.current)throw Error('The order changed. Review a fresh preview.');setPreview(p);setKind('erasure');setConfirmation('');setAcknowledged(false);setFinal(false);}
+ async function erasurePreview(){const generation=clock.current,p=await api(root+'/privacy/preview-erasure',{version:order.version});if(generation!==clock.current)throw Error('The order changed. Review a fresh preview.');
+  if(p.state==='erasing'){
+   if(p.operationId===unreconciledErasure.current)throw Error('Check erasure status before reviewing a resume.');
+   clock.current++;close();setOperationId(p.operationId);setOutcome('erasing');setDraft({});setEditing(false);setCorrectionCheck(false);onInvalidate();onRead({id:p.id,reference:p.reference,version:p.version,privacy:{state:'erasing',operationId:p.operationId}});
+  }
+  setPreview(p);setKind('erasure');setConfirmation('');setAcknowledged(false);setFinal(false);}
  async function erase(){const selected=preview;unreconciledErasure.current=selected.operationId;close();setOperationId(selected.operationId);setOutcome('unknown');setEditing(false);setDraft({});onInvalidate();onFence('erasure',selected.operationId);
   const result=await api(root+'/privacy/erase',{previewToken:selected.previewToken,confirmation:selected.reference,acknowledged:true});
   if(result.ok&&result.state==='complete'){onComplete();return;}throw Error('Erasure is incomplete. Check erasure status before reviewing a resume.');

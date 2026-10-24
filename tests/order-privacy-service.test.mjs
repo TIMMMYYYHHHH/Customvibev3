@@ -142,3 +142,45 @@ test('incomplete erasure scrubs all embedded artwork fields at the original dead
  const clock=Date.now;Date.now=()=>o.detail.artworkExpires*1000+1000;try{await cleanOrders(env);const after=env.sql.prepare('SELECT * FROM orders WHERE id=?').get(o.id),stored=JSON.parse(after.snapshot);assert.deepEqual(stored.items[0],{kind:'photo',name:'Photo',qty:1,files:[]});assert.equal(stored.artworkRemoved,true);assert.deepEqual(stored.contact,snapshot.contact);assert.equal(stored.notes,'Retained order note');for(const key of ['fingerprint','created','expires','artwork_expires','version','contact_revision','current_contact','owner_sent','receipt_sent'])assert.equal(after[key],before[key],key);assert.equal(env.sql.prepare('SELECT count(*) n FROM orders WHERE id=?').get(other.id).n,0);assert.throws(()=>env.sql.prepare('UPDATE orders SET snapshot=? WHERE id=?').run(JSON.stringify({...stored,notes:'Arbitrary edit'}),o.id),/order_privacy_guard/);}finally{Date.now=clock;}
  assert.equal(env.sql.prepare('SELECT manifest FROM order_privacy_operations WHERE order_id=?').get(o.id).manifest,manifest);
 });
+test('unfinished erasure stays listed and reopenable after source expiry and cleanup, then explicitly resumes its exact scope once',async()=>{
+ const {cleanOrders}=await import('../security/orders.mjs'),env=artworkEnv(),o=await order(env,{artwork:true}),p=await preview(env,o),operationId=crypto.randomUUID(),realDelete=env.ARTWORK.delete;let deletes=0;
+ env.ARTWORK.delete=async()=>{deletes++;throw Error('Synthetic R2 failure')};assert.equal((await erase(env,o,p,operationId)).body.state,'incomplete');
+ const original=env.sql.prepare('SELECT * FROM order_privacy_operations WHERE order_id=?').get(o.id),minimal={id:o.id,reference:o.detail.reference,version:o.detail.version,privacy:{state:'erasing',operationId}},clock=Date.now;
+ Date.now=()=>o.detail.expires*1000+1000;
+ try{
+  assert.deepEqual((await json(env,'orders/list',{})).body.orders,[minimal]);
+  await cleanOrders(env);assert.equal(env.sql.prepare('SELECT count(*) n FROM orders WHERE id=?').get(o.id).n,0);assert.equal(deletes,1);assert.equal(env.objects.has(o.id+'/0.jpg'),true);
+  for(const query of [{},{q:o.detail.reference},{stage:'new'},{stage:'fulfilled'}])assert.deepEqual((await json(env,'orders/list',query)).body.orders,[minimal],JSON.stringify(query));
+  for(const q of ['Original Person','original@example.com','0821234567'])assert.deepEqual((await json(env,'orders/list',{q})).body.orders,[]);
+  const fresh=await json(env,'orders/detail',{id:o.id});assert.equal(fresh.response.status,200);assert.deepEqual(fresh.body,minimal);
+  const current=env.sql.prepare('SELECT * FROM order_privacy_operations WHERE order_id=?').get(o.id);for(const key of ['manifest','counts','expires','artwork_expires','version','reference'])assert.equal(current[key],original[key],key);
+  assert.equal((await json(env,'privacy/status',{id:o.id,operationId})).body.state,'erasing');const scope=await preview(env,o);assert.equal(scope.operationId,operationId);assert.equal(scope.digest,p.digest);assert.deepEqual(scope.counts,p.counts);assert.equal(scope.expires,p.expires);assert.equal(scope.artworkExpires,p.artworkExpires);assert.equal(deletes,1);
+  env.ARTWORK.delete=async keys=>{deletes++;await realDelete(keys)};assert.equal((await erase(env,o,scope)).body.state,'complete');assert.equal(deletes,2);assert.equal(env.objects.size,0);assert.equal(env.sql.prepare("SELECT amount FROM artwork_usage WHERE id='retained'").get().amount,0);
+  assert.deepEqual((await json(env,'orders/list',{})).body.orders,[]);assert.equal((await call(env,'orders/detail',{id:o.id})).status,404);
+  assert.equal((await erase(env,o,scope)).body.state,'complete');assert.equal(deletes,2);assert.equal(env.sql.prepare("SELECT amount FROM artwork_usage WHERE id='retained'").get().amount,0);
+ }finally{Date.now=clock;}
+});
+test('fresh detail uses only the unfinished operation after normal cleanup removes the expired source',async()=>{
+ const {cleanOrders}=await import('../security/orders.mjs'),env=artworkEnv(),o=await order(env,{artwork:true}),p=await preview(env,o);env.ARTWORK.delete=async()=>{throw Error('Synthetic R2 failure')};const result=await erase(env,o,p),clock=Date.now;
+ Date.now=()=>o.detail.expires*1000+1000;try{await cleanOrders(env);const fresh=await json(env,'orders/detail',{id:o.id});assert.equal(fresh.response.status,200);assert.deepEqual(fresh.body,{id:o.id,reference:o.detail.reference,version:0,privacy:{state:'erasing',operationId:result.body.operationId}});}finally{Date.now=clock;}
+});
+test('operation-only erasure navigation preserves bounded reference pagination and excludes completed jobs',async()=>{
+ const env=artworkEnv(),ids=[];
+ // Minimal already-retained operation rows, with no source/contact/artwork data.
+ for(let seq=1;seq<=52;seq++){
+  const id=crypto.randomUUID(),operationId=crypto.randomUUID();ids.push(id);
+  env.sql.prepare("INSERT INTO order_privacy_operations(operation_id,order_id,version,digest,confirmation_hash,reference,state,manifest,counts,expires,artwork_expires) VALUES(?,?,3,?,?,?,'erasing','{}','{}',1,1)").run(operationId,id,'a'.repeat(64),'b'.repeat(64),'CV-'+String(seq).padStart(6,'0'));
+ }
+ env.sql.prepare("INSERT INTO order_privacy_operations(operation_id,order_id,version,digest,confirmation_hash,reference,state,expires,artwork_expires) VALUES(?,?,3,?,?,NULL,'complete',1,1)").run(crypto.randomUUID(),crypto.randomUUID(),'a'.repeat(64),'b'.repeat(64));
+ const first=(await json(env,'orders/list',{})).body;assert.equal(first.orders.length,50);assert.equal(first.orders[0].reference,'CV-000052');assert.equal(first.orders[49].reference,'CV-000003');assert.equal(first.next,3);
+ const second=(await json(env,'orders/list',{before:first.next})).body;assert.deepEqual(second.orders.map(row=>row.reference),['CV-000002','CV-000001']);assert.equal(second.next,null);assert.equal(new Set([...first.orders,...second.orders].map(row=>row.id)).size,52);
+ assert.deepEqual((await json(env,'orders/list',{q:'000052'})).body.orders.map(row=>row.id),[ids[51]]);assert.deepEqual((await json(env,'orders/list',{q:ids[51]})).body.orders,[]);
+ for(const row of [...first.orders,...second.orders])assert.deepEqual(Object.keys(row).sort(),['id','privacy','reference','version']);
+});
+test('erasure claiming between list selection and privacy projection cannot reveal contact-search matches',async()=>{
+ for(const byReference of [false,true]){
+  const env=artworkEnv(),o=await order(env,{artwork:true}),p=await preview(env,o),prepare=env.DB.prepare.bind(env.DB);let claimed=false;env.ARTWORK.delete=async()=>{throw Error('Synthetic R2 failure')};
+  env.DB.prepare=(sql,...args)=>{const statement=prepare(sql,...args);if(!sql.includes('FROM order_privacy_operations WHERE state=\'erasing\''))return statement;const wrap=s=>({...s,bind(...values){return wrap(s.bind(...values))},async all(){const rows=await s.all();if(!claimed){claimed=true;assert.equal((await erase(env,o,p)).body.state,'incomplete');}return rows}});return wrap(statement)};
+  const rows=(await json(env,'orders/list',{q:byReference?o.detail.reference:'Original Person'})).body.orders;assert.equal(claimed,true);assert.equal(rows.length,byReference?1:0);if(byReference)assert.equal(rows[0].snapshot,undefined);
+ }
+});

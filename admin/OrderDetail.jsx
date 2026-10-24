@@ -33,9 +33,9 @@ function ArtworkPreview({url,alt}){
  return error?<div role="alert"><p className="cv-error">{error}</p><button className="cv-btn secondary" onClick={()=>setAttempt(n=>n+1)}>Retry preview</button></div>:src?<img src={src} alt={alt} onError={()=>setError('This preview could not be displayed. Try again shortly.')}/>:<p className="cv-muted">Loading preview…</p>;
 }
 // Read before and after preparation so a stale archive is never exposed as current.
-export async function prepareOrderArchive(read,build){
- const current=await read();if(current.privacy||!current.snapshot)throw Error('Order privacy changed. Read its current status before downloading.');
- const bytes=await build(current),fresh=await read();
+export async function prepareOrderArchive(read,build,onOrderRead=()=>{}){
+ const current=await read();if(current.privacy)onOrderRead(current);if(current.privacy||!current.snapshot)throw Error('Order privacy changed. Read its current status before downloading.');
+ const bytes=await build(current),fresh=await read();if(fresh.privacy)onOrderRead(fresh);
  if(fresh.privacy||!fresh.snapshot||fresh.version!==current.version||(fresh.contactRevision??0)!==(current.contactRevision??0))throw Error('The order changed during download. Review the current revision and try again.');
  return bytes;
 }
@@ -69,7 +69,7 @@ function OrdinaryOrderDetail({order:initialOrder,onChange,onOrderRead,privacyEpo
  useEffect(()=>onBusyChange(busy||stageLocked),[busy,stageLocked,onBusyChange]);
  const root='/api/orders/'+order.id,expired=order.expires*1000<=Date.now(),artworkExpired=(order.artworkExpires??order.expires)*1000<=Date.now();
  async function act(fn){if(busy||stageLocked)return;setBusy(true);setError('');setMessage('');try{await fn()}catch(e){setError(e.message)}finally{setBusy(false)}}
- async function archive(){const bytes=await prepareOrderArchive(()=>api(root),current=>downloadOrderArchive(current,(index,file)=>adminFetch(`/api/artwork/${file.requestId||order.id}/${index}`,{cache:'no-store'})));const url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));const a=document.createElement('a');a.href=url;a.download=order.reference+'-artwork.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);setMessage('Your artwork archive is ready. Print quantities are in the instructions file.');}
+ async function archive(){const bytes=await prepareOrderArchive(()=>api(root),current=>downloadOrderArchive(current,(index,file)=>adminFetch(`/api/artwork/${file.requestId||order.id}/${index}`,{cache:'no-store'})),onOrderRead);const url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));const a=document.createElement('a');a.href=url;a.download=order.reference+'-artwork.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);setMessage('Your artwork archive is ready. Print quantities are in the instructions file.');}
  const latestUpdate=order.updates.find(u=>u.version===order.version),retryable=order.status!=='fulfilled'&&latestUpdate?.state==='failed'&&!!latestUpdate.retryable;
  const attempted=order.updates.some(u=>u.version===order.version||order.status==='fulfilled'&&u.status==='fulfilled');
  const currentProof=order.proof?.revision?order.proof:null;

@@ -11,7 +11,15 @@ export const ORDER_STATUSES=['new','in_progress','ready_to_ship','shipped','fulf
 const now=()=>Math.floor(Date.now()/1000);
 const fail=(status,error)=>Response.json({error},{status});
 const reference=row=>'CV-'+String(row.seq).padStart(6,'0');
-const listSelect="SELECT id,seq,status,version,created,expires,artwork_expires,fulfilled_at,owner_sent,receipt_sent,contact_revision,CASE WHEN EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id AND p.state='erasing') THEN NULL ELSE snapshot END snapshot,CASE WHEN EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id AND p.state='erasing') THEN NULL ELSE current_contact END current_contact FROM orders WHERE ";
+// Unfinished operations remain navigable using only their retained identity.
+// Their ordinary source rows never participate in searching or projection.
+const listSelect=`SELECT * FROM (
+ SELECT id,seq,status,version,created,expires,artwork_expires,fulfilled_at,owner_sent,receipt_sent,contact_revision,snapshot,current_contact,NULL privacy_operation_id
+ FROM orders WHERE NOT EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id)
+ UNION ALL
+ SELECT order_id,CAST(substr(reference,4) AS INTEGER),NULL,version,NULL,expires,artwork_expires,NULL,NULL,NULL,NULL,NULL,NULL,operation_id
+ FROM order_privacy_operations WHERE state='erasing'
+) AS orders WHERE `;
 const previousReference=row=>{const snapshot=JSON.parse(row.snapshot);return snapshot.referenceVersion===2?undefined:snapshot.reference||'CV-'+row.id;};
 const view=row=>({contactRevision:row.contact_revision,id:row.id,reference:reference(row),...(previousReference(row)?{previousReference:previousReference(row)}:{}),status:row.status,version:row.version,created:row.created,expires:row.expires,artworkExpires:artworkExpiry(row),fulfilledAt:row.fulfilled_at??null,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent,snapshot:{...(artworkExpiry(row)<=now()?retainedSnapshot(JSON.parse(row.snapshot)):JSON.parse(row.snapshot)),contact:currentContact(row)}});
 function validShipping(s){
@@ -26,26 +34,34 @@ export async function orderService(request,env){
  if(path==='list'){
   const before=b.before===undefined?Number.MAX_SAFE_INTEGER:Number(b.before);if(!Number.isSafeInteger(before)||before<1)return fail(400,'Invalid page.');
   if(b.q!==undefined&&(typeof b.q!=='string'||b.q.length>160)||b.stage!==undefined&&b.stage!=='all'&&!ORDER_STATUSES.includes(b.stage))return fail(400,'Invalid search.');
-  const q=(b.q||'').trim(),where=['expires>?','seq<?'],args=[time,before];
-  if(q){where.push("instr(lower('CV-' || printf('%06d',seq) || ' ' || CASE WHEN json_extract(snapshot,'$.referenceVersion')=2 THEN '' ELSE coalesce(json_extract(snapshot,'$.reference'),'CV-' || id) END || ' ' || CASE WHEN EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id AND p.state='erasing') THEN '' ELSE coalesce(json_extract(current_contact,'$.name'),json_extract(snapshot,'$.contact.name')) END),lower(?))>0");args.push(q)}
-  if(b.stage&&b.stage!=='all'){where.push('status=?');args.push(b.stage)}
+  const q=(b.q||'').trim(),where=['(expires>? OR privacy_operation_id IS NOT NULL)','seq<?'],args=[time,before];
+  if(q){where.push("instr(lower('CV-' || printf('%06d',seq) || ' ' || CASE WHEN privacy_operation_id IS NOT NULL OR json_extract(snapshot,'$.referenceVersion')=2 THEN '' ELSE coalesce(json_extract(snapshot,'$.reference'),'CV-' || id) END || ' ' || CASE WHEN privacy_operation_id IS NOT NULL THEN '' ELSE coalesce(json_extract(current_contact,'$.name'),json_extract(snapshot,'$.contact.name')) END),lower(?))>0");args.push(q)}
+  if(b.stage&&b.stage!=='all'){where.push('(status=? OR privacy_operation_id IS NOT NULL)');args.push(b.stage)}
   const grouped=!q&&(!b.stage||['all','fulfilled'].includes(b.stage));
   if(b.fulfilledBefore!==undefined&&(!grouped||b.stage!=='fulfilled'||!/^\d+:\d+$/.test(b.fulfilledBefore)))return fail(400,'Invalid fulfilled page.');
   const summary=r=>{const v=view(r);return {...v,snapshot:{contact:{name:v.snapshot.contact.name},magnetQty:v.snapshot.magnetQty,subtotalCents:v.snapshot.subtotalCents,...Object.fromEntries(['shippingPolicyVersion','deliveryCents','totalCents'].filter(k=>Object.hasOwn(v.snapshot,k)).map(k=>[k,v.snapshot[k]])),paymentStatus:'unpaid'}}};
   let rows=[],completed=[],fulfilledCount=0,fulfilledNext=null;
   if(grouped){
-   fulfilledCount=(await readSelect(env.DB,"SELECT count(*) n FROM orders WHERE expires>? AND status='fulfilled'",[time])).n;
+   fulfilledCount=(await readSelect(env.DB,"SELECT count(*) n FROM orders WHERE expires>? AND status='fulfilled' AND NOT EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id)",[time])).n;
    const cursor=b.fulfilledBefore?.split(':').map(Number),limit=cursor?50:3;
    if(cursor&&cursor.some(n=>!Number.isSafeInteger(n)||n<0))return fail(400,'Invalid fulfilled page.');
    const clauses=cursor?' AND (fulfilled_at<? OR (fulfilled_at=? AND seq<?))':'';
    completed=(await readSelect(env.DB,listSelect+"expires>? AND status='fulfilled'"+clauses+' ORDER BY fulfilled_at DESC,seq DESC LIMIT ?',[time,...(cursor?[cursor[0],cursor[0],cursor[1]]:[]),limit+1],'all')).results;
    if(completed.length>limit){const last=completed[limit-1];fulfilledNext=last.fulfilled_at+':'+last.seq}completed=completed.slice(0,limit);
-   if(b.stage!=='fulfilled'){where.push("status<>'fulfilled'");rows=(await readSelect(env.DB,listSelect+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;}
+   where.push(b.stage==='fulfilled'?'privacy_operation_id IS NOT NULL':"(status<>'fulfilled' OR privacy_operation_id IS NOT NULL)");rows=(await readSelect(env.DB,listSelect+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;
   }else rows=(await readSelect(env.DB,listSelect+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;
-  const selected=[...rows.slice(0,50),...completed],states=(await readSelect(env.DB,'SELECT order_id,operation_id,state FROM order_privacy_operations WHERE order_id IN(SELECT value FROM json_each(?))',[JSON.stringify(selected.map(r=>r.id))],'all')).results,byId=new Map(states.map(p=>[p.order_id,{state:p.state,operationId:p.operation_id}]));const projected=[];for(const r of selected){const privacy=byId.get(r.id);if(privacy?.state==='complete'||r.expires<=now())continue;projected.push(privacy?.state==='erasing'?redactedOrder(r,privacy):summary(r));}return Response.json({orders:projected,next:rows.length>50?rows[49].seq:null,fulfilledCount,fulfilledNext});
+  const selected=[...rows.slice(0,50),...completed],states=(await readSelect(env.DB,'SELECT order_id,operation_id,state FROM order_privacy_operations WHERE order_id IN(SELECT value FROM json_each(?))',[JSON.stringify(selected.map(r=>r.id))],'all')).results,byId=new Map(states.map(p=>[p.order_id,{state:p.state,operationId:p.operation_id}]));const projected=[];
+  for(const r of selected){
+   const privacy=byId.get(r.id);
+   if(privacy?.state==='complete'||r.privacy_operation_id&&privacy?.state!=='erasing'||!privacy&&r.expires<=now())continue;
+   // A claim may win after selection. Never reveal an erasing contact match.
+   if(privacy?.state==='erasing'&&q&&!reference(r).toLowerCase().includes(q.toLowerCase()))continue;
+   projected.push(privacy?.state==='erasing'?redactedOrder(r,privacy):summary(r));
+  }
+  return Response.json({orders:projected,next:rows.length>50?rows[49].seq:null,fulfilledCount,fulfilledNext});
  }
  if(!artworkId(b.id))return fail(400,'Invalid reference.');
- const privacy=await privacyState(env,b.id);if(privacy){if(path==='detail'&&privacy.state==='erasing'){const minimal=await env.DB.prepare('SELECT id,seq,version FROM orders WHERE id=?').bind(b.id).first();return minimal?Response.json(redactedOrder(minimal,privacy)):fail(404,'Order not found.');}return path==='detail'?fail(404,'Order not found.'):privacyConflict();}
+ const privacy=await privacyState(env,b.id);if(privacy){if(path==='detail'&&privacy.state==='erasing'){const minimal=await readSelect(env.DB,"SELECT order_id id,reference,version FROM order_privacy_operations WHERE order_id=? AND operation_id=? AND state='erasing'",[b.id,privacy.operationId]);return minimal?Response.json(redactedOrder(minimal,privacy)):fail(404,'Order not found.');}return path==='detail'?fail(404,'Order not found.'):privacyConflict();}
  if(path==='create'&&b.submissionId&&await privacyState(env,b.submissionId,'submission'))return privacyConflict();
  let row=await (path==='detail'?readSelect(env.DB,'SELECT * FROM orders WHERE id=?',[b.id]):env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first());
  if(path==='create'){
