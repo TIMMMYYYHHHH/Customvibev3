@@ -2,6 +2,15 @@
 ALTER TABLE orders ADD COLUMN current_contact TEXT CHECK(current_contact IS NULL OR json_valid(current_contact));
 ALTER TABLE orders ADD COLUMN contact_revision INTEGER NOT NULL DEFAULT 0;
 CREATE INDEX privacy_order_fingerprint ON orders(fingerprint);
+-- An outstanding initial-mail caller remains visible until its own verified completion.
+-- A clock or a different caller's accepted flags cannot prove that caller has stopped.
+CREATE TABLE initial_order_dispatches(
+ dispatch_id TEXT PRIMARY KEY,submission_id TEXT NOT NULL,order_id TEXT,
+ fingerprint TEXT NOT NULL,expires INTEGER NOT NULL
+);
+CREATE INDEX initial_dispatch_order ON initial_order_dispatches(order_id);
+CREATE INDEX initial_dispatch_fingerprint ON initial_order_dispatches(fingerprint);
+CREATE INDEX initial_dispatch_submission ON initial_order_dispatches(submission_id);
 CREATE TABLE order_privacy_generations(order_id TEXT PRIMARY KEY,revision INTEGER NOT NULL DEFAULT 0);
 INSERT INTO order_privacy_generations(order_id) SELECT id FROM orders;
 CREATE TRIGGER privacy_generation_create AFTER INSERT ON orders BEGIN INSERT INTO order_privacy_generations(order_id) VALUES(NEW.id); END;
@@ -189,9 +198,22 @@ CREATE TRIGGER privacy_fence_mail_delivery_state_insert BEFORE INSERT ON mail_de
 CREATE TRIGGER privacy_fence_mail_delivery_state_update BEFORE UPDATE ON mail_delivery_state WHEN EXISTS(SELECT 1 FROM orders WHERE ((id=OLD.order_id OR id=OLD.reference OR id IN(SELECT order_id FROM submissions WHERE id=OLD.reference)) OR (id=NEW.order_id OR id=NEW.reference OR id IN(SELECT order_id FROM submissions WHERE id=NEW.reference))) AND EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id AND p.state='erasing')) BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
 CREATE TRIGGER privacy_fence_mail_delivery_events_insert BEFORE INSERT ON mail_delivery_events WHEN EXISTS(SELECT 1 FROM orders WHERE ((id IN(SELECT order_id FROM mail_delivery_state WHERE id=NEW.state_id))) AND EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id AND p.state='erasing')) BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
 CREATE TRIGGER privacy_fence_mail_delivery_events_update BEFORE UPDATE ON mail_delivery_events WHEN EXISTS(SELECT 1 FROM orders WHERE ((id IN(SELECT order_id FROM mail_delivery_state WHERE id=OLD.state_id)) OR (id IN(SELECT order_id FROM mail_delivery_state WHERE id=NEW.state_id))) AND EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id AND p.state='erasing')) BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
-CREATE TRIGGER privacy_fence_orders_update BEFORE UPDATE OF snapshot,status,version,created,expires,artwork_expires,fulfilled_at,owner_sent,receipt_sent,current_contact,contact_revision ON orders WHEN EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=OLD.id AND p.state='erasing') BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
+-- Permit only the existing artwork-expiry snapshot reduction, preserving every other field.
+CREATE TRIGGER privacy_fence_orders_update BEFORE UPDATE OF snapshot,status,version,created,expires,artwork_expires,fulfilled_at,owner_sent,receipt_sent,current_contact,contact_revision ON orders WHEN EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=OLD.id AND p.state='erasing') AND NOT (coalesce(OLD.artwork_expires,OLD.expires)<=unixepoch() AND NEW.seq IS OLD.seq AND NEW.id IS OLD.id AND NEW.fingerprint IS OLD.fingerprint AND NEW.status IS OLD.status AND NEW.version IS OLD.version AND NEW.created IS OLD.created AND NEW.expires IS OLD.expires AND NEW.owner_sent IS OLD.owner_sent AND NEW.receipt_sent IS OLD.receipt_sent AND NEW.artwork_expires IS OLD.artwork_expires AND NEW.fulfilled_at IS OLD.fulfilled_at AND NEW.current_contact IS OLD.current_contact AND NEW.contact_revision IS OLD.contact_revision AND json(NEW.snapshot)=json(json_set(OLD.snapshot,'$.items',json((SELECT json_group_array(json_set(json_remove(value,'$.files','$.values','$.brief','$.hasReference'),'$.files',json('[]'))) FROM json_each(OLD.snapshot,'$.items'))),'$.artworkRemoved',json('true')))) BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
 CREATE TRIGGER privacy_replay_order BEFORE INSERT ON orders WHEN EXISTS(SELECT 1 FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE t.kind='order' AND t.id=NEW.id AND (t.expires>unixepoch() OR p.state='erasing')) BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
 CREATE TRIGGER privacy_replay_artwork BEFORE INSERT ON artwork_requests WHEN EXISTS(SELECT 1 FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE ((t.kind='artwork' AND t.id=NEW.id) OR (t.kind='order' AND (t.id=NEW.id OR t.id=NEW.parent_order))) AND (t.expires>unixepoch() OR p.state='erasing')) BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
 CREATE TRIGGER privacy_replay_submission BEFORE INSERT ON submissions WHEN EXISTS(SELECT 1 FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE t.kind='submission' AND t.id=NEW.id AND (t.expires>unixepoch() OR p.state='erasing')) BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;
 
 CREATE TRIGGER privacy_report_claim AFTER INSERT ON order_privacy_operations BEGIN UPDATE finance_report_state SET revision=revision+1 WHERE id=1; END;
+
+CREATE TRIGGER privacy_dispatch_graph_insert AFTER INSERT ON initial_order_dispatches BEGIN
+ UPDATE order_privacy_generations SET revision=revision+1 WHERE order_id=NEW.order_id OR order_id IN(SELECT id FROM orders WHERE fingerprint=NEW.fingerprint);
+END;
+CREATE TRIGGER privacy_dispatch_graph_delete AFTER DELETE ON initial_order_dispatches BEGIN
+ UPDATE order_privacy_generations SET revision=revision+1 WHERE order_id=OLD.order_id OR order_id IN(SELECT id FROM orders WHERE fingerprint=OLD.fingerprint);
+END;
+CREATE TRIGGER privacy_dispatch_immutable BEFORE UPDATE ON initial_order_dispatches BEGIN SELECT RAISE(ABORT,'initial dispatch is immutable'); END;
+CREATE TRIGGER privacy_dispatch_fence BEFORE INSERT ON initial_order_dispatches WHEN
+ EXISTS(SELECT 1 FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE ((t.kind='submission' AND t.id=NEW.submission_id) OR (t.kind='order' AND t.id=NEW.order_id)) AND (t.expires>unixepoch() OR p.state='erasing'))
+ OR EXISTS(SELECT 1 FROM orders o JOIN order_privacy_operations p ON p.order_id=o.id WHERE p.state='erasing' AND (o.id=NEW.order_id OR o.fingerprint=NEW.fingerprint))
+ BEGIN SELECT RAISE(ABORT,'order_privacy_guard'); END;

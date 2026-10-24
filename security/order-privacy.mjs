@@ -8,6 +8,7 @@ const hash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SH
 const active="EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id AND p.state='erasing')";
 // This same SQL gate is evaluated when the write executes, after any D1 queueing.
 const available=`owner_sent=1 AND receipt_sent=1 AND NOT ${active}
+ AND NOT EXISTS(SELECT 1 FROM initial_order_dispatches d WHERE d.order_id=orders.id OR d.fingerprint=orders.fingerprint)
  AND NOT EXISTS(SELECT 1 FROM order_updates u WHERE u.order_id=orders.id AND u.state IN ('pending','uncertain'))
  AND NOT EXISTS(SELECT 1 FROM order_update_attempts a WHERE a.order_id=orders.id AND a.state IN ('pending','uncertain'))
  AND NOT EXISTS(SELECT 1 FROM submissions s WHERE s.kind='order' AND ((s.order_id=orders.id AND (s.owner_sent=0 OR s.receipt_sent=0)) OR (s.order_id IS NULL AND s.fingerprint=orders.fingerprint)))
@@ -49,11 +50,13 @@ async function graph(env,id){
    (SELECT count(*) FROM order_update_attempts WHERE order_id=? AND provider_message_id IS NOT NULL)+(SELECT count(*) FROM mail_delivery_state WHERE order_id=? OR reference IN(SELECT id FROM submissions WHERE order_id=?))+(SELECT count(*) FROM mail_delivery_events WHERE state_id IN(SELECT id FROM mail_delivery_state WHERE order_id=? OR reference IN(SELECT id FROM submissions WHERE order_id=?))) receipts,
    (SELECT count(*) FROM artwork_files f JOIN artwork_requests r ON r.id=f.request_id WHERE (r.id=? OR r.parent_order=?) AND (f.ready=0 OR f.lease_until>unixepoch())) uploads,
    (SELECT count(*) FROM order_updates WHERE order_id=? AND state IN('pending','uncertain'))+(SELECT count(*) FROM order_update_attempts WHERE order_id=? AND state IN('pending','uncertain')) unresolved,
-   (SELECT count(*) FROM submissions s JOIN orders o ON o.fingerprint=s.fingerprint WHERE o.id=? AND s.kind='order' AND s.order_id IS NULL) ambiguous`).bind(...Array(20).fill(id))
+   (SELECT count(*) FROM submissions s JOIN orders o ON o.fingerprint=s.fingerprint WHERE o.id=? AND s.kind='order' AND s.order_id IS NULL) ambiguous,
+   (SELECT count(*) FROM initial_order_dispatches d JOIN orders o ON (o.id=d.order_id OR o.fingerprint=d.fingerprint) WHERE o.id=?) initialDispatches`).bind(...Array(21).fill(id))
  ]);
  const row=result[0].results[0];if(!row)return null;
  const requests=result[1].results,submissions=result[2].results,s=result[3].results[0],blockers=[];
  if(!row.owner_sent||!row.receipt_sent||submissions.some(s=>!s.owner_sent||!s.receipt_sent))blockers.push('Initial customer or owner email is unfinished. Resolve it before a privacy action.');
+ if(s.initialDispatches)blockers.push('An initial email request is still processing or unresolved. Resolve it before a privacy action.');
  if(s.unresolved)blockers.push('A customer update is pending or uncertain. Resolve it before a privacy action.');
  if(s.uploads)blockers.push('Artwork uploads are unfinished. Resolve them before a privacy action.');
  if(s.ambiguous)blockers.push('A legacy submission association needs review. Its ownership cannot be inferred.');
