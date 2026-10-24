@@ -11,9 +11,16 @@ const countLabels={orders:'Order records',history:'Stage history entries',update
 export default function OrderPrivacy({order,locked=false,onInvalidate,onFence,onRead,onComplete}){
  const [editing,setEditing]=useState(false),[draft,setDraft]=useState(()=>({...order.snapshot?.contact})),[preview,setPreview]=useState(null),[kind,setKind]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState(''),[confirmation,setConfirmation]=useState(''),[acknowledged,setAcknowledged]=useState(false),[final,setFinal]=useState(false),[correctionCheck,setCorrectionCheck]=useState(false);
  const [operationId,setOperationId]=useState(order.privacy?.operationId||null),[outcome,setOutcome]=useState(order.privacy?'erasing':'');
- const correctionButton=useRef(null),erasureButton=useRef(null),working=useRef(false),clock=useRef(0);
+ const correctionButton=useRef(null),erasureButton=useRef(null),working=useRef(false),clock=useRef(0),unreconciledErasure=useRef(null);
  const root='/api/orders/'+order.id,redacted=!!order.privacy||!!operationId;
  useEffect(()=>{clock.current++;setPreview(null);setFinal(false);if(!editing&&!redacted)setDraft({...order.snapshot?.contact});},[order.version,order.contactRevision]);
+ // A fresh authoritative DTO may arrive without remounting this controller.
+ // This tab's own provisional DTO must await its explicit status read instead.
+ useEffect(()=>{
+  const privacy=order.privacy;
+  if(privacy?.state!=='erasing'||!privacy.operationId||privacy.operationId===unreconciledErasure.current)return;
+  clock.current++;setOperationId(privacy.operationId);setOutcome('erasing');setDraft({});setEditing(false);setCorrectionCheck(false);close();setError('');setMessage('');
+ },[order.privacy?.state,order.privacy?.operationId]);
  useEffect(()=>{if(!preview)return;const timer=setTimeout(()=>{setPreview(null);setFinal(false);setError('This preview expired. Review a fresh preview before confirming.');},600000);return()=>clearTimeout(timer)},[preview]);
  async function run(fn){if(working.current)return;working.current=true;setBusy(true);setError('');setMessage('');try{await fn()}catch(e){setError(e.message)}finally{working.current=false;setBusy(false)}}
  function close(){setPreview(null);setFinal(false);setConfirmation('');setAcknowledged(false);}
@@ -25,11 +32,11 @@ export default function OrderPrivacy({order,locked=false,onInvalidate,onFence,on
   if(resultError)throw Error(resultError.message+' Current details have been reloaded. Your draft is preserved; review it before another action.');
  }
  async function erasurePreview(){const generation=clock.current,p=await api(root+'/privacy/preview-erasure',{version:order.version});if(generation!==clock.current)throw Error('The order changed. Review a fresh preview.');setPreview(p);setKind('erasure');setConfirmation('');setAcknowledged(false);setFinal(false);}
- async function erase(){const selected=preview;close();setOperationId(selected.operationId);setOutcome('unknown');setEditing(false);setDraft({});onInvalidate();onFence('erasure',selected.operationId);
+ async function erase(){const selected=preview;unreconciledErasure.current=selected.operationId;close();setOperationId(selected.operationId);setOutcome('unknown');setEditing(false);setDraft({});onInvalidate();onFence('erasure',selected.operationId);
   const result=await api(root+'/privacy/erase',{previewToken:selected.previewToken,confirmation:selected.reference,acknowledged:true});
   if(result.ok&&result.state==='complete'){onComplete();return;}throw Error('Erasure is incomplete. Check erasure status before reviewing a resume.');
  }
- async function checkStatus(){close();const status=await api(root+'/privacy/status',{operationId});if(status.state==='complete'){onComplete();return;}if(status.state==='erasing'){setOutcome('erasing');setMessage('Erasure is incomplete. Review its original scope to resume explicitly.');return;}if(status.state!=='not-found')throw Error('The erasure status could not be confirmed.');const fresh=await reread();if(fresh.privacy){setMessage('An erasure is in progress. Check its current status before resuming.');return;}setOperationId(null);setOutcome('');setMessage('No matching erasure is recorded. Current details reloaded. Review a fresh preview before any action.');}
+ async function checkStatus(){close();const status=await api(root+'/privacy/status',{operationId});if(status.state==='complete'){onComplete();return;}if(status.state==='erasing'){unreconciledErasure.current=null;setOutcome('erasing');setMessage('Erasure is incomplete. Review its original scope to resume explicitly.');return;}if(status.state!=='not-found')throw Error('The erasure status could not be confirmed.');const fresh=await reread();if(fresh.privacy){setMessage('An erasure is in progress. Check its current status before resuming.');return;}unreconciledErasure.current=null;setOperationId(null);setOutcome('');setMessage('No matching erasure is recorded. Current details reloaded. Review a fresh preview before any action.');}
  return <section className="cv-order-privacy" aria-labelledby="privacy-heading"><h2 id="privacy-heading">Order privacy</h2>
  {error&&<p role="alert" className="cv-error">{error}{operationId&&' The order remains locked until its result is checked.'}</p>}{message&&<p role="status">{message}</p>}
  {redacted?<><p role="status">{outcome==='unknown'?'Erasure outcome needs checking.':'Erasure is incomplete.'} Customer details and artwork are hidden.</p><p>Checking status does not repeat erasure. Resume only after reviewing the same operation.</p><div className="cv-privacy-actions"><button className="cv-btn secondary" disabled={busy} onClick={()=>run(checkStatus)}>Check erasure status</button><button ref={erasureButton} className="cv-btn secondary" disabled={busy||outcome!=='erasing'} onClick={()=>run(erasurePreview)}>Review erasure to resume</button></div></>:correctionCheck?<><p>The correction result needs checking. Your draft stays in this tab. Customer and artwork controls remain hidden until current details are loaded.</p><button className="cv-btn secondary" disabled={busy} onClick={()=>run(reconcileCorrection)}>Reload current details</button></>:<>

@@ -30,6 +30,16 @@ createServer(async(req,res)=>{try{
    if(privacy&&action==='erase'&&mode==='incomplete-erasure')env.ARTWORK.delete=async()=>{throw Error('Synthetic R2 failure')};
    if(mode==='normal')env.ARTWORK.delete=async keys=>{for(const key of Array.isArray(keys)?keys:[keys])env.objects.delete(key)};
    r=await ordersAPI(new Request('https://admin.customvibe.co.za'+req.url,{method:req.method,headers,body:['GET','HEAD'].includes(req.method)?undefined:body}),env,session);
+   // Reproduce another Admin tab claiming erasure after the mail read, before
+   // the real mounted detail's authoritative follow-up read. No automatic resume.
+   if(!privacy&&action==='preview'&&mode==='authoritative-redaction'&&r.ok){
+    const mail=await r.clone().json(),scope=await(await call('privacy/preview-erasure',{id,version:mail.version})).json();
+    env.ARTWORK.delete=async()=>{throw Error('Synthetic other-tab R2 failure')};
+    const result=await call('privacy/erase',{id,version:scope.version,expectedDigest:scope.digest,operationId:crypto.randomUUID(),confirmation:scope.reference,acknowledged:true});
+    audit.push({method:'FIXTURE',path:'/privacy/erase (synthetic other tab)',status:result.status});
+    if(result.status!==503)throw Error('Synthetic redaction transition did not become incomplete');
+    mode='normal';
+   }
    if(privacy&&action==='correct'&&['lost-correction','correction-read-failure'].includes(mode)&&r.ok){detailFails=mode==='correction-read-failure';mode='normal';r=Response.json({error:'Synthetic lost correction response.'},{status:503});}
    if(privacy&&action==='erase'&&['lost-erasure','erasure-read-failure'].includes(mode)&&r.ok){detailFails=mode==='erasure-read-failure';mode='normal';r=Response.json({error:'Synthetic lost erasure response.'},{status:503});}
   }
