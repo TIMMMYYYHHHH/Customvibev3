@@ -1,3 +1,4 @@
+import {privacyState,privacyConflict} from './order-privacy.mjs';
 import {validateCostEntry,calculateCostLine} from '../shared/finance-costs.mjs';
 import {monthRange} from '../shared/finance-report.mjs';
 import {boundedBody} from '../server/auth.mjs';
@@ -53,11 +54,12 @@ export async function financeService(request,env){
  }
  if(path==='month')return month(db,b,time);
  if(!uuid(b.id))return fail(400,'Invalid order reference.');
+ if(await privacyState(env,b.id))return privacyConflict();
  const order=await db.prepare('SELECT id,version,expires FROM orders WHERE id=?').bind(b.id).first();
  if(!order)return fail(404,'Order not found.');if(order.expires<=now())return fail(410,'This order has expired.');
  const stored=await db.prepare('SELECT * FROM order_costs WHERE order_id=?').bind(b.id).first();
  if(order.expires<=now())return fail(410,'This order has expired.');
- if(path==='order-read')return costResponse(b.id,order.version,costView(stored));
+ if(path==='order-read')return await privacyState(env,b.id)?privacyConflict():costResponse(b.id,order.version,costView(stored));
  if(!integer(b.version)||!integer(b.version+1,1)||!integer(b.orderVersion))return fail(400,'Invalid finance version.');
  let payload;
  if(path==='order-save'){try{payload=entries(b.lines,true)}catch{return fail(400,'Invalid cost lines.');}}
@@ -78,7 +80,7 @@ const projection=`SELECT o.seq,o.id,'CV-' || printf('%06d',o.seq) reference,o.cr
  'unpaid' paymentStatus,c.version costVersion,c.status costStatus,
  coalesce(json_extract(c.payload,'$.complete'),0) costComplete,json_extract(c.payload,'$.totalCents') costCents,
  coalesce(json_extract(c.payload,'$.knownCostCents'),0) knownCostCents
- FROM orders o LEFT JOIN order_costs c ON c.order_id=o.id WHERE o.expires>? AND o.created>=? AND o.created<?`;
+ FROM orders o LEFT JOIN order_costs c ON c.order_id=o.id WHERE o.expires>? AND o.created>=? AND o.created<? AND NOT EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=o.id AND p.state='erasing')`;
 async function month(db,b,time){
  let range;try{range=monthRange(b.month);if(b.before!==undefined&&!integer(b.before,1)||b.revision!==undefined&&!integer(b.revision)||b.validUntil!==undefined&&b.validUntil!==null&&!integer(b.validUntil,1))throw Error('Invalid page');}catch{return fail(400,'Invalid month or report page.');}
  if(b.validUntil!==undefined&&b.validUntil!==null&&b.validUntil<=time)return fail(409,'Report expired. Start a fresh export.');

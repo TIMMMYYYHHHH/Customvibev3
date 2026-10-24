@@ -1,3 +1,4 @@
+import {privacyState,privacyConflict} from './order-privacy.mjs';
 import {readSelect} from './read.mjs';
 import {ARTWORK_LIMITS as limits,artworkId,artworkHash} from '../src/artwork-policy.mjs';
 import {validateJpeg} from '../server/jpeg.mjs';
@@ -35,11 +36,13 @@ function verifiedObject(object,file){
  return object?.size===file.size&&checksum?.byteLength===32&&Array.from(new Uint8Array(checksum),b=>b.toString(16).padStart(2,'0')).join('')===file.sha256;
 }
 async function unexpired(env,id){
+ if(await privacyState(env,id,'artwork'))return false;
  const row=await env.DB.prepare('SELECT expires FROM artwork_requests WHERE id=?').bind(id).first();
  return row&&row.expires>epoch();
 }
 async function init(body,env){
  if(!artworkId(body.id)||!artworkHash(body.owner)||!artworkHash(body.key))return fail(400,'Invalid artwork request.');
+ if(await privacyState(env,body.id,'artwork')||await privacyState(env,body.id)||body.parentOrder&&await privacyState(env,body.parentOrder))return privacyConflict();
  let m;try{m=manifest(body.files)}catch{return fail(400,'Check artwork sizes and formats.')}
  const now=epoch(),day=Math.floor(now/86400),month=new Date().toISOString().slice(0,7),slot=Math.floor(now/900);
  const existing=await env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(body.id).first();
@@ -60,7 +63,8 @@ async function upload(request,env){
  if(!artworkId(id)||!artworkHash(owner)||!/^\d{1,2}$/.test(raw||'')||request.headers.get('content-type')!=='image/jpeg')return fail(400,'Invalid upload.');
  const index=Number(raw);
  // Return only this immutable manifest entry, not every file in the order.
- const row=await env.DB.prepare('SELECT r.owner,r.expires,json_extract(r.manifest,?) AS file,f.ready,f.lease FROM artwork_requests r LEFT JOIN artwork_files f ON f.request_id=r.id AND f.slot=? WHERE r.id=?').bind('$['+index+']',index,id).first();
+ const row=await env.DB.prepare(`SELECT r.owner,r.expires,EXISTS(SELECT 1 FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE ((t.kind='artwork' AND t.id=r.id) OR (t.kind='order' AND (t.id=r.id OR t.id=r.parent_order))) AND (t.expires>unixepoch() OR p.state='erasing')) AS privacy_blocked,json_extract(r.manifest,?) AS file,f.ready,f.lease FROM artwork_requests r LEFT JOIN artwork_files f ON f.request_id=r.id AND f.slot=? WHERE r.id=?`).bind('$['+index+']',index,id).first();
+ if(row?.privacy_blocked)return privacyConflict();
  if(!row||row.owner!==owner)return fail(403,'Artwork session not found.');if(row.expires<=epoch())return fail(410,'Artwork expired.');
  const file=row.file&&JSON.parse(row.file);if(!file)return fail(400,'Unknown artwork file.');
  if(row.ready){
@@ -98,7 +102,9 @@ export async function artworkService(request,env){
  const body=await request.json();
  if(path==='/artwork/init')return init(body,env);
  if(!artworkId(body.id))return fail(400,'Invalid reference.');
+ if(await privacyState(env,body.id,'artwork'))return privacyConflict();
  const row=await (['/artwork/detail','/artwork/download'].includes(path)?readSelect(env.DB,'SELECT * FROM artwork_requests WHERE id=?',[body.id]):env.DB.prepare('SELECT * FROM artwork_requests WHERE id=?').bind(body.id).first());
+ if(await privacyState(env,body.id,'artwork'))return privacyConflict();
  if(!row)return fail(404,'Artwork not found or removed.');if(row.expires<=epoch())return fail(410,'This artwork has expired.');
  if(path==='/artwork/complete'){
   if(row.owner!==body.owner)return fail(403,'Artwork belongs to another session.');
@@ -122,7 +128,7 @@ export async function artworkService(request,env){
  if(path==='/artwork/download'){
   if(!Number.isInteger(body.index)||!files[body.index])return fail(404,'File not found.');
   if(!await operation(env))return fail(429,'The download allowance is full.');
-  const object=await env.ARTWORK.get(objectKey(body.id,body.index));if(!object)return fail(404,'File no longer available.');
+  const object=await env.ARTWORK.get(objectKey(body.id,body.index));if(await privacyState(env,body.id,'artwork'))return privacyConflict();if(!object)return fail(404,'File no longer available.');
   return new Response(object.body,{headers:{'Content-Type':'image/jpeg','Content-Disposition':`attachment; filename="${files[body.index].name}"`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}});
  }
  return fail(404,'Not found.');

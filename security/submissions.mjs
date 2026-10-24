@@ -1,3 +1,4 @@
+import {privacyState,privacyConflict} from './order-privacy.mjs';
 import {sourceBindingInsert,acceptanceBindingGuard,validRecipientBinding} from './mail-delivery.mjs';
 import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
@@ -5,6 +6,7 @@ const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 export async function submissionState(request,env){
  const body=await request.json(),path=new URL(request.url).pathname,now=Math.floor(Date.now()/1000);
  if(!env.DB||!hex(body.id))return new Response(null,{status:400});
+ if(await privacyState(env,body.id,'submission'))return privacyConflict();
  if(path==='/submissions/claim-contact'){
   const claimed=await env.DB.prepare("UPDATE submissions SET contact_started=1 WHERE id=? AND kind='contact' AND expires>? AND contact_started=0 AND owner_sent=0 RETURNING id").bind(body.id,now).first();
   const row=await env.DB.prepare("SELECT owner_sent FROM submissions WHERE id=? AND kind='contact' AND expires>?").bind(body.id,now).first();
@@ -29,6 +31,7 @@ export async function submissionState(request,env){
  if(row){
   if(row.fingerprint!==body.fingerprint||row.kind!==body.kind||row.expires<=now)return Response.json({conflict:true});
   const attempt=await env.DB.prepare('UPDATE submissions SET tries=tries+1 WHERE id=? RETURNING tries').bind(body.id).first();
+  if(await privacyState(env,body.id,'submission'))return privacyConflict();
   return Response.json({allowed:attempt.tries<=12,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent});
  }
  if(!Number.isSafeInteger(body.createdAt)||body.createdAt<now-3600||body.createdAt>now+60)return Response.json({expired:true});
