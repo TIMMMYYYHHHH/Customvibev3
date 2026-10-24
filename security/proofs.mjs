@@ -1,3 +1,4 @@
+import {privacyState,privacyConflict} from './order-privacy.mjs';
 import {readSelect} from './read.mjs';
 import {artworkExpiry} from '../server/order-retention.mjs';
 import {proofRows,reusableProofFiles} from '../src/proof-manifest.mjs';
@@ -22,8 +23,9 @@ export async function proofService(request,env){
  const b=await request.json(),action=new URL(request.url).pathname.slice('/proofs/'.length),time=now();
  if(['issue','check-link','exchange','read','download','approve','changes'].includes(action))return fail(410,'Separate customer artwork approval is no longer required.');
  if(!artworkId(b.id))return fail(400,'Invalid order.');
+ if(await privacyState(env,b.id))return privacyConflict();
  const order=await env.DB.prepare('SELECT * FROM orders WHERE id=? AND expires>?').bind(b.id,time).first();if(!order)return fail(410,'Order unavailable or expired.');const snapshot=JSON.parse(order.snapshot);
- if(action==='detail')return Response.json(await proofDetail(env,b.id));
+ if(action==='detail'){const detail=await proofDetail(env,b.id);return await privacyState(env,b.id)?privacyConflict():Response.json(detail);}
  if(artworkExpiry(order)<=time)return fail(410,'Artwork has expired.');
  // An immutable publish identity makes a lost success response safe to retry.
  if(action==='publish'&&artworkId(b.requestId)&&b.requestId!==b.id){const prior=await env.DB.prepare('SELECT revision,digest FROM proof_revisions WHERE order_id=? AND publish_id=?').bind(b.id,b.requestId).first();if(prior)return Response.json({ok:true,...prior});}

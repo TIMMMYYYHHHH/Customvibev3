@@ -4,7 +4,7 @@ import security from '../security/index.mjs';
 import {artworkEnv} from './helpers/artwork.mjs';
 
 const hourly={cron:'0 * * * *'},fiveMinute={cron:'*/5 * * * *'};
-const orderWork=['orders_proofs','orders_proof_state','orders_proof_records','orders_proof_sessions','orders_select','orders_records'];
+const orderWork=['orders_proofs','orders_proof_state','orders_proof_records','orders_proof_sessions','orders_privacy','orders_select','orders_records'];
 const allWork=['maps',...orderWork,'artwork_select','artwork_records','artwork_usage','mail_state','mail_events','auth'];
 
 function fixture(t,failAt){
@@ -50,7 +50,14 @@ function fixture(t,failAt){
  }
  env.DB={prepare:sql=>wrap(sql,original.prepare(sql)),batch:async statements=>{
   const info=statements.map(s=>statementInfo.get(s)),sql=info[0].sql;
-  const label=sql.startsWith('DELETE FROM attempts')?'auth':sql.startsWith('UPDATE artwork_usage')?'artwork_records':sql.startsWith('UPDATE order_update_attempts')?'orders_records':statements.length===3?'orders_proofs':'orders_proof_records';
+  let label;
+  if(sql.startsWith('DELETE FROM attempts'))label='auth';
+  else if(sql.startsWith('UPDATE artwork_usage'))label='artwork_records';
+  else if(sql.startsWith('UPDATE order_update_attempts'))label='orders_records';
+  else if(sql.startsWith('DELETE FROM order_privacy_tombstones'))label='orders_privacy';
+  else if(sql.startsWith('DELETE FROM proof_sessions')&&sql.includes('COALESCE(artwork_expires,expires)'))label='orders_proofs';
+  else if(sql.startsWith('DELETE FROM proof_sessions')&&sql.includes('WHERE expires<='))label='orders_proof_records';
+  else throw Error('Unexpected scheduled batch: '+sql);
   return operation(label,()=>original.batch(info.map(s=>s.statement)));
  }};
  const count=table=>env.sql.prepare('SELECT count(*) AS n FROM '+table).get().n;
@@ -83,6 +90,12 @@ for(const [failed,step] of [
  if(failed==='auth'){assert.equal(f.count('mail_delivery_state'),0);assert.equal(f.count('mail_delivery_events'),0)}
  f.assertOffline();
  assert.deepEqual(f.events,[[{event:'customvibe_unavailable',step,reason:'database'}]]);
+});
+
+test('privacy metadata cleanup failure stops remaining hourly work without replay or private diagnostics',async t=>{
+ const f=fixture(t,'orders_privacy'),operationId=crypto.randomUUID(),id=crypto.randomUUID();
+ f.env.sql.prepare("INSERT INTO order_privacy_operations(operation_id,order_id,version,digest,confirmation_hash,state,expires,artwork_expires) VALUES(?,?,0,?,?,'complete',1,1)").run(operationId,id,'e'.repeat(64),'f'.repeat(64));f.env.sql.prepare("INSERT INTO order_privacy_tombstones(kind,id,operation_id,expires) VALUES('order',?,?,1)").run(id,operationId);
+ await assert.rejects(security.scheduled(hourly,f.env),error=>assertPrivateRejection(error,f.error));assert.deepEqual(f.operations,allWork.slice(0,allWork.indexOf('orders_privacy')+1));for(const table of ['order_privacy_operations','order_privacy_tombstones','orders','artwork_requests','attempts','mail_delivery_state'])assert.equal(f.count(table),1,table);assert.equal(f.env.objects.size,1);assert.equal(f.env.sql.prepare("SELECT amount FROM artwork_usage WHERE id='retained'").get().amount,4);f.assertOffline();assert.deepEqual(f.events,[[{event:'customvibe_unavailable',step:'scheduled_orders',reason:'database'}]]);
 });
 
 test('mail event cleanup failure rejects privately, preserves partial cleanup and skips auth without retry',async t=>{

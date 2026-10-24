@@ -94,10 +94,22 @@ export async function submissions(request,env,network=fetch,lockerSource){
   const emails=orderEmails(submission,privateArtwork,assignedReference);
   if(recordEnabled&&privateArtwork){for(const field of ['text','html'])emails.owner[field]=emails.owner[field].replace('/artwork?request=','/orders?order=');}
 
-  if(!permit.ownerSent){const accepted=await mail(emails.owner,`cv-${kind}-${submission.id}-owner`,env,network);await state(env,'mark',{id,stage:'owner_sent',...accepted});}
-  let receiptSent=permit.receiptSent;
-  if(kind==='order'&&!receiptSent){try{const accepted=await mail(emails.customer,`cv-${kind}-${submission.id}-customer`,env,network);await state(env,'mark',{id,stage:'receipt_sent',...accepted});receiptSent=true;}catch{receiptSent=false;}}
-  if(recordEnabled){await recordCall('delivery',{stage:'owner_sent'});if(receiptSent)await recordCall('delivery',{stage:'receipt_sent'});}
-  return Response.json({ok:true,reference:submission.referenceVersion===2?assignedReference:requestReference(submission),status:kind==='order'?'unpaid-request':'message-sent',receiptSent:kind==='order'?receiptSent:null});
+  // The private atomic authorization and privacy claim exclude each other. Fresh
+  // flags replace the earlier reserve result, which another caller may have changed.
+  const dispatchId=crypto.randomUUID(),dispatch=await state(env,'claim-dispatch',{id,dispatchId});
+  if(dispatch.claimed!==true)throw Error('Initial dispatch unavailable');
+  let dispatchComplete=false;
+  try{
+   if(!dispatch.ownerSent){const accepted=await mail(emails.owner,`cv-${kind}-${submission.id}-owner`,env,network);await state(env,'mark',{id,stage:'owner_sent',...accepted});}
+   let receiptSent=dispatch.receiptSent;
+   if(!receiptSent){try{const accepted=await mail(emails.customer,`cv-${kind}-${submission.id}-customer`,env,network);await state(env,'mark',{id,stage:'receipt_sent',...accepted});receiptSent=true;}catch{receiptSent=false;}}
+   if(recordEnabled){await recordCall('delivery',{stage:'owner_sent'});if(receiptSent)await recordCall('delivery',{stage:'receipt_sent'});}
+   dispatchComplete=receiptSent===true;
+   return Response.json({ok:true,reference:submission.referenceVersion===2?assignedReference:requestReference(submission),status:'unpaid-request',receiptSent});
+  }finally{
+   // Uncertain execution leaves its opaque authorization outstanding. Neither a
+   // timeout nor another caller's acceptance proves this caller has completed.
+   if(dispatchComplete)await state(env,'finish-dispatch',{id,dispatchId});
+  }
  }catch{return fail(503,'We could not confirm sending. Retry here without changing your details to avoid duplicates. Keep this tab open.');}
 }

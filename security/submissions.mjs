@@ -1,3 +1,5 @@
+import {artworkId} from '../src/artwork-policy.mjs';
+import {privacyState,privacyConflict} from './order-privacy.mjs';
 import {sourceBindingInsert,acceptanceBindingGuard,validRecipientBinding} from './mail-delivery.mjs';
 import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
@@ -5,6 +7,23 @@ const hex=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 export async function submissionState(request,env){
  const body=await request.json(),path=new URL(request.url).pathname,now=Math.floor(Date.now()/1000);
  if(!env.DB||!hex(body.id))return new Response(null,{status:400});
+ if(await privacyState(env,body.id,'submission'))return privacyConflict();
+ if(path==='/submissions/claim-dispatch'||path==='/submissions/finish-dispatch'){
+  if(!artworkId(body.dispatchId)||Object.keys(body).some(k=>!['id','dispatchId'].includes(k)))return new Response(null,{status:400});
+  if(path==='/submissions/finish-dispatch'){
+   // Only the owning caller releases its authorization after the whole send workflow.
+   await env.DB.prepare('DELETE FROM initial_order_dispatches WHERE dispatch_id=? AND submission_id=?').bind(body.dispatchId,body.id).run();return Response.json({ok:true});
+  }
+  const results=await env.DB.batch([
+   env.DB.prepare(`INSERT INTO initial_order_dispatches(dispatch_id,submission_id,order_id,fingerprint,expires)
+    SELECT ?,s.id,s.order_id,s.fingerprint,s.expires FROM submissions s WHERE s.id=? AND s.kind='order' AND s.expires>unixepoch()
+    AND NOT EXISTS(SELECT 1 FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE t.kind='submission' AND t.id=s.id AND (t.expires>unixepoch() OR p.state='erasing'))
+    AND NOT EXISTS(SELECT 1 FROM orders o JOIN order_privacy_operations p ON p.order_id=o.id WHERE p.state='erasing' AND (o.id=s.order_id OR o.fingerprint=s.fingerprint))
+    ON CONFLICT DO NOTHING`).bind(body.dispatchId,body.id),
+   env.DB.prepare("SELECT s.owner_sent,s.receipt_sent FROM initial_order_dispatches d JOIN submissions s ON s.id=d.submission_id AND s.fingerprint=d.fingerprint WHERE d.dispatch_id=? AND d.submission_id=? AND s.kind='order' AND s.expires>unixepoch()").bind(body.dispatchId,body.id)
+  ]);
+  const row=results[1].results[0];return row?Response.json({claimed:true,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent}):privacyConflict();
+ }
  if(path==='/submissions/claim-contact'){
   const claimed=await env.DB.prepare("UPDATE submissions SET contact_started=1 WHERE id=? AND kind='contact' AND expires>? AND contact_started=0 AND owner_sent=0 RETURNING id").bind(body.id,now).first();
   const row=await env.DB.prepare("SELECT owner_sent FROM submissions WHERE id=? AND kind='contact' AND expires>?").bind(body.id,now).first();
@@ -29,6 +48,7 @@ export async function submissionState(request,env){
  if(row){
   if(row.fingerprint!==body.fingerprint||row.kind!==body.kind||row.expires<=now)return Response.json({conflict:true});
   const attempt=await env.DB.prepare('UPDATE submissions SET tries=tries+1 WHERE id=? RETURNING tries').bind(body.id).first();
+  if(await privacyState(env,body.id,'submission'))return privacyConflict();
   return Response.json({allowed:attempt.tries<=12,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent});
  }
  if(!Number.isSafeInteger(body.createdAt)||body.createdAt<now-3600||body.createdAt>now+60)return Response.json({expired:true});

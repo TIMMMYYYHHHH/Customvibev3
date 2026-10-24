@@ -1,3 +1,4 @@
+import {privacyState} from './order-privacy.mjs';
 import {stockQuantity,stockSum} from '../shared/stock.mjs';
 const now=()=>Math.floor(Date.now()/1000),MAX=Number.MAX_SAFE_INTEGER;
 const fail=(status,code,error)=>Response.json({error,code},{status});
@@ -23,7 +24,7 @@ const schema={
  'order-reverse':['id','operationId','orderVersion','usageVersion','lines','reason']
 };
 async function orderRecord(db,id){
- if(!uuid(id))invalid('Invalid order reference.');const row=await db.prepare('SELECT id,version,expires FROM orders WHERE id=?').bind(id).first();
+ if(!uuid(id))invalid('Invalid order reference.');if(await privacyState({DB:db},id))conflict('PRIVACY','This order is being erased or has been erased.');const row=await db.prepare('SELECT id,version,expires FROM orders WHERE id=?').bind(id).first();
  if(!row)throw new StockError(404,'NOT_FOUND','Order not found.');if(row.expires<=now())throw new StockError(410,'EXPIRED','This order has expired.');return row;
 }
 function usageView(row,items){
@@ -123,5 +124,5 @@ export async function stockService(request,env){
  await db.batch([header,...updates,db.prepare("UPDATE stock_movements SET result=json_set(?,'$.revision',seq) WHERE operation_id=? AND result IS NULL").bind(JSON.stringify(result),b.operationId)]);
  if(order)await orderRecord(db,b.id);
  const saved=await db.prepare('SELECT request_digest,result FROM stock_movements WHERE operation_id=?').bind(b.operationId).first();if(!saved)conflict();if(saved.request_digest!==requestDigest)conflict('OPERATION_MISMATCH','This operation identity belongs to a different request.');if(!saved.result)throw Error('Incomplete operation');return Response.json(JSON.parse(saved.result));
- }catch(error){if(error instanceof StockError)return fail(error.status,error.code,error.message);if(error instanceof TypeError||error instanceof RangeError)return fail(400,'INVALID','Invalid or overflowing stock quantity.');return fail(503,'UNAVAILABLE','Stock is temporarily unavailable. Keep this tab open and reconcile before retrying.');}
+ }catch(error){if(String(error?.message).includes('order_privacy_guard'))return fail(409,'PRIVACY','Order privacy state changed. Read the current order before continuing.');if(error instanceof StockError)return fail(error.status,error.code,error.message);if(error instanceof TypeError||error instanceof RangeError)return fail(400,'INVALID','Invalid or overflowing stock quantity.');return fail(503,'UNAVAILABLE','Stock is temporarily unavailable. Keep this tab open and reconcile before retrying.');}
 }

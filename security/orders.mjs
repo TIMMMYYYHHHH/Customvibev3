@@ -1,3 +1,4 @@
+import {currentContact,privacyState,privacyConflict,redactedOrder,cleanOrderPrivacy} from './order-privacy.mjs';
 import {sourceBindingInsert,acceptanceBindingGuard,validRecipientBinding,deliveryForOrder} from './mail-delivery.mjs';
 import {DAILY_SEND_LIMIT,MONTHLY_SEND_LIMIT} from '../shared/business-constants.mjs';
 import {validProviderMessageId} from '../server/mail-receipt.mjs';
@@ -10,8 +11,17 @@ export const ORDER_STATUSES=['new','in_progress','ready_to_ship','shipped','fulf
 const now=()=>Math.floor(Date.now()/1000);
 const fail=(status,error)=>Response.json({error},{status});
 const reference=row=>'CV-'+String(row.seq).padStart(6,'0');
+// Unfinished operations remain navigable using only their retained identity.
+// Their ordinary source rows never participate in searching or projection.
+const listSelect=`SELECT * FROM (
+ SELECT id,seq,status,version,created,expires,artwork_expires,fulfilled_at,owner_sent,receipt_sent,contact_revision,snapshot,current_contact,NULL privacy_operation_id
+ FROM orders WHERE NOT EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id)
+ UNION ALL
+ SELECT order_id,CAST(substr(reference,4) AS INTEGER),NULL,version,NULL,expires,artwork_expires,NULL,NULL,NULL,NULL,NULL,NULL,operation_id
+ FROM order_privacy_operations WHERE state='erasing'
+) AS orders WHERE `;
 const previousReference=row=>{const snapshot=JSON.parse(row.snapshot);return snapshot.referenceVersion===2?undefined:snapshot.reference||'CV-'+row.id;};
-const view=row=>({id:row.id,reference:reference(row),...(previousReference(row)?{previousReference:previousReference(row)}:{}),status:row.status,version:row.version,created:row.created,expires:row.expires,artworkExpires:artworkExpiry(row),fulfilledAt:row.fulfilled_at??null,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent,snapshot:artworkExpiry(row)<=now()?retainedSnapshot(JSON.parse(row.snapshot)):JSON.parse(row.snapshot)});
+const view=row=>({contactRevision:row.contact_revision,id:row.id,reference:reference(row),...(previousReference(row)?{previousReference:previousReference(row)}:{}),status:row.status,version:row.version,created:row.created,expires:row.expires,artworkExpires:artworkExpiry(row),fulfilledAt:row.fulfilled_at??null,ownerSent:!!row.owner_sent,receiptSent:!!row.receipt_sent,snapshot:{...(artworkExpiry(row)<=now()?retainedSnapshot(JSON.parse(row.snapshot)):JSON.parse(row.snapshot)),contact:currentContact(row)}});
 function validShipping(s){
  if(s.shippingPolicyVersion!==undefined&&s.shippingPolicyVersion!==1)return false;
  if(s.deliveryCents==null)return s.shippingPolicyVersion===undefined&&s.totalCents==null;
@@ -24,25 +34,35 @@ export async function orderService(request,env){
  if(path==='list'){
   const before=b.before===undefined?Number.MAX_SAFE_INTEGER:Number(b.before);if(!Number.isSafeInteger(before)||before<1)return fail(400,'Invalid page.');
   if(b.q!==undefined&&(typeof b.q!=='string'||b.q.length>160)||b.stage!==undefined&&b.stage!=='all'&&!ORDER_STATUSES.includes(b.stage))return fail(400,'Invalid search.');
-  const q=(b.q||'').trim(),where=['expires>?','seq<?'],args=[time,before];
-  if(q){where.push("instr(lower('CV-' || printf('%06d',seq) || ' ' || CASE WHEN json_extract(snapshot,'$.referenceVersion')=2 THEN '' ELSE coalesce(json_extract(snapshot,'$.reference'),'CV-' || id) END || ' ' || json_extract(snapshot,'$.contact.name')),lower(?))>0");args.push(q)}
-  if(b.stage&&b.stage!=='all'){where.push('status=?');args.push(b.stage)}
+  const q=(b.q||'').trim(),where=['(expires>? OR privacy_operation_id IS NOT NULL)','seq<?'],args=[time,before];
+  if(q){where.push("instr(lower('CV-' || printf('%06d',seq) || ' ' || CASE WHEN privacy_operation_id IS NOT NULL OR json_extract(snapshot,'$.referenceVersion')=2 THEN '' ELSE coalesce(json_extract(snapshot,'$.reference'),'CV-' || id) END || ' ' || CASE WHEN privacy_operation_id IS NOT NULL THEN '' ELSE coalesce(json_extract(current_contact,'$.name'),json_extract(snapshot,'$.contact.name')) END),lower(?))>0");args.push(q)}
+  if(b.stage&&b.stage!=='all'){where.push('(status=? OR privacy_operation_id IS NOT NULL)');args.push(b.stage)}
   const grouped=!q&&(!b.stage||['all','fulfilled'].includes(b.stage));
   if(b.fulfilledBefore!==undefined&&(!grouped||b.stage!=='fulfilled'||!/^\d+:\d+$/.test(b.fulfilledBefore)))return fail(400,'Invalid fulfilled page.');
   const summary=r=>{const v=view(r);return {...v,snapshot:{contact:{name:v.snapshot.contact.name},magnetQty:v.snapshot.magnetQty,subtotalCents:v.snapshot.subtotalCents,...Object.fromEntries(['shippingPolicyVersion','deliveryCents','totalCents'].filter(k=>Object.hasOwn(v.snapshot,k)).map(k=>[k,v.snapshot[k]])),paymentStatus:'unpaid'}}};
   let rows=[],completed=[],fulfilledCount=0,fulfilledNext=null;
   if(grouped){
-   fulfilledCount=(await readSelect(env.DB,"SELECT count(*) n FROM orders WHERE expires>? AND status='fulfilled'",[time])).n;
+   fulfilledCount=(await readSelect(env.DB,"SELECT count(*) n FROM orders WHERE expires>? AND status='fulfilled' AND NOT EXISTS(SELECT 1 FROM order_privacy_operations p WHERE p.order_id=orders.id)",[time])).n;
    const cursor=b.fulfilledBefore?.split(':').map(Number),limit=cursor?50:3;
    if(cursor&&cursor.some(n=>!Number.isSafeInteger(n)||n<0))return fail(400,'Invalid fulfilled page.');
    const clauses=cursor?' AND (fulfilled_at<? OR (fulfilled_at=? AND seq<?))':'';
-   completed=(await readSelect(env.DB,"SELECT * FROM orders WHERE expires>? AND status='fulfilled'"+clauses+' ORDER BY fulfilled_at DESC,seq DESC LIMIT ?',[time,...(cursor?[cursor[0],cursor[0],cursor[1]]:[]),limit+1],'all')).results;
+   completed=(await readSelect(env.DB,listSelect+"expires>? AND status='fulfilled'"+clauses+' ORDER BY fulfilled_at DESC,seq DESC LIMIT ?',[time,...(cursor?[cursor[0],cursor[0],cursor[1]]:[]),limit+1],'all')).results;
    if(completed.length>limit){const last=completed[limit-1];fulfilledNext=last.fulfilled_at+':'+last.seq}completed=completed.slice(0,limit);
-   if(b.stage!=='fulfilled'){where.push("status<>'fulfilled'");rows=(await readSelect(env.DB,'SELECT * FROM orders WHERE '+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;}
-  }else rows=(await readSelect(env.DB,'SELECT * FROM orders WHERE '+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;
-  return Response.json({orders:[...rows.slice(0,50),...completed].map(summary),next:rows.length>50?rows[49].seq:null,fulfilledCount,fulfilledNext});
+   where.push(b.stage==='fulfilled'?'privacy_operation_id IS NOT NULL':"(status<>'fulfilled' OR privacy_operation_id IS NOT NULL)");rows=(await readSelect(env.DB,listSelect+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;
+  }else rows=(await readSelect(env.DB,listSelect+where.join(' AND ')+' ORDER BY seq DESC LIMIT 51',args,'all')).results;
+  const selected=[...rows.slice(0,50),...completed],states=(await readSelect(env.DB,'SELECT order_id,operation_id,state FROM order_privacy_operations WHERE order_id IN(SELECT value FROM json_each(?))',[JSON.stringify(selected.map(r=>r.id))],'all')).results,byId=new Map(states.map(p=>[p.order_id,{state:p.state,operationId:p.operation_id}]));const projected=[];
+  for(const r of selected){
+   const privacy=byId.get(r.id);
+   if(privacy?.state==='complete'||r.privacy_operation_id&&privacy?.state!=='erasing'||!privacy&&r.expires<=now())continue;
+   // A claim may win after selection. Never reveal an erasing contact match.
+   if(privacy?.state==='erasing'&&q&&!reference(r).toLowerCase().includes(q.toLowerCase()))continue;
+   projected.push(privacy?.state==='erasing'?redactedOrder(r,privacy):summary(r));
+  }
+  return Response.json({orders:projected,next:rows.length>50?rows[49].seq:null,fulfilledCount,fulfilledNext});
  }
  if(!artworkId(b.id))return fail(400,'Invalid reference.');
+ const privacy=await privacyState(env,b.id);if(privacy){if(path==='detail'&&privacy.state==='erasing'){const minimal=await readSelect(env.DB,"SELECT order_id id,reference,version FROM order_privacy_operations WHERE order_id=? AND operation_id=? AND state='erasing'",[b.id,privacy.operationId]);return minimal?Response.json(redactedOrder(minimal,privacy)):fail(404,'Order not found.');}return path==='detail'?fail(404,'Order not found.'):privacyConflict();}
+ if(path==='create'&&b.submissionId&&await privacyState(env,b.submissionId,'submission'))return privacyConflict();
  let row=await (path==='detail'?readSelect(env.DB,'SELECT * FROM orders WHERE id=?',[b.id]):env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(b.id).first());
  if(path==='create'){
   if(!artworkHash(b.fingerprint)||!validSnapshot(b.snapshot)||(b.snapshot.referenceVersion!==undefined&&(b.snapshot.referenceVersion!==2||b.snapshot.reference!==undefined))||JSON.stringify(b.snapshot).length>ORDER_LIMITS.recordCharacters||(b.snapshot.reference!==undefined&&b.snapshot.reference!==requestReference({id:b.id,referenceVersion:1})))return fail(400,'Invalid order.');
@@ -56,7 +76,7 @@ export async function orderService(request,env){
  }
  if(!row)return fail(404,'Order not found. Older orders may only have artwork.');
  if(row.expires<=time)return fail(410,'This order has expired.');
- if(path==='detail')return Response.json({...view(row),mailDelivery:await deliveryForOrder(env,b.id),proof:await proofDetail(env,b.id),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,"SELECT attempt,version,status,state,created,updated,rejected,CASE WHEN ? THEN provider_message_id ELSE NULL END AS providerMessageId,CASE WHEN ? THEN accepted_at ELSE NULL END AS acceptedAt,'manual-update' AS purpose,(state='failed' AND rejected=1 AND status<>'fulfilled') AS retryable FROM order_update_attempts WHERE order_id=? ORDER BY version DESC,rowid DESC",[artworkExpiry(row)>time?1:0,artworkExpiry(row)>time?1:0,b.id],'all')).results});
+ if(path==='detail'){const detail={...view(row),mailDelivery:await deliveryForOrder(env,b.id),proof:await proofDetail(env,b.id),history:(await readSelect(env.DB,'SELECT version,status,created FROM order_history WHERE order_id=? ORDER BY version DESC',[b.id],'all')).results,updates:(await readSelect(env.DB,"SELECT attempt,version,status,state,created,updated,rejected,CASE WHEN ? THEN provider_message_id ELSE NULL END AS providerMessageId,CASE WHEN ? THEN accepted_at ELSE NULL END AS acceptedAt,'manual-update' AS purpose,(state='failed' AND rejected=1 AND status<>'fulfilled') AS retryable FROM order_update_attempts WHERE order_id=? ORDER BY version DESC,rowid DESC",[artworkExpiry(row)>time?1:0,artworkExpiry(row)>time?1:0,b.id],'all')).results};const latest=await privacyState(env,b.id);return latest?.state==='complete'?fail(404,'Order not found.'):Response.json(latest?.state==='erasing'?redactedOrder(row,latest):detail);}
  if(path==='preview-retry'){
   if(!Number.isSafeInteger(b.version)||b.version!==row.version||!artworkHash(b.tokenHash))return fail(409,'Order changed. Preview again.');
   const statement=env.DB.prepare("UPDATE order_update_attempts SET preview_hash=?,preview_until=? WHERE order_id=? AND version=? AND attempt=? AND state='failed' AND rejected=1 AND status<>'fulfilled' AND EXISTS(SELECT 1 FROM order_updates u JOIN orders o ON o.id=u.order_id WHERE u.order_id=? AND u.version=? AND u.reservation=order_update_attempts.attempt AND u.state='failed' AND o.version=u.version AND o.status<>'fulfilled' AND o.expires>?) RETURNING attempt").bind(b.tokenHash,time+600,b.id,b.version,b.attempt,b.id,b.version,time);
@@ -64,6 +84,7 @@ export async function orderService(request,env){
   return changed.results.length?Response.json({ok:true}):fail(409,'The previous attempt changed. Review a fresh preview.');
  }
  if(path==='claim-update'){
+  const contactRevision=b.contactRevision===undefined?0:b.contactRevision;if(!Number.isSafeInteger(contactRevision)||contactRevision!==row.contact_revision)return fail(409,'Customer contact changed. Preview again.');
   if(!Number.isSafeInteger(b.version)||b.version!==row.version)return fail(409,'Order changed.');
   const retry=typeof b.retryAttempt==='string'&&artworkHash(b.retryTokenHash);
   const existing=await env.DB.prepare("SELECT reservation,state FROM order_updates WHERE order_id=? AND (version=? OR (?='fulfilled' AND status='fulfilled'))").bind(b.id,b.version,row.status).first();
@@ -74,16 +95,16 @@ export async function orderService(request,env){
   const available=counters.map(()=>'(NOT EXISTS(SELECT 1 FROM attempts WHERE id=? AND until>? AND count+1>?))').join(' AND ');
   // The summary swap, attempt trigger and allowance charges share one transaction.
   const insert=env.DB.prepare(`INSERT INTO order_updates(order_id,version,status,created,updated,reservation)
-   SELECT id,version,status,?,?,? FROM orders WHERE id=? AND version=? AND expires>?
+   SELECT id,version,status,?,?,? FROM orders WHERE id=? AND version=? AND expires>? AND contact_revision=?
    AND (status<>'fulfilled' OR NOT EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND status='fulfilled')) AND ${available}
    ON CONFLICT(order_id,version) DO UPDATE SET state='pending',created=excluded.created,updated=excluded.updated,reservation=excluded.reservation
    WHERE order_updates.status<>'fulfilled' AND order_updates.state='failed' AND order_updates.reservation=?
-   AND EXISTS(SELECT 1 FROM order_update_attempts a WHERE a.attempt=order_updates.reservation AND a.state='failed' AND a.rejected=1 AND a.preview_hash=? AND a.preview_until>?)`).bind(time,time,reservation,b.id,b.version,time,b.id,...counters.flatMap(([id,,limit])=>[id,time,limit]),retry?b.retryAttempt:null,retry?b.retryTokenHash:null,time);
+   AND EXISTS(SELECT 1 FROM order_update_attempts a WHERE a.attempt=order_updates.reservation AND a.state='failed' AND a.rejected=1 AND a.preview_hash=? AND a.preview_until>?)`).bind(time,time,reservation,b.id,b.version,time,contactRevision,b.id,...counters.flatMap(([id,,limit])=>[id,time,limit]),retry?b.retryAttempt:null,retry?b.retryTokenHash:null,time);
   await env.DB.batch([insert,...counters.map(([id,until])=>env.DB.prepare('INSERT INTO attempts(id,count,until) SELECT ?,1,? WHERE EXISTS(SELECT 1 FROM order_updates WHERE order_id=? AND version=? AND reservation=?) ON CONFLICT(id) DO UPDATE SET count=CASE WHEN until<=? THEN 1 ELSE count+1 END,until=CASE WHEN until<=? THEN excluded.until ELSE until END').bind(id,until,b.id,b.version,reservation,time,time))]);
   const result=await env.DB.prepare('SELECT reservation,state FROM order_updates WHERE order_id=? AND version=?').bind(b.id,b.version).first();
   if(!result||retry&&result.reservation!==reservation){
    const latest=await env.DB.prepare('SELECT version FROM orders WHERE id=? AND expires>?').bind(b.id,time).first();
-   if(latest?.version!==b.version)return fail(409,'Order changed.');
+   if(latest?.version!==b.version||(await env.DB.prepare('SELECT contact_revision FROM orders WHERE id=?').bind(b.id).first())?.contact_revision!==contactRevision)return fail(409,'Order or customer contact changed.');
    for(const [id,,limit] of counters){const cap=await env.DB.prepare('SELECT count FROM attempts WHERE id=? AND until>?').bind(id,time).first();if(cap?.count>=limit)return fail(429,'The shared email allowance is full.');}
    return fail(409,'This attempt changed. Review its history and preview again.');
   }
@@ -115,7 +136,7 @@ export async function orderService(request,env){
  }
  return fail(404,'Not found.');
 }
-export async function cleanOrders(env){const time=now();await cleanProofs(env);
+export async function cleanOrders(env){const time=now();await cleanProofs(env);await cleanOrderPrivacy(env);
  const expired=(await env.DB.prepare("SELECT id,snapshot FROM orders WHERE artwork_expires<=? AND expires>? AND json_extract(snapshot,'$.artworkRemoved') IS NULL LIMIT 50").bind(time,time).all()).results;
  for(const row of expired)await env.DB.prepare('UPDATE orders SET snapshot=? WHERE id=?').bind(JSON.stringify({...retainedSnapshot(JSON.parse(row.snapshot)),artworkRemoved:true}),row.id).run();
  // Receipt metadata ends at the original artwork deadline; attempt history keeps its existing lifetime.

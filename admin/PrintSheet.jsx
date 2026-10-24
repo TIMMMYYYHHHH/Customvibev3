@@ -30,14 +30,19 @@ export default function PrintSheet({order,disabled=false,onClose,onBusyChange,on
  const active=useRef(true),operation=useRef(0),controller=useRef(null),resources=useRef([]),busyRef=useRef(false),title=useRef(null),callbacks=useRef({onBusyChange,onOrderRead});callbacks.current={onBusyChange,onOrderRead};
  function clearResources(){for(const url of resources.current)URL.revokeObjectURL(url);resources.current=[];}
  function working(value){busyRef.current=value;setBusy(value);callbacks.current.onBusyChange?.(value);}
+ async function readCurrentOrder(){
+  const fresh=await api('/api/orders/'+order.id);
+  if(fresh.privacy){callbacks.current.onOrderRead?.(fresh);throw Error('Order privacy changed. Read its current status before printing.');}
+  return fresh;
+ }
  async function prepare(){
   if(busyRef.current||disabled)return;
   const run=++operation.current;controller.current?.abort();const abort=new AbortController();controller.current=abort;
   clearResources();setPrepared(null);setError('');setStatus('Loading current artwork…');working(true);
   try{
-   const fresh=await api('/api/orders/'+order.id),job=createPrintJob(fresh);
+   const fresh=await readCurrentOrder(),job=createPrintJob(fresh);
    const artwork=await readPrintArtwork(job,(file,options)=>adminFetch(`/api/artwork/${file.requestId}/${file.index}`,{cache:'no-store',signal:options.signal}),{signal:abort.signal});
-   assertCurrentPrintOrder(job,await api('/api/orders/'+order.id));
+   assertCurrentPrintOrder(job,await readCurrentOrder());
    if(!active.current||run!==operation.current||abort.signal.aborted)return;
    const urls=new Map();for(const [name,bytes] of artwork){const url=URL.createObjectURL(new Blob([bytes],{type:'image/jpeg'}));resources.current.push(url);urls.set(name,url);}
    callbacks.current.onOrderRead?.(fresh);setPrepared({order:fresh,artwork,urls});setPageIndex(0);setStatus('Current artwork is ready. Check the sheet before downloading.');
@@ -62,13 +67,13 @@ export default function PrintSheet({order,disabled=false,onClose,onBusyChange,on
   if(blocked||busyRef.current)return;
   const run=++operation.current;working(true);setError('');setStatus('Checking the current revision and preparing your PDF…');
   try{
-   assertCurrentPrintOrder(job,await api('/api/orders/'+order.id));
+   assertCurrentPrintOrder(job,await readCurrentOrder());
    const logo=await fetch(logoUrl,{cache:'no-store'});
    if(!logo.ok||!logo.headers.get('content-type')?.startsWith('image/png'))throw Error('The print logo could not load. Retry when connected.');
    const logoBytes=new Uint8Array(await logo.arrayBuffer());
    const {exportPrintPdf}=await import('./print-pdf.mjs');
    const bytes=await exportPrintPdf(job,prepared.artwork,{logoBytes});
-   assertCurrentPrintOrder(job,await api('/api/orders/'+order.id));
+   assertCurrentPrintOrder(job,await readCurrentOrder());
    if(!active.current||run!==operation.current)return;
    const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));resources.current.push(url);
    const anchor=document.createElement('a');anchor.href=url;anchor.download=`${order.reference.replace(/[^a-zA-Z0-9-]/g,'')}-print-sheets.pdf`;anchor.click();
