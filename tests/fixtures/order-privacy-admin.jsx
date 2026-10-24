@@ -1,0 +1,11 @@
+// Actual product Orders and OrderDetail, disposable routed synthetic data only.
+import React,{useEffect,useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import Orders from '../../admin/Orders';
+import '../../src/fonts.css';
+import '../../admin/admin-shell.css';
+import '../../admin/workroom.css';
+const options=['normal','conflict-correction','auth-expired','lost-correction','correction-read-failure','incomplete-erasure','lost-erasure','erasure-read-failure'];
+function Fixture(){const [state,setState]=useState({audit:[]}),[mode,setMode]=useState('normal');async function read(){const current=await(await fetch('/__privacy/state')).json();setState(current);setMode(current.mode);}useEffect(()=>{read();const timer=setInterval(read,700);return()=>clearInterval(timer)},[]);async function control(value){await fetch('/__privacy/control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:value})});setMode(value==='reset'?'normal':value);if(value==='reset')location.href='/orders?order=11111111-1111-4111-8111-111111111111';else read();}
+return <div className="cv-admin admin-workroom"><aside style={{padding:20,borderBottom:'1px solid #ded7de',overflowWrap:'anywhere'}} aria-label="Synthetic fixture controls"><strong>Synthetic local fixture. No real customer records or email.</strong><p><a href="/orders">Open board</a> · <a href="/orders?order=11111111-1111-4111-8111-111111111111">Open selected order</a> · <a href="/narrow" target="_top">375px iframe</a></p><label htmlFor="fixture-mode">Failure mode </label><select id="fixture-mode" value={mode} onChange={e=>control(e.target.value)}>{options.map(value=><option key={value}>{value}</option>)}</select> <button className="cv-btn quiet" onClick={()=>control('normal')}>Restore normal access</button> <button className="cv-btn quiet" onClick={()=>control('reset')}>Reset synthetic records</button><p>Email send requests: {state.sendRequests??0}. Provider calls: {state.providerCalls??0}.</p><details><summary>Request audit</summary><ol>{state.audit.map((row,n)=><li key={n}>{row.method} {row.path} : {row.status}</li>)}</ol></details></aside><Orders/></div>}
+createRoot(document.getElementById('root')).render(<Fixture/>);
