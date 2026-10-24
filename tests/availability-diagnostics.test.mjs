@@ -113,6 +113,32 @@ test('order and artwork SELECT recovery preserves records and does not replay qu
  }
 });
 
+test('a transient privacy read recovers against newly erasing authoritative state without replaying erasure',async t=>{
+ const {default:security}=await import('../security/index.mjs'),{artworkEnv}=await import('./helpers/artwork.mjs');
+ const env=artworkEnv(),id=crypto.randomUUID(),expires=Math.floor(Date.now()/1000)+3600,operationId=crypto.randomUUID();t.after(()=>env.sql.close());t.mock.method(console,'warn',()=>{});t.mock.method(console,'error',()=>{});
+ const snapshot=JSON.stringify({contact:{name:'PRIVATE_CONTACT',email:'private@example.invalid',phone:'0821234567'},items:[],magnetQty:1,subtotalCents:5000,paymentStatus:'unpaid'});
+ env.sql.prepare('INSERT INTO orders(id,fingerprint,snapshot,created,expires,artwork_expires,owner_sent,receipt_sent) VALUES(?,?,?,?,?,?,1,1)').run(id,'a'.repeat(64),snapshot,1,expires,expires);
+ env.sql.prepare('INSERT INTO artwork_requests(id,owner,manifest,bytes,created,expires,finalized,reservation) VALUES(?,?,?,?,?,?,1,?)').run(id,'b'.repeat(64),'[{"name":"design-01-photo.jpg"}]',4,1,expires,'fixture');env.sql.prepare('INSERT INTO artwork_files(request_id,slot,ready) VALUES(?,0,1)').run(id);env.sql.prepare("INSERT INTO artwork_usage VALUES('retained',4)").run();
+ let reads=0,deletions=0;env.ARTWORK.delete=async()=>{deletions++;throw Error('Synthetic retained deletion failure')};const original=env.DB.prepare.bind(env.DB),call=(path,body)=>security.fetch(new Request('https://internal/'+path,{method:'POST',body:JSON.stringify(body)}),env);
+ env.DB.prepare=sql=>{const statement=original(sql);return {bind(...args){const bound=statement.bind(...args);return {...bound,async first(){if(sql.includes('FROM order_privacy_tombstones')&&++reads===1){const p=await(await call('privacy/preview-erasure',{id,version:0})).json();const erased=await call('privacy/erase',{id,version:0,expectedDigest:p.digest,operationId,confirmation:p.reference,acknowledged:true});assert.equal((await erased.json()).state,'incomplete');throw Error('D1_ERROR: transient remote failure')}return bound.first()}}}}};
+ const response=await call('orders/detail',{id}),body=await response.json();assert.equal(response.status,200);assert.equal(body.privacy.state,'erasing');assert.equal(body.privacy.operationId,operationId);assert.equal(body.snapshot,undefined);assert.doesNotMatch(JSON.stringify(body),/PRIVATE_CONTACT|private@example/);assert.equal(reads,2);assert.equal(deletions,1);assert.equal(env.sql.prepare("SELECT amount FROM artwork_usage WHERE id='retained'").get().amount,4);assert.equal(env.sql.prepare('SELECT count(*) n FROM order_privacy_operations').get().n,1);
+});
+
+test('privacy gate failures stay closed with bounded transient reads and no schema, quota or mutation retries',async t=>{
+ const {default:security}=await import('../security/index.mjs'),{artworkEnv}=await import('./helpers/artwork.mjs');
+ const events=[];t.mock.method(console,'warn',(...args)=>events.push(args));t.mock.method(console,'error',(...args)=>events.push(args));
+ for(const [route,target,body] of [
+  ['orders/detail','FROM order_privacy_tombstones',{id:crypto.randomUUID()}],
+  ['artwork/detail','FROM artwork_requests r JOIN order_privacy_operations',{id:crypto.randomUUID()}],
+  ['submissions/reserve','FROM submissions s JOIN order_privacy_operations',{id:'c'.repeat(64),key:'d'.repeat(64),fingerprint:'e'.repeat(64),kind:'order',createdAt:Math.floor(Date.now()/1000)}]
+ ])for(const [message,expected] of [['D1_ERROR: transient remote failure PRIVATE_FAILURE',2],['D1_ERROR: no such table: PRIVATE_FAILURE',1],["D1_ERROR: Your account has exceeded D1's free tier daily row read limit. PRIVATE_FAILURE",1]]){
+  const env=artworkEnv(),original=env.DB.prepare.bind(env.DB);t.after(()=>env.sql.close());let reads=0,mutations=0;
+  env.DB.prepare=sql=>{assert.match(sql,/^SELECT /,'A failed privacy gate must precede mutations');const statement=original(sql);return {bind(...args){const bound=statement.bind(...args);return {...bound,async first(){if(sql.includes(target)){reads++;throw Error(message)}return bound.first()}}}}};env.DB.batch=async()=>{mutations++;assert.fail('A failed privacy gate must not reach a mutation batch')};
+  const response=await security.fetch(new Request('https://internal/'+route,{method:'POST',body:JSON.stringify(body)}),env);assert.equal(response.status,503,route);assert.equal(reads,expected,route);assert.equal(mutations,0);assert.equal(env.sql.prepare('SELECT count(*) n FROM artwork_usage').get().n,0);
+ }
+ assert.doesNotMatch(JSON.stringify(events),/PRIVATE_FAILURE/);
+});
+
 test('preview uses one order snapshot and preserves upstream failure without retrying sends',async()=>{
  const {ordersAPI}=await import('../admin/orders-api.mjs');
  const id=crypto.randomUUID(),url='https://admin.customvibe.co.za/api/orders/'+id+'/preview';let calls=0;
@@ -128,8 +154,10 @@ test('read helper refuses writes and artwork download quota failures are never r
  await assert.rejects(readSelect({},'INSERT INTO attempts VALUES (?)',[1]),/Read-only/);
  const {default:security}=await import('../security/index.mjs');
  t.mock.method(console,'error',()=>{});let quotaWrites=0,objectReads=0;
- const DB={prepare:sql=>({bind:()=>({first:async()=>{if(sql.startsWith('SELECT'))return {finalized:1,expires:Math.floor(Date.now()/1000)+60,manifest:'[{"name":"design-01-photo.jpg"}]'};quotaWrites++;throw Error('D1_ERROR: transient failure')}})})};
- const result=await security.fetch(new Request('https://auth.internal/artwork/download',{method:'POST',body:JSON.stringify({id:crypto.randomUUID(),index:0})}),{DB,ARTWORK:{get:async()=>{objectReads++}}});
+ const {artworkEnv}=await import('./helpers/artwork.mjs');const env=artworkEnv(),id=crypto.randomUUID(),original=env.DB.prepare.bind(env.DB);t.after(()=>env.sql.close());
+ env.sql.prepare('INSERT INTO artwork_requests(id,owner,manifest,bytes,created,expires,finalized,reservation) VALUES(?,?,?,?,?,?,1,?)').run(id,'a'.repeat(64),'[{"name":"design-01-photo.jpg"}]',4,1,Math.floor(Date.now()/1000)+60,'fixture');
+ env.DB.prepare=sql=>{const statement=original(sql);return {bind(...args){const bound=statement.bind(...args);return {...bound,async first(){if(sql.startsWith('INSERT INTO artwork_usage')){quotaWrites++;throw Error('D1_ERROR: transient failure')}return bound.first()}}}}};env.ARTWORK.get=async()=>{objectReads++};
+ const result=await security.fetch(new Request('https://auth.internal/artwork/download',{method:'POST',body:JSON.stringify({id,index:0})}),env);
  assert.equal(result.status,503);assert.equal(quotaWrites,1);assert.equal(objectReads,0);
 });
 

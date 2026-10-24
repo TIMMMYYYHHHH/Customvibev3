@@ -1,3 +1,4 @@
+import {readSelect} from './read.mjs';
 import {boundedBody} from '../server/auth.mjs';
 import {artworkId,artworkHash} from '../src/artwork-policy.mjs';
 const now=()=>Math.floor(Date.now()/1000),fail=(status,error)=>Response.json({error},{status});
@@ -22,13 +23,13 @@ function contact(value){
 export function currentContact(row){return row.current_contact?JSON.parse(row.current_contact):JSON.parse(row.snapshot).contact;}
 export async function privacyState(env,id,kind='order'){
  const time=now();
- const tomb=await env.DB.prepare("SELECT p.operation_id,p.state FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE t.kind=? AND t.id=? AND (t.expires>? OR p.state='erasing')").bind(kind,id,time).first();
+ const tomb=await readSelect(env.DB,"SELECT p.operation_id,p.state FROM order_privacy_tombstones t JOIN order_privacy_operations p USING(operation_id) WHERE t.kind=? AND t.id=? AND (t.expires>? OR p.state='erasing')",[kind,id,time]);
  if(tomb)return {state:tomb.state,operationId:tomb.operation_id};
  if(kind==='artwork'){
-  const row=await env.DB.prepare("SELECT p.operation_id,p.state FROM artwork_requests r JOIN order_privacy_operations p ON p.order_id=r.id OR p.order_id=r.parent_order WHERE r.id=? AND (p.state='erasing' OR p.expires>?)").bind(id,time).first();if(row)return {state:row.state,operationId:row.operation_id};
+  const row=await readSelect(env.DB,"SELECT p.operation_id,p.state FROM artwork_requests r JOIN order_privacy_operations p ON p.order_id=r.id OR p.order_id=r.parent_order WHERE r.id=? AND (p.state='erasing' OR p.expires>?)",[id,time]);if(row)return {state:row.state,operationId:row.operation_id};
  }
  if(kind==='submission'){
-  const row=await env.DB.prepare("SELECT p.operation_id,p.state FROM submissions s JOIN order_privacy_operations p ON p.order_id=s.order_id WHERE s.id=? AND (p.state='erasing' OR p.expires>?)").bind(id,time).first();if(row)return {state:row.state,operationId:row.operation_id};
+  const row=await readSelect(env.DB,"SELECT p.operation_id,p.state FROM submissions s JOIN order_privacy_operations p ON p.order_id=s.order_id WHERE s.id=? AND (p.state='erasing' OR p.expires>?)",[id,time]);if(row)return {state:row.state,operationId:row.operation_id};
  }
  return null;
 }
